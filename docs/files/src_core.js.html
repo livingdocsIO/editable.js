@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>src&#x2F;core.js</title>
+    <link rel="stylesheet" href="http:&#x2F;&#x2F;yui.yahooapis.com&#x2F;3.8.0&#x2F;build&#x2F;cssgrids&#x2F;cssgrids-min.css">
+    <link rel="stylesheet" href="..&#x2F;assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="..&#x2F;assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="..&#x2F;assets/favicon.png">
+    <script src="http:&#x2F;&#x2F;yui.yahooapis.com&#x2F;combo?3.8.0&#x2F;build&#x2F;yui&#x2F;yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="..&#x2F;assets/css/logo.png" title=""></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: </em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="..&#x2F;classes/DOM.html">DOM</a></li>
+            
+                <li><a href="..&#x2F;classes/Editable.html">Editable</a></li>
+            
+                <li><a href="..&#x2F;classes/Selection.html">Selection</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="..&#x2F;modules/core.html">core</a></li>
+            
+                <li><a href="..&#x2F;modules/dom.html">dom</a></li>
+            
+                <li><a href="..&#x2F;modules/selection.html">selection</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: src&#x2F;core.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+&#x2F;**
+ * The Core module provides main functionalities of Editable.JS API.
+ *
+ * @module core
+ *&#x2F;
+
+
+var Editable = (function() {
+  &#x27;use strict&#x27;;
+
+  var EVENTS = [
+    &#x2F;**
+     * The focus event is triggered when an element gains focus.
+     *
+     * @event focus
+     * @param {HTMLElement} element The element triggering the event.
+     *&#x2F;
+    &#x27;focus&#x27;,
+
+    &#x2F;**
+     * The blur event is triggered when an element looses focus.
+     *
+     * @event blur
+     * @param {HTMLElement} element The element triggering the event.
+     *&#x2F;
+    &#x27;blur&#x27;,
+
+    &#x2F;**
+     * The flow event is triggered when the user starts typing or pause typing.
+     *
+     * @event flow
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {String} action The flow action: &quot;start&quot; or &quot;pause&quot;.
+     *&#x2F;
+    &#x27;flow&#x27;,
+
+    &#x2F;**
+     * The selection event is triggered after the user has selected some
+     * content.
+     *
+     * @event selection
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {Selection} selection The actual Selection object.
+     *&#x2F;
+    &#x27;selection&#x27;,
+
+    &#x2F;**
+     * The cursor event is triggered after cursor position has changed.
+     *
+     * @event selection
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {Cursor} cursor The actual Cursor object.
+     *&#x2F;
+    &#x27;cursor&#x27;,
+
+    &#x2F;**
+     * The insert event is triggered when a new block should be inserted. This
+     * happens when ENTER key is pressed at the beginning of a block (should
+     * insert before) or at the end of a block (should insert after).
+     *
+     * @event insert
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {String} direction The insert direction: &quot;before&quot; or &quot;after&quot;.
+     *&#x2F;
+    &#x27;insert&#x27;,
+
+    &#x2F;**
+     * The split event is triggered when a block should be splitted into two
+     * blocks. This happens when ENTER is pressed within a non-empty block.
+     *
+     * @event split
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {String} before The HTML string before the split.
+     * @param {String} after The HTML string after the split.
+     *&#x2F;
+    &#x27;split&#x27;,
+
+    &#x2F;**
+     * The merge event is triggered when two needs to be merged. This happens
+     * when BACKSPACE is pressed at the beginning of a block (should merge with
+     * the preceeding block) or DEL is pressed at the end of a block (should
+     * merge with the following block).
+     *
+     * @event merge
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {String} direction The merge direction: &quot;before&quot; or &quot;after&quot;.
+     *&#x2F;
+    &#x27;merge&#x27;,
+
+    &#x2F;**
+     * The empty event is triggered when a block is emptied.
+     *
+     * @event empty
+     * @param {HTMLElement} element The element triggering the event.
+     *&#x2F;
+    &#x27;empty&#x27;,
+
+    &#x2F;**
+     * The switch event is triggered when the user switches to another block.
+     * This happens when TAB is pressed (move one block after) or SHIFT+TAB
+     * is pressed (move one block before).
+     *
+     * @event switch
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {String} direction The switch direction: &quot;before&quot; or &quot;after&quot;.
+     *&#x2F;
+    &#x27;switch&#x27;,
+
+    &#x2F;**
+     * The move event is triggered when the user moves a selection in a block.
+     * This happens when the user selects some (or all) content in a block and
+     * an ARROW key is pressed (up: drag before, down: drag after).
+     *
+     * @event move
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {Selection} selection The actual Selection object.
+     * @param {String} direction The move direction: &quot;before&quot; or &quot;after&quot;.
+     *&#x2F;
+    &#x27;move&#x27;,
+
+    &#x2F;**
+     * The clipboard event is triggered when the user copies, pastes or cuts
+     * a selection within a block.
+     *
+     * @event clipboard
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {Selection} selection The actual Selection object.
+     * @param {String} action The clipboard action: &quot;copy&quot;, &quot;paste&quot;, &quot;cut&quot;.
+     *&#x2F;
+    &#x27;cliboard&#x27;
+  ];
+
+  &#x2F;**
+   * @class Editable
+   * @static
+   *&#x2F;
+  return {    
+    &#x2F;**
+     * Initializes the API.
+     *
+     * @method init
+     * @param {Object} [options={}] Configuration options override.
+     * @static
+     * @chainable
+     *&#x2F;
+    init: function(options) {
+      return this;
+    },
+
+    &#x2F;**
+     * Adds the API to the given target elements.
+     *
+     * @method add
+     * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
+     *    array of HTMLElement or a query selector representing the target where
+     *    the API should be added on.
+     * @param {Object} [options={}] Configuration options override.
+     * @static
+     * @chainable
+     *&#x2F;
+    add: function(target, options) {
+      return this;
+    },
+
+    &#x2F;**
+     * Removes the API from the given target elements.
+     *
+     * @method remove
+     * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
+     *    array of HTMLElement or a query selector representing the target where
+     *    the API should be removed from.
+     * @static
+     * @chainable
+     *&#x2F;
+    remove: function(target) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe a callback function to a custom event fired by the API.
+     *
+     * @method on
+     * @param {String} event The name of the event.
+     * @param {Function} handler The callback to execute in response to the
+     *     event.
+     * @static
+     * @chainable
+     *&#x2F;
+    on: function(event, handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Unsubscribe a callback function from a custom event fired by the API.
+     *
+     * @method off
+     * @param {String} event The name of the event.
+     * @param {Function|Boolean} handler The callback to remove from the
+     *     event or the special value false to remove all callbacks.
+     * @static
+     * @chainable
+     *&#x2F;
+    off: function(event, handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;focus:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method focus
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    focus: function(handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;blur:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method blur
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    blur: function(handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;flow:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method flow
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    flow: function(handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;selection:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method selection
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    selection: function(handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;cursor:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method cursor
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    cursor: function(handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;insert:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method insert
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    insert: function(handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;split:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method split
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    split: function(handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;merge:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method merge
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    merge: function(handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;empty:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method empty
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    empty: function(handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;switch:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method switch
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    switch: function(handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;move:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method move
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    move: function(handler) {
+      return this;
+    },
+
+    &#x2F;**
+     * Subscribe to the {{#crossLink &quot;Editable&#x2F;clipboard:event&quot;}}{{&#x2F;crossLink}}
+     * event.
+     *
+     * @method clipboard
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     *&#x2F;
+    clipboard: function(handler) {
+      return this;
+    }
+  };
+})();
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="..&#x2F;assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="..&#x2F;assets/js/yui-prettify.js"></script>
+<script src="..&#x2F;assets/../api.js"></script>
+<script src="..&#x2F;assets/js/api-filter.js"></script>
+<script src="..&#x2F;assets/js/api-list.js"></script>
+<script src="..&#x2F;assets/js/api-search.js"></script>
+<script src="..&#x2F;assets/js/apidocs.js"></script>
+</body>
+</html>

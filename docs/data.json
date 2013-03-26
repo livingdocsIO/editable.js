@@ -1,0 +1,714 @@
+{
+    "project": {},
+    "files": {
+        "src/core.js": {
+            "name": "src/core.js",
+            "modules": {
+                "core": 1
+            },
+            "classes": {
+                "Editable": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/dom.js": {
+            "name": "src/dom.js",
+            "modules": {
+                "dom": 1
+            },
+            "classes": {
+                "DOM": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
+        "src/selection.js": {
+            "name": "src/selection.js",
+            "modules": {
+                "selection": 1
+            },
+            "classes": {
+                "Selection": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "core": {
+            "name": "core",
+            "submodules": {
+                "dom": 1,
+                "selection": 1
+            },
+            "classes": {
+                "Editable": 1,
+                "DOM": 1,
+                "Selection": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "src/selection.js",
+            "line": 13,
+            "description": "The Core module provides main functionalities of Editable.JS API."
+        },
+        "dom": {
+            "name": "dom",
+            "submodules": {},
+            "classes": {
+                "DOM": 1
+            },
+            "fors": {},
+            "is_submodule": 1,
+            "namespaces": {},
+            "module": "core",
+            "namespace": "",
+            "file": "src/dom.js",
+            "line": 13,
+            "description": "The DOM module provides a cross-browser abstraction layer for DOM\nmanipulations and helpers for common tasks."
+        },
+        "selection": {
+            "name": "selection",
+            "submodules": {},
+            "classes": {
+                "Selection": 1
+            },
+            "fors": {},
+            "is_submodule": 1,
+            "namespaces": {},
+            "module": "core",
+            "namespace": "",
+            "file": "src/selection.js",
+            "line": 13,
+            "description": "The Selection module provides a cross-browser abstraction layer for range\nand selection."
+        }
+    },
+    "classes": {
+        "Editable": {
+            "name": "Editable",
+            "shortname": "Editable",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "core",
+            "namespace": "",
+            "file": "src/core.js",
+            "line": 133,
+            "static": 1
+        },
+        "DOM": {
+            "name": "DOM",
+            "shortname": "DOM",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "core",
+            "submodule": "dom",
+            "namespace": "",
+            "file": "src/dom.js",
+            "line": 13,
+            "static": 1
+        },
+        "Selection": {
+            "name": "Selection",
+            "shortname": "Selection",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "core",
+            "submodule": "selection",
+            "namespace": "",
+            "file": "src/selection.js",
+            "line": 13,
+            "static": 1
+        }
+    },
+    "classitems": [
+        {
+            "file": "src/core.js",
+            "line": 12,
+            "description": "The focus event is triggered when an element gains focus.",
+            "itemtype": "event",
+            "name": "focus",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 20,
+            "description": "The blur event is triggered when an element looses focus.",
+            "itemtype": "event",
+            "name": "blur",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 28,
+            "description": "The flow event is triggered when the user starts typing or pause typing.",
+            "itemtype": "event",
+            "name": "flow",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                },
+                {
+                    "name": "action",
+                    "description": "The flow action: \"start\" or \"pause\".",
+                    "type": "String"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 37,
+            "description": "The selection event is triggered after the user has selected some\ncontent.",
+            "itemtype": "event",
+            "name": "selection",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                },
+                {
+                    "name": "selection",
+                    "description": "The actual Selection object.",
+                    "type": "Selection"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 47,
+            "description": "The cursor event is triggered after cursor position has changed.",
+            "itemtype": "event",
+            "name": "selection",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                },
+                {
+                    "name": "cursor",
+                    "description": "The actual Cursor object.",
+                    "type": "Cursor"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 56,
+            "description": "The insert event is triggered when a new block should be inserted. This\nhappens when ENTER key is pressed at the beginning of a block (should\ninsert before) or at the end of a block (should insert after).",
+            "itemtype": "event",
+            "name": "insert",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                },
+                {
+                    "name": "direction",
+                    "description": "The insert direction: \"before\" or \"after\".",
+                    "type": "String"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 67,
+            "description": "The split event is triggered when a block should be splitted into two\nblocks. This happens when ENTER is pressed within a non-empty block.",
+            "itemtype": "event",
+            "name": "split",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                },
+                {
+                    "name": "before",
+                    "description": "The HTML string before the split.",
+                    "type": "String"
+                },
+                {
+                    "name": "after",
+                    "description": "The HTML string after the split.",
+                    "type": "String"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 78,
+            "description": "The merge event is triggered when two needs to be merged. This happens\nwhen BACKSPACE is pressed at the beginning of a block (should merge with\nthe preceeding block) or DEL is pressed at the end of a block (should\nmerge with the following block).",
+            "itemtype": "event",
+            "name": "merge",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                },
+                {
+                    "name": "direction",
+                    "description": "The merge direction: \"before\" or \"after\".",
+                    "type": "String"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 90,
+            "description": "The empty event is triggered when a block is emptied.",
+            "itemtype": "event",
+            "name": "empty",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 98,
+            "description": "The switch event is triggered when the user switches to another block.\nThis happens when TAB is pressed (move one block after) or SHIFT+TAB\nis pressed (move one block before).",
+            "itemtype": "event",
+            "name": "switch",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                },
+                {
+                    "name": "direction",
+                    "description": "The switch direction: \"before\" or \"after\".",
+                    "type": "String"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 109,
+            "description": "The move event is triggered when the user moves a selection in a block.\nThis happens when the user selects some (or all) content in a block and\nan ARROW key is pressed (up: drag before, down: drag after).",
+            "itemtype": "event",
+            "name": "move",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                },
+                {
+                    "name": "selection",
+                    "description": "The actual Selection object.",
+                    "type": "Selection"
+                },
+                {
+                    "name": "direction",
+                    "description": "The move direction: \"before\" or \"after\".",
+                    "type": "String"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 121,
+            "description": "The clipboard event is triggered when the user copies, pastes or cuts\na selection within a block.",
+            "itemtype": "event",
+            "name": "clipboard",
+            "params": [
+                {
+                    "name": "element",
+                    "description": "The element triggering the event.",
+                    "type": "HTMLElement"
+                },
+                {
+                    "name": "selection",
+                    "description": "The actual Selection object.",
+                    "type": "Selection"
+                },
+                {
+                    "name": "action",
+                    "description": "The clipboard action: \"copy\", \"paste\", \"cut\".",
+                    "type": "String"
+                }
+            ],
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 138,
+            "description": "Initializes the API.",
+            "itemtype": "method",
+            "name": "init",
+            "params": [
+                {
+                    "name": "options",
+                    "description": "Configuration options override.",
+                    "type": "Object",
+                    "optional": true,
+                    "optdefault": "{}"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 150,
+            "description": "Adds the API to the given target elements.",
+            "itemtype": "method",
+            "name": "add",
+            "params": [
+                {
+                    "name": "target",
+                    "description": "A HTMLElement, an\n   array of HTMLElement or a query selector representing the target where\n   the API should be added on.",
+                    "type": "HTMLElement|Array(HTMLElement)|String"
+                },
+                {
+                    "name": "options",
+                    "description": "Configuration options override.",
+                    "type": "Object",
+                    "optional": true,
+                    "optdefault": "{}"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 165,
+            "description": "Removes the API from the given target elements.",
+            "itemtype": "method",
+            "name": "remove",
+            "params": [
+                {
+                    "name": "target",
+                    "description": "A HTMLElement, an\n   array of HTMLElement or a query selector representing the target where\n   the API should be removed from.",
+                    "type": "HTMLElement|Array(HTMLElement)|String"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 179,
+            "description": "Subscribe a callback function to a custom event fired by the API.",
+            "itemtype": "method",
+            "name": "on",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The name of the event.",
+                    "type": "String"
+                },
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n    event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 193,
+            "description": "Unsubscribe a callback function from a custom event fired by the API.",
+            "itemtype": "method",
+            "name": "off",
+            "params": [
+                {
+                    "name": "event",
+                    "description": "The name of the event.",
+                    "type": "String"
+                },
+                {
+                    "name": "handler",
+                    "description": "The callback to remove from the\n    event or the special value false to remove all callbacks.",
+                    "type": "Function|Boolean"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 207,
+            "description": "Subscribe to the {{#crossLink \"Editable/focus:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "focus",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 221,
+            "description": "Subscribe to the {{#crossLink \"Editable/blur:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "blur",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 235,
+            "description": "Subscribe to the {{#crossLink \"Editable/flow:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "flow",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 249,
+            "description": "Subscribe to the {{#crossLink \"Editable/selection:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "selection",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 263,
+            "description": "Subscribe to the {{#crossLink \"Editable/cursor:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "cursor",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 277,
+            "description": "Subscribe to the {{#crossLink \"Editable/insert:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "insert",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 291,
+            "description": "Subscribe to the {{#crossLink \"Editable/split:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "split",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 305,
+            "description": "Subscribe to the {{#crossLink \"Editable/merge:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "merge",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 319,
+            "description": "Subscribe to the {{#crossLink \"Editable/empty:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "empty",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 333,
+            "description": "Subscribe to the {{#crossLink \"Editable/switch:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "switch",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 347,
+            "description": "Subscribe to the {{#crossLink \"Editable/move:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "move",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        },
+        {
+            "file": "src/core.js",
+            "line": 361,
+            "description": "Subscribe to the {{#crossLink \"Editable/clipboard:event\"}}{{/crossLink}}\nevent.",
+            "itemtype": "method",
+            "name": "clipboard",
+            "params": [
+                {
+                    "name": "handler",
+                    "description": "The callback to execute in response to the\n  event.",
+                    "type": "Function"
+                }
+            ],
+            "static": 1,
+            "chainable": 1,
+            "class": "Editable",
+            "module": "core"
+        }
+    ],
+    "warnings": []
+}
