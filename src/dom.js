@@ -6,7 +6,6 @@
  * @submodule dom
  */
 
-
 Editable.dom = (function() {
   'use strict';
 
