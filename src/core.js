@@ -47,7 +47,7 @@ var Editable = (function() {
     /**
      * The cursor event is triggered after cursor position has changed.
      *
-     * @event selection
+     * @event cursor
      * @param {HTMLElement} element The element triggering the event.
      * @param {Cursor} cursor The actual Cursor object.
      */
