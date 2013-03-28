@@ -26,13 +26,6 @@ module.exports = function (grunt) {
           'test/css/{,*/}*.css'
         ],
         tasks: ['livereload']
-      },
-      jasmine: {
-        files: [
-          'src/{,*/}*.js',
-          'spec/**/*Spec.js',
-        ],
-        tasks: ['jasmine']
       }
     },
     connect: {
@@ -74,11 +67,19 @@ module.exports = function (grunt) {
         'src/{,*/}*.js'
       ]
     },
-    jasmine : {
-      src : 'src/**/*.js',
-      options: {
-        specs: 'spec/**/*Spec.js',
-        helpers: 'spec/*Helper.js'
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js',
+        browsers: ['PhantomJS']
+      },
+      browsers: {
+        configFile: 'karma.conf.js',
+        browsers: ['Chrome', 'Firefox', 'Safari']
+      },
+      build: {
+        configFile: 'karma.conf.js',
+        browsers: ['Chrome', 'Firefox', 'Safari'],
+        singleRun: true
       }
     },
     concat: {
@@ -114,13 +115,17 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('test', [
-    'jasmine',
-    'watch:jasmine'
+    'karma:unit'
+  ]);
+
+  grunt.registerTask('lint', [
+    'jshint'
   ]);
 
   grunt.registerTask('build', [
     'clean:dist',
-    'jasmine',
+    'karma:build',
+    'jshint',
     'concat',
     'uglify'
   ]);
