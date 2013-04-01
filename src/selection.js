@@ -6,15 +6,57 @@
  * @submodule selection
  */
 
+function EditableSelection (editableHost, rangySelection) {
+  this.host = editableHost;
+  this.selection = rangySelection;
+}
 
-Editable.selection = (function() {
-  'use strict';
-
-  /**
-   * @class Selection
-   * @static
-   */
+EditableSelection.prototype = (function () {
   return {
 
-  };
+    text: function () {
+
+    },
+
+    isAllSelected: function () {
+
+    },
+
+    strip: function () {
+
+    },
+
+    deleteContent: function () {
+
+    },
+
+    /**
+     * Expand the current selection
+     *
+     * @param: {String} either of these: 'word', 'sentence', 'tag' or 'block'.
+     */
+    expand: function (scope) {
+
+    },
+
+    parentNodes: function () {
+
+    },
+
+    isTheSameAs: function (otherSelection) {
+      self = this.selection;
+      other = otherSelection.selection;
+      if (
+        self.anchorNode === other.anchorNode &&
+        self.anchorOffset === other.anchorOffset &&
+        self.focusNode === other.focusNode &&
+        self.focusOffset === other.focusOffset
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+  }
 })();

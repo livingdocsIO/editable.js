@@ -6,14 +6,11 @@
  */
 
 
-Editable.cursor = (function() {
-  'use strict';
+function Cursor (editable, rangySelection) {
+  this.host = editable;
+  this.selection = rangySelection;
+}
 
-  /**
-   * @class Cursor
-   * @static
-   */
-  return {
+Cursor.prototype = (function() {
 
-  };
 })();

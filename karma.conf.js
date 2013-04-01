@@ -16,6 +16,9 @@ files = [
   JASMINE,
   JASMINE_ADAPTER,
 
+  // vendor files
+  'vendor/*.js',
+
   // source files
   'src/**/*.js',
 

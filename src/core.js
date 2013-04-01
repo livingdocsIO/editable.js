@@ -129,6 +129,8 @@ var Editable = (function() {
     'cliboard'
   ];
 
+  var isInitialized = false;
+
   /**
    * @class Editable
    * @static
@@ -143,6 +145,11 @@ var Editable = (function() {
      * @chainable
      */
     init: function(options) {
+      if (isInitialized) return;
+      isInitialized = true;
+
+      this.events.setup();
+
       return this;
     },
 
@@ -158,6 +165,10 @@ var Editable = (function() {
      * @chainable
      */
     add: function(target, options) {
+      $(target).attr("contenteditable", true);
+      $(target).addClass("-js-editable");
+      // todo: check css whitespace settings
+      // todo: much much more obviously...
       return this;
     },
 
@@ -172,6 +183,8 @@ var Editable = (function() {
      * @chainable
      */
     remove: function(target) {
+      $(target).removeAttr("contenteditable");
+      $(target).removeClass("-js-editable");
       return this;
     },
 
