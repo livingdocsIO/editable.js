@@ -14,29 +14,49 @@ Editable.events = (function() {
         }
       });
 
+      // cache selectionChanged function for simplicity
+      var selectionChanged = Editable.selectionWatcher.selectionChanged;
+
       if (Editable.browserFeatures.selectionchange) {
+        var selectionDirty = false;
+        var suppressSelectionChanges = false;
 
         // fires on mousemove (thats probably a bit too much)
         // catches changes like 'select all' from context menu
         $document.on('selectionchange.editable', function(event) {
-          console.log('selection changed');
+          if (suppressSelectionChanges) {
+            selectionDirty = true;
+          } else {
+            selectionChanged();
+          }
+        });
+
+        // listen for selection changes by mouse so we can
+        // suppress the selectionchange event and only fire the
+        // change event on mouseup
+        $document.on('mousedown.editable', '.-js-editable', function(event) {
+          suppressSelectionChanges = true;
+          $document.on('mouseup.editableSelection', function(event) {
+            $document.off('.editableSelection');
+            suppressSelectionChanges = false;
+
+            if (selectionDirty) {
+              selectionDirty = false;
+              selectionChanged();
+            }
+          });
         });
 
       } else {
 
         // listen for selection changes by mouse
-        $document.on('mousedown.editable', '.-js-editable', function(event) {
-          $document.on('mouseup.editableSelection', function(event) {
-            $document.off('.editableSelection');
-            console.log('mouseup after mousedown in editable block');
-            // test if selection has changed
-          });
+        $document.on('mouseup.editableSelection', function(event) {
+          selectionChanged();
         });
 
         // listen for selection changes by keys
         $document.on('keyup.editable', '.-js-editable', function(event) {
-          console.log('keyup in editable block');
-          // test if selection has changed
+          selectionChanged();
         });
 
       }

@@ -5,7 +5,7 @@
  * @submodule cursor
  */
 
-Editable.cursor = (function() {
+Editable.Cursor = (function() {
   'use strict';
 
   /**
@@ -22,7 +22,5 @@ Editable.cursor = (function() {
 
   })();
 
-  return {
-    Cursor: Cursor
-  };
+  return Cursor;
 })();

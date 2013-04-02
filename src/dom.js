@@ -15,5 +15,9 @@ Editable.dom = (function() {
    */
   return {
 
+    closest: function(childNode, selector) {
+      return $(childNode).closest(selector)[0];
+    }
+
   };
 })();

@@ -6,12 +6,13 @@
  * @submodule selection
  */
 
-Editable.selection = (function() {
+Editable.Selection = (function() {
   'use strict';
 
-  var Selection = function(editableHost, rangySelection) {
+  // Selection class
+  var Selection = function(editableHost, rangyRange) {
     this.host = editableHost;
-    this.selection = rangySelection;
+    this.range = rangyRange;
   };
 
   Selection.prototype = (function() {
@@ -40,31 +41,10 @@ Editable.selection = (function() {
        */
       expand: function(scope) {
 
-      },
-
-      parentNodes: function() {
-
-      },
-
-      isTheSameAs: function(otherSelection) {
-        var self = this.selection;
-        var other = otherSelection.selection;
-        if (
-            self.anchorNode === other.anchorNode &&
-            self.anchorOffset === other.anchorOffset &&
-            self.focusNode === other.focusNode &&
-            self.focusOffset === other.focusOffset
-        ) {
-          return true;
-        } else {
-          return false;
-        }
       }
 
     };
   })();
 
-  return {
-    Selection: Selection
-  };
+  return Selection;
 })();
