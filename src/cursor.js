@@ -5,12 +5,24 @@
  * @submodule cursor
  */
 
+Editable.cursor = (function() {
+  'use strict';
 
-function Cursor (editable, rangySelection) {
-  this.host = editable;
-  this.selection = rangySelection;
-}
+  /**
+   * Cursor class description
+   *
+   * @class Cursor
+   * @constructor
+   */
+  var Cursor = function() {
 
-Cursor.prototype = (function() {
+  };
 
+  Cursor.prototype = (function() {
+
+  })();
+
+  return {
+    Cursor: Cursor
+  };
 })();
