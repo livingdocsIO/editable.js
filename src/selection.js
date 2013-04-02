@@ -6,57 +6,65 @@
  * @submodule selection
  */
 
-function EditableSelection (editableHost, rangySelection) {
-  this.host = editableHost;
-  this.selection = rangySelection;
-}
+Editable.selection = (function() {
+  'use strict';
 
-EditableSelection.prototype = (function () {
-  return {
+  var Selection = function(editableHost, rangySelection) {
+    this.host = editableHost;
+    this.selection = rangySelection;
+  };
 
-    text: function () {
+  Selection.prototype = (function() {
+    return {
 
-    },
+      text: function() {
 
-    isAllSelected: function () {
+      },
 
-    },
+      isAllSelected: function() {
 
-    strip: function () {
+      },
 
-    },
+      strip: function() {
 
-    deleteContent: function () {
+      },
 
-    },
+      deleteContent: function() {
 
-    /**
-     * Expand the current selection
-     *
-     * @param: {String} either of these: 'word', 'sentence', 'tag' or 'block'.
-     */
-    expand: function (scope) {
+      },
 
-    },
+      /**
+       * Expand the current selection
+       *
+       * @param: {String} either of these: 'word', 'sentence', 'tag' or 'block'.
+       */
+      expand: function(scope) {
 
-    parentNodes: function () {
+      },
 
-    },
+      parentNodes: function() {
 
-    isTheSameAs: function (otherSelection) {
-      self = this.selection;
-      other = otherSelection.selection;
-      if (
-        self.anchorNode === other.anchorNode &&
-        self.anchorOffset === other.anchorOffset &&
-        self.focusNode === other.focusNode &&
-        self.focusOffset === other.focusOffset
-      ) {
-        return true;
-      } else {
-        return false;
+      },
+
+      isTheSameAs: function(otherSelection) {
+        self = this.selection;
+        other = otherSelection.selection;
+        if (
+            self.anchorNode === other.anchorNode &&
+            self.anchorOffset === other.anchorOffset &&
+            self.focusNode === other.focusNode &&
+            self.focusOffset === other.focusOffset
+        ) {
+          return true;
+        } else {
+          return false;
+        }
       }
-    }
 
-  }
+    };
+  })();
+
+  return {
+    Selection: Selection
+  };
 })();
