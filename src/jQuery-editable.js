@@ -1,4 +1,4 @@
-jQuery.fn.editable = function (add) {
+jQuery.fn.editable = function(add) {
   if (add === undefined || add) {
     Editable.add(this);
   } else {

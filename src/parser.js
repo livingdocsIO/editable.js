@@ -39,9 +39,9 @@ Editable.parser = (function() {
      * @method getNodeIndex
      * @param {HTMLElement}
      */
-    getNodeIndex: function (node) {
+    getNodeIndex: function(node) {
       var index = 0;
-      while( (node = node.previousSibling) !== null ) {
+      while ((node = node.previousSibling) !== null) {
         index += 1;
       }
       return index;
@@ -61,7 +61,7 @@ Editable.parser = (function() {
       for (i = 0, len = childNodes.length; i < len; i++) {
         child = childNodes[i];
 
-        if (child.nodeType === 3 && !this.isEmptyTextNode(child) ) {
+        if (child.nodeType === 3 && !this.isEmptyTextNode(child)) {
           return false;
         } else if (child.nodeType === 1) {
           return false;
