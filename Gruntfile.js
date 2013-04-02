@@ -86,7 +86,9 @@ module.exports = function (grunt) {
       dist: {
         files: {
           'dist/editable.js': [
-            'src/*.js'
+            'vendor/rangy-1.2.3/rangy-core.js',
+            'src/core.js',
+            'src/!(core).js'
           ]
         }
       }
@@ -126,7 +128,7 @@ module.exports = function (grunt) {
     'clean:dist',
     'karma:build',
     'jshint',
-    'concat',
+    'concat:dist',
     'uglify'
   ]);
 

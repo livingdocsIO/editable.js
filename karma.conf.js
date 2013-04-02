@@ -17,10 +17,12 @@ files = [
   JASMINE_ADAPTER,
 
   // vendor files
-  'vendor/*.js',
+  'vendor/jquery-*.js',
+  'vendor/rangy-1.2.3/rangy-core.js',
 
   // source files
-  'src/**/*.js',
+  'src/core.js',
+  'src/!(core).js',
 
   // tests
   'spec/**/*.spec.js',
