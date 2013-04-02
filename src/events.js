@@ -1,10 +1,11 @@
 Editable.events = (function() {
+  'use strict';
 
   return {
 
     setup: function() {
-      $document = $(document);
-      _this = this;
+      var $document = $(document);
+      var _this = this;
 
       $document.on('keydown.editable', '.-js-editable', function(event) {
         if (_this.actOnKeyStroke(event)) {
@@ -45,34 +46,34 @@ Editable.events = (function() {
     actOnKeyStroke: function(event) {
       switch (event.keyCode) {
 
-        // Left (37), Right (39)
-        case 37:
-        case 39:
-          return false;
+      // Left (37), Right (39)
+      case 37:
+      case 39:
+        return false;
 
-        // Backspace
-        case 8:
-          console.log('Backspace');
-          return false;
+      // Backspace
+      case 8:
+        console.log('Backspace');
+        return false;
 
-        // Delete
-        case 46:
-          console.log('Delete');
-          return false;
+      // Delete
+      case 46:
+        console.log('Delete');
+        return false;
 
-        // Enter
-        case 13:
-          if (event.shiftKey) {
-            console.log('Shift Enter');
-            return false;
-          } else {
-            console.log('Enter');
-            return false;
-          }
-          break;
-
-        default:
+      // Enter
+      case 13:
+        if (event.shiftKey) {
+          console.log('Shift Enter');
           return false;
+        } else {
+          console.log('Enter');
+          return false;
+        }
+        break;
+
+      default:
+        return false;
       }
     }
 

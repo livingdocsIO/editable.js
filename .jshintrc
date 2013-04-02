@@ -14,11 +14,14 @@
   "noarg": true,
   "regexp": true,
   "undef": true,
-  "unused": true,
+  "unused": false,
   "strict": true,
   "trailing": true,
   "smarttabs": true,
+  "quotmark": true,
   "globals": {
-    "angular": false
+    "jQuery": true,
+    "$": true,
+    "Editable": true
   }
 }

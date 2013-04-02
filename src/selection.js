@@ -47,8 +47,8 @@ Editable.selection = (function() {
       },
 
       isTheSameAs: function(otherSelection) {
-        self = this.selection;
-        other = otherSelection.selection;
+        var self = this.selection;
+        var other = otherSelection.selection;
         if (
             self.anchorNode === other.anchorNode &&
             self.anchorOffset === other.anchorOffset &&

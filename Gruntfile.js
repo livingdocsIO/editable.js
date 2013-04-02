@@ -34,7 +34,7 @@ module.exports = function (grunt) {
           port: 9000,
           // Change this to '0.0.0.0' to access the server from outside.
           middleware: function(connect, options) {
-            return [lrSnippet, folderMount(connect, options.base)]
+            return [lrSnippet, folderMount(connect, options.base)];
           }
         }
       },
@@ -104,7 +104,7 @@ module.exports = function (grunt) {
 
   // livereload does not work with grunt-contrib-watch, so we use regarde instead
   // https://github.com/gruntjs/grunt-contrib-watch/issues/59
-  grunt.renameTask('regarde', 'watch')
+  grunt.renameTask('regarde', 'watch');
 
   grunt.registerTask('server', [
     'clean:server',

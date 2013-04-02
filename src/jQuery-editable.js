@@ -1,4 +1,6 @@
 jQuery.fn.editable = function(add) {
+  'use strict';
+
   if (add === undefined || add) {
     Editable.add(this);
   } else {
