@@ -14,7 +14,8 @@ Editable.browserFeatures = (function() {
   /**
    * Check selectionchange event (currently supported in IE, Chrome and Safari)
    *
-   * couldn't find anything helpful on the web so far.
+   * To handle selectionchange in firefox see CKEditor selection object
+   * https://github.com/ckeditor/ckeditor-dev/blob/master/core/selection.js#L388
    */
   var selectionchange = (function() {
 
