@@ -20,8 +20,7 @@ Editable.browserFeatures = (function() {
   var selectionchange = (function() {
 
     // not exactly feature detection... is it?
-    var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-    return !isFirefox;
+    return !(bowser.gecko || bowser.opera);
   })();
 
 

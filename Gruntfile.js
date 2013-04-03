@@ -87,6 +87,7 @@ module.exports = function (grunt) {
         files: {
           'dist/editable.js': [
             'vendor/rangy-1.2.3/rangy-core.js',
+            'vendor/bowser.js',
             'src/core.js',
             'src/!(core).js'
           ]

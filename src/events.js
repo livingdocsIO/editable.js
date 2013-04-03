@@ -22,7 +22,7 @@ Editable.events = (function() {
         console.log('Cut');
       }).on('paste.editable', '.-js-editable', function(event) {
         console.log('Paste');
-      });      
+      });
 
       // cache selectionChanged function for simplicity
       var selectionChanged = Editable.selectionWatcher.selectionChanged;

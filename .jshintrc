@@ -23,6 +23,7 @@
     "jQuery": true,
     "$": true,
     "rangy": true,
-    "Editable": true
+    "Editable": true,
+    "bowser": true
   }
 }

@@ -19,6 +19,7 @@ files = [
   // vendor files
   'vendor/jquery-*.js',
   'vendor/rangy-1.2.3/rangy-core.js',
+  'vendor/bowser.js',
 
   // source files
   'src/core.js',
