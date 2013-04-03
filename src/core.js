@@ -4,7 +4,7 @@
  * @module core
  */
 
-var Editable = (function() {
+(function(exports, undefined) {
   'use strict';
 
   var EVENTS = [
@@ -135,7 +135,7 @@ var Editable = (function() {
    * @class Editable
    * @static
    */
-  return {
+  exports.Editable = {
     /**
      * Initializes the API.
      *
@@ -384,4 +384,4 @@ var Editable = (function() {
       return this;
     }
   };
-})();
+})(window);
