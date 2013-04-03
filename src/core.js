@@ -131,11 +131,17 @@
 
   var isInitialized = false;
 
+  var $ = exports.jQuery || function() {
+    throw new Error('jQuery-like library not yet implemented');
+  };
+
   /**
    * @class Editable
    * @static
    */
   exports.Editable = {
+    $: $,
+
     /**
      * Initializes the API.
      *
