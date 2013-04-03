@@ -16,7 +16,13 @@ Editable.events = (function() {
         console.log('Focus');
       }).on('blur.editable', '.-js-editable', function(event) {
         console.log('Blur');
-      });;
+      }).on('copy.editable', '.-js-editable', function(event) {
+        console.log('Copy');
+      }).on('cut.editable', '.-js-editable', function(event) {
+        console.log('Cut');
+      }).on('paste.editable', '.-js-editable', function(event) {
+        console.log('Paste');
+      });      
 
       // cache selectionChanged function for simplicity
       var selectionChanged = Editable.selectionWatcher.selectionChanged;
