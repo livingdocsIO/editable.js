@@ -4,7 +4,7 @@
  * @module core
  */
 
-(function(exports, undefined) {
+(function(exports, jQuery, undefined) {
   'use strict';
 
   var EVENTS = [
@@ -131,7 +131,7 @@
 
   var isInitialized = false;
 
-  var $ = exports.jQuery || function() {
+  var $ = jQuery || function() {
     throw new Error('jQuery-like library not yet implemented');
   };
 
@@ -434,4 +434,4 @@
       return this;
     }
   };
-})(window);
+})(window, window.jQuery);
