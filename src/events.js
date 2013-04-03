@@ -61,11 +61,20 @@ Editable.events = (function() {
 
         // listen for selection changes by mouse
         $document.on('mouseup.editableSelection', function(event) {
-          selectionChanged();
+
+          // In Opera when clicking outside of a block
+          // it does not update the selection as it should
+          // without the timeout
+          setTimeout(selectionChanged, 0);
+
         });
 
         // listen for selection changes by keys
         $document.on('keyup.editable', '.-js-editable', function(event) {
+
+          // when pressing Command + Shift + Left for example the keyup is only triggered
+          // after at least two keys are released. Strange. The culprit seems to be the
+          // Command key. Do we need a workaround?
           selectionChanged();
         });
 
