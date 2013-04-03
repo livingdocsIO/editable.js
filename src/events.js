@@ -12,7 +12,11 @@ Editable.events = (function() {
           event.preventDefault();
           event.stopPropagation();
         }
-      });
+      }).on('focus.editable', '.-js-editable', function(event) {
+        console.log('Focus');
+      }).on('blur.editable', '.-js-editable', function(event) {
+        console.log('Blur');
+      });;
 
       // cache selectionChanged function for simplicity
       var selectionChanged = Editable.selectionWatcher.selectionChanged;
