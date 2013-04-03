@@ -135,6 +135,37 @@
     throw new Error('jQuery-like library not yet implemented');
   };
 
+  var listeners = {};
+
+  var addListener = function(event, listener) {
+    if (listeners[event] === undefined) {
+      listeners[event] = [];
+    }
+
+    listeners[event].push(listener);
+  };
+
+  var removeListener = function(event, listener) {
+    var eventListeners = listeners[event];
+    if (eventListeners === undefined) return;
+
+    for (var i=0, len=eventListeners.length; i < len; i++) {
+      if (eventListeners[i] === listener){
+        eventListeners.splice(i, 1);
+        break;
+      }
+    }
+  };
+
+  var notifyListeners = function(event, context, args) {
+    var eventListeners = listeners[event];
+    if (eventListeners === undefined) return;
+
+    for (var i=0, len=eventListeners.length; i < len; i++) {
+      eventListeners[i].apply(context, args);
+    }
+  };
+
   /**
    * @class Editable
    * @static
@@ -205,7 +236,17 @@
      * @chainable
      */
     on: function(event, handler) {
+      // TODO throw error if event is not one of EVENTS
+      // TODO throw error if handler is not a function
+      addListener(event, handler);
       return this;
+    },
+
+    trigger: function(event, context, args) {
+      // TODO throw error if event is not one of EVENTS
+      // TODO context=this if not specified
+      // TODO if args is defined use it instead of function arguments
+      notifyListeners(event, context, Array.prototype.slice.call(arguments).splice(2));
     },
 
     /**
