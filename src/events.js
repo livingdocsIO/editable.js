@@ -1,6 +1,7 @@
 (function(exports, Editable, undefined) {
   'use strict';
 
+  var $ = Editable.$;
 
   Editable.events = {
 
