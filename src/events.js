@@ -70,9 +70,40 @@ Editable.events = (function() {
     actOnKeyStroke: function(event) {
       switch (event.keyCode) {
 
-      // Left (37), Right (39)
+      // Left
       case 37:
+        console.log('Left arrow');
+        return false;
+
+      // Right
       case 39:
+        console.log('Right arrow');
+        return false;
+
+      // Up
+      case 38:
+        console.log('Up arrow');
+        return false;
+
+      // Down
+      case 40:
+        console.log('Down arrow');
+        return false;
+
+      // Tab
+      case 9:
+        if (event.shiftKey) {
+          console.log('Shift Tab');
+          return false;
+        } else {
+          console.log('Tab');
+          return false;
+        }
+        break;
+
+      // Escape
+      case 27:
+        console.log('Escape');
         return false;
 
       // Backspace
