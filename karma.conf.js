@@ -22,11 +22,7 @@ files = [
   'vendor/bowser.js',
 
   // source files
-  'src/core.js',
-  'src/!(core).js',
-
-  // tests
-  'spec/**/*.spec.js',
+  '.tmp/editable-test.js',
 ];
 
 // list of files to exclude

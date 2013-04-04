@@ -5,7 +5,7 @@
   "esnext": true,
   "bitwise": true,
   "camelcase": true,
-  "curly": true,
+  "curly": false,
   "eqeqeq": true,
   "immed": true,
   "indent": 2,
@@ -24,6 +24,7 @@
     "$": true,
     "rangy": true,
     "Editable": true,
-    "bowser": true
+    "bowser": true,
+    "events": true
   }
 }

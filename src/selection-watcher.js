@@ -56,9 +56,9 @@ Editable.selectionWatcher = (function() {
     if (rangySelection.rangeCount) {
       var range = rangySelection.getRangeAt(0);
 
-      var hostNode = Editable.dom.closest(range.commonAncestorContainer, '.-js-editable');
-      if (hostNode) {
-        return new RangeContainer(hostNode, range);
+      var hostNode = $(range.commonAncestorContainer).closest('.-js-editable');
+      if (hostNode.length) {
+        return new RangeContainer(hostNode[0], range);
       }
     }
 

@@ -21,11 +21,18 @@ module.exports = function (grunt) {
       livereload: {
         files: [
           '*.html',
-          'src/{,*/}*.js',
+          '.tmp/{,*/}*.js',
           'test/js/{,*/}*.js',
           'test/css/{,*/}*.css'
         ],
         tasks: ['livereload']
+      },
+      src: {
+        files: [
+          'src/{,*/}*.js',
+          'spec/**/*.spec.js'
+        ],
+        tasks: ['concat:editable']
       }
     },
     connect: {
@@ -86,10 +93,22 @@ module.exports = function (grunt) {
       dist: {
         files: {
           'dist/editable.js': [
-            'vendor/rangy-1.2.3/rangy-core.js',
-            'vendor/bowser.js',
+            '.tmp/editable.js'
+          ]
+        }
+      },
+      editable: {
+        files: {
+          '.tmp/editable.js': [
+            'editable.prefix',
+            'src/util/*.js',
             'src/core.js',
-            'src/!(core).js'
+            'src/!(core).js',
+            'editable.suffix'
+          ],
+          '.tmp/editable-test.js': [
+            '.tmp/editable.js',
+            'spec/**/*.spec.js'
           ]
         }
       }
@@ -111,6 +130,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('server', [
     'clean:server',
+    'concat:editable',
     'livereload-start',
     'connect:livereload',
     'open',
@@ -118,6 +138,8 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('test', [
+    'clean:server',
+    'concat:editable',
     'karma:unit'
   ]);
 
@@ -125,10 +147,17 @@ module.exports = function (grunt) {
     'jshint'
   ]);
 
+  grunt.registerTask('dev', [
+    'concat:editable',
+    'watch:src'
+  ]);
+
   grunt.registerTask('build', [
-    'clean:dist',
-    'karma:build',
     'jshint',
+    'clean:dist',
+    'clean:server',
+    'concat:editable',
+    'karma:build',
     'concat:dist',
     'uglify'
   ]);

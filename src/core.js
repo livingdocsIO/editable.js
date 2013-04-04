@@ -179,7 +179,7 @@
       if (isInitialized) { return; }
       isInitialized = true;
 
-      this.events.setup();
+      events.setup();
 
       return this;
     },
@@ -255,7 +255,7 @@
      */
     off: function(event, handler) {
       // TODO throw error if event is not one of EVENTS
-      // TODO if handler is flase remove all callbacks      
+      // TODO if handler is flase remove all callbacks
       removeListener(event, handler);
       return this;
     },
