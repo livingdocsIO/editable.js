@@ -81,11 +81,11 @@ module.exports = function (grunt) {
       },
       browsers: {
         configFile: 'karma.conf.js',
-        browsers: ['Chrome', 'Firefox', 'Safari']
+        browsers: ['Chrome', 'Firefox', 'Safari', 'Opera']
       },
       build: {
         configFile: 'karma.conf.js',
-        browsers: ['Chrome', 'Firefox', 'Safari'],
+        browsers: ['Chrome', 'Firefox', 'Safari', 'Opera'],
         singleRun: true
       }
     },
@@ -107,8 +107,12 @@ module.exports = function (grunt) {
             'editable.suffix'
           ],
           '.tmp/editable-test.js': [
-            '.tmp/editable.js',
-            'spec/**/*.spec.js'
+            'editable.prefix',
+            'src/util/*.js',
+            'src/core.js',
+            'src/!(core).js',
+            'spec/**/*.spec.js',
+            'editable.suffix'
           ]
         }
       }
