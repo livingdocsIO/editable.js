@@ -1,9 +1,7 @@
-(function(exports, Editable, undefined) {
+var events = (function() {
   'use strict';
 
-  var $ = Editable.$;
-
-  Editable.events = {
+  return {
 
     setup: function() {
       var $document = $(document);
@@ -150,4 +148,4 @@
     }
 
   };
-})(window, window.Editable);
+})();

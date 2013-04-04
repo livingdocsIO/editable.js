@@ -1,0 +1,2 @@
+  window.Editable = Editable;
+})(window, document, window.jQuery);

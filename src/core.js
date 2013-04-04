@@ -4,7 +4,7 @@
  * @module core
  */
 
-(function(exports, jQuery, undefined) {
+(function() {
   'use strict';
 
   var EVENTS = [
@@ -131,10 +131,6 @@
 
   var isInitialized = false;
 
-  var $ = jQuery || function() {
-    throw new Error('jQuery-like library not yet implemented');
-  };
-
   var listeners = {};
 
   var addListener = function(event, listener) {
@@ -170,9 +166,7 @@
    * @class Editable
    * @static
    */
-  exports.Editable = {
-    $: $,
-
+  Editable = {
     /**
      * Initializes the API.
      *
@@ -242,7 +236,7 @@
       return this;
     },
 
-    trigger: function(event, context, args) {
+    _trigger: function(event, context, args) {
       // TODO throw error if event is not one of EVENTS
       // TODO context=this if not specified
       // TODO if args is defined use it instead of function arguments
@@ -434,4 +428,4 @@
       return this;
     }
   };
-})(window, window.jQuery);
+})();
