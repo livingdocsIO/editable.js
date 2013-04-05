@@ -5,128 +5,6 @@
  */
 
 (function() {
-  var EVENTS = [
-    /**
-     * The focus event is triggered when an element gains focus.
-     *
-     * @event focus
-     * @param {HTMLElement} element The element triggering the event.
-     */
-    'focus',
-
-    /**
-     * The blur event is triggered when an element looses focus.
-     *
-     * @event blur
-     * @param {HTMLElement} element The element triggering the event.
-     */
-    'blur',
-
-    /**
-     * The flow event is triggered when the user starts typing or pause typing.
-     *
-     * @event flow
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {String} action The flow action: "start" or "pause".
-     */
-    'flow',
-
-    /**
-     * The selection event is triggered after the user has selected some
-     * content.
-     *
-     * @event selection
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {Selection} selection The actual Selection object.
-     */
-    'selection',
-
-    /**
-     * The cursor event is triggered after cursor position has changed.
-     *
-     * @event cursor
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {Cursor} cursor The actual Cursor object.
-     */
-    'cursor',
-
-    /**
-     * The insert event is triggered when a new block should be inserted. This
-     * happens when ENTER key is pressed at the beginning of a block (should
-     * insert before) or at the end of a block (should insert after).
-     *
-     * @event insert
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {String} direction The insert direction: "before" or "after".
-     */
-    'insert',
-
-    /**
-     * The split event is triggered when a block should be splitted into two
-     * blocks. This happens when ENTER is pressed within a non-empty block.
-     *
-     * @event split
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {String} before The HTML string before the split.
-     * @param {String} after The HTML string after the split.
-     */
-    'split',
-
-    /**
-     * The merge event is triggered when two needs to be merged. This happens
-     * when BACKSPACE is pressed at the beginning of a block (should merge with
-     * the preceeding block) or DEL is pressed at the end of a block (should
-     * merge with the following block).
-     *
-     * @event merge
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {String} direction The merge direction: "before" or "after".
-     */
-    'merge',
-
-    /**
-     * The empty event is triggered when a block is emptied.
-     *
-     * @event empty
-     * @param {HTMLElement} element The element triggering the event.
-     */
-    'empty',
-
-    /**
-     * The switch event is triggered when the user switches to another block.
-     * This happens when TAB is pressed (move one block after) or SHIFT+TAB
-     * is pressed (move one block before).
-     *
-     * @event switch
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {String} direction The switch direction: "before" or "after".
-     */
-    'switch',
-
-    /**
-     * The move event is triggered when the user moves a selection in a block.
-     * This happens when the user selects some (or all) content in a block and
-     * an ARROW key is pressed (up: drag before, down: drag after).
-     *
-     * @event move
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {Selection} selection The actual Selection object.
-     * @param {String} direction The move direction: "before" or "after".
-     */
-    'move',
-
-    /**
-     * The clipboard event is triggered when the user copies, pastes or cuts
-     * a selection within a block.
-     *
-     * @event clipboard
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {Selection} selection The actual Selection object.
-     * @param {String} action The clipboard action: "copy", "paste", "cut".
-     */
-    'cliboard'
-  ];
-
   var isInitialized = false;
 
   /**
@@ -221,7 +99,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/focus:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/focus:event"}}{{/crossLink}}
      * event.
      *
      * @method focus
@@ -235,7 +113,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/blur:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/blur:event"}}{{/crossLink}}
      * event.
      *
      * @method blur
@@ -249,7 +127,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/flow:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/flow:event"}}{{/crossLink}}
      * event.
      *
      * @method flow
@@ -263,7 +141,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/selection:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/selection:event"}}{{/crossLink}}
      * event.
      *
      * @method selection
@@ -277,7 +155,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/cursor:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/cursor:event"}}{{/crossLink}}
      * event.
      *
      * @method cursor
@@ -291,7 +169,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/insert:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/insert:event"}}{{/crossLink}}
      * event.
      *
      * @method insert
@@ -305,7 +183,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/split:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/split:event"}}{{/crossLink}}
      * event.
      *
      * @method split
@@ -319,7 +197,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/merge:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/merge:event"}}{{/crossLink}}
      * event.
      *
      * @method merge
@@ -333,7 +211,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/empty:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/empty:event"}}{{/crossLink}}
      * event.
      *
      * @method empty
@@ -347,7 +225,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/switch:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/switch:event"}}{{/crossLink}}
      * event.
      *
      * @method switch
@@ -361,7 +239,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/move:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/move:event"}}{{/crossLink}}
      * event.
      *
      * @method move
@@ -375,7 +253,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Editable/clipboard:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Event/clipboard:event"}}{{/crossLink}}
      * event.
      *
      * @method clipboard

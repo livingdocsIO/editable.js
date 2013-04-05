@@ -1,6 +1,130 @@
+/**
+ * The Events module is responsible for dealing with events and their handlers.
+ *
+ * @module events
+ */
+
 var events = (function() {
+  /**
+   * The focus event is triggered when an element gains focus.
+   *
+   * @event focus
+   * @param {HTMLElement} element The element triggering the event.
+   */
+
+  /**
+   * The blur event is triggered when an element looses focus.
+   *
+   * @event blur
+   * @param {HTMLElement} element The element triggering the event.
+   */
+
+  /**
+   * The flow event is triggered when the user starts typing or pause typing.
+   *
+   * @event flow
+   * @param {HTMLElement} element The element triggering the event.
+   * @param {String} action The flow action: "start" or "pause".
+   */
+
+  /**
+   * The selection event is triggered after the user has selected some
+   * content.
+   *
+   * @event selection
+   * @param {HTMLElement} element The element triggering the event.
+   * @param {Selection} selection The actual Selection object.
+   */
+
+  /**
+   * The cursor event is triggered after cursor position has changed.
+   *
+   * @event cursor
+   * @param {HTMLElement} element The element triggering the event.
+   * @param {Cursor} cursor The actual Cursor object.
+   */
+
+  /**
+   * The insert event is triggered when a new block should be inserted. This
+   * happens when ENTER key is pressed at the beginning of a block (should
+   * insert before) or at the end of a block (should insert after).
+   *
+   * @event insert
+   * @param {HTMLElement} element The element triggering the event.
+   * @param {String} direction The insert direction: "before" or "after".
+   */
+
+  /**
+   * The split event is triggered when a block should be splitted into two
+   * blocks. This happens when ENTER is pressed within a non-empty block.
+   *
+   * @event split
+   * @param {HTMLElement} element The element triggering the event.
+   * @param {String} before The HTML string before the split.
+   * @param {String} after The HTML string after the split.
+   */
+
+  /**
+   * The merge event is triggered when two needs to be merged. This happens
+   * when BACKSPACE is pressed at the beginning of a block (should merge with
+   * the preceeding block) or DEL is pressed at the end of a block (should
+   * merge with the following block).
+   *
+   * @event merge
+   * @param {HTMLElement} element The element triggering the event.
+   * @param {String} direction The merge direction: "before" or "after".
+   */
+
+  /**
+   * The empty event is triggered when a block is emptied.
+   *
+   * @event empty
+   * @param {HTMLElement} element The element triggering the event.
+   */
+
+  /**
+   * The switch event is triggered when the user switches to another block.
+   * This happens when TAB is pressed (move one block after) or SHIFT+TAB
+   * is pressed (move one block before).
+   *
+   * @event switch
+   * @param {HTMLElement} element The element triggering the event.
+   * @param {String} direction The switch direction: "before" or "after".
+   */
+
+  /**
+   * The move event is triggered when the user moves a selection in a block.
+   * This happens when the user selects some (or all) content in a block and
+   * an ARROW key is pressed (up: drag before, down: drag after).
+   *
+   * @event move
+   * @param {HTMLElement} element The element triggering the event.
+   * @param {Selection} selection The actual Selection object.
+   * @param {String} direction The move direction: "before" or "after".
+   */
+
+  /**
+   * The clipboard event is triggered when the user copies, pastes or cuts
+   * a selection within a block.
+   *
+   * @event clipboard
+   * @param {HTMLElement} element The element triggering the event.
+   * @param {Selection} selection The actual Selection object.
+   * @param {String} action The clipboard action: "copy", "paste", "cut".
+   */
+
+  /**
+   * Contains the list of event listeners grouped by event type.
+   * 
+   * @private
+   * @type {Object}
+   */
   var listeners = {};
 
+  /**
+   * @class Event
+   * @static
+   */
   return {
     addListener: function(event, listener) {
       if (listeners[event] === undefined) {
