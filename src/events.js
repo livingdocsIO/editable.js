@@ -1,5 +1,38 @@
 var events = (function() {
+  var listeners = {};
+
   return {
+    addListener: function(event, listener) {
+      if (listeners[event] === undefined) {
+        listeners[event] = [];
+      }
+
+      listeners[event].push(listener);
+    },
+
+    removeListener: function(event, listener) {
+      var eventListeners = listeners[event];
+      if (eventListeners === undefined) return;
+
+      for (var i=0, len=eventListeners.length; i < len; i++) {
+        if (eventListeners[i] === listener){
+          eventListeners.splice(i, 1);
+          break;
+        }
+      }
+    },
+
+    notifyListeners: function(event, context) {
+      var eventListeners = listeners[event];
+      if (eventListeners === undefined) return;
+
+      for (var i=0, len=eventListeners.length; i < len; i++) {
+        eventListeners[i].apply(
+            context,
+            Array.prototype.slice.call(arguments).splice(2)
+        );
+      }
+    },
 
     setup: function() {
       var $document = $(document);
