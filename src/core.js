@@ -231,7 +231,7 @@
      * @chainable
      */
     focus: function(handler) {
-      return this;
+      return this.on('focus', handler);
     },
 
     /**
@@ -245,7 +245,7 @@
      * @chainable
      */
     blur: function(handler) {
-      return this;
+      return this.on('blur', handler);
     },
 
     /**
@@ -259,7 +259,7 @@
      * @chainable
      */
     flow: function(handler) {
-      return this;
+      return this.on('flow', handler);
     },
 
     /**
@@ -273,7 +273,7 @@
      * @chainable
      */
     selection: function(handler) {
-      return this;
+      return this.on('selection', handler);
     },
 
     /**
@@ -287,7 +287,7 @@
      * @chainable
      */
     cursor: function(handler) {
-      return this;
+      return this.on('cursor', handler);
     },
 
     /**
@@ -301,7 +301,7 @@
      * @chainable
      */
     insert: function(handler) {
-      return this;
+      return this.on('insert', handler);
     },
 
     /**
@@ -315,7 +315,7 @@
      * @chainable
      */
     split: function(handler) {
-      return this;
+      return this.on('split', handler);
     },
 
     /**
@@ -329,7 +329,7 @@
      * @chainable
      */
     merge: function(handler) {
-      return this;
+      return this.on('merge', handler);
     },
 
     /**
@@ -343,7 +343,7 @@
      * @chainable
      */
     empty: function(handler) {
-      return this;
+      return this.on('empty', handler);
     },
 
     /**
@@ -357,7 +357,7 @@
      * @chainable
      */
     'switch': function(handler) {
-      return this;
+      return this.on('switch', handler);
     },
 
     /**
@@ -371,7 +371,7 @@
      * @chainable
      */
     move: function(handler) {
-      return this;
+      return this.on('move', handler);
     },
 
     /**
@@ -385,7 +385,7 @@
      * @chainable
      */
     clipboard: function(handler) {
-      return this;
+      return this.on('clipboard', handler);
     }
   };
 })();
