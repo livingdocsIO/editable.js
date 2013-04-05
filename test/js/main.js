@@ -3,10 +3,10 @@
 
     Editable.init();
     $("article>div>p").editable();
-    Editable.on('focus', function() {
-      console.log('Focus event handler was triggered');
-    }).on('blur', function() {
-      console.log('Blur event handler was triggered');
+    Editable.focus(function(el) {
+      console.log('Focus event handler was triggered on', el);
+    }).blur(function(el) {
+      console.log('Blur event handler was triggered on', el);
     });
   });
 })(jQuery);
