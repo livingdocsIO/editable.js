@@ -1,6 +1,4 @@
 Editable.browserFeatures = (function() {
-  'use strict';
-
   /**
    * Check for contenteditable support
    *

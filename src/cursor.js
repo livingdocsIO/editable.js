@@ -6,8 +6,6 @@
  */
 
 Editable.Cursor = (function() {
-  'use strict';
-
   /**
    * Cursor class description
    *

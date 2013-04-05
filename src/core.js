@@ -5,8 +5,6 @@
  */
 
 (function() {
-  'use strict';
-
   var EVENTS = [
     /**
      * The focus event is triggered when an element gains focus.

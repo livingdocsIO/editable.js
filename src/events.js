@@ -1,6 +1,4 @@
 var events = (function() {
-  'use strict';
-
   return {
 
     setup: function() {

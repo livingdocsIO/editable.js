@@ -24,8 +24,6 @@
   */
 
 Editable.parser = (function() {
-  'use strict';
-
   /**
    * @class DOM
    * @static

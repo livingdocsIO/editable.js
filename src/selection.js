@@ -7,8 +7,6 @@
  */
 
 Editable.Selection = (function() {
-  'use strict';
-
   // Selection class
   var Selection = function(editableHost, rangyRange) {
     this.host = editableHost;

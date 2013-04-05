@@ -7,8 +7,6 @@
  */
 
 Editable.selectionWatcher = (function() {
-  'use strict';
-
   /** RangeContainer
    *
    * primarily used to compare ranges
