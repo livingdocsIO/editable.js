@@ -1,7 +1,6 @@
 ;(function($) {
   $(document).ready(function() {
 
-    Editable.init();
     $("article>div>p").editable();
     Editable.focus(function(el) {
       console.log('Focus event handler was triggered on', el);

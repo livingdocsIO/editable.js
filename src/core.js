@@ -13,23 +13,6 @@
    */
   Editable = {
     /**
-     * Initializes the API.
-     *
-     * @method init
-     * @param {Object} [options={}] Configuration options override.
-     * @static
-     * @chainable
-     */
-    init: function(options) {
-      if (isInitialized) { return; }
-      isInitialized = true;
-
-      events.setup();
-
-      return this;
-    },
-
-    /**
      * Adds the API to the given target elements.
      *
      * @method add
@@ -41,6 +24,11 @@
      * @chainable
      */
     add: function(target, options) {
+      if (!isInitialized) {
+        isInitialized = true;
+        events.setup();    
+      }      
+
       $(target).attr('contenteditable', true);
       $(target).addClass('-js-editable');
       // todo: check css whitespace settings
