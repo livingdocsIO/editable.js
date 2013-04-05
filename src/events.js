@@ -44,9 +44,9 @@ var events = (function() {
           event.stopPropagation();
         }
       }).on('focus.editable', '.-js-editable', function(event) {
-        console.log('Focus');
+        _this.notifyListeners('focus', Editable, this);
       }).on('blur.editable', '.-js-editable', function(event) {
-        console.log('Blur');
+        _this.notifyListeners('blur', Editable, this);
       }).on('copy.editable', '.-js-editable', function(event) {
         console.log('Copy');
       }).on('cut.editable', '.-js-editable', function(event) {
