@@ -26,8 +26,8 @@
     add: function(target, options) {
       if (!isInitialized) {
         isInitialized = true;
-        events.setup();    
-      }      
+        events.setup();
+      }
 
       $(target).attr('contenteditable', true);
       $(target).addClass('-js-editable');
