@@ -24,6 +24,7 @@
     "rangy": true,
     "Editable": true,
     "bowser": true,
-    "events": true
+    "events": true,
+    "behavior": true
   }
 }
