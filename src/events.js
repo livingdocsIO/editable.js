@@ -19,7 +19,7 @@ var events = (function() {
         listeners[event] = [];
       }
 
-      listeners[event].push(listener);
+      listeners[event].unshift(listener);
     },
 
     removeListener: function(event, listener) {
@@ -49,6 +49,14 @@ var events = (function() {
     setup: function() {
       var $document = $(document);
       var _this = this;
+      var eventType = null;
+
+      listeners = {};
+      // TODO check the Editable.config.event object to prevent
+      // registering invalid handlers
+      for(eventType in Editable.config.event) {
+        _this.addListener(eventType, Editable.config.event[eventType]);
+      }
 
       $document.on('keydown.editable', '.-js-editable', function(event) {
         if (_this.actOnKeyStroke(event)) {
