@@ -25,6 +25,8 @@
      */
     add: function(target, options) {
       if (!isInitialized) {
+        // TODO check config file integrity
+
         isInitialized = true;
         events.setup();
       }
@@ -87,7 +89,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/focus:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/focus:event"}}{{/crossLink}}
      * event.
      *
      * @method focus
@@ -101,7 +103,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/blur:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/blur:event"}}{{/crossLink}}
      * event.
      *
      * @method blur
@@ -115,7 +117,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/flow:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/flow:event"}}{{/crossLink}}
      * event.
      *
      * @method flow
@@ -129,7 +131,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/selection:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/selection:event"}}{{/crossLink}}
      * event.
      *
      * @method selection
@@ -143,7 +145,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/cursor:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/cursor:event"}}{{/crossLink}}
      * event.
      *
      * @method cursor
@@ -157,7 +159,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/insert:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/insert:event"}}{{/crossLink}}
      * event.
      *
      * @method insert
@@ -171,7 +173,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/split:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/split:event"}}{{/crossLink}}
      * event.
      *
      * @method split
@@ -185,7 +187,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/merge:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/merge:event"}}{{/crossLink}}
      * event.
      *
      * @method merge
@@ -199,7 +201,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/empty:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/empty:event"}}{{/crossLink}}
      * event.
      *
      * @method empty
@@ -213,7 +215,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/switch:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/switch:event"}}{{/crossLink}}
      * event.
      *
      * @method switch
@@ -227,7 +229,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/move:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/move:event"}}{{/crossLink}}
      * event.
      *
      * @method move
@@ -241,7 +243,7 @@
     },
 
     /**
-     * Subscribe to the {{#crossLink "Event/clipboard:event"}}{{/crossLink}}
+     * Subscribe to the {{#crossLink "Editable/clipboard:event"}}{{/crossLink}}
      * event.
      *
      * @method clipboard
