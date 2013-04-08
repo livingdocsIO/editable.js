@@ -1,10 +1,10 @@
 /**
- * The Events module is responsible for dealing with events and their handlers.
+ * The Dispatcher module is responsible for dealing with events and their handlers.
  *
- * @module events
+ * @module dispatcher
  */
 
-var events = (function() {
+var dispatcher = (function() {
   /**
    * Contains the list of event listeners grouped by event type.
    * 

@@ -21,8 +21,8 @@ describe("Global Object", function() {
   });
 
   // Test no variables are leaking into global namespace
-  it("should not define events globally", function() {
-    expect(window.events).not.toBeDefined();
+  it("should not define dispatcher globally", function() {
+    expect(window.dispatcher).not.toBeDefined();
   });
 
 });

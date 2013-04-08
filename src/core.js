@@ -28,7 +28,7 @@
         // TODO check config file integrity
 
         isInitialized = true;
-        events.setup();
+        dispatcher.setup();
       }
 
       $(target).attr('contenteditable', true);
@@ -67,7 +67,7 @@
     on: function(event, handler) {
       // TODO throw error if event is not one of EVENTS
       // TODO throw error if handler is not a function
-      events.addListener(event, handler);
+      dispatcher.addListener(event, handler);
       return this;
     },
 
@@ -84,7 +84,7 @@
     off: function(event, handler) {
       // TODO throw error if event is not one of EVENTS
       // TODO if handler is flase remove all callbacks
-      events.removeListener(event, handler);
+      dispatcher.removeListener(event, handler);
       return this;
     },
 
