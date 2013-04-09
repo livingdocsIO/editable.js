@@ -25,6 +25,7 @@
     "Editable": true,
     "bowser": true,
     "dispatcher": true,
-    "behavior": true
+    "behavior": true,
+    "keyboard": true
   }
 }

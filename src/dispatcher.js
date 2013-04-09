@@ -7,11 +7,67 @@
 var dispatcher = (function() {
   /**
    * Contains the list of event listeners grouped by event type.
-   * 
+   *
    * @private
    * @type {Object}
    */
   var listeners = {};
+
+  var actOnKeyStroke = function(event) {
+    switch (event.keyCode) {
+
+    case keyboard.KEY_LEFT:
+      console.log('Left arrow');
+      return false;
+
+    case keyboard.KEY_RIGHT:
+      console.log('Right arrow');
+      return false;
+
+    case keyboard.KEY_UP:
+      console.log('Up arrow');
+      return false;
+
+    case keyboard.KEY_DOWN:
+      console.log('Down arrow');
+      return false;
+
+    case keyboard.KEY_TAB:
+      if (event.shiftKey) {
+        console.log('Shift Tab');
+        return false;
+      } else {
+        console.log('Tab');
+        return false;
+      }
+      break;
+
+    case keyboard.KEY_ESC:
+      console.log('Escape');
+      return false;
+
+    case keyboard.KEY_BACKSPACE:
+      console.log('Backspace');
+      return false;
+
+    case keyboard.KEY_DELETE:
+      console.log('Delete');
+      return false;
+
+    case keyboard.KEY_ENTER:
+      if (event.shiftKey) {
+        console.log('Shift Enter');
+        return false;
+      } else {
+        console.log('Enter');
+        return false;
+      }
+      break;
+
+    default:
+      return false;
+    }
+  };
 
   return {
     addListener: function(event, listener) {
@@ -60,7 +116,7 @@ var dispatcher = (function() {
       }
 
       $document.on('keydown.editable', '.-js-editable', function(event) {
-        if (_this.actOnKeyStroke(event)) {
+        if (actOnKeyStroke(event)) {
           event.preventDefault();
           event.stopPropagation();
         }
@@ -132,72 +188,6 @@ var dispatcher = (function() {
 
       }
 
-    },
-
-    actOnKeyStroke: function(event) {
-      switch (event.keyCode) {
-
-      // Left
-      case 37:
-        console.log('Left arrow');
-        return false;
-
-      // Right
-      case 39:
-        console.log('Right arrow');
-        return false;
-
-      // Up
-      case 38:
-        console.log('Up arrow');
-        return false;
-
-      // Down
-      case 40:
-        console.log('Down arrow');
-        return false;
-
-      // Tab
-      case 9:
-        if (event.shiftKey) {
-          console.log('Shift Tab');
-          return false;
-        } else {
-          console.log('Tab');
-          return false;
-        }
-        break;
-
-      // Escape
-      case 27:
-        console.log('Escape');
-        return false;
-
-      // Backspace
-      case 8:
-        console.log('Backspace');
-        return false;
-
-      // Delete
-      case 46:
-        console.log('Delete');
-        return false;
-
-      // Enter
-      case 13:
-        if (event.shiftKey) {
-          console.log('Shift Enter');
-          return false;
-        } else {
-          console.log('Enter');
-          return false;
-        }
-        break;
-
-      default:
-        return false;
-      }
     }
-
   };
 })();
