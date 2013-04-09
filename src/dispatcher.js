@@ -13,62 +13,6 @@ var dispatcher = (function() {
    */
   var listeners = {};
 
-  var actOnKeyStroke = function(event) {
-    switch (event.keyCode) {
-
-    case keyboard.KEY_LEFT:
-      console.log('Left arrow');
-      return false;
-
-    case keyboard.KEY_RIGHT:
-      console.log('Right arrow');
-      return false;
-
-    case keyboard.KEY_UP:
-      console.log('Up arrow');
-      return false;
-
-    case keyboard.KEY_DOWN:
-      console.log('Down arrow');
-      return false;
-
-    case keyboard.KEY_TAB:
-      if (event.shiftKey) {
-        console.log('Shift Tab');
-        return false;
-      } else {
-        console.log('Tab');
-        return false;
-      }
-      break;
-
-    case keyboard.KEY_ESC:
-      console.log('Escape');
-      return false;
-
-    case keyboard.KEY_BACKSPACE:
-      console.log('Backspace');
-      return false;
-
-    case keyboard.KEY_DELETE:
-      console.log('Delete');
-      return false;
-
-    case keyboard.KEY_ENTER:
-      if (event.shiftKey) {
-        console.log('Shift Enter');
-        return false;
-      } else {
-        console.log('Enter');
-        return false;
-      }
-      break;
-
-    default:
-      return false;
-    }
-  };
-
   return {
     addListener: function(event, listener) {
       if (listeners[event] === undefined) {
@@ -116,10 +60,7 @@ var dispatcher = (function() {
       }
 
       $document.on('keydown.editable', '.-js-editable', function(event) {
-        if (actOnKeyStroke(event)) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
+        keyboard.dispatchKeyEvent(event, this);
       }).on('focus.editable', '.-js-editable', function(event) {
         _this.notifyListeners('focus', Editable, this);
       }).on('blur.editable', '.-js-editable', function(event) {
@@ -130,6 +71,30 @@ var dispatcher = (function() {
         console.log('Cut');
       }).on('paste.editable', '.-js-editable', function(event) {
         console.log('Paste');
+      });
+
+      keyboard.on('left', function(event) {
+        console.log('Left key pressed');
+      }).on('up', function(event) {
+        console.log('Up key pressed');
+      }).on('right', function(event) {
+        console.log('Right key pressed');
+      }).on('down', function(event) {
+        console.log('Down key pressed');
+      }).on('tab', function(event) {
+        console.log('Tab key pressed');
+      }).on('shiftTab', function(event) {
+        console.log('Shift+Tab key pressed');
+      }).on('esc', function(event) {
+        console.log('Esc key pressed');
+      }).on('backspace', function(event) {
+        console.log('Backspace key pressed');
+      }).on('delete', function(event) {
+        console.log('Delete key pressed');
+      }).on('enter', function(event) {
+        console.log('Enter key pressed');
+      }).on('shiftEnter', function(event) {
+        console.log('Shift+Enter key pressed');
       });
 
       // cache selectionChanged function for simplicity
