@@ -20,6 +20,10 @@ var behavior = (function() {
       console.log('Default cursor behavior');
     },
 
+    newline: function(element, cursor) {
+      console.log('Default newline behavior');
+    },
+
     insert: function(element, direction) {
       console.log('Default insert behavior');
     },

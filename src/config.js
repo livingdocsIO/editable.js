@@ -68,6 +68,19 @@
       },
 
       /**
+       * The newline event is triggered when a newline should be inserted. This
+       * happens when SHIFT+ENTER key is pressed.
+       * The default behavior is to add a <br />
+       * 
+       * @event newline
+       * @param {HTMLElement} element The element triggering the event.
+       * @param {Cursor} cursor The actual cursor object.
+       */
+      newline: function(element, cursor) {
+        behavior.newline(element, cursor);
+      },
+
+      /**
        * The insert event is triggered when a new block should be inserted. This
        * happens when ENTER key is pressed at the beginning of a block (should
        * insert before) or at the end of a block (should insert after).

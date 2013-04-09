@@ -159,6 +159,20 @@
     },
 
     /**
+     * Subscribe to the {{#crossLink "Editable/newline:event"}}{{/crossLink}}
+     * event.
+     *
+     * @method newline
+     * @param {Function} handler The callback to execute in response to the
+     *   event.
+     * @static
+     * @chainable
+     */
+    newline: function(handler) {
+      return this.on('newline', handler);
+    },
+
+    /**
      * Subscribe to the {{#crossLink "Editable/insert:event"}}{{/crossLink}}
      * event.
      *
