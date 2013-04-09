@@ -95,6 +95,10 @@ var dispatcher = (function() {
         console.log('Enter key pressed');
       }).on('shiftEnter', function(event) {
         console.log('Shift+Enter key pressed');
+        event.preventDefault();
+        event.stopPropagation();
+        // TODO pass the missing parameter "Cursor"
+        _this.notifyListeners('newline', Editable, this);
       });
 
       // cache selectionChanged function for simplicity

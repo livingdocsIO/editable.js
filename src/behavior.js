@@ -22,6 +22,18 @@ var behavior = (function() {
 
     newline: function(element, cursor) {
       console.log('Default newline behavior');
+      var range,
+          sel = rangy.getSelection(),
+          br = document.createElement('br');
+
+      if (sel.rangeCount) {
+        range = sel.getRangeAt(0);
+        range.insertNode(br);
+        range.setStartAfter(br);
+        range.setEndAfter(br);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
     },
 
     insert: function(element, direction) {
