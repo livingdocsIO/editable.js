@@ -41,7 +41,7 @@ var dispatcher = (function() {
       for (var i=0, len=eventListeners.length; i < len; i++) {
         if(eventListeners[i].apply(
             Editable,
-            Array.prototype.slice.call(arguments).splice(2)
+            Array.prototype.slice.call(arguments).splice(1)
         ) === false)
           break;
       }
@@ -102,9 +102,9 @@ var dispatcher = (function() {
       });
 
       // cache selectionChanged function for simplicity
-      var selectionChanged = Editable.selectionWatcher.selectionChanged;
+      var selectionChanged = selectionWatcher.selectionChanged;
 
-      if (Editable.browserFeatures.selectionchange) {
+      if (browserFeatures.selectionchange) {
         var selectionDirty = false;
         var suppressSelectionChanges = false;
 
