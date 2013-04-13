@@ -9,6 +9,9 @@
 
   /**
    * @class Editable
+   *
+   * Note: Editable variable is defined in editable.prefix
+   *
    * @static
    */
   Editable = {
