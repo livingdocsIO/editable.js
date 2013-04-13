@@ -34,13 +34,13 @@ var dispatcher = (function() {
       }
     },
 
-    notifyListeners: function(event, context) {
+    notifyListeners: function(event) {
       var eventListeners = listeners[event];
       if (eventListeners === undefined) return;
 
       for (var i=0, len=eventListeners.length; i < len; i++) {
         if(eventListeners[i].apply(
-            context,
+            Editable,
             Array.prototype.slice.call(arguments).splice(2)
         ) === false)
           break;
@@ -62,9 +62,9 @@ var dispatcher = (function() {
       $document.on('keydown.editable', '.-js-editable', function(event) {
         keyboard.dispatchKeyEvent(event, this);
       }).on('focus.editable', '.-js-editable', function(event) {
-        _this.notifyListeners('focus', Editable, this);
+        _this.notifyListeners('focus', this);
       }).on('blur.editable', '.-js-editable', function(event) {
-        _this.notifyListeners('blur', Editable, this);
+        _this.notifyListeners('blur', this);
       }).on('copy.editable', '.-js-editable', function(event) {
         console.log('Copy');
       }).on('cut.editable', '.-js-editable', function(event) {
@@ -98,7 +98,7 @@ var dispatcher = (function() {
         event.preventDefault();
         event.stopPropagation();
         // TODO pass the missing parameter "Cursor"
-        _this.notifyListeners('newline', Editable, this);
+        _this.notifyListeners('newline', this);
       });
 
       // cache selectionChanged function for simplicity
