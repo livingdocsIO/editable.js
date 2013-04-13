@@ -20,7 +20,7 @@ var behavior = (function() {
       console.log('Default cursor behavior');
     },
 
-    newline: function(element, cursor) {
+    newline: function(element, cursor, selection) {
       console.log('Default newline behavior');
       var range,
           sel = rangy.getSelection(),

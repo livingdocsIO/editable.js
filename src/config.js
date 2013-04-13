@@ -75,9 +75,10 @@
        * @event newline
        * @param {HTMLElement} element The element triggering the event.
        * @param {Cursor} cursor The actual cursor object.
+       * @param {Selection} selection The actual selection object.
        */
-      newline: function(element, cursor) {
-        behavior.newline(element, cursor);
+      newline: function(element, cursor, selection) {
+        behavior.newline(element, cursor, selection);
       },
 
       /**
