@@ -26,6 +26,11 @@
     "bowser": true,
     "dispatcher": true,
     "behavior": true,
-    "keyboard": true
+    "keyboard": true,
+    "selectionWatcher": true,
+    "Selection": true,
+    "Cursor": true,
+    "parser": true,
+    "browserFeatures": true
   }
 }

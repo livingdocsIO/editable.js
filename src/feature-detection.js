@@ -1,4 +1,4 @@
-Editable.browserFeatures = (function() {
+var browserFeatures = (function() {
   /**
    * Check for contenteditable support
    *

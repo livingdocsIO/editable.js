@@ -6,7 +6,7 @@
  * @submodule selection
  */
 
-Editable.Selection = (function() {
+var Selection = (function() {
   // Selection class
   var Selection = function(editableHost, rangyRange) {
     this.host = editableHost;

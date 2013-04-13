@@ -5,7 +5,7 @@
  * @submodule cursor
  */
 
-Editable.Cursor = (function() {
+var Cursor = (function() {
   /**
    * Cursor class description
    *

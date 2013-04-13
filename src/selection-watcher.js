@@ -6,7 +6,7 @@
  * @submodule selectionWatcher
  */
 
-Editable.selectionWatcher = (function() {
+var selectionWatcher = (function() {
   /** RangeContainer
    *
    * primarily used to compare ranges

@@ -23,7 +23,7 @@
   * 'NOTATION_NODE': 12
   */
 
-Editable.parser = (function() {
+var parser = (function() {
   /**
    * @class DOM
    * @static
