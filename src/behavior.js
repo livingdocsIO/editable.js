@@ -13,11 +13,19 @@ var behavior = (function() {
     },
 
     selection: function(element, selection) {
-      console.log('Default selection behavior');
+      if (selection) {
+        console.log('Default selection behavior');
+      } else {
+        console.log('Default selection empty behavior');
+      }
     },
 
     cursor: function(element, cursor) {
-      console.log('Default cursor behavior');
+      if (cursor) {
+        console.log('Default cursor behavior');
+      } else {
+        console.log('Default cursor empty behavior');
+      }
     },
 
     newline: function(element, cursor, selection) {

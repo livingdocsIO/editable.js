@@ -7,6 +7,7 @@
  */
 
 var selectionWatcher = (function() {
+
   /** RangeContainer
    *
    * primarily used to compare ranges
@@ -19,6 +20,7 @@ var selectionWatcher = (function() {
     this.range = rangyRange;
     this.isAnythingSelected = (rangyRange !== undefined);
     this.cursor = (this.isAnythingSelected && rangyRange.collapsed);
+    this.selection = !this.cursor;
   };
 
   RangeContainer.prototype.isDifferentFrom = function(otherRangeContainer) {
@@ -34,8 +36,9 @@ var selectionWatcher = (function() {
   };
 
 
-  var rangySelection;
-  var currentRange = new RangeContainer();
+  var rangySelection,
+      currentSelection,
+      currentRange = new RangeContainer();
 
   /**
    * Return a RangeContainer if the current selection is within an editable
@@ -66,8 +69,18 @@ var selectionWatcher = (function() {
 
   return {
 
-    getRangySelection: function() {
-      return rangySelection;
+    // get a fresh Selection or Cursor
+    getFreshSelection: function() {
+      var range = getRangeContainer();
+      if (!range.isAnythingSelected) return undefined;
+
+      return range.cursor ?
+        new Cursor(range.host, range.range) :
+        new Selection(range.host, range.range);
+    },
+
+    getSelection: function() {
+      return currentSelection;
     },
 
     selectionChanged: function() {
@@ -77,15 +90,36 @@ var selectionWatcher = (function() {
 
         if (currentRange.isAnythingSelected) {
           if (currentRange.cursor) {
-            console.log('cursor - changed selection');
 
-            // console.log(currentRange.range.startContainer.textContent);
-            // console.log(currentRange.range.startOffset);
+            // emtpy selection
+            if (currentSelection instanceof Selection) {
+              dispatcher.notifyListeners('selection', currentSelection.host);
+            }
+
+            // new cursor
+            currentSelection = new Cursor(currentRange.host, currentRange.range);
+            dispatcher.notifyListeners('cursor', currentSelection.host, currentSelection);
           } else {
-            console.log('selection - changed selection');
+
+            // emtpy cursor
+            if (currentSelection instanceof Cursor) {
+              dispatcher.notifyListeners('cursor', currentSelection.host);
+            }
+
+            // new selection
+            currentSelection = new Selection(currentRange.host, currentRange.range);
+            dispatcher.notifyListeners('selection', currentSelection.host, currentSelection);
           }
         } else {
-          console.log('empty - changed selection');
+          var previousSelection = currentSelection;
+          currentSelection = undefined;
+
+          // empty selection or cursor
+          if (previousSelection instanceof Cursor) {
+            dispatcher.notifyListeners('cursor', previousSelection.host);
+          } else if (previousSelection instanceof Selection) {
+            dispatcher.notifyListeners('selection', previousSelection.host);
+          }
         }
       }
     }

@@ -7,7 +7,8 @@
  */
 
 var Selection = (function() {
-  // Selection class
+
+  // constructor
   var Selection = function(editableHost, rangyRange) {
     this.host = editableHost;
     this.range = rangyRange;
@@ -17,7 +18,11 @@ var Selection = (function() {
     return {
 
       text: function() {
+        return this.range.toString();
+      },
 
+      html: function() {
+        return this.range.toHtml();
       },
 
       isAllSelected: function() {

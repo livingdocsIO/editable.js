@@ -6,19 +6,22 @@
  */
 
 var Cursor = (function() {
+
   /**
    * Cursor class description
    *
    * @class Cursor
    * @constructor
    */
-  var Cursor = function() {
-
+  var Cursor = function(editableHost, rangyRange) {
+    this.host = editableHost;
+    this.range = rangyRange;
   };
 
   Cursor.prototype = (function() {
-
+    return {};
   })();
 
   return Cursor;
 })();
+
