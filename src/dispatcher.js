@@ -97,8 +97,8 @@ var dispatcher = (function() {
         console.log('Shift+Enter key pressed');
         event.preventDefault();
         event.stopPropagation();
-        // TODO pass the missing parameter "Cursor"
-        _this.notifyListeners('newline', this);
+        var freshSelection = selectionWatcher.getFreshSelection(); 
+        _this.notifyListeners('newline', this, freshSelection instanceof Cursor ? freshSelection : null, freshSelection instanceof Selection ? freshSelection: null);
       });
 
       // cache selectionChanged function for simplicity
