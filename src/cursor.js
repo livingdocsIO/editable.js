@@ -19,7 +19,33 @@ var Cursor = (function() {
   };
 
   Cursor.prototype = (function() {
-    return {};
+    return {
+      isAtTheEnd: function() {
+        
+      },
+
+      insertBefore: function(element) {
+        //TODO smart check on element type, now
+        //assume it is a dom element
+        this.range.insertNode(element);
+        this.range.setStartAfter(element);
+        this.range.setEndAfter(element);
+      },
+
+      insertAfter: function(element) {
+        //TODO smart check on element type, now
+        //assume it is a dom element
+        this.range.insertNode(element);
+        this.range.setStartBefore(element);
+        this.range.setEndBefore(element);
+      },
+
+      update: function() {
+        var sel = rangy.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(this.range);
+      }      
+    };
   })();
 
   return Cursor;
