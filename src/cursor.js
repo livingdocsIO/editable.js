@@ -21,8 +21,12 @@ var Cursor = (function() {
   Cursor.prototype = (function() {
     return {
       isAtTheEnd: function() {
-        
+        return parser.isEndOfHost(
+          this.host,
+          this.range.endContainer,
+          this.range.endOffset);
       },
+
 
       insertBefore: function(element) {
         //TODO smart check on element type, now
@@ -44,7 +48,7 @@ var Cursor = (function() {
         var sel = rangy.getSelection();
         sel.removeAllRanges();
         sel.addRange(this.range);
-      }      
+      }
     };
   })();
 

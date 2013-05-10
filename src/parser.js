@@ -76,6 +76,32 @@ var parser = (function() {
      */
     isEmptyTextNode: function(node) {
       return node.nodeType === 3 && !node.nodeValue;
+    },
+
+    isEndOfHost: function(editable, endContainer, endOffset) {
+      if (endContainer === editable) {
+        return this.isEndOffset(endContainer, endOffset);
+      }
+
+      if (this.isEndOffset(endContainer, endOffset)) {
+        var parentContainer = endContainer.parentNode;
+        var offsetInParent = this.getNodeIndex(endContainer);
+        return this.isEndOfHost(editable, parentContainer, offsetInParent);
+      } else {
+        return false;
+      }
+    },
+
+    isEndOffset: function (container, offset) {
+      if (container.nodeType === 3) {
+        // ignore whitespace at the end
+        var text = container.nodeValue;
+        return offset >= string.trimRight(text).length;
+
+        // return offset === container.length;
+      } else {
+        return container.childNodes[offset] === container.lastChild;
+      }
     }
 
   };

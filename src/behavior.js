@@ -35,33 +35,25 @@ var behavior = (function() {
         cursor = selection.deleteContent();
       }
 
-      if(cursor.isAtTheEnd()) {
+      var atTheEnd = cursor.isAtTheEnd();
+      var br = document.createElement('br');
+      cursor.insertBefore(br);
+
+      if(atTheEnd) {
         console.log('at the end');
-      }
-      else {
+
+        var noWidthSpace = document.createTextNode('\u200B');
+        cursor.insertAfter(noWidthSpace);
+
+        // var trailingBr = document.createElement('br');
+        // trailingBr.setAttribute('type', '-editablejs');
+        // cursor.insertAfter(trailingBr);
+
+      } else {
         console.log('not at the end');
       }
 
-      /*var br = document.createElement('br');
-      var trailingBr = document.createElement('br');
-      trailingBr.setAttribute('type', '-editablejs');
-      cursor.insertBefore(br);
-      cursor.insertAfter(trailingBr);
-      cursor.update();*/
-
-
-      /*var range,
-          sel = rangy.getSelection(),
-          
-
-      if (sel.rangeCount) {
-        range = sel.getRangeAt(0);
-        range.insertNode(br);
-        range.setStartAfter(br);
-        range.setEndAfter(br);
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }*/
+      cursor.update();
     },
 
     insert: function(element, direction) {

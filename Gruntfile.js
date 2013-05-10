@@ -113,7 +113,7 @@ module.exports = function (grunt) {
             'src/util/*.js',
             'src/core.js',
             'src/!(core).js',
-            'spec/**/*.spec.js',
+            'spec/**/*.js',
             'editable.suffix'
           ]
         }
