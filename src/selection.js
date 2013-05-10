@@ -8,7 +8,13 @@
 
 var Selection = (function() {
 
-  // constructor
+  /**
+   * Class that represents a selection and provides functionality to access or
+   * modify the selection.
+   *
+   * @class Selection
+   * @constructor
+   */
   var Selection = function(editableHost, rangyRange) {
     this.host = editableHost;
     this.range = rangyRange;
@@ -17,22 +23,44 @@ var Selection = (function() {
   Selection.prototype = (function() {
     return {
 
+      /**
+       * Get the text inside the selection.
+       *
+       * @method text
+       */
       text: function() {
         return this.range.toString();
       },
 
+      /**
+       * Get the html inside the selection.
+       *
+       * @method html
+       */
       html: function() {
         return this.range.toHtml();
       },
 
+      /**
+       *
+       * @method isAllSelected
+       */
       isAllSelected: function() {
 
       },
 
+      /**
+       *
+       * @method strip
+       */
       strip: function() {
 
       },
 
+      /**
+       *
+       * @method deleteContent
+       */
       deleteContent: function() {
 
       },
@@ -40,7 +68,8 @@ var Selection = (function() {
       /**
        * Expand the current selection
        *
-       * @param: {String} either of these: 'word', 'sentence', 'tag' or 'block'.
+       * @method expand
+       * @param {String} scope: either of: 'word', 'sentence', 'tag' or 'block'.
        */
       expand: function(scope) {
 

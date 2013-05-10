@@ -1,5 +1,8 @@
 /**
- * The Core module provides main functionalities of Editable.JS API.
+ * The Core module provides the Editable singleton that defines the Editable.JS
+ * API and is the main entry point for Editable.JS.
+ * It also provides the cursor module for cross-browser cursors, and the dom
+ * submodule.
  *
  * @module core
  */
@@ -8,15 +11,19 @@
   var isInitialized = false;
 
   /**
+   * Singleton for the Editable.JS API that is externally visible.
+   * Note that the Editable literal is defined
+   * first in editable.prefix in order for it to be the only externally visible
+   * variable.
+   *
    * @class Editable
-   *
-   * Note: Editable variable is defined in editable.prefix
-   *
    * @static
    */
   Editable = {
     /**
-     * Adds the API to the given target elements.
+     * Adds the Editable.JS API to the given target elements.
+     * Opposite of {{#crossLink "Editable/remove"}}{{/crossLink}}.
+     * Calls dispatcher.setup to setup all event listeners.
      *
      * @method add
      * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
@@ -42,7 +49,8 @@
     },
 
     /**
-     * Removes the API from the given target elements.
+     * Removes the Editable.JS API from the given target elements.
+     * Opposite of {{#crossLink "Editable/add"}}{{/crossLink}}.
      *
      * @method remove
      * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
@@ -59,6 +67,7 @@
 
     /**
      * Subscribe a callback function to a custom event fired by the API.
+     * Opposite of {{#crossLink "Editable/off"}}{{/crossLink}}.
      *
      * @method on
      * @param {String} event The name of the event.
@@ -76,6 +85,7 @@
 
     /**
      * Unsubscribe a callback function from a custom event fired by the API.
+     * Opposite of {{#crossLink "Editable/on"}}{{/crossLink}}.
      *
      * @method off
      * @param {String} event The name of the event.

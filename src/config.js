@@ -1,9 +1,12 @@
 (function() {
   /**
-   * Default configuration object.
-   * 
+   * This configuration object allows a user to overwrite the Editable.JS behavior
+   * of the events defined in the Editable singleton.
+   * The configuration object can be accessed by a user through the externally
+   * visible Editable variable.
+   *
    * @property config
-   * @for  Editable 
+   * @for  Editable
    * @type {Object}
    */
   Editable.config = {
@@ -22,7 +25,7 @@
       /**
        * The blur event is triggered when an element looses focus.
        * The default behavior is to... TODO
-       * 
+       *
        * @event blur
        * @param {HTMLElement} element The element triggering the event.
        */
@@ -33,7 +36,7 @@
       /**
        * The flow event is triggered when the user starts typing or pause typing.
        * The default behavior is to... TODO
-       * 
+       *
        * @event flow
        * @param {HTMLElement} element The element triggering the event.
        * @param {String} action The flow action: "start" or "pause".
@@ -46,7 +49,7 @@
        * The selection event is triggered after the user has selected some
        * content.
        * The default behavior is to... TODO
-       * 
+       *
        * @event selection
        * @param {HTMLElement} element The element triggering the event.
        * @param {Selection} selection The actual Selection object.
@@ -58,7 +61,7 @@
       /**
        * The cursor event is triggered after cursor position has changed.
        * The default behavior is to... TODO
-       * 
+       *
        * @event cursor
        * @param {HTMLElement} element The element triggering the event.
        * @param {Cursor} cursor The actual Cursor object.
@@ -71,7 +74,7 @@
        * The newline event is triggered when a newline should be inserted. This
        * happens when SHIFT+ENTER key is pressed.
        * The default behavior is to add a <br />
-       * 
+       *
        * @event newline
        * @param {HTMLElement} element The element triggering the event.
        * @param {Cursor} cursor The actual cursor object.
@@ -86,7 +89,7 @@
        * happens when ENTER key is pressed at the beginning of a block (should
        * insert before) or at the end of a block (should insert after).
        * The default behavior is to... TODO
-       * 
+       *
        * @event insert
        * @param {HTMLElement} element The element triggering the event.
        * @param {String} direction The insert direction: "before" or "after".
@@ -99,7 +102,7 @@
        * The split event is triggered when a block should be splitted into two
        * blocks. This happens when ENTER is pressed within a non-empty block.
        * The default behavior is to... TODO
-       * 
+       *
        * @event split
        * @param {HTMLElement} element The element triggering the event.
        * @param {String} before The HTML string before the split.
@@ -115,7 +118,7 @@
        * the preceeding block) or DEL is pressed at the end of a block (should
        * merge with the following block).
        * The default behavior is to... TODO
-       * 
+       *
        * @event merge
        * @param {HTMLElement} element The element triggering the event.
        * @param {String} direction The merge direction: "before" or "after".
@@ -127,7 +130,7 @@
       /**
        * The empty event is triggered when a block is emptied.
        * The default behavior is to... TODO
-       * 
+       *
        * @event empty
        * @param {HTMLElement} element The element triggering the event.
        */
@@ -140,7 +143,7 @@
        * This happens when TAB is pressed (move one block after) or SHIFT+TAB
        * is pressed (move one block before).
        * The default behavior is to... TODO
-       * 
+       *
        * @event switch
        * @param {HTMLElement} element The element triggering the event.
        * @param {String} direction The switch direction: "before" or "after".
@@ -154,7 +157,7 @@
        * This happens when the user selects some (or all) content in a block and
        * an ARROW key is pressed (up: drag before, down: drag after).
        * The default behavior is to... TODO
-       * 
+       *
        * @event move
        * @param {HTMLElement} element The element triggering the event.
        * @param {Selection} selection The actual Selection object.
@@ -168,7 +171,7 @@
        * The clipboard event is triggered when the user copies, pastes or cuts
        * a selection within a block.
        * The default behavior is to... TODO
-       * 
+       *
        * @event clipboard
        * @param {HTMLElement} element The element triggering the event.
        * @param {Selection} selection The actual Selection object.

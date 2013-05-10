@@ -1,7 +1,8 @@
 /**
  * The Dispatcher module is responsible for dealing with events and their handlers.
  *
- * @module dispatcher
+ * @module core
+ * @submodule dispatcher
  */
 
 var dispatcher = (function() {
@@ -13,6 +14,12 @@ var dispatcher = (function() {
    */
   var listeners = {};
 
+  /**
+   * Singleton that contains all event listeners that Editable.JS is listening
+   * to and allows to add, remove, and notify listeners.
+   *
+   * @class Dispatcher
+   */
   return {
     addListener: function(event, listener) {
       if (listeners[event] === undefined) {
@@ -47,6 +54,11 @@ var dispatcher = (function() {
       }
     },
 
+    /**
+     * Sets up all events that Editable.JS is catching.
+     *
+     * @method setup
+     */
     setup: function() {
       var $document = $(document);
       var _this = this;
