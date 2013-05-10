@@ -191,7 +191,7 @@ var dispatcher = (function() {
       // TODO check the Editable.config.event object to prevent
       // registering invalid handlers
       for(eventType in Editable.config.event) {
-        _this.addListener(eventType, Editable.config.event[eventType]);
+        this.addListener(eventType, Editable.config.event[eventType]);
       }
 
       // setup all events notifications
