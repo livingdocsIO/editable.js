@@ -1,9 +1,7 @@
 (function() {
   /**
-   * This configuration object allows a user to overwrite the Editable.JS behavior
-   * of the events defined in the Editable singleton.
-   * The configuration object can be accessed by a user through the externally
-   * visible Editable variable.
+   * Defines all supported event types by Editable.JS and provides default
+   * implementations for them defined in {{#crossLink "Behavior"}}{{/crossLink}}
    *
    * @property config
    * @for  Editable

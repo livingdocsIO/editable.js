@@ -84,6 +84,7 @@ var selectionWatcher = (function() {
     },
 
     selectionChanged: function() {
+      console.log("selection changed");
       var newRange = getRangeContainer();
       if (newRange.isDifferentFrom(currentRange)) {
         currentRange = newRange;
