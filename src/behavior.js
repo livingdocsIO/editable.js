@@ -23,6 +23,7 @@ var behavior = (function() {
 
     blur: function(element) {
       console.log('Default blur behavior');
+      element.innerHTML = content.cleanInternals(element.innerHTML);
     },
 
     flow: function(element, action) {
