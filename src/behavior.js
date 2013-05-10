@@ -52,7 +52,7 @@ var behavior = (function() {
 
       /*var range,
           sel = rangy.getSelection(),
-          
+
 
       if (sel.rangeCount) {
         range = sel.getRangeAt(0);

@@ -179,7 +179,6 @@ var dispatcher = (function() {
     setup: function() {
 
       var $document = $(document);
-      var _this = this;
       var eventType = null;
 
       listeners = {};
@@ -190,8 +189,8 @@ var dispatcher = (function() {
       }
 
       // setup all events notifications
-      setupElementEvents($document, _this.notifyListeners);
-      setupKeyboardEvents($document, _this.notifyListeners);
+      setupElementEvents($document, this.notifyListeners);
+      setupKeyboardEvents($document, this.notifyListeners);
 
       // cache selectionChanged function for simplicity
       var selectionChanged = selectionWatcher.selectionChanged;
