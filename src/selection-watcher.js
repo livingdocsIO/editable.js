@@ -79,6 +79,14 @@ var selectionWatcher = (function() {
         new Selection(range.host, range.range);
     },
 
+    getCursor: function() {
+      var cursor = this.getFreshSelection();
+      if (cursor instanceof Selection) {
+        cursor = cursor.deleteContent();
+      }
+      return cursor;
+    },
+
     getSelection: function() {
       return currentSelection;
     },

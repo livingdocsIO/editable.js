@@ -68,12 +68,26 @@ var dispatcher = (function() {
         console.log('Delete key pressed');
       }).on('enter', function(event) {
         console.log('Enter key pressed');
+
+        event.preventDefault();
+        event.stopPropagation();
+        var cursor = selectionWatcher.getCursor()
+
+        if (cursor.isAtTheEnd()) {
+          notifier('insert', this, "end");
+        } else if(cursor.isAtTheBeginning()) {
+          notifier('insert', this, "beginning");
+        } else {
+          var firstPart, secondPart;
+          notifier('split', this, firstPart, secondPart);
+        }
+
       }).on('shiftEnter', function(event) {
         console.log('Shift+Enter key pressed');
         event.preventDefault();
         event.stopPropagation();
-        var freshSelection = selectionWatcher.getFreshSelection();
-        notifier('newline', this, freshSelection instanceof Cursor ? freshSelection : null, freshSelection instanceof Selection ? freshSelection: null);
+        var cursor = selectionWatcher.getCursor()
+        notifier('newline', this, cursor);
       });
   };
 

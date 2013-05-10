@@ -27,6 +27,10 @@ var Cursor = (function() {
           this.range.endOffset);
       },
 
+      isAtTheBeginning: function() {
+        // todo
+        return false;
+      },
 
       insertBefore: function(element) {
         //TODO smart check on element type, now

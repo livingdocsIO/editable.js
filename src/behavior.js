@@ -46,12 +46,9 @@ var behavior = (function() {
       }
     },
 
-    newline: function(element, cursor, selection) {
+    newline: function(element, cursor) {
       console.log(cursor);
       console.log('Default newline behavior');
-      if(selection) {
-        cursor = selection.deleteContent();
-      }
 
       var atTheEnd = cursor.isAtTheEnd();
       var br = document.createElement('br');
