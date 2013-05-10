@@ -29,10 +29,30 @@ var behavior = (function() {
     },
 
     newline: function(element, cursor, selection) {
+      console.log(cursor);
       console.log('Default newline behavior');
-      var range,
+      if(selection) {
+        cursor = selection.deleteContent();
+      }
+
+      if(cursor.isAtTheEnd()) {
+        console.log('at the end');
+      }
+      else {
+        console.log('not at the end');
+      }
+
+      /*var br = document.createElement('br');
+      var trailingBr = document.createElement('br');
+      trailingBr.setAttribute('type', '-editablejs');
+      cursor.insertBefore(br);
+      cursor.insertAfter(trailingBr);
+      cursor.update();*/
+
+
+      /*var range,
           sel = rangy.getSelection(),
-          br = document.createElement('br');
+          
 
       if (sel.rangeCount) {
         range = sel.getRangeAt(0);
@@ -41,7 +61,7 @@ var behavior = (function() {
         range.setEndAfter(br);
         sel.removeAllRanges();
         sel.addRange(range);
-      }
+      }*/
     },
 
     insert: function(element, direction) {
