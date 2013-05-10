@@ -1,3 +1,9 @@
+/**
+ * The Keyboard module defines an event API for key events.
+ * @module core
+ * @submodule keyboard
+ */
+
 var keyboard = (function() {
   var KEY_LEFT = 37,
       KEY_UP = 38,
@@ -32,6 +38,13 @@ var keyboard = (function() {
     }
   };
 
+  /**
+   * Singleton that defines its own API for keyboard events and dispatches
+   * keyboard events from the browser to this API.
+   * The keyboard API events are handled by {{#crossLink "Dispatcher"}}{{/crossLink}}.
+   * @class Keyboard
+   * @static
+   */
   return {
     dispatchKeyEvent: function(event, target) {
       switch (event.keyCode) {

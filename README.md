@@ -1,34 +1,44 @@
 Editable.JS
 ==========
 
-Low level JavaScript API for dealing with content editable
+JavaScript API that defines a browser-consistent content editable interface
 
 
 Development
 -----------
 
-Organization:  
-All code is wrapped in one function by editable.prefix and editable.suffix. So all files of editable.js share the same closure.  
-(JSHint does not know this, so all variables defined directly in this editable.js scope have to be added to the globals in .jshintrc)
+Organization:
+All files of Editable.JS share the same closure. This is in order to allow all classes inside the Editable.JS API to use global objects, but only expose the Editable singleton as the only externally visible variable of Editable.JS. To get a shared closure the files editable.prefix and editable.suffix wrap all code.
 
 
-Optional prerequisites:  
-- [PhantomJS](http://phantomjs.org/)
-- [YUIDoc](http://yui.github.com/yuidoc/)
+JSHint does not know this, so all variables defined directly in this editable.js scope have to be added to the globals in .jshintrc
+
 
 Setup:
+
+- [PhantomJS](http://phantomjs.org/)
+
 ```bash
 # install PhantomJS with homebrew
 brew install phantomjs
-
-# YUIDoc should be installed globally (its not required in packages.json)
-sudo npm install -g yuidocjs
 
 # install node dependencies
 npm install
 ```
 
-Grunt tasks:  
+
+Development setup (optional):
+
+- [YUIDoc](http://yui.github.com/yuidoc/)
+
+```bash
+# YUIDoc should be installed globally (its not required in packages.json)
+npm install -g yuidocjs
+```
+
+
+Grunt tasks:
+
 ```bash
 # watch and update editable.js and editable-test.js in .tmp/
 # (required for grunt server and running tests)
@@ -50,7 +60,8 @@ grunt jshint
 grunt build
 ```
 
-YUIDoc
+YUIDoc:
+
 ```bash
 # build and run the documentation
 yuidoc --server src/
