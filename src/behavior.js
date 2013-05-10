@@ -1,4 +1,21 @@
+/**
+ * The Behavior module defines the behavior triggered in response to the Editable.JS
+ * events (see {{#crossLink "Editable"}}{{/crossLink}}).
+ * The behavior can be overwritten by a user with the Editable.config object.
+ *
+ * @module core
+ * @submodule behavior
+ */
+
+
 var behavior = (function() {
+  /**
+    * Singleton for the behavior module.
+    * Provides default behavior of the Editable.JS API.
+    *
+    * @class Behavior
+    * @static
+    */
   return {
     focus: function(element) {
       console.log('Default focus behavior');

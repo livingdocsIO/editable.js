@@ -8,7 +8,7 @@
 var Cursor = (function() {
 
   /**
-   * Cursor class description
+   * Class for the Cursor module.
    *
    * @class Cursor
    * @constructor
