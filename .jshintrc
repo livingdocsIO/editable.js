@@ -31,6 +31,7 @@
     "Selection": true,
     "Cursor": true,
     "parser": true,
-    "browserFeatures": true
+    "browserFeatures": true,
+    "content"
   }
 }
