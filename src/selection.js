@@ -34,7 +34,8 @@ var Selection = (function() {
       },
 
       deleteContent: function() {
-
+        this.range.deleteContents();
+        return new Cursor(this.host, this.range);
       },
 
       /**
