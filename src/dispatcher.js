@@ -44,51 +44,51 @@ var dispatcher = (function() {
    * @param {Function} notifier: The callback to be triggered when the event is caught.
    */
   var setupKeyboardEvents = function($document, notifier) {
-      $document.on('keydown.editable', '.-js-editable', function(event) {
-        keyboard.dispatchKeyEvent(event, this);
-      });
+    $document.on('keydown.editable', '.-js-editable', function(event) {
+      keyboard.dispatchKeyEvent(event, this);
+    });
 
-      keyboard.on('left', function(event) {
-        console.log('Left key pressed');
-      }).on('up', function(event) {
-        console.log('Up key pressed');
-      }).on('right', function(event) {
-        console.log('Right key pressed');
-      }).on('down', function(event) {
-        console.log('Down key pressed');
-      }).on('tab', function(event) {
-        console.log('Tab key pressed');
-      }).on('shiftTab', function(event) {
-        console.log('Shift+Tab key pressed');
-      }).on('esc', function(event) {
-        console.log('Esc key pressed');
-      }).on('backspace', function(event) {
-        console.log('Backspace key pressed');
-      }).on('delete', function(event) {
-        console.log('Delete key pressed');
-      }).on('enter', function(event) {
-        console.log('Enter key pressed');
+    keyboard.on('left', function(event) {
+      console.log('Left key pressed');
+    }).on('up', function(event) {
+      console.log('Up key pressed');
+    }).on('right', function(event) {
+      console.log('Right key pressed');
+    }).on('down', function(event) {
+      console.log('Down key pressed');
+    }).on('tab', function(event) {
+      console.log('Tab key pressed');
+    }).on('shiftTab', function(event) {
+      console.log('Shift+Tab key pressed');
+    }).on('esc', function(event) {
+      console.log('Esc key pressed');
+    }).on('backspace', function(event) {
+      console.log('Backspace key pressed');
+    }).on('delete', function(event) {
+      console.log('Delete key pressed');
+    }).on('enter', function(event) {
+      console.log('Enter key pressed');
 
-        event.preventDefault();
-        event.stopPropagation();
-        var cursor = selectionWatcher.getCursor()
+      event.preventDefault();
+      event.stopPropagation();
+      var cursor = selectionWatcher.getCursor();
 
-        if (cursor.isAtTheEnd()) {
-          notifier('insert', this, "end");
-        } else if(cursor.isAtTheBeginning()) {
-          notifier('insert', this, "beginning");
-        } else {
-          var firstPart, secondPart;
-          notifier('split', this, firstPart, secondPart);
-        }
+      if (cursor.isAtTheEnd()) {
+        notifier('insert', this, 'end');
+      } else if(cursor.isAtTheBeginning()) {
+        notifier('insert', this, 'beginning');
+      } else {
+        var firstPart, secondPart;
+        notifier('split', this, firstPart, secondPart);
+      }
 
-      }).on('shiftEnter', function(event) {
-        console.log('Shift+Enter key pressed');
-        event.preventDefault();
-        event.stopPropagation();
-        var cursor = selectionWatcher.getCursor()
-        notifier('newline', this, cursor);
-      });
+    }).on('shiftEnter', function(event) {
+      console.log('Shift+Enter key pressed');
+      event.preventDefault();
+      event.stopPropagation();
+      var cursor = selectionWatcher.getCursor();
+      notifier('newline', this, cursor);
+    });
   };
 
   /**

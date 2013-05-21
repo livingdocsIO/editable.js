@@ -32,6 +32,7 @@
     "Cursor": true,
     "parser": true,
     "browserFeatures": true,
-    "content"
+    "content": true,
+    "string": true
   }
 }
