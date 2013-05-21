@@ -129,7 +129,19 @@ module.exports = function (grunt) {
           ],
         }
       }
+    },
+    copy: {
+      lukas: {
+        files: [{
+          expand: true,
+          cwd: 'dist/',
+          src: ['*'],
+          dest: '../livingdocs-engine/vendor/editableJS/'
+        }]
+
+      }
     }
+
   });
 
   // livereload does not work with grunt-contrib-watch, so we use regarde instead
@@ -168,6 +180,11 @@ module.exports = function (grunt) {
     // 'karma:build',
     'concat:dist',
     'uglify'
+  ]);
+
+  grunt.registerTask('build-lukas', [
+    'build',
+    'copy:lukas'
   ]);
 
   grunt.registerTask('default', ['server']);
