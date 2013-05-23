@@ -93,6 +93,16 @@ var parser = (function() {
       }
     },
 
+    isStartOffset: function (container, offset) {
+      if (container.nodeType === 3) {
+        var text = container.nodeValue;
+        var actualStart = text.length - string.trimLeft(text).length;
+        return offset <= actualStart;
+      } else {
+        return container.childNodes[offset] === container.firstChild;
+      }
+    },
+
     isEndOffset: function (container, offset) {
       if (container.nodeType === 3) {
         // ignore whitespace at the end

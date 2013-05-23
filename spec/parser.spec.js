@@ -55,6 +55,33 @@ describe("Test parser", function() {
     expect(parser.isEndOffset(textWithLink, 1)).toEqual(false);
   });
 
+  // isStartOffset
+  it("isStartOffset should work for single child node", function() {
+    // <div>|foobar</div>
+    expect(parser.isStartOffset(oneWord, 0)).toEqual(true);
+  });
+
+  it("isStartOffset should work with a text node", function() {
+    // |foobar
+    expect(parser.isStartOffset(textNode, 0)).toEqual(true);
+
+    // f|oobar
+    expect(parser.isStartOffset(textNode, 1)).toEqual(false);
+  });
+
+  it("isStartOffset should ignore whitespace at the beginning", function() {
+    // <div> |foobar </div>
+    expect(parser.isStartOffset(oneWordWithWhitespace.firstChild, 1)).toEqual(true);
+  });
+
+  it("isStartOffset should work with text and element nodes", function() {
+    // <div>|foo <a href='#'>bar</a>.</div>
+    expect(parser.isStartOffset(textWithLink, 0)).toEqual(true);
+
+    // <div>foo <a href='#'>|bar</a>.</div>
+    expect(parser.isStartOffset(textWithLink, 1)).toEqual(false);
+  });
+
   // isEndOfHost
   it("isEndOfHost should work with text node in nested content", function() {
     var endContainer = $(linkWithSpan).find("span")[0].firstChild;
