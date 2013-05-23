@@ -72,7 +72,7 @@ var behavior = (function() {
     },
 
     insert: function(element, direction) {
-      log('Default insert behavior');
+      log('Default insert ' + direction + ' behavior');
     },
 
     split: function(element, before, after) {
