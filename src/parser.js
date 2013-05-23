@@ -79,29 +79,29 @@ var parser = (function() {
       return node.nodeType === 3 && !node.nodeValue;
     },
 
-    isBeginningOfHost: function(editable, endContainer, endOffset) {
-      if (endContainer === editable) {
-        return this.isStartOffset(endContainer, endOffset);
+    isBeginningOfHost: function(host, container, offset) {
+      if (container === host) {
+        return this.isStartOffset(container, offset);
       }
 
-      if (this.isStartOffset(endContainer, endOffset)) {
-        var parentContainer = endContainer.parentNode;
-        var offsetInParent = this.getNodeIndex(endContainer);
-        return this.isBeginningOfHost(editable, parentContainer, offsetInParent);
+      if (this.isStartOffset(container, offset)) {
+        var parentContainer = container.parentNode;
+        var offsetInParent = this.getNodeIndex(container);
+        return this.isBeginningOfHost(host, parentContainer, offsetInParent);
       } else {
         return false;
       }
     },
 
-    isEndOfHost: function(editable, endContainer, endOffset) {
-      if (endContainer === editable) {
-        return this.isEndOffset(endContainer, endOffset);
+    isEndOfHost: function(host, container, offset) {
+      if (container === host) {
+        return this.isEndOffset(container, offset);
       }
 
-      if (this.isEndOffset(endContainer, endOffset)) {
-        var parentContainer = endContainer.parentNode;
-        var offsetInParent = this.getNodeIndex(endContainer);
-        return this.isEndOfHost(editable, parentContainer, offsetInParent);
+      if (this.isEndOffset(container, offset)) {
+        var parentContainer = container.parentNode;
+        var offsetInParent = this.getNodeIndex(container);
+        return this.isEndOfHost(host, parentContainer, offsetInParent);
       } else {
         return false;
       }
