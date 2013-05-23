@@ -33,6 +33,8 @@
     "parser": true,
     "browserFeatures": true,
     "content": true,
-    "string": true
+    "string": true,
+    "log": true,
+    "error": true
   }
 }
