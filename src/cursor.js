@@ -28,6 +28,9 @@ var Cursor = (function() {
       },
 
       isAtTheBeginning: function() {
+        //TODO discuss if this should be
+        //startContainer/startOffset as to 
+        //deal with selections. See #13
         return parser.isBeginningOfHost(
           this.host,
           this.range.endContainer,
