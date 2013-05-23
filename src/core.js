@@ -81,6 +81,7 @@
      * @chainable
      */
     on: function(event, handler) {
+      initialize();
       // TODO throw error if event is not one of EVENTS
       // TODO throw error if handler is not a function
       dispatcher.addListener(event, handler);
