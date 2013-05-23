@@ -8,6 +8,8 @@
    * @type {Object}
    */
   Editable.config = {
+    log: true,
+
     event: {
       /**
        * The focus event is triggered when an element gains focus.

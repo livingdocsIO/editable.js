@@ -18,44 +18,44 @@ var behavior = (function() {
     */
   return {
     focus: function(element) {
-      console.log('Default focus behavior');
+      log('Default focus behavior');
     },
 
     blur: function(element) {
-      console.log('Default blur behavior');
+      log('Default blur behavior');
       element.innerHTML = content.cleanInternals(element.innerHTML);
     },
 
     flow: function(element, action) {
-      console.log('Default flow behavior');
+      log('Default flow behavior');
     },
 
     selection: function(element, selection) {
       if (selection) {
-        console.log('Default selection behavior');
+        log('Default selection behavior');
       } else {
-        console.log('Default selection empty behavior');
+        log('Default selection empty behavior');
       }
     },
 
     cursor: function(element, cursor) {
       if (cursor) {
-        console.log('Default cursor behavior');
+        log('Default cursor behavior');
       } else {
-        console.log('Default cursor empty behavior');
+        log('Default cursor empty behavior');
       }
     },
 
     newline: function(element, cursor) {
-      console.log(cursor);
-      console.log('Default newline behavior');
+      log(cursor);
+      log('Default newline behavior');
 
       var atTheEnd = cursor.isAtTheEnd();
       var br = document.createElement('br');
       cursor.insertBefore(br);
 
       if(atTheEnd) {
-        console.log('at the end');
+        log('at the end');
 
         var noWidthSpace = document.createTextNode('\u200B');
         cursor.insertAfter(noWidthSpace);
@@ -65,38 +65,38 @@ var behavior = (function() {
         // cursor.insertAfter(trailingBr);
 
       } else {
-        console.log('not at the end');
+        log('not at the end');
       }
 
       cursor.update();
     },
 
     insert: function(element, direction) {
-      console.log('Default insert behavior');
+      log('Default insert behavior');
     },
 
     split: function(element, before, after) {
-      console.log('Default split behavior');
+      log('Default split behavior');
     },
 
     merge: function(element, direction) {
-      console.log('Default merge behavior');
+      log('Default merge behavior');
     },
 
     empty: function(element) {
-      console.log('Default empty behavior');
+      log('Default empty behavior');
     },
 
     'switch': function(element, direction) {
-      console.log('Default switch behavior');
+      log('Default switch behavior');
     },
 
     move: function(element, selection, direction) {
-      console.log('Default move behavior');
+      log('Default move behavior');
     },
 
     clipboard: function(element, selection, action) {
-      console.log('Default clipboard behavior');
+      log('Default clipboard behavior');
     }
   };
 })();

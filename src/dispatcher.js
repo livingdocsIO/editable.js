@@ -27,11 +27,11 @@ var dispatcher = (function() {
     }).on('blur.editable', '.-js-editable', function(event) {
       notifier('blur', this);
     }).on('copy.editable', '.-js-editable', function(event) {
-      console.log('Copy');
+      log('Copy');
     }).on('cut.editable', '.-js-editable', function(event) {
-      console.log('Cut');
+      log('Cut');
     }).on('paste.editable', '.-js-editable', function(event) {
-      console.log('Paste');
+      log('Paste');
     });
   };
 
@@ -49,25 +49,25 @@ var dispatcher = (function() {
     });
 
     keyboard.on('left', function(event) {
-      console.log('Left key pressed');
+      log('Left key pressed');
     }).on('up', function(event) {
-      console.log('Up key pressed');
+      log('Up key pressed');
     }).on('right', function(event) {
-      console.log('Right key pressed');
+      log('Right key pressed');
     }).on('down', function(event) {
-      console.log('Down key pressed');
+      log('Down key pressed');
     }).on('tab', function(event) {
-      console.log('Tab key pressed');
+      log('Tab key pressed');
     }).on('shiftTab', function(event) {
-      console.log('Shift+Tab key pressed');
+      log('Shift+Tab key pressed');
     }).on('esc', function(event) {
-      console.log('Esc key pressed');
+      log('Esc key pressed');
     }).on('backspace', function(event) {
-      console.log('Backspace key pressed');
+      log('Backspace key pressed');
     }).on('delete', function(event) {
-      console.log('Delete key pressed');
+      log('Delete key pressed');
     }).on('enter', function(event) {
-      console.log('Enter key pressed');
+      log('Enter key pressed');
 
       event.preventDefault();
       event.stopPropagation();
@@ -83,7 +83,7 @@ var dispatcher = (function() {
       }
 
     }).on('shiftEnter', function(event) {
-      console.log('Shift+Enter key pressed');
+      log('Shift+Enter key pressed');
       event.preventDefault();
       event.stopPropagation();
       var cursor = selectionWatcher.getCursor();
