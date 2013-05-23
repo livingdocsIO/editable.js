@@ -28,8 +28,13 @@ var Cursor = (function() {
       },
 
       isAtTheBeginning: function() {
-        // todo
-        return false;
+        //TODO discuss if this should be
+        //startContainer/startOffset as to 
+        //deal with selections. See #12
+        return parser.isBeginningOfHost(
+          this.host,
+          this.range.endContainer,
+          this.range.endOffset);
       },
 
       insertBefore: function(element) {

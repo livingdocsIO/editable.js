@@ -4,7 +4,7 @@ describe("Test parser", function() {
   var empty = $("<div></div>")[0];
   var emptyWithWhitespace = $("<div> </div>")[0];
   var oneWord = $("<div>foobar</div>")[0];
-  var oneWordWithWhitespace = $("<div>foobar </div>")[0];
+  var oneWordWithWhitespace = $("<div> foobar </div>")[0];
   var textNode = oneWord.firstChild;
   var text = $("<div>foo bar.</div>")[0];
   var textWithLink = $("<div>foo <a href='#'>bar</a>.</div>")[0];
@@ -43,8 +43,8 @@ describe("Test parser", function() {
   });
 
   it("isEndOffset should ignore whitespace at the end", function() {
-    // <div>foobar| </div>
-    expect(parser.isEndOffset(oneWordWithWhitespace.firstChild, 6)).toEqual(true);
+    // <div> foobar| </div>
+    expect(parser.isEndOffset(oneWordWithWhitespace.firstChild, 7)).toEqual(true);
   });
 
   it("isEndOffset should work with text and element nodes", function() {
@@ -53,6 +53,33 @@ describe("Test parser", function() {
 
     // <div>foo <a href='#'>bar</a>|.</div>
     expect(parser.isEndOffset(textWithLink, 1)).toEqual(false);
+  });
+
+  // isStartOffset
+  it("isStartOffset should work for single child node", function() {
+    // <div>|foobar</div>
+    expect(parser.isStartOffset(oneWord, 0)).toEqual(true);
+  });
+
+  it("isStartOffset should work with a text node", function() {
+    // |foobar
+    expect(parser.isStartOffset(textNode, 0)).toEqual(true);
+
+    // f|oobar
+    expect(parser.isStartOffset(textNode, 1)).toEqual(false);
+  });
+
+  it("isStartOffset should ignore whitespace at the beginning", function() {
+    // <div> |foobar </div>
+    expect(parser.isStartOffset(oneWordWithWhitespace.firstChild, 1)).toEqual(true);
+  });
+
+  it("isStartOffset should work with text and element nodes", function() {
+    // <div>|foo <a href='#'>bar</a>.</div>
+    expect(parser.isStartOffset(textWithLink, 0)).toEqual(true);
+
+    // <div>foo <a href='#'>|bar</a>.</div>
+    expect(parser.isStartOffset(textWithLink, 1)).toEqual(false);
   });
 
   // isEndOfHost
@@ -77,6 +104,25 @@ describe("Test parser", function() {
   it("isEndOfHost should work with single text node", function() {
     var endContainer = oneWord.firstChild;
     expect(parser.isEndOfHost(oneWord, endContainer, 6)).toEqual(true);
+  });
+
+  // isBeginningOfHost
+  it("isBeginningOfHost should work with link node in nested content", function() {
+    var endContainer = $(linkWithSpan).find("a")[0];
+    // <div><a href='#'>|foo <span class='important'>bar</span></a></div>
+    expect(parser.isBeginningOfHost(linkWithSpan, endContainer, 0)).toEqual(true);
+
+    // <div><a href='#'>foo <span class='important'>|bar</span></a></div>
+    expect(parser.isBeginningOfHost(linkWithSpan, endContainer, 1)).toEqual(false);
+  });
+
+  it("isBeginningOfHost should work with single text node", function() {
+    var endContainer = oneWord.firstChild;
+    // <div>|foobar</div>
+    expect(parser.isBeginningOfHost(oneWord, endContainer, 0)).toEqual(true);
+    
+    // <div>f|oobar</div>
+    expect(parser.isBeginningOfHost(oneWord, endContainer, 1)).toEqual(false);
   });
 
 });
