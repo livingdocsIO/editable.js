@@ -45,12 +45,21 @@
     add: function(target, options) {
       initialize();
 
-      $(target).attr('contenteditable', true);
-      $(target).addClass('-js-editable');
+      if (!this.isDisabled) {
+        $(target)
+          .attr('contenteditable', true)
+          .addClass('-js-editable');
+      } else {
+        $(target)
+          .removeAttr('contenteditable')
+          .addClass('-js-editable-disabled');
+      }
+
       // todo: check css whitespace settings
       // todo: much much more obviously...
       return this;
     },
+
 
     /**
      * Removes the Editable.JS API from the given target elements.
@@ -64,10 +73,35 @@
      * @chainable
      */
     remove: function(target) {
-      $(target).removeAttr('contenteditable');
-      $(target).removeClass('-js-editable');
+      $(target)
+        .removeAttr('contenteditable')
+        .removeClass('-js-editable')
+        .removeClass('-js-editable-disabled');
       return this;
     },
+
+
+
+    isDisabled: false,
+
+    disable: function() {
+      this.isDisabled = true;
+
+      $('.-js-editable')
+        .removeAttr('contenteditable')
+        .removeClass('-js-editable')
+        .addClass('-js-editable-disabled');
+    },
+
+    enable: function() {
+      this.isDisabled = false;
+
+      $('.-js-editable-disabled')
+        .attr('contenteditable', true)
+        .removeClass('-js-editable-disabled')
+        .addClass('-js-editable');
+    },
+
 
     /**
      * Subscribe a callback function to a custom event fired by the API.

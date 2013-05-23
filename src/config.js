@@ -9,6 +9,8 @@
    */
   Editable.config = {
     log: true,
+    cssClass: '-js-editable',
+    cssClassDisabled: '-js-editable-disabled',
 
     event: {
       /**
