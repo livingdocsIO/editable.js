@@ -4,7 +4,7 @@ describe("Test parser", function() {
   var empty = $("<div></div>")[0];
   var emptyWithWhitespace = $("<div> </div>")[0];
   var oneWord = $("<div>foobar</div>")[0];
-  var oneWordWithWhitespace = $("<div>foobar </div>")[0];
+  var oneWordWithWhitespace = $("<div> foobar </div>")[0];
   var textNode = oneWord.firstChild;
   var text = $("<div>foo bar.</div>")[0];
   var textWithLink = $("<div>foo <a href='#'>bar</a>.</div>")[0];
@@ -43,8 +43,8 @@ describe("Test parser", function() {
   });
 
   it("isEndOffset should ignore whitespace at the end", function() {
-    // <div>foobar| </div>
-    expect(parser.isEndOffset(oneWordWithWhitespace.firstChild, 6)).toEqual(true);
+    // <div> foobar| </div>
+    expect(parser.isEndOffset(oneWordWithWhitespace.firstChild, 7)).toEqual(true);
   });
 
   it("isEndOffset should work with text and element nodes", function() {
