@@ -74,9 +74,9 @@ var dispatcher = (function() {
       var cursor = selectionWatcher.getCursor();
 
       if (cursor.isAtTheEnd()) {
-        notifier('insert', this, 'end');
+        notifier('insert', this, 'after');
       } else if(cursor.isAtTheBeginning()) {
-        notifier('insert', this, 'beginning');
+        notifier('insert', this, 'before');
       } else {
         var firstPart, secondPart;
         notifier('split', this, firstPart, secondPart);

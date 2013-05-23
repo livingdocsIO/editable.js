@@ -28,8 +28,10 @@ var Cursor = (function() {
       },
 
       isAtTheBeginning: function() {
-        // todo
-        return false;
+        return parser.isBeginningOfHost(
+          this.host,
+          this.range.endContainer,
+          this.range.endOffset);
       },
 
       insertBefore: function(element) {
