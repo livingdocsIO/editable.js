@@ -106,5 +106,24 @@ describe("Test parser", function() {
     expect(parser.isEndOfHost(oneWord, endContainer, 6)).toEqual(true);
   });
 
+  // isBeginningOfHost
+  it("isBeginningOfHost should work with link node in nested content", function() {
+    var endContainer = $(linkWithSpan).find("a")[0];
+    // <div><a href='#'>|foo <span class='important'>bar</span></a></div>
+    expect(parser.isBeginningOfHost(linkWithSpan, endContainer, 0)).toEqual(true);
+
+    // <div><a href='#'>foo <span class='important'>|bar</span></a></div>
+    expect(parser.isBeginningOfHost(linkWithSpan, endContainer, 1)).toEqual(false);
+  });
+
+  it("isBeginningOfHost should work with single text node", function() {
+    var endContainer = oneWord.firstChild;
+    // <div>|foobar</div>
+    expect(parser.isBeginningOfHost(oneWord, endContainer, 0)).toEqual(true);
+    
+    // <div>f|oobar</div>
+    expect(parser.isBeginningOfHost(oneWord, endContainer, 1)).toEqual(false);
+  });
+
 });
 

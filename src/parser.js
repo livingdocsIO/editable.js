@@ -79,6 +79,20 @@ var parser = (function() {
       return node.nodeType === 3 && !node.nodeValue;
     },
 
+    isBeginningOfHost: function(editable, endContainer, endOffset) {
+      if (endContainer === editable) {
+        return this.isStartOffset(endContainer, endOffset);
+      }
+
+      if (this.isStartOffset(endContainer, endOffset)) {
+        var parentContainer = endContainer.parentNode;
+        var offsetInParent = this.getNodeIndex(endContainer);
+        return this.isBeginningOfHost(editable, parentContainer, offsetInParent);
+      } else {
+        return false;
+      }
+    },
+
     isEndOfHost: function(editable, endContainer, endOffset) {
       if (endContainer === editable) {
         return this.isEndOffset(endContainer, endOffset);
