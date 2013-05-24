@@ -78,8 +78,7 @@ var dispatcher = (function() {
       } else if(cursor.isAtTheBeginning()) {
         notifier('insert', this, 'before');
       } else {
-        var firstPart, secondPart;
-        notifier('split', this, firstPart, secondPart);
+        notifier('split', this, cursor.before(), cursor.after());
       }
 
     }).on('shiftEnter', function(event) {

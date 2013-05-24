@@ -57,6 +57,20 @@ var Cursor = (function() {
         var sel = rangy.getSelection();
         sel.removeAllRanges();
         sel.addRange(this.range);
+      },
+
+      before: function() {
+        return parser.elementsBeforeOffset(
+          this.host,
+          this.range.endContainer,
+          this.range.endOffset);
+      },
+
+      after: function() {
+        return parser.elementsAfterOffset(
+          this.host,
+          this.range.endContainer,
+          this.range.endOffset);
       }
     };
   })();
