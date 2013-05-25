@@ -75,6 +75,11 @@ var Cursor = (function() {
         fragment = range.cloneContents();
         range.detach();
         return fragment;
+      },
+
+      moveBefore: function(element) {
+        this.range.setStartBefore(element);
+        this.range.setEndBefore(element);
       }
     };
   })();
