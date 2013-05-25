@@ -77,9 +77,11 @@ var behavior = (function() {
 
     split: function(element, cursor, before, after) {
       var parent = element.parentNode;
+      var newStart = after.firstChild.firstChild;
       parent.insertBefore(before, element);
-      parent.insertBefore(after, element);
-      parent.removeChild(element);
+      parent.replaceChild(after, element);
+      cursor.moveBefore(newStart);
+      cursor.update();
     },
 
     merge: function(element, direction) {
