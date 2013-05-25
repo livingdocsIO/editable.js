@@ -128,6 +128,5 @@ var parser = (function() {
         return container.childNodes[offset] === container.lastChild;
       }
     }
-
   };
 })();
