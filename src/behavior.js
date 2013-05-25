@@ -75,7 +75,7 @@ var behavior = (function() {
       log('Default insert ' + direction + ' behavior');
     },
 
-    split: function(element, before, after) {
+    split: function(element, cursor, before, after) {
       var parent = element.parentNode;
       parent.insertBefore(before, element);
       parent.insertBefore(after, element);
