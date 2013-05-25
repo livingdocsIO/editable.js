@@ -60,17 +60,21 @@ var Cursor = (function() {
       },
 
       before: function() {
-        return parser.elementsBeforeOffset(
-          this.host,
-          this.range.endContainer,
-          this.range.endOffset);
+        var fragment = null;
+        var range = this.range.cloneRange();
+        range.setStartBefore(this.host);
+        fragment = range.cloneContents();
+        range.detach();
+        return fragment;
       },
 
       after: function() {
-        return parser.elementsAfterOffset(
-          this.host,
-          this.range.endContainer,
-          this.range.endOffset);
+        var fragment = null;
+        var range = this.range.cloneRange();
+        range.setEndAfter(this.host);
+        fragment = range.cloneContents();
+        range.detach();
+        return fragment;
       }
     };
   })();

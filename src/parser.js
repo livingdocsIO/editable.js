@@ -127,15 +127,6 @@ var parser = (function() {
       } else {
         return container.childNodes[offset] === container.lastChild;
       }
-    },
-
-    elementsBeforeOffset: function(host, container, offset) {
-      return null;
-    },
-
-    elementsAfterOffset: function(host, container, offset) {
-      return null;
     }
-
   };
 })();
