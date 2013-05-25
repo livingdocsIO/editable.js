@@ -77,6 +77,8 @@ var behavior = (function() {
 
     split: function(element, before, after) {
       log('Default split behavior');
+      log(before);
+      log(after);
     },
 
     merge: function(element, direction) {
