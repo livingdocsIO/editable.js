@@ -76,9 +76,10 @@ var behavior = (function() {
     },
 
     split: function(element, before, after) {
-      log('Default split behavior');
-      log(before);
-      log(after);
+      var parent = element.parentNode;
+      parent.insertBefore(before, element);
+      parent.insertBefore(after, element);
+      parent.removeChild(element);
     },
 
     merge: function(element, direction) {
