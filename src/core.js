@@ -14,6 +14,12 @@
     if (!isInitialized) {
       // TODO check config file integrity
 
+      // make sure rangy is initialized. e.g Rangy doesn't initialize
+      // when loaded after the document is ready.
+      if (!rangy.initialized) {
+        rangy.init();
+      }
+
       isInitialized = true;
       dispatcher.setup();
     }
@@ -79,7 +85,6 @@
         .removeClass('-js-editable-disabled');
       return this;
     },
-
 
 
     isDisabled: false,
