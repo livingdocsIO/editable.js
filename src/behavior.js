@@ -75,8 +75,12 @@ var behavior = (function() {
       log('Default insert ' + direction + ' behavior');
     },
 
-    split: function(element, before, after) {
-      log('Default split behavior');
+    split: function(element, cursor, before, after) {
+      var parent = element.parentNode;
+      var newStart = after.firstChild;
+      parent.insertBefore(before, element);
+      parent.replaceChild(after, element);
+      newStart.focus();
     },
 
     merge: function(element, direction) {
