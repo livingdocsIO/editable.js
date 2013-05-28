@@ -20,64 +20,63 @@ var Selection = (function() {
     this.range = rangyRange;
   };
 
-  Selection.prototype = (function() {
-    return {
+  // add Cursor prototpye to Selection prototype chain
+  var Base = function() {};
+  Base.prototype = Cursor.prototype;
+  Selection.prototype = $.extend(new Base(), {
+    /**
+     * Get the text inside the selection.
+     *
+     * @method text
+     */
+    text: function() {
+      return this.range.toString();
+    },
 
-      /**
-       * Get the text inside the selection.
-       *
-       * @method text
-       */
-      text: function() {
-        return this.range.toString();
-      },
+    /**
+     * Get the html inside the selection.
+     *
+     * @method html
+     */
+    html: function() {
+      return this.range.toHtml();
+    },
 
-      /**
-       * Get the html inside the selection.
-       *
-       * @method html
-       */
-      html: function() {
-        return this.range.toHtml();
-      },
+    /**
+     *
+     * @method isAllSelected
+     */
+    isAllSelected: function() {
 
-      /**
-       *
-       * @method isAllSelected
-       */
-      isAllSelected: function() {
+    },
 
-      },
+    /**
+     *
+     * @method strip
+     */
+    strip: function() {
 
-      /**
-       *
-       * @method strip
-       */
-      strip: function() {
+    },
 
-      },
+    /**
+     *
+     * @method deleteContent
+     */
+    deleteContent: function() {
+      this.range.deleteContents();
+      return new Cursor(this.host, this.range);
+    },
 
-      /**
-       *
-       * @method deleteContent
-       */
-      deleteContent: function() {
-        this.range.deleteContents();
-        return new Cursor(this.host, this.range);
-      },
+    /**
+     * Expand the current selection
+     *
+     * @method expand
+     * @param {String} scope: either of: 'word', 'sentence', 'tag' or 'block'.
+     */
+    expand: function(scope) {
 
-      /**
-       * Expand the current selection
-       *
-       * @method expand
-       * @param {String} scope: either of: 'word', 'sentence', 'tag' or 'block'.
-       */
-      expand: function(scope) {
-
-      }
-
-    };
-  })();
+    }
+  });
 
   return Selection;
 })();
