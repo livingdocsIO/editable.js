@@ -106,12 +106,12 @@
        *
        * @event split
        * @param {HTMLElement} element The element triggering the event.
-       * @param {Cursor} cursor The actual cursor object.
        * @param {String} before The HTML string before the split.
        * @param {String} after The HTML string after the split.
+       * @param {Cursor} cursor The actual cursor object. 
        */
-      split: function(element, cursor, before, after) {
-        behavior.split(element, cursor, before, after);
+      split: function(element, before, after, cursor) {
+        behavior.split(element, before, after, cursor);
       },
 
       /**

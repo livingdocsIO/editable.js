@@ -78,7 +78,7 @@ var dispatcher = (function() {
       } else if(cursor.isAtTheBeginning()) {
         notifier('insert', this, 'before');
       } else {
-        notifier('split', this, cursor, cursor.before(), cursor.after());
+        notifier('split', this, cursor.before(), cursor.after(), cursor);
       }
 
     }).on('shiftEnter', function(event) {
