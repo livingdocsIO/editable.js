@@ -1,7 +1,8 @@
 /**
  * The Behavior module defines the behavior triggered in response to the Editable.JS
  * events (see {{#crossLink "Editable"}}{{/crossLink}}).
- * The behavior can be overwritten by a user with the Editable.config object.
+ * The behavior can be overwritten by a user with Editable.init() or on
+ * Editable.add() per element.
  *
  * @module core
  * @submodule behavior

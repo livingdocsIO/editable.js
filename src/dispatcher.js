@@ -201,10 +201,10 @@ var dispatcher = (function() {
       var eventType = null;
 
       listeners = {};
-      // TODO check the Editable.config.event object to prevent
+      // TODO check the config.event object to prevent
       // registering invalid handlers
-      for(eventType in Editable.config.event) {
-        this.addListener(eventType, Editable.config.event[eventType]);
+      for(eventType in config.event) {
+        this.addListener(eventType, config.event[eventType]);
       }
 
       // setup all events notifications

@@ -36,6 +36,20 @@
    */
   Editable = {
     /**
+     * Initialzed Editable with a custom configuration
+     */
+    init: function(userConfiguration) {
+      if (isInitialized) {
+        error("Editable is already initialized");
+        return;
+      }
+
+      $.extend(true, config, userConfiguration);
+      initialize();
+    },
+
+
+    /**
      * Adds the Editable.JS API to the given target elements.
      * Opposite of {{#crossLink "Editable/remove"}}{{/crossLink}}.
      * Calls dispatcher.setup to setup all event listeners.
@@ -44,12 +58,14 @@
      * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
      *    array of HTMLElement or a query selector representing the target where
      *    the API should be added on.
-     * @param {Object} [options={}] Configuration options override.
+     * @param {Object} [elementConfiguration={}] Configuration options override.
      * @static
      * @chainable
      */
-    add: function(target, options) {
+    add: function(target, elementConfiguration) {
       initialize();
+      var elemConfig = $.extend(true, {}, config, elementConfiguration);
+      // todo: store element configuration
 
       if (!this.isDisabled) {
         $(target)

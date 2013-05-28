@@ -4,7 +4,7 @@ var log, error;
 // If the last param is the string "trace" console.trace will be called
 // configuration: disable with config.log = false
 log = function() {
-  if (Editable.config.log === false) { return; }
+  if (config.log === false) { return; }
 
   var args, _ref;
   args = Array.prototype.slice.call(arguments);
@@ -30,7 +30,7 @@ log = function() {
 // Falls back to console.log if console.error is not available
 // configuration: disable with config.log = false
 error = function() {
-  if (Editable.config.log === false) { return; }
+  if (config.log === false) { return; }
 
   var args;
   args = Array.prototype.slice.call(arguments);

@@ -1,4 +1,10 @@
 ;(function($) {
+
+  // initalize Editable
+  Editable.init({
+    log: true
+  });
+
   $(document).ready(function() {
 
     $("article>div>p").editable();
