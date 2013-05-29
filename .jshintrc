@@ -35,6 +35,7 @@
     "content": true,
     "string": true,
     "log": true,
-    "error": true
+    "error": true,
+    "config": true
   }
 }
