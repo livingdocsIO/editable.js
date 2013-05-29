@@ -40,7 +40,7 @@
      */
     init: function(userConfiguration) {
       if (isInitialized) {
-        error("Editable is already initialized");
+        error('Editable is already initialized');
         return;
       }
 
