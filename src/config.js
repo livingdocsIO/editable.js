@@ -9,6 +9,7 @@ var config = {
   log: false,
   cssClass: '-js-editable',
   cssClassDisabled: '-js-editable-disabled',
+  mouseMoveSelectionChanges: false,
 
   event: {
     /**

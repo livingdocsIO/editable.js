@@ -115,7 +115,10 @@ var dispatcher = (function() {
     // suppress the selectionchange event and only fire the
     // change event on mouseup
     $document.on('mousedown.editable', '.-js-editable', function(event) {
-      suppressSelectionChanges = true;
+      if (config.mouseMoveSelectionChanges === false) {
+        suppressSelectionChanges = true;
+      }
+
       $document.on('mouseup.editableSelection', function(event) {
         $document.off('.editableSelection');
         suppressSelectionChanges = false;
