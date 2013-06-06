@@ -97,7 +97,7 @@ var Cursor = (function() {
       },
 
       setAsSelection: function() {
-        rangy.getSelection().setSingleRange(this.range)
+        rangy.getSelection().setSingleRange(this.range);
       },
 
       detach: function() {
