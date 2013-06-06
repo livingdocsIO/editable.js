@@ -51,6 +51,18 @@ var Selection = (function() {
     },
 
     /**
+     * Get the ClientRects of this selection.
+     * Use this if you want more precision than getBoundingClientRect can give.
+     */
+    getRects: function() {
+      var coords = this.range.nativeRange.getClientRects();
+
+      // todo: translate into absolute positions
+      // just like Cursor#getCoordinates()
+      return coords;
+    },
+
+    /**
      *
      * @method strip
      */

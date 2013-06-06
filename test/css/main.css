@@ -104,14 +104,49 @@ article {
 }
 
 
+.selection-tip {
+    position: absolute;
+    color: #eee;
+    padding: 2px 5px;
+    background: #333;
+    border-radius: 5px;
+}
 
 
+    .selection-tip:after /* triangle decoration */
+    {
+        width: 0;
+        height: 0;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 8px solid #333;
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: -8px;
+        margin-left: -8px;
+    }
 
+        .selection-tip.top:after
+        {
+            border-top-color: transparent;
+            border-bottom: 8px solid #111;
+            top: -20px;
+            bottom: auto;
+        }
 
+        .selection-tip.left:after
+        {
+            left: 8px;
+            margin: 0;
+        }
 
-
-
-
+        .selection-tip.right:after
+        {
+            right: 8px;
+            left: auto;
+            margin: 0;
+        }
 
 
 

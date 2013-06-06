@@ -72,6 +72,36 @@ var Cursor = (function() {
         fragment = range.cloneContents();
         range.detach();
         return fragment;
+      },
+
+      /**
+       * Get the BoundingClientRect of the cursor.
+       * The returned values are absolute to document.body.
+       */
+      getCoordinates: function() {
+        var coords = this.range.nativeRange.getBoundingClientRect();
+
+        // code from mdn: https://developer.mozilla.org/en-US/docs/Web/API/window.scrollX
+        var x = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+        var y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+        // translate into absolute positions
+        return {
+          top: coords.top + y,
+          bottom: coords.bottom + y,
+          left: coords.left + x,
+          right: coords.right + x,
+          height: coords.height,
+          width: coords.width
+        };
+      },
+
+      setAsSelection: function() {
+        rangy.getSelection().setSingleRange(this.range)
+      },
+
+      detach: function() {
+        this.range.detach();
       }
     };
   })();
