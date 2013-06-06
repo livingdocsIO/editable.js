@@ -117,6 +117,10 @@ var dispatcher = (function() {
     $document.on('mousedown.editable', '.-js-editable', function(event) {
       if (config.mouseMoveSelectionChanges === false) {
         suppressSelectionChanges = true;
+
+        // Without this timeout the previous selection is active
+        // until the mouseup event (no. not good).
+        setTimeout(notifier, 0);
       }
 
       $document.on('mouseup.editableSelection', function(event) {
