@@ -10,7 +10,7 @@
     var tooltip = $('<div class="selection-tip" style="display:none;">How may I help?</div>')
     $(document.body).append(tooltip);
 
-    $("article>div>p").editable();
+    $("article>div>p, article>div li").editable();
     Editable.focus(function(el) {
       console.log('Focus event handler was triggered on', el);
 
