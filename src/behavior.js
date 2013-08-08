@@ -72,7 +72,7 @@ var behavior = (function() {
       cursor.update();
     },
 
-    insert: function(element, direction) {
+    insert: function(element, direction, cursor) {
       log('Default insert ' + direction + ' behavior');
     },
 
