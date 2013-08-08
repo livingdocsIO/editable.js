@@ -72,8 +72,22 @@ var behavior = (function() {
       cursor.update();
     },
 
-    insert: function(element, direction) {
+    insert: function(element, direction, cursor) {
       log('Default insert ' + direction + ' behavior');
+      var parent = element.parentNode;
+      var newElement = element.cloneNode(false);
+      if(newElement.id) newElement.id += '-js-editable-clone';
+
+      switch(direction) {
+        case 'before':
+          parent.insertBefore(newElement, element);
+          break;
+        case 'after':
+          parent.insertBefore(newElement, element.nextSibling);
+          break;            
+      }
+
+      newElement.focus();
     },
 
     split: function(element, before, after, cursor) {

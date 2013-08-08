@@ -109,9 +109,10 @@ var config = {
      * @event insert
      * @param {HTMLElement} element The element triggering the event.
      * @param {String} direction The insert direction: "before" or "after".
+     * @param {Cursor} cursor The actual cursor object.
      */
-    insert: function(element, direction) {
-      behavior.insert(element, direction);
+    insert: function(element, direction, cursor) {
+      behavior.insert(element, direction, cursor);
     },
 
 
