@@ -34,6 +34,11 @@ describe("Test parser", function() {
     expect(parser.isEndOffset(oneWord, 0)).toEqual(true);
   });
 
+  it("isEndOffset should work for empty node", function() {
+    // <div>|</div>
+    expect(parser.isEndOffset(empty, 0)).toEqual(true);
+  });  
+
   it("isEndOffset should work with a text node", function() {
     // foobar|
     expect(parser.isEndOffset(textNode, 6)).toEqual(true);
@@ -59,6 +64,11 @@ describe("Test parser", function() {
   it("isStartOffset should work for single child node", function() {
     // <div>|foobar</div>
     expect(parser.isStartOffset(oneWord, 0)).toEqual(true);
+  });
+
+  it("isStartOffset should work for empty node", function() {
+    // <div>|</div>
+    expect(parser.isStartOffset(empty, 0)).toEqual(true);
   });
 
   it("isStartOffset should work with a text node", function() {

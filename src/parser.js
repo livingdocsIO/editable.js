@@ -113,7 +113,10 @@ var parser = (function() {
         var actualStart = text.length - string.trimLeft(text).length;
         return offset <= actualStart;
       } else {
-        return container.childNodes[offset] === container.firstChild;
+        if(container.childNodes.length === 0)
+          return true;
+        else
+          return container.childNodes[offset] === container.firstChild;
       }
     },
 
@@ -125,7 +128,10 @@ var parser = (function() {
 
         // return offset === container.length;
       } else {
-        return container.childNodes[offset] === container.lastChild;
+        if(container.childNodes.length === 0)
+          return true;
+        else
+          return container.childNodes[offset] === container.lastChild;
       }
     }
   };
