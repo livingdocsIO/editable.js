@@ -126,7 +126,7 @@ var behavior = (function() {
       fragment = document.createDocumentFragment();
       chunks = merger.childNodes;
       for(i = 0; i < chunks.length; i++) {
-        fragment.appendChild(chunks[i]);
+        fragment.appendChild(chunks[i].cloneNode(true));
       }
       newChild = container.appendChild(fragment);
 
