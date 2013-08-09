@@ -98,8 +98,39 @@ var behavior = (function() {
       newStart.focus();
     },
 
-    merge: function(element, direction) {
-      log('Default merge behavior');
+    merge: function(element, direction, cursor) {      
+      log('Default merge ' + direction + ' behavior');
+      var container, merger, fragment, chunks, i, newChild;
+
+      switch(direction) {
+        case 'before':
+          container = element.previousElementSibling;
+          merger = element;
+          break;
+        case 'after':
+          container = element;
+          merger = element.nextElementSibling;
+          break;            
+      }
+
+      if(!(container && container.getAttribute('contenteditable') &&
+          merger && merger.getAttribute('contenteditable')))
+        return;
+
+      if(container.childNodes.length > 0)
+        cursor.moveAtTheEnd(container.lastChild);
+      else
+        cursor.moveAtTheBeginning(container);
+      cursor.update();
+
+      fragment = document.createDocumentFragment();
+      chunks = merger.childNodes;
+      for(i = 0; i < chunks.length; i++) {
+        fragment.appendChild(chunks[i]);
+      }
+      newChild = container.appendChild(fragment);
+
+      merger.parentNode.removeChild(merger);
     },
 
     empty: function(element) {

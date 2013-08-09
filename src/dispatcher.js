@@ -64,8 +64,22 @@ var dispatcher = (function() {
       log('Esc key pressed');
     }).on('backspace', function(event) {
       log('Backspace key pressed');
+
+      var cursor = selectionWatcher.getCursor();
+      if(cursor.isAtTheBeginning()) {
+        event.preventDefault();
+        event.stopPropagation();
+        notifier('merge', this, 'before', cursor);
+      }
     }).on('delete', function(event) {
       log('Delete key pressed');
+
+      var cursor = selectionWatcher.getCursor();
+      if(cursor.isAtTheEnd()) {
+        event.preventDefault();
+        event.stopPropagation();
+        notifier('merge', this, 'after', cursor);
+      }      
     }).on('enter', function(event) {
       log('Enter key pressed');
 
