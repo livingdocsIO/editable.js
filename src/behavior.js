@@ -76,7 +76,7 @@ var behavior = (function() {
       log('Default insert ' + direction + ' behavior');
       var parent = element.parentNode;
       var newElement = element.cloneNode(false);
-      if(newElement.id) newElement.id += '-js-editable-clone';
+      if(newElement.id) newElement.removeAttribute('id');
 
       switch(direction) {
         case 'before':
