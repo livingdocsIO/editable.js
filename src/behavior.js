@@ -79,12 +79,12 @@ var behavior = (function() {
       if(newElement.id) newElement.removeAttribute('id');
 
       switch(direction) {
-        case 'before':
-          parent.insertBefore(newElement, element);
-          break;
-        case 'after':
-          parent.insertBefore(newElement, element.nextSibling);
-          break;            
+      case 'before':
+        parent.insertBefore(newElement, element);
+        break;
+      case 'after':
+        parent.insertBefore(newElement, element.nextSibling);
+        break;
       }
 
       newElement.focus();
