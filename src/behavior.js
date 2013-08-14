@@ -39,7 +39,7 @@ var behavior = (function() {
       }
     },
 
-    cursor: function(element, cursor) {
+    cursor: function(element, cursor) {
       if (cursor) {
         log('Default cursor behavior');
       } else {
