@@ -79,14 +79,14 @@ var behavior = (function() {
       if(newElement.id) newElement.removeAttribute('id');
 
       switch(direction) {
-        case 'before':
-          parent.insertBefore(newElement, element);
-          element.focus();
-          break;
-        case 'after':
-          parent.insertBefore(newElement, element.nextSibling);
-          newElement.focus();
-          break;
+      case 'before':
+        parent.insertBefore(newElement, element);
+        element.focus();
+        break;
+      case 'after':
+        parent.insertBefore(newElement, element.nextSibling);
+        newElement.focus();
+        break;
       }
     },
 
@@ -98,19 +98,19 @@ var behavior = (function() {
       newStart.focus();
     },
 
-    merge: function(element, direction, cursor) {      
+    merge: function(element, direction, cursor) {
       log('Default merge ' + direction + ' behavior');
       var container, merger, fragment, chunks, i, newChild;
 
       switch(direction) {
-        case 'before':
-          container = element.previousElementSibling;
-          merger = element;
-          break;
-        case 'after':
-          container = element;
-          merger = element.nextElementSibling;
-          break;            
+      case 'before':
+        container = element.previousElementSibling;
+        merger = element;
+        break;
+      case 'after':
+        container = element;
+        merger = element.nextElementSibling;
+        break;
       }
 
       if(!(container && container.getAttribute('contenteditable') &&

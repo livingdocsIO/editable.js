@@ -79,7 +79,7 @@ var dispatcher = (function() {
         event.preventDefault();
         event.stopPropagation();
         notifier('merge', this, 'after', cursor);
-      }      
+      }
     }).on('enter', function(event) {
       log('Enter key pressed');
 
