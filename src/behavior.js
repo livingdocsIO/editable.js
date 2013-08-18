@@ -81,13 +81,13 @@ var behavior = (function() {
       switch(direction) {
         case 'before':
           parent.insertBefore(newElement, element);
+          element.focus();
           break;
         case 'after':
           parent.insertBefore(newElement, element.nextSibling);
-          break;            
+          newElement.focus();
+          break;
       }
-
-      newElement.focus();
     },
 
     split: function(element, before, after, cursor) {
