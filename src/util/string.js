@@ -6,6 +6,10 @@ var string = (function() {
 
     trimLeft: function(text) {
       return text.replace(/^\s+/, "");
+    },
+
+    trim: function(text) {
+      return text.replace(/^\s+|\s+$/g, "");
     }
   };
 })();

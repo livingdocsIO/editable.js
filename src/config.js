@@ -126,9 +126,10 @@ var config = {
      * @event merge
      * @param {HTMLElement} element The element triggering the event.
      * @param {String} direction The merge direction: "before" or "after".
+     * @param {Cursor} cursor The actual cursor object.
      */
-    merge: function(element, direction) {
-      behavior.merge(element, direction);
+    merge: function(element, direction, cursor) {
+      behavior.merge(element, direction, cursor);
     },
 
     /**

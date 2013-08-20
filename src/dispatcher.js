@@ -64,8 +64,22 @@ var dispatcher = (function() {
       log('Esc key pressed');
     }).on('backspace', function(event) {
       log('Backspace key pressed');
+
+      var cursor = selectionWatcher.getCursor();
+      if(cursor.isAtTheBeginning()) {
+        event.preventDefault();
+        event.stopPropagation();
+        notifier('merge', this, 'before', cursor);
+      }
     }).on('delete', function(event) {
       log('Delete key pressed');
+
+      var cursor = selectionWatcher.getCursor();
+      if(cursor.isAtTheEnd()) {
+        event.preventDefault();
+        event.stopPropagation();
+        notifier('merge', this, 'after', cursor);
+      }
     }).on('enter', function(event) {
       log('Enter key pressed');
 
@@ -73,10 +87,10 @@ var dispatcher = (function() {
       event.stopPropagation();
       var cursor = selectionWatcher.getCursor();
 
-      if (cursor.isAtTheEnd()) {
-        notifier('insert', this, 'after', cursor);
-      } else if(cursor.isAtTheBeginning()) {
+      if (cursor.isAtTheBeginning()) {
         notifier('insert', this, 'before', cursor);
+      } else if(cursor.isAtTheEnd()) {
+        notifier('insert', this, 'after', cursor);
       } else {
         notifier('split', this, cursor.before(), cursor.after(), cursor);
       }
