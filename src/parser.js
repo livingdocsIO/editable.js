@@ -109,9 +109,7 @@ var parser = (function() {
 
     isStartOffset: function (container, offset) {
       if (container.nodeType === 3) {
-        var text = container.nodeValue;
-        var actualStart = text.length - string.trimLeft(text).length;
-        return offset <= actualStart;
+        return offset === 0;
       } else {
         if(container.childNodes.length === 0)
           return true;
@@ -122,11 +120,7 @@ var parser = (function() {
 
     isEndOffset: function (container, offset) {
       if (container.nodeType === 3) {
-        // ignore whitespace at the end
-        var text = container.nodeValue;
-        return offset >= string.trimRight(text).length;
-
-        // return offset === container.length;
+        return offset === container.length;
       } else {
         if(container.childNodes.length === 0)
           return true;
