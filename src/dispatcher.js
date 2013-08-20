@@ -87,10 +87,10 @@ var dispatcher = (function() {
       event.stopPropagation();
       var cursor = selectionWatcher.getCursor();
 
-      if (cursor.isAtTheEnd()) {
-        notifier('insert', this, 'after', cursor);
-      } else if(cursor.isAtTheBeginning()) {
+      if (cursor.isAtTheBeginning()) {
         notifier('insert', this, 'before', cursor);
+      } else if(cursor.isAtTheEnd()) {
+        notifier('insert', this, 'after', cursor);
       } else {
         notifier('split', this, cursor.before(), cursor.after(), cursor);
       }
