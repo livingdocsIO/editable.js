@@ -67,7 +67,7 @@ var config = {
      * @param {HTMLElement} element The element triggering the event.
      * @param {Cursor} cursor The actual Cursor object.
      */
-    cursor: function(element, cursor) {
+    cursor: function(element, cursor) {
       behavior.cursor(element, cursor);
     },
 
