@@ -47,9 +47,11 @@ describe("Test parser", function() {
     expect(parser.isEndOffset(textNode, 5)).toEqual(false);
   });
 
-  it("isEndOffset should ignore whitespace at the end", function() {
+  it("isEndOffset should work with whitespace at the end", function() {
     // <div> foobar| </div>
-    expect(parser.isEndOffset(oneWordWithWhitespace.firstChild, 7)).toEqual(true);
+    expect(parser.isEndOffset(oneWordWithWhitespace.firstChild, 7)).toEqual(false);
+    // <div> foobar |</div>
+    expect(parser.isEndOffset(oneWordWithWhitespace.firstChild, 8)).toEqual(true);
   });
 
   it("isEndOffset should work with text and element nodes", function() {
@@ -79,9 +81,11 @@ describe("Test parser", function() {
     expect(parser.isStartOffset(textNode, 1)).toEqual(false);
   });
 
-  it("isStartOffset should ignore whitespace at the beginning", function() {
+  it("isStartOffset should work with whitespace at the beginning", function() {
     // <div> |foobar </div>
-    expect(parser.isStartOffset(oneWordWithWhitespace.firstChild, 1)).toEqual(true);
+    expect(parser.isStartOffset(oneWordWithWhitespace.firstChild, 1)).toEqual(false);
+    // <div>| foobar </div>
+    expect(parser.isStartOffset(oneWordWithWhitespace.firstChild, 0)).toEqual(true);
   });
 
   it("isStartOffset should work with text and element nodes", function() {
