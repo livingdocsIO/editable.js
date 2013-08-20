@@ -20,6 +20,7 @@ var behavior = (function() {
   return {
     focus: function(element) {
       log('Default focus behavior');
+      content.removeEmptyTags(element);
     },
 
     blur: function(element) {
