@@ -1,7 +1,7 @@
 var content = (function() {
   return {
-    cleanInternals: function(htmlString) {
-      return htmlString.replace(/\u200B/g, '<br />');
+    cleanInternals: function(element) {
+      element.innerHTML = element.innerHTML.replace(/\u200B/g, '<br />');
     },
 
     removeEmptyTags: function(element) {
