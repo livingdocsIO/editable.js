@@ -26,6 +26,7 @@ var behavior = (function() {
 
     blur: function(element) {
       log('Default blur behavior');
+      content.normalizeTags(element);
       content.cleanInternals(element);
     },
 

@@ -127,6 +127,24 @@ var parser = (function() {
         else
           return container.childNodes[offset] === container.lastChild;
       }
+    },
+
+    isSameNode: function(target, source) {
+      var i, len, attr;
+
+      if(target.nodeType !== source.nodeType)
+        return false;
+
+      if(target.nodeName !== source.nodeName)
+        return false;
+
+      for(i = 0, len = target.attributes.length; i < len; i++) {
+        attr = target.attributes[i];
+        if(source.getAttribute(attr.name) !== attr.value)
+          return false;
+      }
+
+      return true;
     }
   };
 })();
