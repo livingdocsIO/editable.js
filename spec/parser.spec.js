@@ -139,5 +139,23 @@ describe("Test parser", function() {
     expect(parser.isBeginningOfHost(oneWord, endContainer, 1)).toEqual(false);
   });
 
+  it("isSameNode should fail when tags are different", function() {
+    var source = text.firstChild;
+    var target = link.firstChild;
+    expect(parser.isSameNode(target, source)).toEqual(false);
+  });
+
+  it("isSameNode should fail when attributes are different", function() {
+    var source = link.firstChild;
+    var target = link.firstChild.cloneNode(true);    
+    target.setAttribute('key', 'value');
+    expect(parser.isSameNode(target, source)).toEqual(false);
+  });
+
+  it("isSameNode should work when nodes have same tag and attributes", function() {
+    var source = link.firstChild;
+    var target = link.firstChild.cloneNode(true);
+    expect(parser.isSameNode(target, source)).toEqual(true);
+  });
 });
 
