@@ -16,7 +16,7 @@ var content = (function() {
               break;
 
             for(j = 0; j < sibling.childNodes.length; j++) {
-              node.appendChild(sibling.childNodes[j]);
+              node.appendChild(sibling.childNodes[j].cloneNode(true));
             }
 
             sibling.parentNode.removeChild(sibling);
