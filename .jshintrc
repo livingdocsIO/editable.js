@@ -36,6 +36,7 @@
     "string": true,
     "log": true,
     "error": true,
-    "config": true
+    "config": true,
+    "block": true
   }
 }
