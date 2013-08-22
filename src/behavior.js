@@ -142,6 +142,25 @@ var behavior = (function() {
 
     'switch': function(element, direction, cursor) {
       console.log('Default switch behavior');
+
+      var next, previous;
+
+      switch(direction) {
+      case 'before':
+        previous = block.previous(element);
+        if(previous) {
+          cursor.moveAtTheEnd(previous);
+          cursor.update();
+        }
+        break;
+      case 'after':
+        next = block.next(element);
+        if(next) {
+          cursor.moveAtTheBeginning(next);
+          cursor.update();
+        }
+        break;
+      }
     },
 
     move: function(element, selection, direction) {
