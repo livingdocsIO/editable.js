@@ -81,13 +81,9 @@ var dispatcher = (function() {
         notifier('switch', that, 'after', cursor);
       });
     }).on('tab', function(event) {
-      event.preventDefault();
-      event.stopPropagation();
-      notifier('switch', this, 'after', selectionWatcher.getCursor());
+      log('Tab key pressed');
     }).on('shiftTab', function(event) {
-      event.preventDefault();
-      event.stopPropagation();
-      notifier('switch', this, 'before', selectionWatcher.getCursor());
+      log('Shift+Tab key pressed');
     }).on('esc', function(event) {
       log('Esc key pressed');
     }).on('backspace', function(event) {

@@ -145,8 +145,7 @@ var config = {
 
     /**
      * The switch event is triggered when the user switches to another block.
-     * This happens when TAB is pressed (move one block after) or SHIFT+TAB
-     * is pressed (move one block before).
+     * This happens when an ARROW key is pressed near the boundaries of a block.
      * The default behavior is to... TODO
      *
      * @event switch
