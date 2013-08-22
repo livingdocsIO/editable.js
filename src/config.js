@@ -152,9 +152,10 @@ var config = {
      * @event switch
      * @param {HTMLElement} element The element triggering the event.
      * @param {String} direction The switch direction: "before" or "after".
+     * @param {Cursor} cursor The actual cursor object.*
      */
-    'switch': function(element, direction) {
-      behavior.switch(element, direction);
+    'switch': function(element, direction, cursor) {
+      behavior.switch(element, direction, cursor);
     },
 
     /**

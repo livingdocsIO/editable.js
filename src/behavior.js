@@ -140,8 +140,8 @@ var behavior = (function() {
       log('Default empty behavior');
     },
 
-    'switch': function(element, direction) {
-      log('Default switch behavior');
+    'switch': function(element, direction, cursor) {
+      console.log('Default switch behavior');
     },
 
     move: function(element, selection, direction) {
