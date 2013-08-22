@@ -44,22 +44,50 @@ var dispatcher = (function() {
    * @param {Function} notifier: The callback to be triggered when the event is caught.
    */
   var setupKeyboardEvents = function($document, notifier) {
+    var cursorChanged = function(event, callback) {
+      var cursor = selectionWatcher.getCursor();
+      setTimeout(function() {
+        var newCursor = selectionWatcher.getCursor();
+        if(newCursor.equals(cursor)) {
+          event.preventDefault();
+          event.stopPropagation();
+          callback(newCursor);
+        }
+      }, 1);
+    };
+
     $document.on('keydown.editable', '.-js-editable', function(event) {
       keyboard.dispatchKeyEvent(event, this);
     });
 
     keyboard.on('left', function(event) {
-      log('Left key pressed');
+      var that = this;
+      cursorChanged(event, function(cursor) {
+        notifier('switch', that, 'before', cursor);
+      });
     }).on('up', function(event) {
-      log('Up key pressed');
+      var that = this;
+      cursorChanged(event, function(cursor) {
+        notifier('switch', that, 'before', cursor);
+      });
     }).on('right', function(event) {
-      log('Right key pressed');
+      var that = this;
+      cursorChanged(event, function(cursor) {
+        notifier('switch', that, 'after', cursor);
+      });
     }).on('down', function(event) {
-      log('Down key pressed');
+      var that = this;
+      cursorChanged(event, function(cursor) {
+        notifier('switch', that, 'after', cursor);
+      });
     }).on('tab', function(event) {
-      log('Tab key pressed');
+      event.preventDefault();
+      event.stopPropagation();
+      notifier('switch', this, 'after', selectionWatcher.getCursor());
     }).on('shiftTab', function(event) {
-      log('Shift+Tab key pressed');
+      event.preventDefault();
+      event.stopPropagation();
+      notifier('switch', this, 'before', selectionWatcher.getCursor());
     }).on('esc', function(event) {
       log('Esc key pressed');
     }).on('backspace', function(event) {
