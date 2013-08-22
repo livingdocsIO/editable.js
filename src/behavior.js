@@ -107,17 +107,16 @@ var behavior = (function() {
 
       switch(direction) {
       case 'before':
-        container = element.previousElementSibling;
+        container = block.previous(element);
         merger = element;
         break;
       case 'after':
         container = element;
-        merger = element.nextElementSibling;
+        merger = block.next(element);
         break;
       }
 
-      if(!(container && container.getAttribute('contenteditable') &&
-          merger && merger.getAttribute('contenteditable')))
+      if(!(container && merger))
         return;
 
       if(container.childNodes.length > 0)
