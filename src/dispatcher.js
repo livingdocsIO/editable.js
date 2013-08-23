@@ -44,42 +44,35 @@ var dispatcher = (function() {
    * @param {Function} notifier: The callback to be triggered when the event is caught.
    */
   var setupKeyboardEvents = function($document, notifier) {
-    var cursorChanged = function(event, callback) {
-      var cursor = selectionWatcher.getCursor();
+    var dispatchSwitchEvent = function(event, element, direction) {
+      var cursor;
+
+      if(event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
+        return;
+
+      cursor = selectionWatcher.getCursor();
       setTimeout(function() {
         var newCursor = selectionWatcher.getCursor();
         if(newCursor.equals(cursor)) {
           event.preventDefault();
           event.stopPropagation();
-          callback(newCursor);
+          notifier('switch', element, direction, newCursor);
         }
       }, 1);
-    };
+    }
 
     $document.on('keydown.editable', '.-js-editable', function(event) {
       keyboard.dispatchKeyEvent(event, this);
     });
 
     keyboard.on('left', function(event) {
-      var that = this;
-      cursorChanged(event, function(cursor) {
-        notifier('switch', that, 'before', cursor);
-      });
+      dispatchSwitchEvent(event, this, 'before');
     }).on('up', function(event) {
-      var that = this;
-      cursorChanged(event, function(cursor) {
-        notifier('switch', that, 'before', cursor);
-      });
+      dispatchSwitchEvent(event, this, 'before');
     }).on('right', function(event) {
-      var that = this;
-      cursorChanged(event, function(cursor) {
-        notifier('switch', that, 'after', cursor);
-      });
+      dispatchSwitchEvent(event, this, 'after');
     }).on('down', function(event) {
-      var that = this;
-      cursorChanged(event, function(cursor) {
-        notifier('switch', that, 'after', cursor);
-      });
+      dispatchSwitchEvent(event, this, 'after');
     }).on('tab', function(event) {
       log('Tab key pressed');
     }).on('shiftTab', function(event) {
