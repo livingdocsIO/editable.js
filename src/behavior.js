@@ -140,7 +140,7 @@ var behavior = (function() {
     },
 
     'switch': function(element, direction, cursor) {
-      console.log('Default switch behavior');
+      log('Default switch behavior');
 
       var next, previous;
 
