@@ -50,7 +50,9 @@ var dispatcher = (function() {
       if(event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
         return;
 
-      cursor = selectionWatcher.getCursor();
+      cursor = selectionWatcher.getSelection();
+      if(cursor instanceof Selection) return;
+
       setTimeout(function() {
         var newCursor = selectionWatcher.getCursor();
         if(newCursor.equals(cursor)) {
