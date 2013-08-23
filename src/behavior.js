@@ -20,12 +20,14 @@ var behavior = (function() {
   return {
     focus: function(element) {
       log('Default focus behavior');
+      content.normalizeSpaces(element);
       content.removeEmptyTags(element);
     },
 
     blur: function(element) {
       log('Default blur behavior');
-      element.innerHTML = content.cleanInternals(element.innerHTML);
+      content.normalizeTags(element);
+      content.cleanInternals(element);
     },
 
     flow: function(element, action) {
