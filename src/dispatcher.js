@@ -66,7 +66,7 @@ var dispatcher = (function() {
       log('Backspace key pressed');
 
       var cursor = selectionWatcher.getCursor();
-      if(cursor.isAtTheBeginning()) {
+      if(cursor.isAtBeginning()) {
         event.preventDefault();
         event.stopPropagation();
         notifier('merge', this, 'before', cursor);
@@ -75,7 +75,7 @@ var dispatcher = (function() {
       log('Delete key pressed');
 
       var cursor = selectionWatcher.getCursor();
-      if(cursor.isAtTheEnd()) {
+      if(cursor.isAtEnd()) {
         event.preventDefault();
         event.stopPropagation();
         notifier('merge', this, 'after', cursor);
@@ -87,9 +87,9 @@ var dispatcher = (function() {
       event.stopPropagation();
       var cursor = selectionWatcher.getCursor();
 
-      if (cursor.isAtTheBeginning()) {
+      if (cursor.isAtBeginning()) {
         notifier('insert', this, 'before', cursor);
-      } else if(cursor.isAtTheEnd()) {
+      } else if(cursor.isAtEnd()) {
         notifier('insert', this, 'after', cursor);
       } else {
         notifier('split', this, cursor.before(), cursor.after(), cursor);

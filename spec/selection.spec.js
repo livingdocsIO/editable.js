@@ -8,10 +8,10 @@ describe("Selection Class", function() {
     expect( Selection.prototype.hasOwnProperty("isAllSelected") ).toEqual(true);
   });
 
-  it("should have isAtTheEnd() method from Cursor in its protoype chain", function() {
-    expect( Selection.prototype.hasOwnProperty("isAtTheEnd") ).toEqual(false);
-    expect( Cursor.prototype.hasOwnProperty("isAtTheEnd") ).toEqual(true);
-    expect( "isAtTheEnd" in Selection.prototype ).toEqual(true);
+  it("should have isAtEnd() method from Cursor in its protoype chain", function() {
+    expect( Selection.prototype.hasOwnProperty("isAtEnd") ).toEqual(false);
+    expect( Cursor.prototype.hasOwnProperty("isAtEnd") ).toEqual(true);
+    expect( "isAtEnd" in Selection.prototype ).toEqual(true);
   });
 
 });
