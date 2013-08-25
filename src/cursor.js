@@ -20,14 +20,14 @@ var Cursor = (function() {
 
   Cursor.prototype = (function() {
     return {
-      isAtTheEnd: function() {
+      isAtEnd: function() {
         return parser.isEndOfHost(
           this.host,
           this.range.endContainer,
           this.range.endOffset);
       },
 
-      isAtTheBeginning: function() {
+      isAtBeginning: function() {
         return parser.isBeginningOfHost(
           this.host,
           this.range.startContainer,

@@ -54,11 +54,11 @@ var behavior = (function() {
       log(cursor);
       log('Default newline behavior');
 
-      var atTheEnd = cursor.isAtTheEnd();
+      var atEnd = cursor.isAtEnd();
       var br = document.createElement('br');
       cursor.insertBefore(br);
 
-      if(atTheEnd) {
+      if(atEnd) {
         log('at the end');
 
         var noWidthSpace = document.createTextNode('\u200B');
