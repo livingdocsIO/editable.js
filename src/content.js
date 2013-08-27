@@ -56,7 +56,7 @@ var content = (function() {
 
       for (i = 0, len = element.childNodes.length; i < len; i++) {
         node = element.childNodes[i];
-        if(node && !node.textContent) {
+        if(node && node.nodeName !== 'BR' && !node.textContent) {
           node.parentNode.removeChild(node);
         }
       }
