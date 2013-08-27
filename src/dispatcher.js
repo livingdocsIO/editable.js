@@ -68,12 +68,16 @@ var dispatcher = (function() {
     });
 
     keyboard.on('left', function(event) {
+      log('Left key pressed');
       dispatchSwitchEvent(event, this, 'before');
     }).on('up', function(event) {
+      log('Up key pressed');
       dispatchSwitchEvent(event, this, 'before');
     }).on('right', function(event) {
+      log('Right key pressed');
       dispatchSwitchEvent(event, this, 'after');
     }).on('down', function(event) {
+      log('Down key pressed');
       dispatchSwitchEvent(event, this, 'after');
     }).on('tab', function(event) {
       log('Tab key pressed');
