@@ -104,12 +104,12 @@ var Cursor = (function() {
         this.range.detach();
       },
 
-      moveAtTheBeginning: function(element) {
+      moveBefore: function(element) {
         this.range.setStart(element, 0);
         this.range.setEnd(element, 0);
       },
 
-      moveAtTheEnd: function(element) {
+      moveAfter: function(element) {
         this.range.setStartAfter(element);
         this.range.setEndAfter(element);
       }

@@ -121,9 +121,9 @@ var behavior = (function() {
         return;
 
       if(container.childNodes.length > 0)
-        cursor.moveAtTheEnd(container.lastChild);
+        cursor.moveAfter(container.lastChild);
       else
-        cursor.moveAtTheBeginning(container);
+        cursor.moveBefore(container);
       cursor.update();
 
       fragment = document.createDocumentFragment();
