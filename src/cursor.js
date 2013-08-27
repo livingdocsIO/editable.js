@@ -110,8 +110,8 @@ var Cursor = (function() {
       },
 
       moveAfter: function(element) {
-        this.range.setStartAfter(element);
-        this.range.setEndAfter(element);
+        this.range.selectNodeContents(element);
+        this.range.collapse(false);
       },
 
       equals: function(cursor) {
