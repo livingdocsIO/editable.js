@@ -54,11 +54,11 @@ var behavior = (function() {
       log(cursor);
       log('Default newline behavior');
 
-      var atTheEnd = cursor.isAtTheEnd();
+      var atEnd = cursor.isAtEnd();
       var br = document.createElement('br');
       cursor.insertBefore(br);
 
-      if(atTheEnd) {
+      if(atEnd) {
         log('at the end');
 
         var noWidthSpace = document.createTextNode('\u200B');
@@ -120,9 +120,9 @@ var behavior = (function() {
         return;
 
       if(container.childNodes.length > 0)
-        cursor.moveAtTheEnd(container.lastChild);
+        cursor.moveAfter(container.lastChild);
       else
-        cursor.moveAtTheBeginning(container);
+        cursor.moveBefore(container);
       cursor.update();
 
       fragment = document.createDocumentFragment();

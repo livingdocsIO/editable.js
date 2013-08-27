@@ -20,14 +20,14 @@ var Cursor = (function() {
 
   Cursor.prototype = (function() {
     return {
-      isAtTheEnd: function() {
+      isAtEnd: function() {
         return parser.isEndOfHost(
           this.host,
           this.range.endContainer,
           this.range.endOffset);
       },
 
-      isAtTheBeginning: function() {
+      isAtBeginning: function() {
         return parser.isBeginningOfHost(
           this.host,
           this.range.startContainer,
@@ -104,14 +104,14 @@ var Cursor = (function() {
         this.range.detach();
       },
 
-      moveAtTheBeginning: function(element) {
+      moveBefore: function(element) {
         this.range.setStart(element, 0);
         this.range.setEnd(element, 0);
       },
 
-      moveAtTheEnd: function(element) {
-        this.range.selectNodeContents(element);
-        this.range.collapse(false);
+      moveAfter: function(element) {
+        this.range.setStartAfter(element);
+        this.range.setEndAfter(element);
       },
 
       equals: function(cursor) {
