@@ -9,7 +9,7 @@ var content = (function() {
         node = element.childNodes[i];
         if(!node) continue;
 
-        if(node.nodeType === 1) {
+        if(node.nodeType === 1 && node.nodeName !== 'BR') {
           sibling = node;
           while((sibling = sibling.nextSibling) !== null) {
             if(!parser.isSameNode(sibling, node))
@@ -56,7 +56,7 @@ var content = (function() {
 
       for (i = 0, len = element.childNodes.length; i < len; i++) {
         node = element.childNodes[i];
-        if(node && !node.textContent) {
+        if(node && node.nodeName !== 'BR' && !node.textContent) {
           node.parentNode.removeChild(node);
         }
       }
