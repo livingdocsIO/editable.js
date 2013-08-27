@@ -148,14 +148,14 @@ var behavior = (function() {
       case 'before':
         previous = block.previous(element);
         if(previous) {
-          cursor.moveAtTheEnd(previous);
+          cursor.moveAfter(previous);
           cursor.update();
         }
         break;
       case 'after':
         next = block.next(element);
         if(next) {
-          cursor.moveAtTheBeginning(next);
+          cursor.moveBefore(next);
           cursor.update();
         }
         break;
