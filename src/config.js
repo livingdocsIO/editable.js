@@ -145,16 +145,16 @@ var config = {
 
     /**
      * The switch event is triggered when the user switches to another block.
-     * This happens when TAB is pressed (move one block after) or SHIFT+TAB
-     * is pressed (move one block before).
+     * This happens when an ARROW key is pressed near the boundaries of a block.
      * The default behavior is to... TODO
      *
      * @event switch
      * @param {HTMLElement} element The element triggering the event.
      * @param {String} direction The switch direction: "before" or "after".
+     * @param {Cursor} cursor The actual cursor object.*
      */
-    'switch': function(element, direction) {
-      behavior.switch(element, direction);
+    'switch': function(element, direction, cursor) {
+      behavior.switch(element, direction, cursor);
     },
 
     /**

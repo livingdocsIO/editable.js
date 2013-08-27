@@ -44,18 +44,41 @@ var dispatcher = (function() {
    * @param {Function} notifier: The callback to be triggered when the event is caught.
    */
   var setupKeyboardEvents = function($document, notifier) {
+    var dispatchSwitchEvent = function(event, element, direction) {
+      var cursor;
+
+      if(event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
+        return;
+
+      cursor = selectionWatcher.getSelection();
+      if(cursor instanceof Selection) return;
+
+      setTimeout(function() {
+        var newCursor = selectionWatcher.getCursor();
+        if(newCursor.equals(cursor)) {
+          event.preventDefault();
+          event.stopPropagation();
+          notifier('switch', element, direction, newCursor);
+        }
+      }, 1);
+    }
+
     $document.on('keydown.editable', '.-js-editable', function(event) {
       keyboard.dispatchKeyEvent(event, this);
     });
 
     keyboard.on('left', function(event) {
       log('Left key pressed');
+      dispatchSwitchEvent(event, this, 'before');
     }).on('up', function(event) {
       log('Up key pressed');
+      dispatchSwitchEvent(event, this, 'before');
     }).on('right', function(event) {
       log('Right key pressed');
+      dispatchSwitchEvent(event, this, 'after');
     }).on('down', function(event) {
       log('Down key pressed');
+      dispatchSwitchEvent(event, this, 'after');
     }).on('tab', function(event) {
       log('Tab key pressed');
     }).on('shiftTab', function(event) {
