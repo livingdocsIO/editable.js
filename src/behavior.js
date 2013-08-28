@@ -166,8 +166,26 @@ var behavior = (function() {
       log('Default move behavior');
     },
 
-    clipboard: function(element, selection, action) {
+    clipboard: function(element, action, cursor) {
       log('Default clipboard behavior');
+
+      if(action !== 'paste') return;
+
+      var sel = rangy.saveSelection();
+
+      var pasteHolder = document.createElement('textarea');
+      pasteHolder.setAttribute('style', 'position: absolute; left: -9999px');
+      document.body.appendChild(pasteHolder);
+      pasteHolder.focus();
+
+      setTimeout(function() {
+        rangy.restoreSelection(sel);
+        var cursor = selectionWatcher.getCursor();
+        var pasteElement = document.createTextNode(pasteHolder.value)
+        cursor.insertAfter(pasteElement);
+        cursor.moveAfter(pasteElement);
+        cursor.update();
+      }, 0);
     }
   };
 })();

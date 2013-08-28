@@ -28,10 +28,13 @@ var dispatcher = (function() {
       notifier('blur', this);
     }).on('copy.editable', '.-js-editable', function(event) {
       log('Copy');
+      notifier('clipboard', this, 'copy', selectionWatcher.getFreshSelection());
     }).on('cut.editable', '.-js-editable', function(event) {
       log('Cut');
+      notifier('clipboard', this, 'cut', selectionWatcher.getFreshSelection());
     }).on('paste.editable', '.-js-editable', function(event) {
       log('Paste');
+      notifier('clipboard', this, 'paste', selectionWatcher.getFreshSelection());
     });
   };
 
