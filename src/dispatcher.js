@@ -23,8 +23,10 @@ var dispatcher = (function() {
    */
   var setupElementEvents = function($document, notifier) {
     $document.on('focus.editable', '.-js-editable', function(event) {
+      if(this.getAttribute('editableIsPasting')) return;
       notifier('focus', this);
     }).on('blur.editable', '.-js-editable', function(event) {
+      if(this.getAttribute('editableIsPasting')) return;
       notifier('blur', this);
     }).on('copy.editable', '.-js-editable', function(event) {
       log('Copy');

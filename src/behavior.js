@@ -171,6 +171,8 @@ var behavior = (function() {
 
       if(action !== 'paste') return;
 
+      element.setAttribute('editableIsPasting', true);
+
       var sel = rangy.saveSelection();
 
       var pasteHolder = document.createElement('textarea');
@@ -187,6 +189,8 @@ var behavior = (function() {
         cursor.update();
 
         document.body.removeChild(pasteHolder);
+
+        element.removeAttribute('editableIsPasting');
       }, 0);
     }
   };
