@@ -185,6 +185,8 @@ var behavior = (function() {
         cursor.insertAfter(pasteElement);
         cursor.moveAfter(pasteElement);
         cursor.update();
+
+        document.body.removeChild(pasteHolder);
       }, 0);
     }
   };
