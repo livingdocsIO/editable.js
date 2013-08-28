@@ -88,8 +88,8 @@ var dispatcher = (function() {
     }).on('backspace', function(event) {
       log('Backspace key pressed');
 
-      var cursor = selectionWatcher.getCursor();
-      if(cursor.isAtBeginning()) {
+      var cursor = selectionWatcher.getFreshSelection();
+      if(cursor instanceof Cursor && cursor.isAtBeginning()) {
         event.preventDefault();
         event.stopPropagation();
         notifier('merge', this, 'before', cursor);
@@ -97,8 +97,8 @@ var dispatcher = (function() {
     }).on('delete', function(event) {
       log('Delete key pressed');
 
-      var cursor = selectionWatcher.getCursor();
-      if(cursor.isAtEnd()) {
+      var cursor = selectionWatcher.getFreshSelection();
+      if(cursor instanceof Cursor && cursor.isAtEnd()) {
         event.preventDefault();
         event.stopPropagation();
         notifier('merge', this, 'after', cursor);
