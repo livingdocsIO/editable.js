@@ -173,22 +173,26 @@ var behavior = (function() {
 
       element.setAttribute('editableIsPasting', true);
 
-      var sel = rangy.saveSelection();
+      if(cursor instanceof Selection) {
+        cursor.deleteContent();
+      }
 
       var pasteHolder = document.createElement('textarea');
       pasteHolder.setAttribute('style', 'position: absolute; left: -9999px');
-      document.body.appendChild(pasteHolder);
+      cursor.insertAfter(pasteHolder);
       pasteHolder.focus();
 
+      var sel = rangy.saveSelection();
+
       setTimeout(function() {
+        var pastedValue = pasteHolder.value;
+        element.removeChild(pasteHolder);
+
         rangy.restoreSelection(sel);
         var cursor = selectionWatcher.getCursor();
-        var pasteElement = document.createTextNode(pasteHolder.value)
+        var pasteElement = document.createTextNode(pastedValue)
         cursor.insertAfter(pasteElement);
-        cursor.moveAfter(pasteElement);
         cursor.update();
-
-        document.body.removeChild(pasteHolder);
 
         element.removeAttribute('editableIsPasting');
       }, 0);
