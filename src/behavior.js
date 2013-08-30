@@ -168,6 +168,7 @@ var behavior = (function() {
 
     clipboard: function(element, action, cursor) {
       log('Default clipboard behavior');
+      var pasteHolder, sel;
 
       if(action !== 'paste') return;
 
@@ -177,21 +178,22 @@ var behavior = (function() {
         cursor.deleteContent();
       }
 
-      var pasteHolder = document.createElement('textarea');
+      pasteHolder = document.createElement('textarea');
       pasteHolder.setAttribute('style', 'position: absolute; left: -9999px');
       cursor.insertAfter(pasteHolder);
+      sel = rangy.saveSelection();
       pasteHolder.focus();
 
-      var sel = rangy.saveSelection();
-
       setTimeout(function() {
-        var pastedValue = pasteHolder.value;
+        var pasteValue, pasteElement, cursor;
+        pasteValue = pasteHolder.value;
         element.removeChild(pasteHolder);
 
         rangy.restoreSelection(sel);
-        var cursor = selectionWatcher.getCursor();
-        var pasteElement = document.createTextNode(pastedValue)
+        cursor = selectionWatcher.getCursor();
+        pasteElement = document.createTextNode(pasteValue);
         cursor.insertAfter(pasteElement);
+        cursor.moveAfter(pasteElement);
         cursor.update();
 
         element.removeAttribute('editableIsPasting');
