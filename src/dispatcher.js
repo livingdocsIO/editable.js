@@ -60,7 +60,7 @@ var dispatcher = (function() {
       if(cursor instanceof Selection) return;
 
       setTimeout(function() {
-        var newCursor = selectionWatcher.getCursor();
+        var newCursor = selectionWatcher.forceCursor();
         if(newCursor.equals(cursor)) {
           event.preventDefault();
           event.stopPropagation();
@@ -114,7 +114,7 @@ var dispatcher = (function() {
 
       event.preventDefault();
       event.stopPropagation();
-      var cursor = selectionWatcher.getCursor();
+      var cursor = selectionWatcher.forceCursor();
 
       if (cursor.isAtBeginning()) {
         notifier('insert', this, 'before', cursor);
@@ -128,7 +128,7 @@ var dispatcher = (function() {
       log('Shift+Enter key pressed');
       event.preventDefault();
       event.stopPropagation();
-      var cursor = selectionWatcher.getCursor();
+      var cursor = selectionWatcher.forceCursor();
       notifier('newline', this, cursor);
     });
   };
