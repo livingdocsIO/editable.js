@@ -27,6 +27,7 @@
     "dispatcher": true,
     "behavior": true,
     "keyboard": true,
+    "RangeContainer": true,
     "selectionWatcher": true,
     "Selection": true,
     "Cursor": true,

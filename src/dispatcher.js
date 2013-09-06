@@ -12,8 +12,8 @@ var dispatcher = (function() {
    * @private
    * @type {Object}
    */
-  var listeners = {};
-  var editableSelector = undefined;
+  var listeners = {},
+      editableSelector;
 
   /**
    * Sets up events that are triggered on modifying an element.
@@ -67,7 +67,7 @@ var dispatcher = (function() {
           notifier('switch', element, direction, newCursor);
         }
       }, 1);
-    }
+    };
 
     $document.on('keydown.editable', editableSelector, function(event) {
       keyboard.dispatchKeyEvent(event, this);
