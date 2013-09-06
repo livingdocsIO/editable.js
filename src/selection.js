@@ -73,6 +73,7 @@ var Selection = (function() {
     /**
      *
      * @method deleteContent
+     * @return Cursor instance
      */
     deleteContent: function() {
       this.range.deleteContents();

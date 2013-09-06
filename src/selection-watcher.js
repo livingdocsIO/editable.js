@@ -40,30 +40,36 @@ var selectionWatcher = (function() {
 
   return {
 
-    // get a fresh Selection or Cursor
+    /**
+     * Gets a fresh RangeContainer with the current selection or cursor.
+     *
+     * @return Either a Cursor or Selection instance or undefined if
+     * there is neither a selection or cursor.
+     */
     getFreshSelection: function() {
       var range = getRangeContainer();
-      if (!range.isAnythingSelected) return undefined;
 
       return range.isCursor ?
-        new Cursor(range.host, range.range) :
-        new Selection(range.host, range.range);
+        range.getCursor() :
+        range.getSelection();
     },
 
-    // get the selection set by the last selectionChanged event
-    // sometimes the event does not fire fast enough and the seleciton
-    // you get is not the most recent one.
-    // In those cases use getFreshSelection()
+    /**
+     * Get the selection set by the last selectionChanged event.
+     * Sometimes the event does not fire fast enough and the seleciton
+     * you get is not the one the user sees.
+     * In those cases use #getFreshSelection()
+     *
+     * @return Either a Cursor or Selection instance or undefined if
+     * there is neither a selection or cursor.
+     */
     getSelection: function() {
       return currentSelection;
     },
 
     forceCursor: function() {
-      var cursor = this.getFreshSelection();
-      if (cursor instanceof Selection) {
-        cursor = cursor.deleteContent();
-      }
-      return cursor;
+      var range = getRangeContainer();
+      return range.forceCursor();
     },
 
     selectionChanged: function() {
