@@ -92,20 +92,44 @@
     },
 
 
+    /**
+     * Removes the Editable.JS API from the given target elements.
+     * The target elements are marked as disabled.
+     *
+     * @method disable
+     * @param { jQuery element | undefined  } target editable root element(s)
+     *    If no param is specified all editables are disabled.
+     * @static
+     * @chainable
+     */
     disable: function($elem) {
       $elem = $elem || $('.' + config.editableClass)
       $elem
         .removeAttr('contenteditable')
         .removeClass(config.editableClass)
         .addClass(config.editableDisabledClass);
+
+      return this;
     },
 
+
+    /**
+     * Adds the Editable.JS API to the given target elements.
+     *
+     * @method enable
+     * @param { jQuery element | undefined } target editable root element(s)
+     *    If no param is specified all editables marked as disabled are enabled.
+     * @static
+     * @chainable
+     */
     enable: function($elem) {
       $elem = $elem || $('.' + config.editableDisabledClass)
       $elem
         .attr('contenteditable', true)
         .removeClass(config.editableDisabledClass)
         .addClass(config.editableClass);
+
+      return this;
     },
 
 
