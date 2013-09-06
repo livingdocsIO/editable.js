@@ -12,8 +12,8 @@ var dispatcher = (function() {
    * @private
    * @type {Object}
    */
-  var listeners = {};
-  var editableSelector = undefined;
+  var listeners = {},
+      editableSelector;
 
   /**
    * Sets up events that are triggered on modifying an element.
@@ -60,14 +60,14 @@ var dispatcher = (function() {
       if(cursor instanceof Selection) return;
 
       setTimeout(function() {
-        var newCursor = selectionWatcher.getCursor();
+        var newCursor = selectionWatcher.forceCursor();
         if(newCursor.equals(cursor)) {
           event.preventDefault();
           event.stopPropagation();
           notifier('switch', element, direction, newCursor);
         }
       }, 1);
-    }
+    };
 
     $document.on('keydown.editable', editableSelector, function(event) {
       keyboard.dispatchKeyEvent(event, this);
@@ -114,7 +114,7 @@ var dispatcher = (function() {
 
       event.preventDefault();
       event.stopPropagation();
-      var cursor = selectionWatcher.getCursor();
+      var cursor = selectionWatcher.forceCursor();
 
       if (cursor.isAtBeginning()) {
         notifier('insert', this, 'before', cursor);
@@ -128,7 +128,7 @@ var dispatcher = (function() {
       log('Shift+Enter key pressed');
       event.preventDefault();
       event.stopPropagation();
-      var cursor = selectionWatcher.getCursor();
+      var cursor = selectionWatcher.forceCursor();
       notifier('newline', this, cursor);
     });
   };

@@ -66,7 +66,7 @@
       initialize();
       var elemConfig = $.extend(true, {}, config, elementConfiguration);
       // todo: store element configuration
-      this.enable( $(target) )
+      this.enable($(target));
 
       // todo: check css whitespace settings
       return this;
@@ -85,8 +85,8 @@
      * @chainable
      */
     remove: function(target) {
-      $target = $(target)
-      this.disable($target)
+      var $target = $(target);
+      this.disable($target);
       $target.removeClass(config.editableDisabledClass);
       return this;
     },
@@ -103,7 +103,7 @@
      * @chainable
      */
     disable: function($elem) {
-      $elem = $elem || $('.' + config.editableClass)
+      $elem = $elem || $('.' + config.editableClass);
       $elem
         .removeAttr('contenteditable')
         .removeClass(config.editableClass)
@@ -123,7 +123,7 @@
      * @chainable
      */
     enable: function($elem) {
-      $elem = $elem || $('.' + config.editableDisabledClass)
+      $elem = $elem || $('.' + config.editableDisabledClass);
       $elem
         .attr('contenteditable', true)
         .removeClass(config.editableDisabledClass)
