@@ -190,7 +190,7 @@ var behavior = (function() {
         element.removeChild(pasteHolder);
 
         rangy.restoreSelection(sel);
-        cursor = selectionWatcher.getCursor();
+        cursor = selectionWatcher.forceCursor();
         pasteElement = document.createTextNode(pasteValue);
         cursor.insertAfter(pasteElement);
         cursor.moveAfter(pasteElement);
