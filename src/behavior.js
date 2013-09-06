@@ -172,7 +172,7 @@ var behavior = (function() {
 
       if(action !== 'paste') return;
 
-      element.setAttribute('editableIsPasting', true);
+      element.setAttribute(config.pastingAttribute, true);
 
       if(cursor instanceof Selection) {
         cursor.deleteContent();
@@ -196,7 +196,7 @@ var behavior = (function() {
         cursor.moveAfter(pasteElement);
         cursor.update();
 
-        element.removeAttribute('editableIsPasting');
+        element.removeAttribute(config.pastingAttribute);
       }, 0);
     }
   };
