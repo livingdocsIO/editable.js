@@ -50,16 +50,20 @@ var selectionWatcher = (function() {
         new Selection(range.host, range.range);
     },
 
+    // get the selection set by the last selectionChanged event
+    // sometimes the event does not fire fast enough and the seleciton
+    // you get is not the most recent one.
+    // In those cases use getFreshSelection()
+    getSelection: function() {
+      return currentSelection;
+    },
+
     forceCursor: function() {
       var cursor = this.getFreshSelection();
       if (cursor instanceof Selection) {
         cursor = cursor.deleteContent();
       }
       return cursor;
-    },
-
-    getSelection: function() {
-      return currentSelection;
     },
 
     selectionChanged: function() {
