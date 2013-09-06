@@ -5,40 +5,11 @@
  * @module core
  * @submodule selectionWatcher
  */
-
 var selectionWatcher = (function() {
-
-  /** RangeContainer
-   *
-   * primarily used to compare ranges
-   * its designed to work with undefined ranges as well
-   * so we can easily compare them without checking for undefined
-   * all the time
-   */
-  var RangeContainer = function(editableHost, rangyRange) {
-    this.host = editableHost;
-    this.range = rangyRange;
-    this.isAnythingSelected = (rangyRange !== undefined);
-    this.cursor = (this.isAnythingSelected && rangyRange.collapsed);
-    this.selection = !this.cursor;
-  };
-
-  RangeContainer.prototype.isDifferentFrom = function(otherRangeContainer) {
-    var self = this.range;
-    var other = otherRangeContainer.range;
-    if (self && other) {
-      return !self.equals(other);
-    } else if (!self && !other) {
-      return false;
-    } else {
-      return true;
-    }
-  };
-
 
   var rangySelection,
       currentSelection,
-      currentRange = new RangeContainer();
+      currentRange;
 
   /**
    * Return a RangeContainer if the current selection is within an editable
@@ -74,7 +45,7 @@ var selectionWatcher = (function() {
       var range = getRangeContainer();
       if (!range.isAnythingSelected) return undefined;
 
-      return range.cursor ?
+      return range.isCursor ?
         new Cursor(range.host, range.range) :
         new Selection(range.host, range.range);
     },
@@ -97,7 +68,7 @@ var selectionWatcher = (function() {
         currentRange = newRange;
 
         if (currentRange.isAnythingSelected) {
-          if (currentRange.cursor) {
+          if (currentRange.isCursor) {
 
             // emtpy selection
             if (currentSelection instanceof Selection) {
