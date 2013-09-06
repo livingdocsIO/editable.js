@@ -13,6 +13,7 @@ var dispatcher = (function() {
    * @type {Object}
    */
   var listeners = {};
+  var editableSelector = undefined;
 
   /**
    * Sets up events that are triggered on modifying an element.
@@ -22,16 +23,21 @@ var dispatcher = (function() {
    * @param {Function} notifier: The callback to be triggered when the event is caught.
    */
   var setupElementEvents = function($document, notifier) {
-    $document.on('focus.editable', '.-js-editable', function(event) {
+    $document.on('focus.editable', editableSelector, function(event) {
+      if(this.getAttribute(config.pastingAttribute)) return;
       notifier('focus', this);
-    }).on('blur.editable', '.-js-editable', function(event) {
+    }).on('blur.editable', editableSelector, function(event) {
+      if(this.getAttribute(config.pastingAttribute)) return;
       notifier('blur', this);
-    }).on('copy.editable', '.-js-editable', function(event) {
+    }).on('copy.editable', editableSelector, function(event) {
       log('Copy');
-    }).on('cut.editable', '.-js-editable', function(event) {
+      notifier('clipboard', this, 'copy', selectionWatcher.getFreshSelection());
+    }).on('cut.editable', editableSelector, function(event) {
       log('Cut');
-    }).on('paste.editable', '.-js-editable', function(event) {
+      notifier('clipboard', this, 'cut', selectionWatcher.getFreshSelection());
+    }).on('paste.editable', editableSelector, function(event) {
       log('Paste');
+      notifier('clipboard', this, 'paste', selectionWatcher.getFreshSelection());
     });
   };
 
@@ -63,7 +69,7 @@ var dispatcher = (function() {
       }, 1);
     }
 
-    $document.on('keydown.editable', '.-js-editable', function(event) {
+    $document.on('keydown.editable', editableSelector, function(event) {
       keyboard.dispatchKeyEvent(event, this);
     });
 
@@ -151,7 +157,7 @@ var dispatcher = (function() {
     // listen for selection changes by mouse so we can
     // suppress the selectionchange event and only fire the
     // change event on mouseup
-    $document.on('mousedown.editable', '.-js-editable', function(event) {
+    $document.on('mousedown.editable', editableSelector, function(event) {
       if (config.mouseMoveSelectionChanges === false) {
         suppressSelectionChanges = true;
 
@@ -191,7 +197,7 @@ var dispatcher = (function() {
     });
 
     // listen for selection changes by keys
-    $document.on('keyup.editable', '.-js-editable', function(event) {
+    $document.on('keyup.editable', editableSelector, function(event) {
 
       // when pressing Command + Shift + Left for example the keyup is only triggered
       // after at least two keys are released. Strange. The culprit seems to be the
@@ -243,6 +249,7 @@ var dispatcher = (function() {
 
       var $document = $(document);
       var eventType = null;
+      editableSelector = '.' + config.editableClass;
 
       listeners = {};
       // TODO check the config.event object to prevent

@@ -166,8 +166,38 @@ var behavior = (function() {
       log('Default move behavior');
     },
 
-    clipboard: function(element, selection, action) {
+    clipboard: function(element, action, cursor) {
       log('Default clipboard behavior');
+      var pasteHolder, sel;
+
+      if(action !== 'paste') return;
+
+      element.setAttribute(config.pastingAttribute, true);
+
+      if(cursor instanceof Selection) {
+        cursor.deleteContent();
+      }
+
+      pasteHolder = document.createElement('textarea');
+      pasteHolder.setAttribute('style', 'position: absolute; left: -9999px');
+      cursor.insertAfter(pasteHolder);
+      sel = rangy.saveSelection();
+      pasteHolder.focus();
+
+      setTimeout(function() {
+        var pasteValue, pasteElement, cursor;
+        pasteValue = pasteHolder.value;
+        element.removeChild(pasteHolder);
+
+        rangy.restoreSelection(sel);
+        cursor = selectionWatcher.getCursor();
+        pasteElement = document.createTextNode(pasteValue);
+        cursor.insertAfter(pasteElement);
+        cursor.moveAfter(pasteElement);
+        cursor.update();
+
+        element.removeAttribute(config.pastingAttribute);
+      }, 0);
     }
   };
 })();

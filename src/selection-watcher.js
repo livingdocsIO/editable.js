@@ -56,8 +56,8 @@ var selectionWatcher = (function() {
     // (I don't know if this occurs from normal use though)
     if (rangySelection.rangeCount) {
       var range = rangySelection.getRangeAt(0);
-
-      var hostNode = $(range.commonAncestorContainer).closest('.-js-editable');
+      var editableSelector = '.' + config.editableClass;
+      var hostNode = $(range.commonAncestorContainer).closest(editableSelector);
       if (hostNode.length) {
         return new RangeContainer(hostNode[0], range);
       }
