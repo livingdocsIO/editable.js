@@ -7,8 +7,9 @@
  */
 var config = {
   log: false,
-  cssClass: '-js-editable',
-  cssClassDisabled: '-js-editable-disabled',
+  editableClass: '-js-editable',
+  editableDisabledClass: '-js-editable-disabled',
+  pastingAttribute: 'x-editable-is-pasting',
   mouseMoveSelectionChanges: false,
 
   event: {
@@ -179,11 +180,11 @@ var config = {
      *
      * @event clipboard
      * @param {HTMLElement} element The element triggering the event.
-     * @param {Selection} selection The actual Selection object.
      * @param {String} action The clipboard action: "copy", "paste", "cut".
+     * @param {Cursor} cursor The actual cursor object.
      */
-    clipboard: function(element, selection, action) {
-      behavior.move(element, selection, action);
+    clipboard: function(element, action, cursor) {
+      behavior.clipboard(element, action, cursor);
     }
   }
 };

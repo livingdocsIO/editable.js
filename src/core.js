@@ -68,17 +68,12 @@
       // todo: store element configuration
 
       if (!this.isDisabled) {
-        $(target)
-          .attr('contenteditable', true)
-          .addClass('-js-editable');
+        this.enable( $(target) )
       } else {
-        $(target)
-          .removeAttr('contenteditable')
-          .addClass('-js-editable-disabled');
+        this.disable( $(target) )
       }
 
       // todo: check css whitespace settings
-      // todo: much much more obviously...
       return this;
     },
 
@@ -95,32 +90,31 @@
      * @chainable
      */
     remove: function(target) {
-      $(target)
-        .removeAttr('contenteditable')
-        .removeClass('-js-editable')
-        .removeClass('-js-editable-disabled');
+      $target = $(target)
+      this.disable($target)
+      $target.removeClass(config.editableDisabledClass);
       return this;
     },
 
 
     isDisabled: false,
 
-    disable: function() {
+    disable: function($elem) {
       this.isDisabled = true;
-
-      $('.-js-editable')
+      $elem = $elem || $('.' + config.editableClass)
+      $elem
         .removeAttr('contenteditable')
-        .removeClass('-js-editable')
-        .addClass('-js-editable-disabled');
+        .removeClass(config.editableClass)
+        .addClass(config.editableDisabledClass);
     },
 
-    enable: function() {
+    enable: function($elem) {
       this.isDisabled = false;
-
-      $('.-js-editable-disabled')
+      $elem = $elem || $('.' + config.editableDisabledClass)
+      $elem
         .attr('contenteditable', true)
-        .removeClass('-js-editable-disabled')
-        .addClass('-js-editable');
+        .removeClass(config.editableDisabledClass)
+        .addClass(config.editableClass);
     },
 
 
