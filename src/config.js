@@ -7,9 +7,9 @@
  */
 var config = {
   log: false,
-  editableClass: '-js-editable',
-  editableDisabledClass: '-js-editable-disabled',
-  pastingAttribute: 'x-editable-is-pasting',
+  editableClass: 'js-editable',
+  editableDisabledClass: 'js-editable-disabled',
+  pastingAttribute: 'data-editable-is-pasting',
   mouseMoveSelectionChanges: false,
 
   event: {
