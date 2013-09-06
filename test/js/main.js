@@ -6,21 +6,11 @@
   });
 
 
-  $(document).ready(function() {
+  var setupTooltip = function() {
     var tooltip = $('<div class="selection-tip" style="display:none;">How may I help?</div>')
     $(document.body).append(tooltip);
 
-    $("article>div>p, article>div li").editable();
-    Editable.focus(function(el) {
-      console.log('Focus event handler was triggered on', el);
-
-    }).blur(function(el) {
-      console.log('Blur event handler was triggered on', el);
-
-      // todo: this should not be necessary here
-      tooltip.hide();
-
-    }).selection(function(el, selection) {
+    Editable.selection(function(el, selection) {
       if (selection) {
         coords = selection.getCoordinates()
 
@@ -31,6 +21,16 @@
       } else {
         tooltip.hide();
       }
+    }).blur(function(el) {
+      // todo: this should not be necessary here
+      tooltip.hide();
     });
+  };
+
+
+  $(document).ready(function() {
+    $("article>div>p, article>div li").editable();
+    setupTooltip();
   });
+
 })(jQuery);
