@@ -28,6 +28,13 @@ var Cursor = (function() {
           this.range.endOffset);
       },
 
+      isAtTextEnd: function() {
+        return parser.isTextEndOfHost(
+          this.host,
+          this.range.endContainer,
+          this.range.endOffset);
+      },
+
       isAtBeginning: function() {
         return parser.isBeginningOfHost(
           this.host,
