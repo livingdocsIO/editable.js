@@ -55,7 +55,7 @@ var Selection = (function() {
       parser.isTextEndOfHost(
         this.host,
         this.range.endContainer,
-        this.range.endOffset)
+        this.range.endOffset);
     },
 
     /**

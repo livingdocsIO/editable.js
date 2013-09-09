@@ -194,12 +194,11 @@ var parser = (function() {
       if (container.nodeType === 3) {
         var text = string.trimRight(container.nodeValue);
         return offset >= text.length;
+      } else if (container.childNodes.length === 0) {
+        return true;
       } else {
-        if (container.childNodes.length === 0)
-          return true;
-        else
-          var lastOffset = this.lastOffsetWithContent(container)
-          return offset >= lastOffset;
+        var lastOffset = this.lastOffsetWithContent(container);
+        return offset >= lastOffset;
       }
     },
 
