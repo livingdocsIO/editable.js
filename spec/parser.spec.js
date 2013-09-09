@@ -1,13 +1,31 @@
 describe('Parser', function() {
 
+  // helper methods
+  var createRangyCursorAfter = function(node) {
+    var range = rangy.createRange();
+    range.setStartAfter(node);
+    range.setEndAfter(node);
+    return range;
+  };
+
+  var createRangyCursorAtEnd = function(node) {
+    var range = rangy.createRange();
+    range.selectNodeContents(node);
+    range.collapse(false);
+    return range;
+  }
+
   // test elements
   var empty = $('<div></div>')[0];
   var emptyWithWhitespace = $('<div> </div>')[0];
+  var singleCharacter = $('<div>a</div>')[0];
   var oneWord = $('<div>foobar</div>')[0];
   var oneWordWithWhitespace = $('<div> foobar </div>')[0];
+  var oneWordWithNbsp = $('<div>&nbsp;foobar&nbsp;</div>')[0];
   var textNode = oneWord.firstChild;
   var text = $('<div>foo bar.</div>')[0];
   var textWithLink = $('<div>foo <a href="#">bar</a>.</div>')[0];
+  var linkWithWhitespace = $('<div><a href="#">bar</a> </div>')[0];
   var link = $('<div><a href="#">foo bar</a></div>')[0];
   var linkWithSpan = $('<div><a href="#">foo <span class="important">bar</span></a></div>')[0];
 
@@ -35,16 +53,85 @@ describe('Parser', function() {
   });
 
 
+  describe('isWhitespaceOnly()', function() {
+
+    it('works with void element', function() {
+      var textNode = document.createTextNode('')
+      expect(parser.isWhitespaceOnly(textNode)).toEqual(true);
+    });
+
+    it('works with single whitespace', function() {
+      expect(parser.isWhitespaceOnly(emptyWithWhitespace.firstChild)).toEqual(true);
+    });
+
+    it('works with a single character', function() {
+      expect(parser.isWhitespaceOnly(singleCharacter.firstChild)).toEqual(false);
+    });
+
+    it('ignores whitespace after the last element', function() {
+      expect(parser.isWhitespaceOnly(link.firstChild)).toEqual(false);
+    });
+  });
+
+
+  describe('lastOffsetWithContent()', function() {
+
+    describe('called with a text node', function(){
+
+      it('works for single character', function() {
+        // <div>a|</div>
+        expect(parser.lastOffsetWithContent(singleCharacter.firstChild)).toEqual(1);
+      });
+
+      it('works with a single word text node', function() {
+        // <div>foobar|</div>
+        expect(parser.lastOffsetWithContent(oneWord.firstChild)).toEqual(6);
+      });
+
+      it('works with a single word text node with whitespace', function() {
+        // <div> foobar| </div>
+        expect(parser.lastOffsetWithContent(oneWordWithWhitespace.firstChild)).toEqual(7);
+      });
+    });
+
+    describe('called with an element node', function(){
+
+      it('works with an empty tag', function() {
+        // <div></div>
+        expect(parser.lastOffsetWithContent(empty)).toEqual(0);
+      });
+
+      it('works with a single character', function() {
+        // <div>a</div>
+        expect(parser.lastOffsetWithContent(singleCharacter)).toEqual(1);
+      });
+
+      it('works with whitespace after last tag', function() {
+        // <div><a href="#">bar</a> </div>
+        expect(parser.lastOffsetWithContent(linkWithWhitespace)).toEqual(1);
+      });
+
+      it('works with whitespace after last tag', function() {
+        // <div>foo <a href="#">bar</a>.</div>
+        expect(parser.lastOffsetWithContent(textWithLink)).toEqual(3);
+      });
+    });
+
+  });
+
   describe('isEndOffset()', function() {
 
     it('works for single child node', function() {
       // <div>foobar|</div>
-      expect(parser.isEndOffset(oneWord, 0)).toEqual(true);
+      var range = createRangyCursorAfter(oneWord.firstChild);
+      expect(range.endOffset).toEqual(1)
+      expect(parser.isEndOffset(oneWord, 1)).toEqual(true);
     });
 
     it('works for empty node', function() {
       // <div>|</div>
-      expect(parser.isEndOffset(empty, 0)).toEqual(true);
+      var range = createRangyCursorAtEnd(empty)
+      expect(parser.isEndOffset(empty, range.endOffset)).toEqual(true);
     });
 
     it('works with a text node', function() {
@@ -64,13 +151,61 @@ describe('Parser', function() {
 
     it('works with text and element nodes', function() {
       // <div>foo <a href='#'>bar</a>.|</div>
-      expect(parser.isEndOffset(textWithLink, 2)).toEqual(true);
+      var range = createRangyCursorAfter(textWithLink.childNodes[2]);
+      expect(range.endOffset).toEqual(3)
+      expect(parser.isEndOffset(textWithLink, 3)).toEqual(true);
 
       // <div>foo <a href='#'>bar</a>|.</div>
-      expect(parser.isEndOffset(textWithLink, 1)).toEqual(false);
+      var range = createRangyCursorAfter(textWithLink.childNodes[1]);
+      expect(range.endOffset).toEqual(2)
+      expect(parser.isEndOffset(textWithLink, 2)).toEqual(false);
     });
   });
 
+
+  describe('isTextEndOffset()', function() {
+
+    it('ignores whitespace at the end', function() {
+      // <div> fooba|r </div>
+      expect(parser.isTextEndOffset(oneWordWithWhitespace.firstChild, 6)).toEqual(false);
+      // <div> foobar| </div>
+      expect(parser.isTextEndOffset(oneWordWithWhitespace.firstChild, 7)).toEqual(true);
+      // <div> foobar |</div>
+      expect(parser.isTextEndOffset(oneWordWithWhitespace.firstChild, 8)).toEqual(true);
+    });
+
+    it('ignores non-breaking-space at the end', function() {
+      // <div> fooba|r </div>
+      expect(parser.isTextEndOffset(oneWordWithNbsp.firstChild, 6)).toEqual(false);
+      // <div> foobar| </div>
+      expect(parser.isTextEndOffset(oneWordWithNbsp.firstChild, 7)).toEqual(true);
+      // <div> foobar |</div>
+      expect(parser.isTextEndOffset(oneWordWithNbsp.firstChild, 8)).toEqual(true);
+    });
+
+    it('ignores whitespace after the last element', function() {
+      // <div><a href="#">bar|</a> </div>
+      expect(parser.isTextEndOffset(linkWithWhitespace.firstChild.firstChild, 2)).toEqual(false);
+      // <div><a href="#">bar|</a> </div>
+      expect(parser.isTextEndOffset(linkWithWhitespace.firstChild.firstChild, 3)).toEqual(true);
+    });
+
+    it('ignores whitespace after the last element', function() {
+      // <div><a href="#">bar|</a> </div>
+      var range = createRangyCursorAfter(linkWithWhitespace.firstChild.firstChild);
+      expect(range.endOffset).toEqual(1);
+      expect(parser.isTextEndOffset(linkWithWhitespace.firstChild, 1)).toEqual(true);
+      expect(parser.isTextEndOffset(linkWithWhitespace.firstChild, 0)).toEqual(false);
+    });
+
+    it('ignores whitespace after the last element', function() {
+      // <div><a href="#">bar</a>| </div>
+      var range = createRangyCursorAfter(linkWithWhitespace.firstChild);
+      expect(range.endOffset).toEqual(1);
+      expect(parser.isTextEndOffset(linkWithWhitespace, 1)).toEqual(true);
+      expect(parser.isTextEndOffset(linkWithWhitespace, 0)).toEqual(false);
+    });
+  });
 
   describe('isStartOffset()', function() {
 
@@ -121,17 +256,21 @@ describe('Parser', function() {
     });
 
     it('works with link node in nested content', function() {
-      var endContainer = $(linkWithSpan).find('a')[0];
       // <div><a href='#'>foo <span class='important'>bar</span>|</a></div>
-      expect(parser.isEndOfHost(linkWithSpan, endContainer, 1)).toEqual(true);
+      var endContainer = $(linkWithSpan).find('a')[0];
+      var range = createRangyCursorAtEnd(endContainer);
+      expect(range.endOffset).toEqual(2)
+      expect(parser.isEndOfHost(linkWithSpan, endContainer, 2)).toEqual(true);
 
       // <div><a href='#'>foo |<span class='important'>bar</span></a></div>
-      expect(parser.isEndOfHost(linkWithSpan, endContainer, 0)).toEqual(false);
+      expect(parser.isEndOfHost(linkWithSpan, endContainer, 1)).toEqual(false);
     });
 
     it('works with single text node', function() {
+      // <div>foobar|</div>
       var endContainer = oneWord.firstChild;
       expect(parser.isEndOfHost(oneWord, endContainer, 6)).toEqual(true);
+      expect(parser.isEndOfHost(oneWord, endContainer, 5)).toEqual(false);
     });
   });
 
