@@ -18,6 +18,7 @@ var Selection = (function() {
   var Selection = function(editableHost, rangyRange) {
     this.host = editableHost;
     this.range = rangyRange;
+    this.isSelection = true;
   };
 
   // add Cursor prototpye to Selection prototype chain
@@ -47,7 +48,14 @@ var Selection = (function() {
      * @method isAllSelected
      */
     isAllSelected: function() {
-
+      return parser.isBeginningOfHost(
+        this.host,
+        this.range.startContainer,
+        this.range.startOffset) &&
+      parser.isTextEndOfHost(
+        this.host,
+        this.range.endContainer,
+        this.range.endOffset)
     },
 
     /**

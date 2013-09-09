@@ -4,17 +4,18 @@ describe('Cursor', function() {
     expect(Cursor).toBeDefined();
   });
 
-  describe('with range', function() {
+  describe('with a range', function() {
 
     beforeEach(function() {
       this.oneWord = $('<div>foobar</div>')[0];
-      var docFragment = document.createDocumentFragment();
-      docFragment.appendChild(this.oneWord);
-
       this.range = rangy.createRange();
       this.range.selectNodeContents(this.oneWord);
       this.range.collapse(false);
-      var cursor = new Cursor(this.oneWord, this.range);
+      this.cursor = new Cursor(this.oneWord, this.range);
+    });
+
+    it('sets #isCursor to true', function(){
+      expect(this.cursor.isCursor).toBe(true);
     });
 
     it('has a valid range', function() {

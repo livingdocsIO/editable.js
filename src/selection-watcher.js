@@ -75,40 +75,27 @@ var selectionWatcher = (function() {
     selectionChanged: function() {
       var newRange = getRangeContainer();
       if (newRange.isDifferentFrom(currentRange)) {
+        var lastSelection = currentSelection;
         currentRange = newRange;
 
-        if (currentRange.isAnythingSelected) {
-          if (currentRange.isCursor) {
-
-            // emtpy selection
-            if (currentSelection instanceof Selection) {
-              dispatcher.notifyListeners('selection', currentSelection.host);
-            }
-
-            // new cursor
-            currentSelection = new Cursor(currentRange.host, currentRange.range);
-            dispatcher.notifyListeners('cursor', currentSelection.host, currentSelection);
-          } else {
-
-            // emtpy cursor
-            if (currentSelection instanceof Cursor) {
-              dispatcher.notifyListeners('cursor', currentSelection.host);
-            }
-
-            // new selection
-            currentSelection = new Selection(currentRange.host, currentRange.range);
-            dispatcher.notifyListeners('selection', currentSelection.host, currentSelection);
+        // empty selection or cursor
+        if (lastSelection) {
+          if (lastSelection.isCursor && !currentRange.isCursor) {
+            dispatcher.notifyListeners('cursor', lastSelection.host);
+          } else if (lastSelection.isSelection && !currentRange.isSelection) {
+            dispatcher.notifyListeners('selection', lastSelection.host);
           }
+        }
+
+        // set new selection or cursor and fire event
+        if (currentRange.isCursor) {
+          currentSelection = new Cursor(currentRange.host, currentRange.range);
+          dispatcher.notifyListeners('cursor', currentSelection.host, currentSelection);
+        } else if (currentRange.isSelection) {
+          currentSelection = new Selection(currentRange.host, currentRange.range);
+          dispatcher.notifyListeners('selection', currentSelection.host, currentSelection);
         } else {
-          var previousSelection = currentSelection;
           currentSelection = undefined;
-
-          // empty selection or cursor
-          if (previousSelection instanceof Cursor) {
-            dispatcher.notifyListeners('cursor', previousSelection.host);
-          } else if (previousSelection instanceof Selection) {
-            dispatcher.notifyListeners('selection', previousSelection.host);
-          }
         }
       }
     }

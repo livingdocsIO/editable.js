@@ -16,6 +16,7 @@ var Cursor = (function() {
   var Cursor = function(editableHost, rangyRange) {
     this.host = editableHost;
     this.range = rangyRange;
+    this.isCursor = true;
   };
 
   Cursor.prototype = (function() {
