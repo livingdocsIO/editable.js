@@ -21,16 +21,16 @@ describe('Parser', function() {
   });
 
 
-  describe('isEmpty()', function() {
+  describe('isVoid()', function() {
 
     it('detects an empty node', function() {
       expect( empty.childNodes.length ).toBe( 0 );
-      expect( parser.isEmpty(empty) ).toBe( true );
+      expect( parser.isVoid(empty) ).toBe( true );
     });
 
     it('detects an non-empty node', function() {
       expect( emptyWithWhitespace.childNodes.length ).toBe( 1 );
-      expect( parser.isEmpty(emptyWithWhitespace) ).toBe( false );
+      expect( parser.isVoid(emptyWithWhitespace) ).toBe( false );
     });
   });
 

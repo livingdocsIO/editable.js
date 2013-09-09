@@ -47,20 +47,20 @@ var parser = (function() {
     },
 
     /**
-     * check if node contains text or element nodes
+     * Check if node contains text or element nodes
      * whitespace counts too!
      *
-     * @method isEmpty
+     * @method isVoid
      * @param {HTMLElement}
      */
-    isEmpty: function(node) {
+    isVoid: function(node) {
       var child, i, len;
       var childNodes = node.childNodes;
 
       for (i = 0, len = childNodes.length; i < len; i++) {
         child = childNodes[i];
 
-        if (child.nodeType === 3 && !this.isEmptyTextNode(child)) {
+        if (child.nodeType === 3 && !this.isVoidTextNode(child)) {
           return false;
         } else if (child.nodeType === 1) {
           return false;
@@ -70,12 +70,12 @@ var parser = (function() {
     },
 
     /**
-     * check if node is a text node and completely empty without any whitespace
+     * Check if node is a text node and completely empty without any whitespace
      *
-     * @method isEmptyTextNode
+     * @method isVoidTextNode
      * @param {HTMLElement}
      */
-    isEmptyTextNode: function(node) {
+    isVoidTextNode: function(node) {
       return node.nodeType === 3 && !node.nodeValue;
     },
 
