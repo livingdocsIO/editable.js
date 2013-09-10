@@ -17,6 +17,7 @@ describe('Parser', function() {
 
   // test elements
   var empty = $('<div></div>')[0];
+  var linebreak = $('<div><br></div>')[0];
   var emptyWithWhitespace = $('<div> </div>')[0];
   var singleCharacter = $('<div>a</div>')[0];
   var oneWord = $('<div>foobar</div>')[0];
@@ -204,6 +205,15 @@ describe('Parser', function() {
       expect(range.endOffset).toEqual(1);
       expect(parser.isTextEndOffset(linkWithWhitespace, 1)).toEqual(true);
       expect(parser.isTextEndOffset(linkWithWhitespace, 0)).toEqual(false);
+    });
+
+    it('ignores a linebreak', function() {
+      // <div>|<br></div>
+      var range = rangy.createRange();
+      range.selectNodeContents(linebreak);
+      range.collapse(true);
+      expect(range.endOffset).toEqual(0);
+      expect(parser.isTextEndOffset(linebreak, 0)).toEqual(true);
     });
   });
 

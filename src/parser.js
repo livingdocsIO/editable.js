@@ -89,6 +89,10 @@ var parser = (function() {
       return node.nodeType === 3 && this.lastOffsetWithContent(node) === 0;
     },
 
+    isLinebreak: function(node) {
+      return node.nodeType === 1 && node.tagName === 'BR';
+    },
+
     /**
      * Returns the last offset where the cursor can be positioned to
      * be at the visible end of its container.
@@ -105,7 +109,10 @@ var parser = (function() {
             childNodes = node.childNodes;
 
         for (i = childNodes.length - 1; i >= 0; i--) {
-          if (!this.isWhitespaceOnly(childNodes[i])) {
+          node = childNodes[i];
+          if (this.isWhitespaceOnly(node) || this.isLinebreak(node)) {
+            continue;
+          } else {
             // The offset starts at 0 before the first element
             // and ends with the length after the last element.
             return i + 1;
