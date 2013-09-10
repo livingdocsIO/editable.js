@@ -1,6 +1,6 @@
 describe('Content', function() {
 
-  describe('normalizeTags', function() {
+  describe('normalizeTags()', function() {
 
     var plain = $('<div>Plain <strong>text</strong><strong>block</strong> example snippet</div>')[0];
     var plainWithSpace = $('<div>Plain <strong>text</strong> <strong>block</strong> example snippet</div>')[0];
@@ -8,35 +8,35 @@ describe('Content', function() {
     var nestedMixed = $('<div>Nested <strong>and mixed <em>text</em></strong><strong><em>block</em> <em>examples</em></strong> snippet</div>')[0];
     var consecutiveNewLines = $('<div>Consecutive<br><br>new lines</div>')[0];
 
-    it('should work with plain block', function() {
+    it('works with plain block', function() {
       var expected = $('<div>Plain <strong>textblock</strong> example snippet</div>')[0];
       var actual = plain.cloneNode(true);
       content.normalizeTags(actual);
       expect(actual.innerHTML).toEqual(expected.innerHTML);
     });
 
-    it('should not merge tags if not consecutives', function() {
+    it('does not merge tags if not consecutives', function() {
       var expected = plainWithSpace.cloneNode(true);
       var actual = plainWithSpace.cloneNode(true);
       content.normalizeTags(actual);
       expect(actual.innerHTML).toEqual(expected.innerHTML);
     });
 
-    it('should work with nested blocks', function() {
+    it('works with nested blocks', function() {
       var expected = $('<div>Nested <strong><em>textblock</em></strong> example snippet</div>')[0];
       var actual = nested.cloneNode(true);
       content.normalizeTags(actual);
       expect(actual.innerHTML).toEqual(expected.innerHTML);
     });
 
-    it('should work with nested blocks that mix other tags', function() {
+    it('works with nested blocks that mix other tags', function() {
       var expected = $('<div>Nested <strong>and mixed <em>textblock</em> <em>examples</em></strong> snippet</div>')[0];
       var actual = nestedMixed.cloneNode(true);
       content.normalizeTags(actual);
       expect(actual.innerHTML).toEqual(expected.innerHTML);
     });
 
-    it('should not merge consecutive new lines', function() {
+    it('does not merge consecutive new lines', function() {
       var expected = consecutiveNewLines.cloneNode(true);
       var actual = consecutiveNewLines.cloneNode(true);
       content.normalizeTags(actual);
@@ -52,7 +52,7 @@ describe('Content', function() {
       range = rangy.createRange();
     });
 
-    it('works', function() {
+    it('works with partially selected <strong><em>', function() {
       // <div>|a <strong><em>b|</em></strong> c</div>
       var test = $('<div>a <strong><em>b</em></strong> c</div>');
       range.setStart(test[0], 0);
@@ -60,7 +60,7 @@ describe('Content', function() {
       expect( content.getInnerTags(range) ).toEqual(['STRONG', 'EM']);
     });
 
-    it('works', function() {
+    it('gets nothing inside a <b>', function() {
       // <div><b>|a|</b></div>
       var test = $('<div><b>a</b></div>');
       range.setStart(test.find('b')[0], 0);
@@ -68,7 +68,7 @@ describe('Content', function() {
       expect( content.getInnerTags(range) ).toEqual([]);
     });
 
-    it('works', function() {
+    it('gets a fully surrounded <b>', function() {
       // <div>|<b>a</b>|</div>
       var test = $('<div><b>a</b></div>');
       range.setStart(test[0], 0);
@@ -76,7 +76,7 @@ describe('Content', function() {
       expect( content.getInnerTags(range) ).toEqual(['B']);
     });
 
-    it('works', function() {
+    it('gets partially selected <b> and <i>', function() {
       // <div><b>a|b</b><i>c|d</i></div>
       var test = $('<div><b>ab</b><i>cd</i></div>');
       var range = rangy.createRange();
