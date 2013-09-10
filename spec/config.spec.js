@@ -10,9 +10,9 @@ describe("Editable configuration", function() {
 
   it("init() should change configuration", function() {
     Editable.init({
-      log: true
+      log: false
     });
-    expect(config.log).toEqual(true);
+    expect(config.log).toEqual(false);
   });
 
 });
