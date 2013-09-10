@@ -60,6 +60,31 @@ var content = (function() {
           node.parentNode.removeChild(node);
         }
       }
+    },
+
+    // get all tags that start or end inside the selection
+    getTags: function(host, range) {
+      var tags = this.getInnerTags(range);
+
+      // get all tags that surround the selection
+      var node = range.commonAncestorContainer;
+      while (node !== host) {
+        tags.push(node.nodeName);
+        node = node.parentNode;
+      }
+      return tags;
+    },
+
+    // get all tags that start or end inside the selection
+    getInnerTags: function(range) {
+      var tags = [], node;
+
+      var iterator = range.createNodeIterator()
+      while(node = iterator.next()) {
+        if (node.nodeType === 1)
+          tags.push(node.nodeName);
+      }
+      return tags;
     }
   };
 })();

@@ -1,5 +1,7 @@
-describe('Test content', function() {
+describe('Content', function() {
+
   describe('normalizeTags', function() {
+
     var plain = $('<div>Plain <strong>text</strong><strong>block</strong> example snippet</div>')[0];
     var plainWithSpace = $('<div>Plain <strong>text</strong> <strong>block</strong> example snippet</div>')[0];
     var nested = $('<div>Nested <strong><em>text</em></strong><strong><em>block</em></strong> example snippet</div>')[0];
@@ -39,6 +41,73 @@ describe('Test content', function() {
       var actual = consecutiveNewLines.cloneNode(true);
       content.normalizeTags(actual);
       expect(actual.innerHTML).toEqual(expected.innerHTML);
+    });
+  });
+
+
+  describe('getInnerTags()', function() {
+
+    var range;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('works', function() {
+      // <div>|a <strong><em>b|</em></strong> c</div>
+      var test = $('<div>a <strong><em>b</em></strong> c</div>');
+      range.setStart(test[0], 0);
+      range.setEnd(test.find('em')[0], 1);
+      expect( content.getInnerTags(range) ).toEqual(['STRONG', 'EM']);
+    });
+
+    it('works', function() {
+      // <div><b>|a|</b></div>
+      var test = $('<div><b>a</b></div>');
+      range.setStart(test.find('b')[0], 0);
+      range.setEnd(test.find('b')[0], 1);
+      expect( content.getInnerTags(range) ).toEqual([]);
+    });
+
+    it('works', function() {
+      // <div>|<b>a</b>|</div>
+      var test = $('<div><b>a</b></div>');
+      range.setStart(test[0], 0);
+      range.setEnd(test[0], 1);
+      expect( content.getInnerTags(range) ).toEqual(['B']);
+    });
+
+    it('works', function() {
+      // <div><b>a|b</b><i>c|d</i></div>
+      var test = $('<div><b>ab</b><i>cd</i></div>');
+      var range = rangy.createRange();
+      range.setStart(test.find('b')[0].firstChild, 1);
+      range.setEnd(test.find('i')[0].firstChild, 1);
+      expect( content.getInnerTags(range) ).toEqual(['B', 'I']);
+    });
+  });
+
+
+  describe('getTags()', function() {
+
+    var range;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('inside <b>', function() {
+      // <div><b>|a|</b></div>
+      var test = $('<div><b>a</b></div>');
+      range.setStart(test.find('b')[0], 0);
+      range.setEnd(test.find('b')[0], 1);
+      expect( content.getTags(test[0], range) ).toEqual(['B']);
+    });
+
+    it('insde <em><b>', function() {
+      // <div><i><b>|a|</b></i></div>
+      var test = $('<div><i><b>a</b></i></div>');
+      range.setStart(test.find('b')[0], 0);
+      range.setEnd(test.find('b')[0], 1);
+      expect( content.getTags(test[0], range) ).toEqual(['B', 'I']);
     });
   });
 });
