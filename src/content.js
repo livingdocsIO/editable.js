@@ -69,7 +69,7 @@ var content = (function() {
       // get all tags that surround the selection
       var node = range.commonAncestorContainer;
       while (node !== host) {
-        tags.push(node.nodeName);
+        tags.push(node);
         node = node.parentNode;
       }
       return tags;
@@ -82,9 +82,17 @@ var content = (function() {
       var iterator = range.createNodeIterator()
       while(node = iterator.next()) {
         if (node.nodeType === 1)
-          tags.push(node.nodeName);
+          tags.push(node);
       }
       return tags;
+    },
+
+    getTagNames: function(elements) {
+      var names = [];
+      for (var i=0; i < elements.length; i++) {
+        names.push(elements[i].nodeName);
+      }
+      return names;
     }
   };
 })();

@@ -57,7 +57,8 @@ describe('Content', function() {
       var test = $('<div>a <strong><em>b</em></strong> c</div>');
       range.setStart(test[0], 0);
       range.setEnd(test.find('em')[0], 1);
-      expect( content.getInnerTags(range) ).toEqual(['STRONG', 'EM']);
+      var tags = content.getInnerTags(range);
+      expect(content.getTagNames(tags)).toEqual(['STRONG', 'EM']);
     });
 
     it('gets nothing inside a <b>', function() {
@@ -65,7 +66,8 @@ describe('Content', function() {
       var test = $('<div><b>a</b></div>');
       range.setStart(test.find('b')[0], 0);
       range.setEnd(test.find('b')[0], 1);
-      expect( content.getInnerTags(range) ).toEqual([]);
+      var tags = content.getInnerTags(range);
+      expect(content.getTagNames(tags)).toEqual([]);
     });
 
     it('gets a fully surrounded <b>', function() {
@@ -73,7 +75,8 @@ describe('Content', function() {
       var test = $('<div><b>a</b></div>');
       range.setStart(test[0], 0);
       range.setEnd(test[0], 1);
-      expect( content.getInnerTags(range) ).toEqual(['B']);
+      var tags = content.getInnerTags(range);
+      expect(content.getTagNames(tags)).toEqual(['B']);
     });
 
     it('gets partially selected <b> and <i>', function() {
@@ -82,7 +85,8 @@ describe('Content', function() {
       var range = rangy.createRange();
       range.setStart(test.find('b')[0].firstChild, 1);
       range.setEnd(test.find('i')[0].firstChild, 1);
-      expect( content.getInnerTags(range) ).toEqual(['B', 'I']);
+      var tags = content.getInnerTags(range);
+      expect(content.getTagNames(tags)).toEqual(['B', 'I']);
     });
   });
 
@@ -99,7 +103,8 @@ describe('Content', function() {
       var test = $('<div><b>a</b></div>');
       range.setStart(test.find('b')[0], 0);
       range.setEnd(test.find('b')[0], 1);
-      expect( content.getTags(test[0], range) ).toEqual(['B']);
+      var tags = content.getTags(test[0], range);
+      expect(content.getTagNames(tags)).toEqual(['B']);
     });
 
     it('insde <em><b>', function() {
@@ -107,7 +112,8 @@ describe('Content', function() {
       var test = $('<div><i><b>a</b></i></div>');
       range.setStart(test.find('b')[0], 0);
       range.setEnd(test.find('b')[0], 1);
-      expect( content.getTags(test[0], range) ).toEqual(['B', 'I']);
+      var tags = content.getTags(test[0], range);
+      expect(content.getTagNames(tags)).toEqual(['B', 'I']);
     });
   });
 });
