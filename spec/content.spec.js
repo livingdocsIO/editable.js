@@ -116,4 +116,23 @@ describe('Content', function() {
       expect(content.getTagNames(tags)).toEqual(['B', 'I']);
     });
   });
+
+
+  describe('wrap()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('creates an <em>', function() {
+      // <div>|b|</div>
+      host = $('<div>b</div>');
+      range.setStart(host[0], 0);
+      range.setEnd(host[0], 1);
+
+      content.wrap(range, '<em>')
+      expect(host.html()).toEqual('<em>b</em>');
+    })
+  });
 });

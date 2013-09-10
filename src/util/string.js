@@ -10,6 +10,10 @@ var string = (function() {
 
     trim: function(text) {
       return text.replace(/^\s+|\s+$/g, "");
+    },
+
+    isString: function(obj) {
+      return toString.call(obj) == '[object String]';
     }
   };
 })();

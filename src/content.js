@@ -93,6 +93,22 @@ var content = (function() {
         names.push(elements[i].nodeName);
       }
       return names;
+    },
+
+    wrap: function(range, elem) {
+      var elem = string.isString(elem) ?
+        $(elem)[0] :
+        elem;
+
+      if(range.canSurroundContents()) {
+        var a = range.surroundContents(elem);
+      } else {
+        console.log('content.surround(): can not surround range')
+      }
+    },
+
+    unwrap: function(elem) {
+      $(elem).contents().unwrap();
     }
   };
 })();
