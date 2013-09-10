@@ -5,15 +5,17 @@
  */
 
 var keyboard = (function() {
-  var KEY_LEFT = 37,
-      KEY_UP = 38,
-      KEY_RIGHT = 39,
-      KEY_DOWN = 40,
-      KEY_TAB = 9,
-      KEY_ESC = 27,
-      KEY_BACKSPACE = 8,
-      KEY_DELETE = 46,
-      KEY_ENTER = 13;
+  var key = {
+    left: 37,
+    up: 38,
+    right: 39,
+    down: 40,
+    tab: 9,
+    esc: 27,
+    backspace: 8,
+    'delete': 46,
+    enter: 13
+  }
 
   var listeners = {};
 
@@ -49,23 +51,23 @@ var keyboard = (function() {
     dispatchKeyEvent: function(event, target) {
       switch (event.keyCode) {
 
-      case KEY_LEFT:
+      case key.left:
         notifyListeners('left', target, event);
         break;
 
-      case KEY_RIGHT:
+      case key.right:
         notifyListeners('right', target, event);
         break;
 
-      case KEY_UP:
+      case key.up:
         notifyListeners('up', target, event);
         break;
 
-      case KEY_DOWN:
+      case key.down:
         notifyListeners('down', target, event);
         break;
 
-      case KEY_TAB:
+      case key.tab:
         if (event.shiftKey) {
           notifyListeners('shiftTab', target, event);
         } else {
@@ -73,19 +75,19 @@ var keyboard = (function() {
         }
         break;
 
-      case KEY_ESC:
+      case key.esc:
         notifyListeners('esc', target, event);
         break;
 
-      case KEY_BACKSPACE:
+      case key.backspace:
         notifyListeners('backspace', target, event);
         break;
 
-      case KEY_DELETE:
+      case key['delete']:
         notifyListeners('delete', target, event);
         break;
 
-      case KEY_ENTER:
+      case key.enter:
         if (event.shiftKey) {
           notifyListeners('shiftEnter', target, event);
         } else {
@@ -99,6 +101,9 @@ var keyboard = (function() {
     on: function(event, handler) {
       addListener(event, handler);
       return this;
-    }
+    },
+
+    // export key-codes for testing
+    key: key
   };
 })();
