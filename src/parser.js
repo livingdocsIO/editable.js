@@ -47,20 +47,20 @@ var parser = (function() {
     },
 
     /**
-     * check if node contains text or element nodes
+     * Check if node contains text or element nodes
      * whitespace counts too!
      *
-     * @method isEmpty
+     * @method isVoid
      * @param {HTMLElement}
      */
-    isEmpty: function(node) {
+    isVoid: function(node) {
       var child, i, len;
       var childNodes = node.childNodes;
 
       for (i = 0, len = childNodes.length; i < len; i++) {
         child = childNodes[i];
 
-        if (child.nodeType === 3 && !this.isEmptyTextNode(child)) {
+        if (child.nodeType === 3 && !this.isVoidTextNode(child)) {
           return false;
         } else if (child.nodeType === 1) {
           return false;
@@ -70,13 +70,56 @@ var parser = (function() {
     },
 
     /**
-     * check if node is a text node and completely empty without any whitespace
+     * Check if node is a text node and completely empty without any whitespace
      *
-     * @method isEmptyTextNode
+     * @method isVoidTextNode
      * @param {HTMLElement}
      */
-    isEmptyTextNode: function(node) {
+    isVoidTextNode: function(node) {
       return node.nodeType === 3 && !node.nodeValue;
+    },
+
+    /**
+     * Check if node is a text node and contains nothing but whitespace
+     *
+     * @method isWhitespaceOnly
+     * @param {HTMLElement}
+     */
+    isWhitespaceOnly: function(node) {
+      return node.nodeType === 3 && this.lastOffsetWithContent(node) === 0;
+    },
+
+    isLinebreak: function(node) {
+      return node.nodeType === 1 && node.tagName === 'BR';
+    },
+
+    /**
+     * Returns the last offset where the cursor can be positioned to
+     * be at the visible end of its container.
+     * Currently works only for empty text nodes (not empty tags)
+     *
+     * @method isWhitespaceOnly
+     * @param {HTMLElement}
+     */
+    lastOffsetWithContent: function(node) {
+      if (node.nodeType === 3) {
+        return string.trimRight(node.nodeValue).length;
+      } else {
+        var i,
+            childNodes = node.childNodes;
+
+        for (i = childNodes.length - 1; i >= 0; i--) {
+          node = childNodes[i];
+          if (this.isWhitespaceOnly(node) || this.isLinebreak(node)) {
+            continue;
+          } else {
+            // The offset starts at 0 before the first element
+            // and ends with the length after the last element.
+            return i + 1;
+          }
+        }
+        return 0;
+      }
     },
 
     isBeginningOfHost: function(host, container, offset) {
@@ -86,6 +129,9 @@ var parser = (function() {
 
       if (this.isStartOffset(container, offset)) {
         var parentContainer = container.parentNode;
+
+        // The index of the element simulates a range offset
+        // right before the element.
         var offsetInParent = this.getNodeIndex(container);
         return this.isBeginningOfHost(host, parentContainer, offsetInParent);
       } else {
@@ -100,7 +146,10 @@ var parser = (function() {
 
       if (this.isEndOffset(container, offset)) {
         var parentContainer = container.parentNode;
-        var offsetInParent = this.getNodeIndex(container);
+
+        // The index of the element plus one simulates a range offset
+        // right after the element.
+        var offsetInParent = this.getNodeIndex(container) + 1;
         return this.isEndOfHost(host, parentContainer, offsetInParent);
       } else {
         return false;
@@ -124,8 +173,39 @@ var parser = (function() {
       } else {
         if(container.childNodes.length === 0)
           return true;
+        else if (offset > 0)
+          return container.childNodes[offset - 1] === container.lastChild;
         else
-          return container.childNodes[offset] === container.lastChild;
+          return false;
+      }
+    },
+
+    isTextEndOfHost: function(host, container, offset) {
+      if (container === host) {
+        return this.isTextEndOffset(container, offset);
+      }
+
+      if (this.isTextEndOffset(container, offset)) {
+        var parentContainer = container.parentNode;
+
+        // The index of the element plus one simulates a range offset
+        // right after the element.
+        var offsetInParent = this.getNodeIndex(container) + 1;
+        return this.isTextEndOfHost(host, parentContainer, offsetInParent);
+      } else {
+        return false;
+      }
+    },
+
+    isTextEndOffset: function (container, offset) {
+      if (container.nodeType === 3) {
+        var text = string.trimRight(container.nodeValue);
+        return offset >= text.length;
+      } else if (container.childNodes.length === 0) {
+        return true;
+      } else {
+        var lastOffset = this.lastOffsetWithContent(container);
+        return offset >= lastOffset;
       }
     },
 

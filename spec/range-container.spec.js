@@ -60,7 +60,7 @@ describe('RangeContainer', function() {
 
       var cursor = this.range.forceCursor();
 
-      expect(cursor instanceof Cursor).toBe(true);
+      expect(cursor.isCursor).toBe(true);
       expect(this.range.host.innerHTML).toEqual('');
     });
   });

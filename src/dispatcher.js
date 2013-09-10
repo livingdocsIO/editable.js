@@ -53,15 +53,17 @@ var dispatcher = (function() {
     var dispatchSwitchEvent = function(event, element, direction) {
       var cursor;
 
-      if(event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
         return;
 
       cursor = selectionWatcher.getSelection();
-      if(cursor instanceof Selection) return;
+      if (cursor.isSelection) return;
 
+      // Detect if the browser moved the cursor in the next tick.
+      // If the cursor stays at its position, fire the switch event.
       setTimeout(function() {
         var newCursor = selectionWatcher.forceCursor();
-        if(newCursor.equals(cursor)) {
+        if (newCursor.equals(cursor)) {
           event.preventDefault();
           event.stopPropagation();
           notifier('switch', element, direction, newCursor);
@@ -94,31 +96,38 @@ var dispatcher = (function() {
     }).on('backspace', function(event) {
       log('Backspace key pressed');
 
-      var cursor = selectionWatcher.getFreshSelection();
-      if(cursor instanceof Cursor && cursor.isAtBeginning()) {
-        event.preventDefault();
-        event.stopPropagation();
-        notifier('merge', this, 'before', cursor);
+      var range = selectionWatcher.getFreshRange();
+      if (range.isCursor) {
+        var cursor = range.getCursor();
+        if ( cursor.isAtBeginning() ) {
+          event.preventDefault();
+          event.stopPropagation();
+          notifier('merge', this, 'before', cursor);
+        }
       }
     }).on('delete', function(event) {
       log('Delete key pressed');
 
-      var cursor = selectionWatcher.getFreshSelection();
-      if(cursor instanceof Cursor && cursor.isAtEnd()) {
-        event.preventDefault();
-        event.stopPropagation();
-        notifier('merge', this, 'after', cursor);
+      var range = selectionWatcher.getFreshRange();
+      if (range.isCursor) {
+        var cursor = range.getCursor();
+        if(cursor.isAtTextEnd()) {
+          event.preventDefault();
+          event.stopPropagation();
+          notifier('merge', this, 'after', cursor);
+        }
       }
     }).on('enter', function(event) {
       log('Enter key pressed');
 
       event.preventDefault();
       event.stopPropagation();
-      var cursor = selectionWatcher.forceCursor();
+      var range = selectionWatcher.getFreshRange();
+      var cursor = range.forceCursor();
 
       if (cursor.isAtBeginning()) {
         notifier('insert', this, 'before', cursor);
-      } else if(cursor.isAtEnd()) {
+      } else if(cursor.isAtTextEnd()) {
         notifier('insert', this, 'after', cursor);
       } else {
         notifier('split', this, cursor.before(), cursor.after(), cursor);
