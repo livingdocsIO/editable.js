@@ -15,7 +15,7 @@ var keyboard = (function() {
     backspace: 8,
     'delete': 46,
     enter: 13
-  }
+  };
 
   var listeners = {};
 
