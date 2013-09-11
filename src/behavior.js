@@ -174,8 +174,8 @@ var behavior = (function() {
 
       element.setAttribute(config.pastingAttribute, true);
 
-      if(cursor instanceof Selection) {
-        cursor.deleteContent();
+      if(cursor.isSelection) {
+        cursor = cursor.deleteContent();
       }
 
       pasteHolder = document.createElement('textarea');

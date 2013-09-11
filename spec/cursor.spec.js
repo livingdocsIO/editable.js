@@ -1,21 +1,30 @@
-describe("Cursor Class", function() {
+describe('Cursor', function() {
 
-  it("should be defined", function() {
+  it('is defined', function() {
     expect(Cursor).toBeDefined();
   });
 
-  it("should be defined", function() {
-    var oneWord = $("<div>foobar</div>")[0];
-    var docFragment = document.createDocumentFragment();
-    docFragment.appendChild(oneWord);
+  describe('with a range', function() {
 
-    var range = rangy.createRange();
-    range.selectNodeContents(oneWord);
-    var cursor = new Cursor(oneWord, range);
-    expect(range.startContainer).toEqual(oneWord);
-    expect(range.startOffset).toEqual(0);
-    expect(range.endContainer).toEqual(oneWord);
-    expect(range.endOffset).toEqual(1);
+    beforeEach(function() {
+      this.oneWord = $('<div>foobar</div>')[0];
+      this.range = rangy.createRange();
+      this.range.selectNodeContents(this.oneWord);
+      this.range.collapse(false);
+      this.cursor = new Cursor(this.oneWord, this.range);
+    });
+
+    it('sets #isCursor to true', function(){
+      expect(this.cursor.isCursor).toBe(true);
+    });
+
+    it('has a valid range', function() {
+      expect(this.range.collapsed).toBe(true);
+      expect(this.range.startContainer).toEqual(this.oneWord);
+      expect(this.range.endContainer).toEqual(this.oneWord);
+      expect(this.range.startOffset).toEqual(1);
+      expect(this.range.endOffset).toEqual(1);
+    });
   });
 
 });
