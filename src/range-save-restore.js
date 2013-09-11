@@ -12,10 +12,6 @@ var rangeSaveRestore = (function() {
     return host.querySelector('#'+ id);
   };
 
-  var gEBI = function(id, doc) {
-    return (doc || window.document).getElementById(id);
-  };
-
   return {
 
     insertRangeBoundaryMarker: function(range, atStart) {
