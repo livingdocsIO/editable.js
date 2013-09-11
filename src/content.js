@@ -62,7 +62,9 @@ var content = (function() {
       }
     },
 
-    // get all tags that start or end inside the selection
+    /**
+     * Get all tags that start or end inside the selection
+     */
     getTags: function(host, range) {
       var tags = this.getInnerTags(range);
 
@@ -75,7 +77,9 @@ var content = (function() {
       return tags;
     },
 
-    // get all tags that start or end inside the selection
+    /**
+     * Get all tags that start or end inside the selection
+     */
     getInnerTags: function(range) {
       var tags = [], node;
 
@@ -87,6 +91,12 @@ var content = (function() {
       return tags;
     },
 
+    /**
+     * Transform an array of elements into a an array
+     * of tagnames in uppercase
+     *
+     * @return example: ['STRONG', 'B']
+     */
     getTagNames: function(elements) {
       var names = [];
       for (var i=0; i < elements.length; i++) {
@@ -104,6 +114,17 @@ var content = (function() {
         var a = range.surroundContents(elem);
       } else {
         console.log('content.surround(): can not surround range');
+      }
+    },
+
+    /**
+     * Unwrap all tags this range is affected by
+     */
+    nuke: function(host, range) {
+      var tags = this.getTags(host, range);
+      for (var i = 0; i < tags.length; i++) {
+        var elem = tags[i];
+        this.unwrap(elem);
       }
     },
 

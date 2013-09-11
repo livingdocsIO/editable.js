@@ -135,4 +135,40 @@ describe('Content', function() {
       expect(host.html()).toEqual('<em>b</em>');
     })
   });
+
+
+  describe('nuke()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('removes surrounding <b>', function() {
+      // <div><b>|a|</b></div>
+      host = $('<div><b>a</b></div>');
+      range.setStart(host.find('b')[0], 0);
+      range.setEnd(host.find('b')[0], 1);
+      content.nuke(host[0], range);
+      expect(host.html()).toEqual('a');
+    });
+
+    it('removes tons of tags', function() {
+      // <div><b>|a<i>b</i><em>c|d</em></b></div>
+      host = $('<div><b>a<i>b</i><em>cd</em></b></div>');
+      range.setStart(host.find('b')[0], 0);
+      range.setEnd(host.find('em')[0].firstChild, 1);
+      content.nuke(host[0], range);
+      expect(host.html()).toEqual('abcd');
+    });
+
+    it('leaves <br> alone', function() {
+      // <div>|a<br>b|</div>
+      host = $('<div>a<br>b</div>');
+      range.setStart(host[0], 0);
+      range.setEnd(host[0], 3);
+      content.nuke(host[0], range);
+      expect(host.html()).toEqual('a<br>b');
+    });
+  });
 });
