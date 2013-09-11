@@ -1,4 +1,11 @@
 var content = (function() {
+
+  var restoreRange = function(host, range, func) {
+    range = rangeSaveRestore.save(range);
+    func.call(content);
+    return rangeSaveRestore.restore(host, range);
+  };
+
   return {
     normalizeTags: function(element) {
       var i, j, node, sibling;
@@ -63,12 +70,12 @@ var content = (function() {
     },
 
     /**
-     * Get all tags that start or end inside the selection
+     * Get all tags that start or end inside the range
      */
     getTags: function(host, range) {
       var tags = this.getInnerTags(range);
 
-      // get all tags that surround the selection
+      // get all tags that surround the range
       var node = range.commonAncestorContainer;
       while (node !== host) {
         tags.push(node);
@@ -78,13 +85,13 @@ var content = (function() {
     },
 
     /**
-     * Get all tags that start or end inside the selection
+     * Get all tags that start or end inside the range
      */
     getInnerTags: function(range) {
       var tags = [], node;
 
       var iterator = range.createNodeIterator();
-      while(node = iterator.next()) {
+      while( (node = iterator.next()) ) {
         if (node.nodeType === 1)
           tags.push(node);
       }
@@ -110,21 +117,64 @@ var content = (function() {
         $(elem)[0] :
         elem;
 
-      if(range.canSurroundContents()) {
+      if(this.isWrappable(range)) {
         var a = range.surroundContents(elem);
       } else {
-        console.log('content.surround(): can not surround range');
+        console.log('content.wrap(): can not surround range');
+      }
+    },
+
+    isWrappable: function(range) {
+      return range.canSurroundContents();
+    },
+
+    forceWrap: function(host, range, elem) {
+      range = restoreRange(host, range, function(){
+        this.nuke(host, range, elem.tagName);
+      });
+
+      // remove all tags if the range is not wrappable
+      if (!this.isWrappable(range)) {
+        range = restoreRange(host, range, function(){
+          this.nuke(host, range);
+        });
+      }
+
+      this.wrap(range, elem);
+    },
+
+    link: function(host, range, attrs) {
+      var $elem = $('<a>');
+      for (var name in attrs) {
+        $elem.attr(name, attrs[name]);
+      }
+      this.forceWrap(host, range, $elem[0]);
+    },
+
+    /**
+     * Unwrap all tags this range is affected by.
+     * Can also affect content outside of the range.
+     */
+    nuke: function(host, range, tagName) {
+      var tags = this.getTags(host, range);
+      for (var i = 0; i < tags.length; i++) {
+        var elem = tags[i];
+        if ( !tagName || elem.tagName === tagName.toUpperCase() ) {
+          this.unwrap(elem);
+        }
       }
     },
 
     /**
-     * Unwrap all tags this range is affected by
+     * Unwrap all tags this range is affected by.
+     * Can also affect content outside of the range.
      */
-    nuke: function(host, range) {
+    nukeTag: function(host, range, tagName) {
       var tags = this.getTags(host, range);
       for (var i = 0; i < tags.length; i++) {
         var elem = tags[i];
-        this.unwrap(elem);
+        if (elem.tagName === tagName)
+          this.unwrap(elem);
       }
     },
 

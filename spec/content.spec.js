@@ -170,5 +170,61 @@ describe('Content', function() {
       content.nuke(host[0], range);
       expect(host.html()).toEqual('a<br>b');
     });
+
+    it('leaves saved range markers intact', function() {
+      // <div><b>|a|</b></div>
+      host = $('<div><b>a</b></div>');
+      range.setStart(host.find('b')[0], 0);
+      range.setEnd(host.find('b')[0], 1);
+      rangeSaveRestore.save(range);
+      content.nuke(host[0], range);
+      expect(host.find('span').length).toEqual(2);
+      expect(host.find('b').length).toEqual(0);
+    });
+  });
+
+
+  describe('link()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('adds a link with href', function() {
+      // <div>|b|</div>
+      host = $('<div>b</div>');
+      range.setStart(host[0], 0);
+      range.setEnd(host[0], 1);
+      var attrs = {
+        href: 'www.link.io',
+      };
+      content.link(host[0], range, attrs);
+      expect(host.html()).toEqual('<a href="www.link.io">b</a>');
+    });
+
+    it('does not nest links', function() {
+      // <div>|<a>b</a>|</div>
+      host = $('<div><a>b</a></div>');
+      range.setStart(host[0], 0);
+      range.setEnd(host[0], 1);
+      var attrs = {
+        href: 'www.link.io',
+      };
+      content.link(host[0], range, attrs);
+      expect(host.html()).toEqual('<a href="www.link.io">b</a>');
+    });
+
+    it('removes partially selected links', function() {
+      // <div><a>b|c|</a></div>
+      host = $('<div><a>bc</a></div>');
+      range.setStart(host.find('a')[0].firstChild, 1);
+      range.setEnd(host.find('a')[0].firstChild, 2);
+      var attrs = {
+        href: 'www.link.io',
+      };
+      content.link(host[0], range, attrs);
+      expect(host.html()).toEqual('b<a href="www.link.io">c</a>');
+    });
   });
 });
