@@ -21,6 +21,7 @@
   "globals": {
     "jQuery": true,
     "$": true,
+    "toString": true,
     "rangy": true,
     "Editable": true,
     "bowser": true,

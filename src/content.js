@@ -79,7 +79,7 @@ var content = (function() {
     getInnerTags: function(range) {
       var tags = [], node;
 
-      var iterator = range.createNodeIterator()
+      var iterator = range.createNodeIterator();
       while(node = iterator.next()) {
         if (node.nodeType === 1)
           tags.push(node);
@@ -96,14 +96,14 @@ var content = (function() {
     },
 
     wrap: function(range, elem) {
-      var elem = string.isString(elem) ?
+      elem = string.isString(elem) ?
         $(elem)[0] :
         elem;
 
       if(range.canSurroundContents()) {
         var a = range.surroundContents(elem);
       } else {
-        console.log('content.surround(): can not surround range')
+        console.log('content.surround(): can not surround range');
       }
     },
 
