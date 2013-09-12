@@ -80,6 +80,57 @@ var Selection = (function() {
 
     /**
      *
+     * @method link
+     */
+    link: function(link, target) {
+      var attrs = {
+        href: link
+      };
+      if (target) attrs.target = target;
+      this.range = content.link(this.host, this.range, attrs);
+      this.update();
+    },
+
+    /**
+     *
+     * @method bold
+     */
+    makeBold: function() {
+      var $bold = $('<strong>');
+      this.range = content.forceWrap(this.host, this.range, $bold[0]);
+      this.update();
+    },
+
+    /**
+     *
+     * @method emphasis
+     */
+    giveEmphasis: function() {
+      var $em = $('<em>');
+      this.range = content.forceWrap(this.host, this.range, $em[0]);
+      this.update();
+    },
+
+    /**
+     *
+     * @method surround
+     */
+    surround: function(startCharacter, endCharacter) {
+      content.surround(this.host, this.range, startCharacter, endCharacter);
+      this.update();
+    },
+
+    /**
+     *
+     * @method removeFormatting
+     */
+    removeFormatting: function() {
+      content.nuke(this.host, this.range);
+      // this.update();
+    },
+
+    /**
+     *
      * @method deleteContent
      * @return Cursor instance
      */

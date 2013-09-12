@@ -5,12 +5,20 @@
     log: false
   });
 
+  var lastSelection;
 
   var setupTooltip = function() {
-    var tooltip = $('<div class="selection-tip" style="display:none;">How may I help?</div>')
+    var tooltip = $('<div class="selection-tip" style="display:none;">' +
+      '<button class="js-format js-format-bold">b</button>' +
+      '<button class="js-format js-format-italic">i</button>' +
+      '<button class="js-format js-format-link">a</button>' +
+      '<button class="js-format js-format-quote">«</button>' +
+      '<button class="js-format js-format-clear">x</button>' +
+    '</div>');
     $(document.body).append(tooltip);
 
     Editable.selection(function(el, selection) {
+      lastSelection = selection;
       if (selection) {
         coords = selection.getCoordinates()
 
@@ -24,6 +32,52 @@
     }).blur(function(el) {
       // todo: this should not be necessary here
       tooltip.hide();
+    });
+
+    setupTooltipListeners();
+  };
+
+  var setupTooltipListeners = function() {
+    // prevent editable from loosing focus
+    $(document).on('mousedown', '.js-format', function(event) {
+      event.preventDefault();
+    });
+
+    $(document).on('click', '.js-format', function(event) {
+      event.preventDefault();
+      if (!lastSelection.isSelection) {
+        console.log('main.js: got no selection');
+      }
+    });
+
+    $(document).on('click', '.js-format-bold', function(event) {
+      if (lastSelection.isSelection) {
+        lastSelection.makeBold();
+      }
+    });
+
+    $(document).on('click', '.js-format-italic', function(event) {
+      if (lastSelection.isSelection) {
+        lastSelection.giveEmphasis();
+      }
+    });
+
+    $(document).on('click', '.js-format-link', function(event) {
+      if (lastSelection.isSelection) {
+        lastSelection.link('www.upfront.io');
+      }
+    });
+
+    $(document).on('click', '.js-format-quote', function(event) {
+      if (lastSelection.isSelection) {
+        lastSelection.surround('«', '»');
+      }
+    });
+
+    $(document).on('click', '.js-format-clear', function(event) {
+      if (lastSelection.isSelection) {
+        lastSelection.removeFormatting();
+      }
     });
   };
 

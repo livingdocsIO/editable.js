@@ -243,5 +243,35 @@ describe('Content', function() {
       content.surround(host[0], range, '«', '»');
       expect(host.html()).toEqual('<i>«a»</i>');
     });
+
+    it('wraps text in double angle quotes', function() {
+      // <div><i>|b|</i></div>
+      host = $('<div><i>a</i></div>');
+      range.setStart(host.find('i')[0], 0);
+      range.setEnd(host.find('i')[0], 1);
+      content.surround(host[0], range, '«', '»');
+      expect(range.startContainer).toEqual(host.find('i')[0]);
+      expect(range.startContainer).toEqual(host.find('i')[0]);
+      expect(range.startOffset).toEqual(0);
+      expect(range.endOffset).toEqual(1);
+    });
+
+    // Bug: The selection is not correctly restored if it touches
+    // the start or end of a TextNode. To check this create a new
+    // paragraph with one character, select it and quote it.
+    // The resulting selection will not contain the end quote.
+    // Thats why the following test is commented out for the moment.
+
+    // it('wraps text in double angle quotes', function() {
+    //   // <div><i>a|b|</i></div>
+    //   host = $('<div><i>ab</i></div>');
+    //   range.setStart(host.find('i')[0].firstChild, 1);
+    //   range.setEnd(host.find('i')[0].firstChild, 2);
+    //   content.surround(host[0], range, '«', '»');
+    //   expect(host.html()).toEqual('<i>a«b»</i>');
+    //   expect(range.startContainer).toEqual(host.find('i')[0].firstChild);
+    //   expect(range.startOffset).toEqual(1);
+    //   expect(range.endOffset).toEqual(4);
+    // });
   });
 });

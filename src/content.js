@@ -145,6 +145,7 @@ var content = (function() {
       }
 
       this.wrap(range, elem);
+      return range;
     },
 
     link: function(host, range, attrs) {
@@ -152,7 +153,7 @@ var content = (function() {
       for (var name in attrs) {
         $elem.attr(name, attrs[name]);
       }
-      this.forceWrap(host, range, $elem[0]);
+      return this.forceWrap(host, range, $elem[0]);
     },
 
     /**
@@ -188,6 +189,7 @@ var content = (function() {
         range.setEndAfter(insertEl);
       }
       this.unwrap(insertEl);
+      range.normalizeBoundaries();
     },
 
     /**
