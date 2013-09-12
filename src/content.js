@@ -124,6 +124,10 @@ var content = (function() {
       }
     },
 
+    unwrap: function(elem) {
+      $(elem).contents().unwrap();
+    },
+
     isWrappable: function(range) {
       return range.canSurroundContents();
     },
@@ -166,6 +170,36 @@ var content = (function() {
     },
 
     /**
+     * Insert a single character (or string) before or after the
+     * the range.
+     */
+    insertCharacter: function(range, character, atStart) {
+      var insertEl = document.createElement('span');
+      insertEl.innerHTML = character;
+
+      var boundaryRange = range.cloneRange();
+      boundaryRange.collapse(atStart);
+      boundaryRange.insertNode(insertEl);
+      boundaryRange.detach();
+
+      if (atStart) {
+        range.setStartBefore(insertEl);
+      } else {
+        range.setEndAfter(insertEl);
+      }
+      this.unwrap(insertEl);
+    },
+
+    /**
+     * Surround the range with characters like start and end quotes.
+     */
+    surround: function(host, range, startCharacter, endCharacter) {
+      if (!endCharacter) endCharacter = startCharacter;
+      this.insertCharacter(range, endCharacter, false);
+      this.insertCharacter(range, startCharacter, true);
+    },
+
+    /**
      * Unwrap all tags this range is affected by.
      * Can also affect content outside of the range.
      */
@@ -176,10 +210,6 @@ var content = (function() {
         if (elem.tagName === tagName)
           this.unwrap(elem);
       }
-    },
-
-    unwrap: function(elem) {
-      $(elem).contents().unwrap();
     }
   };
 })();

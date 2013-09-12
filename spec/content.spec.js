@@ -227,4 +227,21 @@ describe('Content', function() {
       expect(host.html()).toEqual('b<a href="www.link.io">c</a>');
     });
   });
+
+  describe('surround()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('wraps text in double angle quotes', function() {
+      // <div><i>|b|</i></div>
+      host = $('<div><i>a</i></div>');
+      range.setStart(host.find('i')[0], 0);
+      range.setEnd(host.find('i')[0], 1);
+      content.surround(host[0], range, '«', '»');
+      expect(host.html()).toEqual('<i>«a»</i>');
+    });
+  });
 });
