@@ -16,12 +16,20 @@ var Cursor = (function() {
   var Cursor = function(editableHost, rangyRange) {
     this.host = editableHost;
     this.range = rangyRange;
+    this.isCursor = true;
   };
 
   Cursor.prototype = (function() {
     return {
       isAtEnd: function() {
         return parser.isEndOfHost(
+          this.host,
+          this.range.endContainer,
+          this.range.endOffset);
+      },
+
+      isAtTextEnd: function() {
+        return parser.isTextEndOfHost(
           this.host,
           this.range.endContainer,
           this.range.endOffset);
