@@ -129,6 +129,10 @@
         .removeClass(config.editableDisabledClass)
         .addClass(config.editableClass);
 
+      $elem.each(function(index, el) {
+        content.normalizeSpaces(el);
+      });
+
       return this;
     },
 
