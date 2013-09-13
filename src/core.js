@@ -130,6 +130,7 @@
         .addClass(config.editableClass);
 
       $elem.each(function(index, el) {
+        content.normalizeTags(el);
         content.normalizeSpaces(el);
       });
 
