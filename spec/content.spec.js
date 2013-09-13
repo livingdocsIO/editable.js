@@ -250,28 +250,36 @@ describe('Content', function() {
       range.setStart(host.find('i')[0], 0);
       range.setEnd(host.find('i')[0], 1);
       content.surround(host[0], range, '«', '»');
-      expect(range.startContainer).toEqual(host.find('i')[0]);
+
+      // the text nodes are not glued together as they should.
+      // So we have 3 TextNodes after the manipulation.
+      expect(host.find('i')[0].childNodes[0].nodeValue).toEqual('«');
+      expect(host.find('i')[0].childNodes[1].nodeValue).toEqual('a');
+      expect(host.find('i')[0].childNodes[2].nodeValue).toEqual('»');
+
       expect(range.startContainer).toEqual(host.find('i')[0]);
       expect(range.startOffset).toEqual(0);
-      expect(range.endOffset).toEqual(1);
+      expect(range.endContainer).toEqual(host.find('i')[0]);
+      expect(range.endOffset).toEqual(3);
     });
 
-    // Bug: The selection is not correctly restored if it touches
-    // the start or end of a TextNode. To check this create a new
-    // paragraph with one character, select it and quote it.
-    // The resulting selection will not contain the end quote.
-    // Thats why the following test is commented out for the moment.
+    it('wraps text in double angle quotes', function() {
+      // <div><i>a|b|</i></div>
+      host = $('<div><i>ab</i></div>');
+      range.setStart(host.find('i')[0].firstChild, 1);
+      range.setEnd(host.find('i')[0].firstChild, 2);
+      content.surround(host[0], range, '«', '»');
+      expect(host.html()).toEqual('<i>a«b»</i>');
 
-    // it('wraps text in double angle quotes', function() {
-    //   // <div><i>a|b|</i></div>
-    //   host = $('<div><i>ab</i></div>');
-    //   range.setStart(host.find('i')[0].firstChild, 1);
-    //   range.setEnd(host.find('i')[0].firstChild, 2);
-    //   content.surround(host[0], range, '«', '»');
-    //   expect(host.html()).toEqual('<i>a«b»</i>');
-    //   expect(range.startContainer).toEqual(host.find('i')[0].firstChild);
-    //   expect(range.startOffset).toEqual(1);
-    //   expect(range.endOffset).toEqual(4);
-    // });
+      // the text nodes are not glued together as they should.
+      // So we have 3 TextNodes after the manipulation.
+      expect(host.find('i')[0].childNodes[0].nodeValue).toEqual('a«');
+      expect(host.find('i')[0].childNodes[1].nodeValue).toEqual('b');
+      expect(host.find('i')[0].childNodes[2].nodeValue).toEqual('»');
+      expect(range.startContainer).toEqual(host.find('i')[0].firstChild);
+      expect(range.startOffset).toEqual(1);
+      expect(range.endContainer).toEqual(host.find('i')[0]);
+      expect(range.endOffset).toEqual(3);
+    });
   });
 });

@@ -175,8 +175,7 @@ var content = (function() {
      * the range.
      */
     insertCharacter: function(range, character, atStart) {
-      var insertEl = document.createElement('span');
-      insertEl.innerHTML = character;
+      var insertEl = document.createTextNode(character);
 
       var boundaryRange = range.cloneRange();
       boundaryRange.collapse(atStart);
@@ -188,7 +187,6 @@ var content = (function() {
       } else {
         range.setEndAfter(insertEl);
       }
-      this.unwrap(insertEl);
       range.normalizeBoundaries();
     },
 
