@@ -125,8 +125,8 @@ var Selection = (function() {
      * @method removeFormatting
      */
     removeFormatting: function() {
-      content.nuke(this.host, this.range);
-      // this.update();
+      this.range = content.removeFormatting(this.host, this.range);
+      this.update();
     },
 
     /**

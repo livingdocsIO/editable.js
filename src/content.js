@@ -156,6 +156,12 @@ var content = (function() {
       return this.forceWrap(host, range, $elem[0]);
     },
 
+    removeFormatting: function(host, range, tagName) {
+      return restoreRange(host, range, function(){
+        this.nuke(host, range, tagName);
+      });
+    },
+
     /**
      * Unwrap all tags this range is affected by.
      * Can also affect content outside of the range.
