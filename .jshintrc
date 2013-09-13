@@ -21,6 +21,7 @@
   "globals": {
     "jQuery": true,
     "$": true,
+    "toString": true,
     "rangy": true,
     "Editable": true,
     "bowser": true,
@@ -30,6 +31,7 @@
     "RangeContainer": true,
     "selectionWatcher": true,
     "Selection": true,
+    "rangeSaveRestore": true,
     "Cursor": true,
     "parser": true,
     "browserFeatures": true,
