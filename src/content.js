@@ -1,5 +1,12 @@
 var content = (function() {
   return {
+    /**
+     * Remove empty tags and merge consecutive tags (they must have the same
+     * attributes).
+     *
+     * @method normalizeTags
+     * @param  {HTMLElement} element The element to process.
+     */
     normalizeTags: function(element) {
       var i, j, node, sibling;
 
@@ -37,10 +44,23 @@ var content = (function() {
       element.appendChild(fragment);
     },
 
+    /**
+     * Clean the element from character, tags, etc... added by the plugin logic.
+     *
+     * @method cleanInternals
+     * @param  {HTMLElement} element The element to process.
+     */
     cleanInternals: function(element) {
       element.innerHTML = element.innerHTML.replace(/\u200B/g, '<br />');
     },
 
+    /**
+     * Convert the first and last space to a non breaking space charcter to
+     * prevent visual collapse by some browser.
+     *
+     * @method normalizeSpaces
+     * @param  {HTMLElement} element The element to process.
+     */
     normalizeSpaces: function(element) {
       if(!element) return;
 
