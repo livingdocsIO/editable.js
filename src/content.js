@@ -41,10 +41,13 @@ var content = (function() {
     normalizeSpaces: function(element) {
       if(!element) return;
 
-      if(element.nodeType === 3)
-        element.nodeValue = element.nodeValue.replace(/^(\s)/, '\u00A0');
-      else
+      if(element.nodeType === 3) {
+        element.nodeValue = element.nodeValue.replace(/^(\s)/, '\u00A0').replace(/(\s)$/, '\u00A0');
+      }
+      else {
         this.normalizeSpaces(element.firstChild);
+        this.normalizeSpaces(element.lastChild);
+      }
     },
 
     removeEmptyTags: function(element) {
