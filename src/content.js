@@ -42,15 +42,14 @@ var content = (function() {
     },
 
     normalizeSpaces: function(element) {
-      var firstChild = element.firstChild;
+      if(!element) return;
 
-      if(!firstChild) return;
-
-      if(firstChild.nodeType === 3) {
-        firstChild.nodeValue = firstChild.nodeValue.replace(/^(\s)/, '\u00A0');
+      if(element.nodeType === 3) {
+        element.nodeValue = element.nodeValue.replace(/^(\s)/, '\u00A0').replace(/(\s)$/, '\u00A0');
       }
       else {
-        this.normalizeSpaces(firstChild);
+        this.normalizeSpaces(element.firstChild);
+        this.normalizeSpaces(element.lastChild);
       }
     }
   };
