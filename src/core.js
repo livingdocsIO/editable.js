@@ -8,11 +8,15 @@
  */
 
 (function() {
-  var isInitialized = false;
+  var isInitialized = false,
+      editableSelector;
 
   var initialize = function() {
     if (!isInitialized) {
+      isInitialized = true;
+
       // TODO check config file integrity
+      editableSelector = '.' + config.editableClass;
 
       // make sure rangy is initialized. e.g Rangy doesn't initialize
       // when loaded after the document is ready.
@@ -20,7 +24,6 @@
         rangy.init();
       }
 
-      isInitialized = true;
       dispatcher.setup();
     }
   };
@@ -136,6 +139,26 @@
       return this;
     },
 
+    /**
+     * Static method to set the cursor
+     *
+     * @method createCursor
+     * @static
+     */
+    createCursor: function(element, atStart) {
+      var cursor;
+      var $host = $(element).closest(editableSelector);
+
+      if ($host.length) {
+        var range = rangy.createRange();
+        range.selectNodeContents(element);
+        range.collapse(atStart);
+
+        cursor = new Cursor($host[0], range);
+      }
+
+      return cursor;
+    },
 
     /**
      * Subscribe a callback function to a custom event fired by the API.
