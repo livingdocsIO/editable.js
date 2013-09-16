@@ -14,8 +14,6 @@
   var initialize = function() {
     if (!isInitialized) {
       isInitialized = true;
-
-      // TODO check config file integrity
       editableSelector = '.' + config.editableClass;
 
       // make sure rangy is initialized. e.g Rangy doesn't initialize
