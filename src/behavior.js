@@ -20,13 +20,10 @@ var behavior = (function() {
   return {
     focus: function(element) {
       log('Default focus behavior');
-      content.normalizeSpaces(element);
-      content.removeEmptyTags(element);
     },
 
     blur: function(element) {
       log('Default blur behavior');
-      content.normalizeTags(element);
       content.cleanInternals(element);
     },
 
@@ -98,12 +95,14 @@ var behavior = (function() {
       var newStart = after.firstChild;
       parent.insertBefore(before, element);
       parent.replaceChild(after, element);
+      content.normalizeTags(newStart);
+      content.normalizeSpaces(newStart);
       newStart.focus();
     },
 
     merge: function(element, direction, cursor) {
       log('Default merge ' + direction + ' behavior');
-      var container, merger, fragment, chunks, i, newChild;
+      var container, merger, fragment, chunks, i, newChild, sel;
 
       switch(direction) {
       case 'before':
@@ -133,6 +132,11 @@ var behavior = (function() {
       newChild = container.appendChild(fragment);
 
       merger.parentNode.removeChild(merger);
+
+      sel = rangy.saveSelection();
+      content.normalizeTags(container);
+      content.normalizeSpaces(container);
+      rangy.restoreSelection(sel);
     },
 
     empty: function(element) {
