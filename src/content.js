@@ -9,6 +9,9 @@ var content = (function() {
         node = element.childNodes[i];
         if(!node) continue;
 
+        // skip empty tags, so they'll get removed
+        if(node.nodeName !== 'BR' && !node.textContent) continue;
+
         if(node.nodeType === 1 && node.nodeName !== 'BR') {
           sibling = node;
           while((sibling = sibling.nextSibling) !== null) {
@@ -48,17 +51,6 @@ var content = (function() {
       }
       else {
         this.normalizeSpaces(firstChild);
-      }
-    },
-
-    removeEmptyTags: function(element) {
-      var i, len, node;
-
-      for (i = 0, len = element.childNodes.length; i < len; i++) {
-        node = element.childNodes[i];
-        if(node && node.nodeName !== 'BR' && !node.textContent) {
-          node.parentNode.removeChild(node);
-        }
       }
     }
   };
