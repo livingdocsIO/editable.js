@@ -62,10 +62,12 @@ var content = (function() {
      * @param  {HTMLElement} element The element to process.
      */
     normalizeSpaces: function(element) {
+      var nonBreakingSpace = '\u00A0';
+
       if(!element) return;
 
       if(element.nodeType === 3) {
-        element.nodeValue = element.nodeValue.replace(/^(\s)/, '\u00A0').replace(/(\s)$/, '\u00A0');
+        element.nodeValue = element.nodeValue.replace(/^(\s)/, nonBreakingSpace).replace(/(\s)$/, nonBreakingSpace);
       }
       else {
         this.normalizeSpaces(element.firstChild);
