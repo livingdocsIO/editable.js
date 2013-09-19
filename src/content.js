@@ -7,6 +7,13 @@ var content = (function() {
   };
 
   return {
+    /**
+     * Remove empty tags and merge consecutive tags (they must have the same
+     * attributes).
+     *
+     * @method normalizeTags
+     * @param  {HTMLElement} element The element to process.
+     */
     normalizeTags: function(element) {
       var i, j, node, sibling;
 
@@ -15,6 +22,9 @@ var content = (function() {
       for (i = 0; i < element.childNodes.length; i++) {
         node = element.childNodes[i];
         if(!node) continue;
+
+        // skip empty tags, so they'll get removed
+        if(node.nodeName !== 'BR' && !node.textContent) continue;
 
         if(node.nodeType === 1 && node.nodeName !== 'BR') {
           sibling = node;
@@ -41,30 +51,34 @@ var content = (function() {
       element.appendChild(fragment);
     },
 
+    /**
+     * Clean the element from character, tags, etc... added by the plugin logic.
+     *
+     * @method cleanInternals
+     * @param  {HTMLElement} element The element to process.
+     */
     cleanInternals: function(element) {
       element.innerHTML = element.innerHTML.replace(/\u200B/g, '<br />');
     },
 
+    /**
+     * Convert the first and last space to a non breaking space charcter to
+     * prevent visual collapse by some browser.
+     *
+     * @method normalizeSpaces
+     * @param  {HTMLElement} element The element to process.
+     */
     normalizeSpaces: function(element) {
+      var nonBreakingSpace = '\u00A0';
+
       if(!element) return;
 
       if(element.nodeType === 3) {
-        element.nodeValue = element.nodeValue.replace(/^(\s)/, '\u00A0').replace(/(\s)$/, '\u00A0');
+        element.nodeValue = element.nodeValue.replace(/^(\s)/, nonBreakingSpace).replace(/(\s)$/, nonBreakingSpace);
       }
       else {
         this.normalizeSpaces(element.firstChild);
         this.normalizeSpaces(element.lastChild);
-      }
-    },
-
-    removeEmptyTags: function(element) {
-      var i, len, node;
-
-      for (i = 0, len = element.childNodes.length; i < len; i++) {
-        node = element.childNodes[i];
-        if(node && node.nodeName !== 'BR' && !node.textContent) {
-          node.parentNode.removeChild(node);
-        }
       }
     },
 
