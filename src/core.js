@@ -138,25 +138,57 @@
     },
 
     /**
-     * Static method to set the cursor
+     * Set the cursor inside of an editable block.
      *
      * @method createCursor
+     * @param position 'start', 'end', 'before', 'after'
      * @static
      */
-    createCursor: function(element, atStart) {
+    createCursor: function(element, position) {
       var cursor;
       var $host = $(element).closest(editableSelector);
+      position = position || 'start';
 
       if ($host.length) {
         var range = rangy.createRange();
-        range.selectNodeContents(element);
-        range.collapse(atStart);
+
+        if (position === 'start' || position === 'end') {
+          range.selectNodeContents(element);
+          range.collapse(position === 'start' ? true : false);
+        } else if (element !== $host[0]) {
+          if (position === 'before') {
+            range.setStartBefore(element);
+            range.setEndBefore(element);
+          } else if (position === 'after') {
+            range.setStartAfter(element);
+            range.setEndAfter(element);
+          }
+        } else {
+          error('EditableJS: cannot create cursor outside of an editable block.');
+        }
 
         cursor = new Cursor($host[0], range);
       }
 
       return cursor;
     },
+
+    createCursorAtStart: function(element) {
+      this.createCursor(element, 'start');
+    },
+
+    createCursorAtEnd: function(element) {
+      this.createCursor(element, 'end');
+    },
+
+    createCursorBefore: function(element) {
+      this.createCursor(element, 'before');
+    },
+
+    createCursorAfter: function(element) {
+      this.createCursor(element, 'after');
+    },
+
 
     /**
      * Subscribe a callback function to a custom event fired by the API.
