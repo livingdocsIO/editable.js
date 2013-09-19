@@ -196,6 +196,7 @@ var behavior = (function() {
         rangy.restoreSelection(sel);
         cursor = selectionWatcher.forceCursor();
         pasteElement = document.createTextNode(pasteValue);
+        content.normalizeSpaces(pasteElement);
         cursor.insertAfter(pasteElement);
         cursor.moveAfter(pasteElement);
         cursor.update();
