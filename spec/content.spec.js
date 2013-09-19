@@ -5,6 +5,7 @@ describe('Test content', function() {
     var nested = $('<div>Nested <strong><em>text</em></strong><strong><em>block</em></strong> example snippet</div>')[0];
     var nestedMixed = $('<div>Nested <strong>and mixed <em>text</em></strong><strong><em>block</em> <em>examples</em></strong> snippet</div>')[0];
     var consecutiveNewLines = $('<div>Consecutive<br><br>new lines</div>')[0];
+    var emptyTags = $('<div>Example with <strong>empty <em></em>nested</strong><br>tags</div>')[0];
 
     it('should work with plain block', function() {
       var expected = $('<div>Plain <strong>textblock</strong> example snippet</div>')[0];
@@ -37,6 +38,13 @@ describe('Test content', function() {
     it('should not merge consecutive new lines', function() {
       var expected = consecutiveNewLines.cloneNode(true);
       var actual = consecutiveNewLines.cloneNode(true);
+      content.normalizeTags(actual);
+      expect(actual.innerHTML).toEqual(expected.innerHTML);
+    });
+
+    it('should remove empty tags and preserve new lines', function() {
+      var expected = $('<div>Example with <strong>empty nested</strong><br>tags</div>')[0];
+      var actual = emptyTags.cloneNode(true);
       content.normalizeTags(actual);
       expect(actual.innerHTML).toEqual(expected.innerHTML);
     });
