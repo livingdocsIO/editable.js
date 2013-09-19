@@ -16,11 +16,7 @@ var selectionWatcher = (function() {
    * otherwise return an empty RangeContainer
    */
   var getRangeContainer = function() {
-    if (rangySelection) {
-      rangySelection.refresh();
-    } else {
-      rangySelection = rangy.getSelection();
-    }
+    rangySelection = rangy.getSelection();
 
     // rangeCount is 0 or 1 in all browsers except firefox
     // firefox can work with multiple ranges
