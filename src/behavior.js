@@ -102,7 +102,7 @@ var behavior = (function() {
 
     merge: function(element, direction, cursor) {
       log('Default merge ' + direction + ' behavior');
-      var container, merger, fragment, chunks, i, newChild, sel;
+      var container, merger, fragment, chunks, i, newChild, range;
 
       switch(direction) {
       case 'before':
@@ -133,10 +133,10 @@ var behavior = (function() {
 
       merger.parentNode.removeChild(merger);
 
-      sel = rangy.saveSelection();
+      range = rangeSaveRestore.save(cursor.range);
       content.normalizeTags(container);
       content.normalizeSpaces(container);
-      rangy.restoreSelection(sel);
+      rangeSaveRestore.restore(element, range);
     },
 
     empty: function(element) {
