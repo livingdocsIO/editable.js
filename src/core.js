@@ -141,20 +141,20 @@
      * Set the cursor inside of an editable block.
      *
      * @method createCursor
-     * @param position 'start', 'end', 'before', 'after'
+     * @param position 'beginning', 'end', 'before', 'after'
      * @static
      */
     createCursor: function(element, position) {
       var cursor;
       var $host = $(element).closest(editableSelector);
-      position = position || 'start';
+      position = position || 'beginning';
 
       if ($host.length) {
         var range = rangy.createRange();
 
-        if (position === 'start' || position === 'end') {
+        if (position === 'beginning' || position === 'end') {
           range.selectNodeContents(element);
-          range.collapse(position === 'start' ? true : false);
+          range.collapse(position === 'beginning' ? true : false);
         } else if (element !== $host[0]) {
           if (position === 'before') {
             range.setStartBefore(element);
@@ -173,8 +173,8 @@
       return cursor;
     },
 
-    createCursorAtStart: function(element) {
-      this.createCursor(element, 'start');
+    createCursorAtBeginning: function(element) {
+      this.createCursor(element, 'beginning');
     },
 
     createCursorAtEnd: function(element) {
