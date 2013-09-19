@@ -7,6 +7,7 @@
  */
 var config = {
   log: false,
+  logErrors: true,
   editableClass: 'js-editable',
   editableDisabledClass: 'js-editable-disabled',
   pastingAttribute: 'data-editable-is-pasting',

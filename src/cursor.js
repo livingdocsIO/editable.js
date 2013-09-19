@@ -42,20 +42,31 @@ var Cursor = (function() {
           this.range.startOffset);
       },
 
+      /**
+       * Insert content before the cursor
+       *
+       * @param DOM node or document fragment
+       */
       insertBefore: function(element) {
-        //TODO smart check on element type, now
-        //assume it is a dom element
+        var preceedingElement = element;
+
+        if (element.nodeType === 11) { // DOCUMENT_FRAGMENT_NODE
+          var lastIndex = element.childNodes.length - 1;
+          preceedingElement = element.childNodes[lastIndex];
+        }
+
         this.range.insertNode(element);
-        this.range.setStartAfter(element);
-        this.range.setEndAfter(element);
+        this.range.setStartAfter(preceedingElement);
+        this.range.setEndAfter(preceedingElement);
       },
 
+      /**
+       * Insert content after the cursor
+       *
+       * @param DOM node or document fragment
+       */
       insertAfter: function(element) {
-        //TODO smart check on element type, now
-        //assume it is a dom element
         this.range.insertNode(element);
-        this.range.setStartBefore(element);
-        this.range.setEndBefore(element);
       },
 
       update: function() {

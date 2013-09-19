@@ -8,11 +8,13 @@
  */
 
 (function() {
-  var isInitialized = false;
+  var isInitialized = false,
+      editableSelector;
 
   var initialize = function() {
     if (!isInitialized) {
-      // TODO check config file integrity
+      isInitialized = true;
+      editableSelector = '.' + config.editableClass;
 
       // make sure rangy is initialized. e.g Rangy doesn't initialize
       // when loaded after the document is ready.
@@ -20,7 +22,6 @@
         rangy.init();
       }
 
-      isInitialized = true;
       dispatcher.setup();
     }
   };
@@ -135,6 +136,58 @@
       });
 
       return this;
+    },
+
+    /**
+     * Set the cursor inside of an editable block.
+     *
+     * @method createCursor
+     * @param position 'beginning', 'end', 'before', 'after'
+     * @static
+     */
+    createCursor: function(element, position) {
+      var cursor;
+      var $host = $(element).closest(editableSelector);
+      position = position || 'beginning';
+
+      if ($host.length) {
+        var range = rangy.createRange();
+
+        if (position === 'beginning' || position === 'end') {
+          range.selectNodeContents(element);
+          range.collapse(position === 'beginning' ? true : false);
+        } else if (element !== $host[0]) {
+          if (position === 'before') {
+            range.setStartBefore(element);
+            range.setEndBefore(element);
+          } else if (position === 'after') {
+            range.setStartAfter(element);
+            range.setEndAfter(element);
+          }
+        } else {
+          error('EditableJS: cannot create cursor outside of an editable block.');
+        }
+
+        cursor = new Cursor($host[0], range);
+      }
+
+      return cursor;
+    },
+
+    createCursorAtBeginning: function(element) {
+      this.createCursor(element, 'beginning');
+    },
+
+    createCursorAtEnd: function(element) {
+      this.createCursor(element, 'end');
+    },
+
+    createCursorBefore: function(element) {
+      this.createCursor(element, 'before');
+    },
+
+    createCursorAfter: function(element) {
+      this.createCursor(element, 'after');
     },
 
 
