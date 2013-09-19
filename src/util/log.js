@@ -28,9 +28,8 @@ log = function() {
 
 // Allows for safe error logging
 // Falls back to console.log if console.error is not available
-// configuration: disable with config.log = false
 error = function() {
-  if (config.log === false) { return; }
+  if (config.logErrors === false) { return; }
 
   var args;
   args = Array.prototype.slice.call(arguments);
