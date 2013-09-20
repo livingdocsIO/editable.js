@@ -6,7 +6,9 @@
  * all the time
  */
 var RangeContainer = function(editableHost, rangyRange) {
-  this.host = editableHost;
+  this.host = editableHost && editableHost.jquery ?
+    editableHost[0] :
+    editableHost;
   this.range = rangyRange;
   this.isAnythingSelected = (rangyRange !== undefined);
   this.isCursor = (this.isAnythingSelected && rangyRange.collapsed);
