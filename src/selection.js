@@ -74,12 +74,14 @@ var Selection = (function() {
      *
      * @method link
      */
-    link: function(link, target) {
-      var attrs = {
-        href: link
-      };
-      if (target) attrs.target = target;
-      this.range = content.link(this.host, this.range, attrs);
+    link: function(href, attrs) {
+      var $link = $('<a>');
+      if (href) $link.attr('href', href);
+      for (var name in attrs) {
+        $link.attr(name, attrs[name]);
+      }
+
+      this.range = content.forceWrap(this.host, this.range, $link[0]);
       this.setSelection();
     },
 

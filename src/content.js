@@ -182,14 +182,6 @@ var content = (function() {
       $(elem).contents().unwrap();
     },
 
-    link: function(host, range, attrs) {
-      var $elem = $('<a>');
-      for (var name in attrs) {
-        $elem.attr(name, attrs[name]);
-      }
-      return this.forceWrap(host, range, $elem[0]);
-    },
-
     removeFormatting: function(host, range, tagName) {
       return restoreRange(host, range, function(){
         this.nuke(host, range, tagName);
