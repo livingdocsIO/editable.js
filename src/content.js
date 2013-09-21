@@ -152,7 +152,7 @@ var content = (function() {
 
     forceWrap: function(host, range, elem) {
       range = restoreRange(host, range, function(){
-        this.nuke(host, range, elem.tagName);
+        this.nuke(host, range, elem.nodeName);
       });
 
       // remove all tags if the range is not wrappable
@@ -196,7 +196,7 @@ var content = (function() {
       var tags = this.getTags(host, range);
       for (var i = 0; i < tags.length; i++) {
         var elem = tags[i];
-        if ( !tagName || elem.tagName === tagName.toUpperCase() ) {
+        if ( !tagName || elem.nodeName === tagName.toUpperCase() ) {
           this.unwrap(elem);
         }
       }
@@ -273,7 +273,7 @@ var content = (function() {
       var tags = this.getTags(host, range);
       for (var i = 0; i < tags.length; i++) {
         var elem = tags[i];
-        if (elem.tagName === tagName)
+        if (elem.nodeName === tagName)
           this.unwrap(elem);
       }
     }
