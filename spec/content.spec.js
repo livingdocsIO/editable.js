@@ -141,7 +141,6 @@ describe('Content', function() {
 
       content.wrap(range, '<em>')
       expect(host.html()).toEqual('<em>b</em>');
-    })
     });
   });
 
@@ -161,6 +160,70 @@ describe('Content', function() {
 
       expect(content.isAffectedBy(host[0], range, 'b')).toEqual(true);
       expect(content.isAffectedBy(host[0], range, 'strong')).toEqual(false);
+    });
+  });
+
+  describe('containsString()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('finds a character in the range', function() {
+      // <div>|ab|c</div>
+      host = $('<div>abc</div>');
+      range.setStart(host[0].firstChild, 0);
+      range.setEnd(host[0].firstChild, 2);
+
+      expect(content.containsString(range, 'a')).toEqual(true);
+      expect(content.containsString(range, 'b')).toEqual(true);
+      expect(content.containsString(range, 'c')).toEqual(false);
+    });
+  });
+
+  describe('deleteCharacter()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('removes a character in the range and preserves the range', function() {
+      // <div>|ab|c</div>
+      host = $('<div>abc</div>');
+      range.setStart(host[0].firstChild, 0);
+      range.setEnd(host[0].firstChild, 2);
+
+      range = content.deleteCharacter(host[0], range, 'a');
+      expect(host.html()).toEqual('bc');
+
+      // show resulting text nodes
+      expect(host[0].childNodes.length).toEqual(1);
+      expect(host[0].childNodes[0].nodeValue).toEqual('bc');
+
+      // check range. It should look like this:
+      // <div>|b|c</div>
+      expect(range.startContainer).toEqual(host[0]);
+      expect(range.startOffset).toEqual(0);
+      expect(range.endContainer).toEqual(host[0].firstChild);
+      expect(range.endOffset).toEqual(1);
+      expect(range.toString()).toEqual('b');
+    });
+
+    it('works with a partially selected tag', function() {
+      // <div>|a<em>b|b</em></div>
+      host = $('<div>a<em>bb</em></div>');
+      range.setStart(host[0].firstChild, 0);
+      range.setEnd(host.find('em')[0].firstChild, 1);
+
+      range = content.deleteCharacter(host[0], range, 'b');
+      expect(host.html()).toEqual('a<em>b</em>');
+
+      // show resulting nodes
+      expect(host[0].childNodes.length).toEqual(2);
+      expect(host[0].childNodes[0].nodeValue).toEqual('a');
+      expect(host[0].childNodes[1].tagName).toEqual('EM');
     });
   });
 

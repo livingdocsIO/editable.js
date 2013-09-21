@@ -72,14 +72,6 @@ var Selection = (function() {
 
     /**
      *
-     * @method strip
-     */
-    strip: function() {
-
-    },
-
-    /**
-     *
      * @method link
      */
     link: function(link, target) {
@@ -131,8 +123,20 @@ var Selection = (function() {
      * @method surround
      */
     surround: function(startCharacter, endCharacter) {
-      content.surround(this.host, this.range, startCharacter, endCharacter);
+      this.range = content.surround(this.host, this.range, startCharacter, endCharacter);
       this.update();
+    },
+
+    toggleSurround: function(startCharacter, endCharacter) {
+      if (content.containsString(this.range, startCharacter) &&
+        content.containsString(this.range, endCharacter)) {
+
+        this.range = content.deleteCharacter(this.host, this.range, startCharacter);
+        this.range = content.deleteCharacter(this.host, this.range, endCharacter);
+        this.update();
+      } else {
+        this.surround(startCharacter, endCharacter);
+      }
     },
 
     /**

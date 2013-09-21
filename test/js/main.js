@@ -70,7 +70,7 @@
 
     $(document).on('click', '.js-format-quote', function(event) {
       if (lastSelection.isSelection) {
-        lastSelection.surround('«', '»');
+        lastSelection.toggleSurround('«', '»');
       }
     });
 

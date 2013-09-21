@@ -146,22 +146,6 @@ var content = (function() {
       return names;
     },
 
-    wrap: function(range, elem) {
-      elem = string.isString(elem) ?
-        $(elem)[0] :
-        elem;
-
-      if(this.isWrappable(range)) {
-        var a = range.surroundContents(elem);
-      } else {
-        console.log('content.wrap(): can not surround range');
-      }
-    },
-
-    unwrap: function(elem) {
-      $(elem).contents().unwrap();
-    },
-
     isWrappable: function(range) {
       return range.canSurroundContents();
     },
@@ -180,6 +164,22 @@ var content = (function() {
 
       this.wrap(range, elem);
       return range;
+    },
+
+    wrap: function(range, elem) {
+      elem = string.isString(elem) ?
+        $(elem)[0] :
+        elem;
+
+      if(this.isWrappable(range)) {
+        var a = range.surroundContents(elem);
+      } else {
+        console.log('content.wrap(): can not surround range');
+      }
+    },
+
+    unwrap: function(elem) {
+      $(elem).contents().unwrap();
     },
 
     link: function(host, range, attrs) {
@@ -232,11 +232,45 @@ var content = (function() {
 
     /**
      * Surround the range with characters like start and end quotes.
+     *
+     * @method surround
      */
     surround: function(host, range, startCharacter, endCharacter) {
       if (!endCharacter) endCharacter = startCharacter;
       this.insertCharacter(range, endCharacter, false);
       this.insertCharacter(range, startCharacter, true);
+      return range;
+    },
+
+    /**
+     * Removes a character from the text within a range.
+     *
+     * @method deleteCharacter
+     */
+    deleteCharacter: function(host, range, character) {
+      if (this.containsString(range, character)) {
+        range.splitBoundaries();
+        range = restoreRange(host, range, function() {
+          var charRegexp = string.regexp(character);
+
+          var textNodes = range.getNodes([3], function(node) {
+            return node.nodeValue.search(charRegexp) >= 0;
+          });
+
+          for(var i = 0; i < textNodes.length; i++) {
+            var node = textNodes[i];
+            node.nodeValue = node.nodeValue.replace(charRegexp, '');
+          }
+        });
+        range.normalizeBoundaries();
+      }
+
+      return range;
+    },
+
+    containsString: function(range, str) {
+      var text = range.toString();
+      return text.indexOf(str) >= 0;
     },
 
     /**
