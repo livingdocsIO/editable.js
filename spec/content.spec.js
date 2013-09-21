@@ -297,47 +297,46 @@ describe('Content', function() {
   });
 
 
-  describe('link()', function() {
+  describe('forceWrap()', function() {
 
     var range, host;
     beforeEach(function() {
       range = rangy.createRange();
     });
 
-    it('adds a link with href', function() {
+    it('adds a link with an href attribute', function() {
       // <div>|b|</div>
       host = $('<div>b</div>');
       range.setStart(host[0], 0);
       range.setEnd(host[0], 1);
-      var attrs = {
-        href: 'www.link.io',
-      };
-      content.link(host[0], range, attrs);
+
+      var $link = $('<a>');
+      $link.attr('href', 'www.link.io');
+
+      content.forceWrap(host[0], range, $link[0]);
       expect(host.html()).toEqual('<a href="www.link.io">b</a>');
     });
 
-    it('does not nest links', function() {
-      // <div>|<a>b</a>|</div>
-      host = $('<div><a>b</a></div>');
+    it('does not nest tags', function() {
+      // <div>|<em>b</em>|</div>
+      host = $('<div><em>b</em></div>');
       range.setStart(host[0], 0);
       range.setEnd(host[0], 1);
-      var attrs = {
-        href: 'www.link.io',
-      };
-      content.link(host[0], range, attrs);
-      expect(host.html()).toEqual('<a href="www.link.io">b</a>');
+
+      var $em = $('<em>');
+      content.forceWrap(host[0], range, $em[0]);
+      expect(host.html()).toEqual('<em>b</em>');
     });
 
-    it('removes partially selected links', function() {
-      // <div><a>b|c|</a></div>
-      host = $('<div><a>bc</a></div>');
-      range.setStart(host.find('a')[0].firstChild, 1);
-      range.setEnd(host.find('a')[0].firstChild, 2);
-      var attrs = {
-        href: 'www.link.io',
-      };
-      content.link(host[0], range, attrs);
-      expect(host.html()).toEqual('b<a href="www.link.io">c</a>');
+    it('removes partially selected tags', function() {
+      // <div><em>b|c|</em></div>
+      host = $('<div><em>bc</em></div>');
+      range.setStart(host.find('em')[0].firstChild, 1);
+      range.setEnd(host.find('em')[0].firstChild, 2);
+
+      var $em = $('<em>');
+      content.forceWrap(host[0], range, $em[0]);
+      expect(host.html()).toEqual('b<em>c</em>');
     });
   });
 
