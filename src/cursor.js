@@ -69,10 +69,8 @@ var Cursor = (function() {
         this.range.insertNode(element);
       },
 
-      update: function() {
-        var sel = rangy.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(this.range);
+      setSelection: function() {
+        rangy.getSelection().setSingleRange(this.range);
       },
 
       before: function() {
@@ -113,10 +111,6 @@ var Cursor = (function() {
           height: coords.height,
           width: coords.width
         };
-      },
-
-      setAsSelection: function() {
-        rangy.getSelection().setSingleRange(this.range);
       },
 
       detach: function() {

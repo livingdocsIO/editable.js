@@ -80,7 +80,12 @@ var Selection = (function() {
       };
       if (target) attrs.target = target;
       this.range = content.link(this.host, this.range, attrs);
-      this.update();
+      this.setSelection();
+    },
+
+    toggle: function(elem) {
+      this.range = content.toggleTag(this.host, this.range, elem);
+      this.setSelection();
     },
 
     /**
@@ -90,22 +95,12 @@ var Selection = (function() {
     makeBold: function() {
       var $bold = $(config.boldTag);
       this.range = content.forceWrap(this.host, this.range, $bold[0]);
-      this.update();
-    },
-
-    toggleEmphasis: function() {
-      var $italic = $(config.italicTag);
-      this.toggle($italic[0]);
+      this.setSelection();
     },
 
     toggleBold: function() {
       var $bold = $(config.boldTag);
       this.toggle($bold[0]);
-    },
-
-    toggle: function(elem) {
-      this.range = content.toggleTag(this.host, this.range, elem);
-      this.update();
     },
 
     /**
@@ -115,7 +110,12 @@ var Selection = (function() {
     giveEmphasis: function() {
       var $em = $(config.italicTag);
       this.range = content.forceWrap(this.host, this.range, $em[0]);
-      this.update();
+      this.setSelection();
+    },
+
+    toggleEmphasis: function() {
+      var $italic = $(config.italicTag);
+      this.toggle($italic[0]);
     },
 
     /**
@@ -124,7 +124,7 @@ var Selection = (function() {
      */
     surround: function(startCharacter, endCharacter) {
       this.range = content.surround(this.host, this.range, startCharacter, endCharacter);
-      this.update();
+      this.setSelection();
     },
 
     toggleSurround: function(startCharacter, endCharacter) {
@@ -133,7 +133,7 @@ var Selection = (function() {
 
         this.range = content.deleteCharacter(this.host, this.range, startCharacter);
         this.range = content.deleteCharacter(this.host, this.range, endCharacter);
-        this.update();
+        this.setSelection();
       } else {
         this.surround(startCharacter, endCharacter);
       }
@@ -145,7 +145,7 @@ var Selection = (function() {
      */
     removeFormatting: function() {
       this.range = content.removeFormatting(this.host, this.range);
-      this.update();
+      this.setSelection();
     },
 
     /**
