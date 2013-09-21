@@ -125,6 +125,31 @@ describe('Content', function() {
     });
   });
 
+  describe('getTagsByName()', function() {
+
+    var range;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('filters outer tags', function() {
+      // <div><i><b>|a|</b></i></div>
+      var test = $('<div><i><b>a</b></i></div>');
+      range.setStart(test.find('b')[0], 0);
+      range.setEnd(test.find('b')[0], 1);
+      var tags = content.getTagsByName(test[0], range, 'b');
+      expect(content.getTagNames(tags)).toEqual(['B']);
+    });
+
+    it('filters inner tags', function() {
+      // <div>|<i><b>a</b></i>|</div>
+      var test = $('<div><i><b>a</b></i></div>');
+      range.setStart(test[0], 0);
+      range.setEnd(test[0], 1);
+      var tags = content.getTagsByName(test[0], range, 'i');
+      expect(content.getTagNames(tags)).toEqual(['I']);
+    });
+  });
 
   describe('wrap()', function() {
 

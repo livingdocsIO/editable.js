@@ -85,51 +85,31 @@ var content = (function() {
     /**
      * Get all tags that start or end inside the range
      */
-    getTags: function(host, range) {
-      var tags = this.getInnerTags(range);
+    getTags: function(host, range, filterFunc) {
+      var tags = this.getInnerTags(range, filterFunc);
 
       // get all tags that surround the range
       var node = range.commonAncestorContainer;
       while (node !== host) {
-        tags.push(node);
+        if (!filterFunc || filterFunc(node)) {
+          tags.push(node);
+        }
         node = node.parentNode;
       }
       return tags;
     },
 
-    isAffectedBy: function(host, range, tagName) {
-      var elem;
-      var tags = this.getTags(host, range);
-      for (var i = 0; i < tags.length; i++) {
-        elem = tags[i];
-        if (elem.tagName === tagName.toUpperCase()) {
-          return true;
-        }
-      }
-
-      return false;
-    },
-
-    toggleTag: function(host, range, elem) {
-      if (this.isAffectedBy(host, range, elem.tagName)) {
-        return this.removeFormatting(host, range, elem.tagName);
-      } else {
-        return this.forceWrap(host, range, elem);
-      }
+    getTagsByName: function(host, range, tagName) {
+      return this.getTags(host, range, function(node) {
+        return node.nodeName === tagName.toUpperCase();
+      });
     },
 
     /**
      * Get all tags that start or end inside the range
      */
-    getInnerTags: function(range) {
-      var tags = [], node;
-
-      var iterator = range.createNodeIterator();
-      while( (node = iterator.next()) ) {
-        if (node.nodeType === 1)
-          tags.push(node);
-      }
-      return tags;
+    getInnerTags: function(range, filterFunc) {
+      return range.getNodes([1], filterFunc);
     },
 
     /**
@@ -140,10 +120,32 @@ var content = (function() {
      */
     getTagNames: function(elements) {
       var names = [];
-      for (var i=0; i < elements.length; i++) {
+      if (!elements) return names;
+
+      for (var i = 0; i < elements.length; i++) {
         names.push(elements[i].nodeName);
       }
       return names;
+    },
+
+    isAffectedBy: function(host, range, tagName) {
+      var elem;
+      var tags = this.getTags(host, range);
+      for (var i = 0; i < tags.length; i++) {
+        elem = tags[i];
+        if (elem.nodeName === tagName.toUpperCase()) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+    toggleTag: function(host, range, elem) {
+      if (this.isAffectedBy(host, range, elem.nodeName)) {
+        return this.removeFormatting(host, range, elem.nodeName);
+      } else {
+        return this.forceWrap(host, range, elem);
+      }
     },
 
     isWrappable: function(range) {
