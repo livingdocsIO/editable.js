@@ -93,20 +93,35 @@ var Selection = (function() {
 
     /**
      *
-     * @method bold
+     * @method makeBold
      */
     makeBold: function() {
-      var $bold = $('<strong>');
+      var $bold = $(config.boldTag);
       this.range = content.forceWrap(this.host, this.range, $bold[0]);
+      this.update();
+    },
+
+    toggleEmphasis: function() {
+      var $italic = $(config.italicTag);
+      this.toggle($italic[0]);
+    },
+
+    toggleBold: function() {
+      var $bold = $(config.boldTag);
+      this.toggle($bold[0]);
+    },
+
+    toggle: function(elem) {
+      this.range = content.toggleTag(this.host, this.range, elem);
       this.update();
     },
 
     /**
      *
-     * @method emphasis
+     * @method giveEmphasis
      */
     giveEmphasis: function() {
-      var $em = $('<em>');
+      var $em = $(config.italicTag);
       this.range = content.forceWrap(this.host, this.range, $em[0]);
       this.update();
     },

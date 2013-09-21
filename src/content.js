@@ -97,6 +97,27 @@ var content = (function() {
       return tags;
     },
 
+    isAffectedBy: function(host, range, tagName) {
+      var elem;
+      var tags = this.getTags(host, range);
+      for (var i = 0; i < tags.length; i++) {
+        elem = tags[i];
+        if (elem.tagName === tagName.toUpperCase()) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+
+    toggleTag: function(host, range, elem) {
+      if (this.isAffectedBy(host, range, elem.tagName)) {
+        return this.removeFormatting(host, range, elem.tagName);
+      } else {
+        return this.forceWrap(host, range, elem);
+      }
+    },
+
     /**
      * Get all tags that start or end inside the range
      */

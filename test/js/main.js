@@ -52,13 +52,13 @@
 
     $(document).on('click', '.js-format-bold', function(event) {
       if (lastSelection.isSelection) {
-        lastSelection.makeBold();
+        lastSelection.toggleBold();
       }
     });
 
     $(document).on('click', '.js-format-italic', function(event) {
       if (lastSelection.isSelection) {
-        lastSelection.giveEmphasis();
+        lastSelection.toggleEmphasis();
       }
     });
 

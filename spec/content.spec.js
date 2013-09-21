@@ -142,6 +142,48 @@ describe('Content', function() {
       content.wrap(range, '<em>')
       expect(host.html()).toEqual('<em>b</em>');
     })
+    });
+  });
+
+
+  describe('isAffectedBy()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('detects a <b> tag', function() {
+      // <div><b>|a|</b></div>
+      host = $('<div><b>a</b></div>');
+      range.setStart(host.find('b')[0], 0);
+      range.setEnd(host.find('b')[0], 1);
+
+      expect(content.isAffectedBy(host[0], range, 'b')).toEqual(true);
+      expect(content.isAffectedBy(host[0], range, 'strong')).toEqual(false);
+    });
+  });
+
+
+  describe('toggleTag()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('toggles a <b> tag', function() {
+      // <div><b>|a|</b></div>
+      host = $('<div><b>a</b></div>');
+      range.setStart(host.find('b')[0], 0);
+      range.setEnd(host.find('b')[0], 1);
+
+      range = content.toggleTag(host[0], range, $('<b>')[0])
+      expect(host.html()).toEqual('a');
+
+      content.toggleTag(host[0], range, $('<b>')[0])
+      expect(host.html()).toEqual('<b>a</b>');
+    });
   });
 
 
