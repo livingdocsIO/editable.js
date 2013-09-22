@@ -81,24 +81,21 @@ var Selection = (function() {
         $link.attr(name, attrs[name]);
       }
 
-      this.range = content.forceWrap(this.host, this.range, $link[0]);
-      this.setSelection();
+      this.forceWrap($link[0]);
     },
 
     unlink: function() {
-      this.range = content.removeFormatting(this.host, this.range, 'a');
-      this.setSelection();
+      this.removeFormatting('a');
     },
 
     toggleLink: function(href, attrs) {
-      var links = content.getTagsByName(this.host, this.range, 'a');
+      var links = this.getTagsByName('a');
       if (links.length >= 1) {
         var firstLink = links[0];
-        if (content.isExactSelection(this.range, firstLink)) {
+        if (this.isExactSelection(firstLink, 'visible')) {
           this.unlink();
         } else {
-          this.range = content.expandTo(this.host, this.range, firstLink);
-          this.setSelection();
+          this.expandTo(firstLink);
         }
       } else {
         this.link(href, attrs);
@@ -116,8 +113,7 @@ var Selection = (function() {
      */
     makeBold: function() {
       var $bold = $(config.boldTag);
-      this.range = content.forceWrap(this.host, this.range, $bold[0]);
-      this.setSelection();
+      this.forceWrap($bold[0]);
     },
 
     toggleBold: function() {
@@ -131,8 +127,7 @@ var Selection = (function() {
      */
     giveEmphasis: function() {
       var $em = $(config.italicTag);
-      this.range = content.forceWrap(this.host, this.range, $em[0]);
-      this.setSelection();
+      this.forceWrap($em[0]);
     },
 
     toggleEmphasis: function() {
@@ -141,36 +136,44 @@ var Selection = (function() {
     },
 
     /**
+     * Surround the selection with characters like quotes.
      *
      * @method surround
+     * @param {String} E.g. '«'
+     * @param {String} E.g. '»'
      */
     surround: function(startCharacter, endCharacter) {
       this.range = content.surround(this.host, this.range, startCharacter, endCharacter);
       this.setSelection();
     },
 
-    toggleSurround: function(startCharacter, endCharacter) {
-      if (content.containsString(this.range, startCharacter) &&
-        content.containsString(this.range, endCharacter)) {
+    removeSurround: function(startCharacter, endCharacter) {
+      this.range = content.deleteCharacter(this.host, this.range, startCharacter);
+      this.range = content.deleteCharacter(this.host, this.range, endCharacter);
+      this.setSelection();
+    },
 
-        this.range = content.deleteCharacter(this.host, this.range, startCharacter);
-        this.range = content.deleteCharacter(this.host, this.range, endCharacter);
-        this.setSelection();
+    toggleSurround: function(startCharacter, endCharacter) {
+      if (this.containsString(startCharacter) &&
+        this.containsString(endCharacter)) {
+        this.removeSurround(startCharacter, endCharacter);
       } else {
         this.surround(startCharacter, endCharacter);
       }
     },
 
     /**
-     *
      * @method removeFormatting
+     * @param {String} tagName. E.g. 'a' to remove all links.
      */
-    removeFormatting: function() {
-      this.range = content.removeFormatting(this.host, this.range);
+    removeFormatting: function(tagName) {
+      this.range = content.removeFormatting(this.host, this.range, tagName);
       this.setSelection();
     },
 
     /**
+     * Delete the contents inside the range. After that the selection will be a
+     * cursor.
      *
      * @method deleteContent
      * @return Cursor instance
@@ -181,13 +184,85 @@ var Selection = (function() {
     },
 
     /**
-     * Expand the current selection
+     * Expand the current selection.
      *
-     * @method expand
-     * @param {String} scope: either of: 'word', 'sentence', 'tag' or 'block'.
+     * @method expandTo
+     * @param {DOM Node}
      */
-    expand: function(scope) {
+    expandTo: function(elem) {
+      this.range = content.expandTo(this.host, this.range, elem);
+      this.setSelection();
+    },
 
+    /**
+     * Wrap the selection with the specified tag. If any other tag with
+     * the same tagName is affecting the selection this tag will be
+     * remove first.
+     *
+     * @method forceWrap
+     */
+    forceWrap: function(elem) {
+      this.range = content.forceWrap(this.host, this.range, elem);
+      this.setSelection();
+    },
+
+    /**
+     * Get all tags that affect the current selection. Optionally pass a
+     * method to filter the returned elements.
+     *
+     * @method getTags
+     * @param {Function filter(node)} [Optional] Method to filter the returned
+     *   DOM Nodes.
+     * @return {Array of DOM Nodes}
+     */
+    getTags: function(filterFunc) {
+      return content.getTags(this.host, this.range, filterFunc);
+    },
+
+    /**
+     * Get all tags of the specified type that affect the current selection.
+     *
+     * @method getTagsByName
+     * @param {String} tagName. E.g. 'a' to get all links.
+     * @return {Array of DOM Nodes}
+     */
+    getTagsByName: function(tagName) {
+      return content.getTagsByName(this.host, this.range, tagName);
+    },
+
+    /**
+     * Check if the selection is the same as the elements contents.
+     *
+     * @method isExactSelection
+     * @param {DOM Node}
+     * @param {flag:  undefined or 'visible'} if 'visible' is passed
+     *   whitespaces at the beginning or end of the selection will
+     *   be ignored.
+     * @return {Boolean}
+     */
+    isExactSelection: function(elem, onlyVisible) {
+      return content.isExactSelection(this.range, elem, onlyVisible)
+    },
+
+    /**
+     * Check if the selection contains the passed string.
+     *
+     * @method containsString
+     * @return {Boolean}
+     */
+    containsString: function(str) {
+      return content.containsString(this.range, str);
+    },
+
+    /**
+     * Delete all occurences of the specified character from the
+     * selection.
+     *
+     * @method deleteCharacter
+     */
+    deleteCharacter: function(character) {
+      this.range = content.deleteCharacter(this.host, this.range, character);
+      this.setSelection();
     }
   });
 
