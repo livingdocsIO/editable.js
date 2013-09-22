@@ -22,7 +22,7 @@ var string = (function() {
      */
     regexp: function(str, flags) {
       if (!flags) flags = 'g';
-      var escapedStr = str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+      var escapedStr = str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
       return new RegExp(escapedStr, flags);
     }
   };

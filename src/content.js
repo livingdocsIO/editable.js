@@ -144,13 +144,22 @@ var content = (function() {
     /**
      * Check if the range selects all of the elements contents,
      * not less or more.
+     *
+     * @param visible: Only compare visible text. That way it does not
+     *   matter if the user selects an additional whitespace or not.
      */
-    isExactSelection: function(range, elem) {
+    isExactSelection: function(range, elem, visible) {
       var elemRange = rangy.createRange();
       elemRange.selectNodeContents(elem);
       if (range.intersectsRange(elemRange)) {
         var rangeText = range.toString();
         var elemText = $(elem).text();
+
+        if (visible) {
+          rangeText = string.trim(rangeText);
+          elemText = string.trim(elemText);
+        }
+
         return rangeText !== '' && rangeText === elemText;
       } else {
         return false;
