@@ -438,7 +438,7 @@ describe('Content', function() {
     });
 
     it('is true if the selection is directly inside the tag', function() {
-      // <div><em>\b\</em></div>
+      // <div><em>|b|</em></div>
       host = $('<div><em>b</em></div>');
       range.setStart(host.find('em')[0], 0);
       range.setEnd(host.find('em')[0], 1);
@@ -458,7 +458,7 @@ describe('Content', function() {
     });
 
     it('is false if the selection is only partial', function() {
-      // <div><em>a|b\</em></div>
+      // <div><em>a|b|</em></div>
       host = $('<div><em>ab</em></div>');
       range.setEnd(host.find('em')[0].firstChild, 1);
       range.setEnd(host.find('em')[0].firstChild, 2);
@@ -488,7 +488,7 @@ describe('Content', function() {
     });
 
     it('is false if range and elem do not overlap but have the same content', function() {
-      // <div>\b\<em>b</em></div>
+      // <div>|b|<em>b</em></div>
       host = $('<div>b<em>b</em></div>');
       range.setEnd(host[0].firstChild, 0);
       range.setEnd(host[0].firstChild, 1);
