@@ -140,6 +140,23 @@ var content = (function() {
 
       return false;
     },
+
+    /**
+     * Check if the range selects all of the elements contents,
+     * not less or more.
+     */
+    isExactSelection: function(range, elem) {
+      var elemRange = rangy.createRange();
+      elemRange.selectNodeContents(elem);
+      if (range.intersectsRange(elemRange)) {
+        var rangeText = range.toString();
+        var elemText = $(elem).text();
+        return rangeText !== '' && rangeText === elemText;
+      } else {
+        return false;
+      }
+    },
+
     toggleTag: function(host, range, elem) {
       if (this.isAffectedBy(host, range, elem.nodeName)) {
         return this.removeFormatting(host, range, elem.nodeName);

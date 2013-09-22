@@ -419,4 +419,82 @@ describe('Content', function() {
       expect(range.endOffset).toEqual(3);
     });
   });
+
+  describe('isExactSelection()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('is true if the selection is directly outside the tag', function() {
+      // <div>|<em>b</em>|</div>
+      host = $('<div><em>b</em></div>');
+      range.setStart(host[0], 0);
+      range.setEnd(host[0], 1);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(true);
+    });
+
+    it('is true if the selection is directly inside the tag', function() {
+      // <div><em>\b\</em></div>
+      host = $('<div><em>b</em></div>');
+      range.setStart(host.find('em')[0], 0);
+      range.setEnd(host.find('em')[0], 1);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(true);
+    });
+
+    it('is false if the selection goes beyond the tag', function() {
+      // <div>|a<em>b</em>|</div>
+      host = $('<div>a<em>b</em></div>');
+      range.setStart(host[0], 0);
+      range.setEnd(host[0], 2);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(false);
+    });
+
+    it('is false if the selection is only partial', function() {
+      // <div><em>a|b\</em></div>
+      host = $('<div><em>ab</em></div>');
+      range.setEnd(host.find('em')[0].firstChild, 1);
+      range.setEnd(host.find('em')[0].firstChild, 2);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(false);
+    });
+
+    it('is false for a collapsed range', function() {
+      // <div><em>a|b</em></div>
+      host = $('<div><em>ab</em></div>');
+      range.setEnd(host.find('em')[0].firstChild, 1);
+      range.setEnd(host.find('em')[0].firstChild, 1);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(false);
+    });
+
+    it('is false for a collapsed range in an empty tag', function() {
+      // <div><em>|</em></div>
+      host = $('<div><em></em></div>');
+      range.setEnd(host.find('em')[0], 0);
+      range.setEnd(host.find('em')[0], 0);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(false);
+    });
+
+    it('is false if range and elem do not overlap but have the same content', function() {
+      // <div>\b\<em>b</em></div>
+      host = $('<div>b<em>b</em></div>');
+      range.setEnd(host[0].firstChild, 0);
+      range.setEnd(host[0].firstChild, 1);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(false);
+    });
+  });
 });
