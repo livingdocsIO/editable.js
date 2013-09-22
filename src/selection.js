@@ -85,6 +85,26 @@ var Selection = (function() {
       this.setSelection();
     },
 
+    unlink: function() {
+      this.range = content.removeFormatting(this.host, this.range, 'a');
+      this.setSelection();
+    },
+
+    toggleLink: function(href, attrs) {
+      var links = content.getTagsByName(this.host, this.range, 'a');
+      if (links.length >= 1) {
+        var firstLink = links[0];
+        if (content.isExactSelection(this.range, firstLink)) {
+          this.unlink();
+        } else {
+          this.range = content.expandTo(this.host, this.range, firstLink);
+          this.setSelection();
+        }
+      } else {
+        this.link(href, attrs);
+      }
+    },
+
     toggle: function(elem) {
       this.range = content.toggleTag(this.host, this.range, elem);
       this.setSelection();

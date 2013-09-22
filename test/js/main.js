@@ -64,7 +64,7 @@
 
     $(document).on('click', '.js-format-link', function(event) {
       if (lastSelection.isSelection) {
-        lastSelection.link('www.upfront.io');
+        lastSelection.toggleLink('www.upfront.io');
       }
     });
 

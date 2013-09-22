@@ -166,12 +166,20 @@ var content = (function() {
       }
     },
 
+    expandTo: function(host, range, elem) {
+      range.selectNodeContents(elem);
+      return range;
+    },
+
     toggleTag: function(host, range, elem) {
-      if (this.isAffectedBy(host, range, elem.nodeName)) {
+      var elems = this.getTagsByName(host, range, elem.nodeName);
+
+      if (elems.length === 1 &&
+          this.isExactSelection(range, elems[0], 'visible')) {
         return this.removeFormatting(host, range, elem.nodeName);
-      } else {
-        return this.forceWrap(host, range, elem);
       }
+
+      return this.forceWrap(host, range, elem);
     },
 
     isWrappable: function(range) {
