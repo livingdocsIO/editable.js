@@ -241,7 +241,7 @@ var Selection = (function() {
      * @return {Boolean}
      */
     isExactSelection: function(elem, onlyVisible) {
-      return content.isExactSelection(this.range, elem, onlyVisible)
+      return content.isExactSelection(this.range, elem, onlyVisible);
     },
 
     /**
