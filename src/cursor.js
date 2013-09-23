@@ -118,13 +118,55 @@ var Cursor = (function() {
       },
 
       moveBefore: function(element) {
-        this.range.setStart(element, 0);
-        this.range.setEnd(element, 0);
+        this.setHost(element);
+        this.range.setStartBefore(element);
+        this.range.setEndBefore(element);
+        if (this.isSelection) return new Cursor(this.host, this.range);
       },
 
       moveAfter: function(element) {
+        this.setHost(element);
+        this.range.setStartAfter(element);
+        this.range.setEndAfter(element);
+        if (this.isSelection) return new Cursor(this.host, this.range);
+      },
+
+      moveAtBeginning: function(element) {
+        if (!element) element = this.host;
+        this.setHost(element);
+        this.range.selectNodeContents(element);
+        this.range.collapse(true);
+        if (this.isSelection) return new Cursor(this.host, this.range);
+      },
+
+      moveAtEnd: function(element) {
+        if (!element) element = this.host;
+        this.setHost(element);
         this.range.selectNodeContents(element);
         this.range.collapse(false);
+        if (this.isSelection) return new Cursor(this.host, this.range);
+      },
+
+      setHost: function(element) {
+        this.host = parser.getHost(element);
+        if (!this.host) {
+          error('Can not set cursor outside of an editable block');
+        }
+      },
+
+      save: function() {
+        this.savedRangeInfo = rangeSaveRestore.save(this.range);
+        this.savedRangeInfo.host = this.host;
+      },
+
+      restore: function() {
+        if (this.savedRangeInfo) {
+          this.host = this.savedRangeInfo.host;
+          this.range = rangeSaveRestore.restore(this.host, this.savedRangeInfo);
+          this.savedRangeInfo = undefined;
+        } else {
+          error('Could not restore selection');
+        }
       },
 
       equals: function(cursor) {

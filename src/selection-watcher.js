@@ -23,10 +23,9 @@ var selectionWatcher = (function() {
     // (on a mac hold down the command key to select multiple ranges)
     if (rangySelection.rangeCount) {
       var range = rangySelection.getRangeAt(0);
-      var editableSelector = '.' + config.editableClass;
-      var hostNode = $(range.commonAncestorContainer).closest(editableSelector);
-      if (hostNode.length) {
-        return new RangeContainer(hostNode[0], range);
+      var hostNode = parser.getHost(range.commonAncestorContainer);
+      if (hostNode) {
+        return new RangeContainer(hostNode, range);
       }
     }
 

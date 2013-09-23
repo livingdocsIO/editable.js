@@ -119,9 +119,9 @@ var behavior = (function() {
         return;
 
       if(container.childNodes.length > 0)
-        cursor.moveAfter(container.lastChild);
+        cursor.moveAtEnd(container);
       else
-        cursor.moveBefore(container);
+        cursor.moveAtBeginning(container);
       cursor.setSelection();
 
       fragment = document.createDocumentFragment();
@@ -133,10 +133,11 @@ var behavior = (function() {
 
       merger.parentNode.removeChild(merger);
 
-      range = rangeSaveRestore.save(cursor.range);
+      cursor.save();
       content.normalizeTags(container);
       content.normalizeSpaces(container);
-      rangeSaveRestore.restore(element, range);
+      cursor.restore();
+      cursor.setSelection();
     },
 
     empty: function(element) {
@@ -151,15 +152,15 @@ var behavior = (function() {
       switch(direction) {
       case 'before':
         previous = block.previous(element);
-        if(previous) {
-          cursor.moveAfter(previous);
+        if (previous) {
+          cursor.moveAtEnd(previous);
           cursor.setSelection();
         }
         break;
       case 'after':
         next = block.next(element);
-        if(next) {
-          cursor.moveBefore(next);
+        if (next) {
+          cursor.moveAtBeginning(next);
           cursor.setSelection();
         }
         break;
