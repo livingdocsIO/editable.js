@@ -69,7 +69,7 @@ var behavior = (function() {
         log('not at the end');
       }
 
-      cursor.update();
+      cursor.setSelection();
     },
 
     insert: function(element, direction, cursor) {
@@ -122,7 +122,7 @@ var behavior = (function() {
         cursor.moveAfter(container.lastChild);
       else
         cursor.moveBefore(container);
-      cursor.update();
+      cursor.setSelection();
 
       fragment = document.createDocumentFragment();
       chunks = merger.childNodes;
@@ -153,14 +153,14 @@ var behavior = (function() {
         previous = block.previous(element);
         if(previous) {
           cursor.moveAfter(previous);
-          cursor.update();
+          cursor.setSelection();
         }
         break;
       case 'after':
         next = block.next(element);
         if(next) {
           cursor.moveBefore(next);
-          cursor.update();
+          cursor.setSelection();
         }
         break;
       }
@@ -199,7 +199,7 @@ var behavior = (function() {
         content.normalizeSpaces(pasteElement);
         cursor.insertAfter(pasteElement);
         cursor.moveAfter(pasteElement);
-        cursor.update();
+        cursor.setSelection();
 
         element.removeAttribute(config.pastingAttribute);
       }, 0);

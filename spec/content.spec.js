@@ -125,6 +125,31 @@ describe('Content', function() {
     });
   });
 
+  describe('getTagsByName()', function() {
+
+    var range;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('filters outer tags', function() {
+      // <div><i><b>|a|</b></i></div>
+      var test = $('<div><i><b>a</b></i></div>');
+      range.setStart(test.find('b')[0], 0);
+      range.setEnd(test.find('b')[0], 1);
+      var tags = content.getTagsByName(test[0], range, 'b');
+      expect(content.getTagNames(tags)).toEqual(['B']);
+    });
+
+    it('filters inner tags', function() {
+      // <div>|<i><b>a</b></i>|</div>
+      var test = $('<div><i><b>a</b></i></div>');
+      range.setStart(test[0], 0);
+      range.setEnd(test[0], 1);
+      var tags = content.getTagsByName(test[0], range, 'i');
+      expect(content.getTagNames(tags)).toEqual(['I']);
+    });
+  });
 
   describe('wrap()', function() {
 
@@ -141,7 +166,112 @@ describe('Content', function() {
 
       content.wrap(range, '<em>')
       expect(host.html()).toEqual('<em>b</em>');
-    })
+    });
+  });
+
+
+  describe('isAffectedBy()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('detects a <b> tag', function() {
+      // <div><b>|a|</b></div>
+      host = $('<div><b>a</b></div>');
+      range.setStart(host.find('b')[0], 0);
+      range.setEnd(host.find('b')[0], 1);
+
+      expect(content.isAffectedBy(host[0], range, 'b')).toEqual(true);
+      expect(content.isAffectedBy(host[0], range, 'strong')).toEqual(false);
+    });
+  });
+
+  describe('containsString()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('finds a character in the range', function() {
+      // <div>|ab|c</div>
+      host = $('<div>abc</div>');
+      range.setStart(host[0].firstChild, 0);
+      range.setEnd(host[0].firstChild, 2);
+
+      expect(content.containsString(range, 'a')).toEqual(true);
+      expect(content.containsString(range, 'b')).toEqual(true);
+      expect(content.containsString(range, 'c')).toEqual(false);
+    });
+  });
+
+  describe('deleteCharacter()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('removes a character in the range and preserves the range', function() {
+      // <div>|ab|c</div>
+      host = $('<div>abc</div>');
+      range.setStart(host[0].firstChild, 0);
+      range.setEnd(host[0].firstChild, 2);
+
+      range = content.deleteCharacter(host[0], range, 'a');
+      expect(host.html()).toEqual('bc');
+
+      // show resulting text nodes
+      expect(host[0].childNodes.length).toEqual(1);
+      expect(host[0].childNodes[0].nodeValue).toEqual('bc');
+
+      // check range. It should look like this:
+      // <div>|b|c</div>
+      expect(range.startContainer).toEqual(host[0]);
+      expect(range.startOffset).toEqual(0);
+      expect(range.endContainer).toEqual(host[0].firstChild);
+      expect(range.endOffset).toEqual(1);
+      expect(range.toString()).toEqual('b');
+    });
+
+    it('works with a partially selected tag', function() {
+      // <div>|a<em>b|b</em></div>
+      host = $('<div>a<em>bb</em></div>');
+      range.setStart(host[0].firstChild, 0);
+      range.setEnd(host.find('em')[0].firstChild, 1);
+
+      range = content.deleteCharacter(host[0], range, 'b');
+      expect(host.html()).toEqual('a<em>b</em>');
+
+      // show resulting nodes
+      expect(host[0].childNodes.length).toEqual(2);
+      expect(host[0].childNodes[0].nodeValue).toEqual('a');
+      expect(host[0].childNodes[1].tagName).toEqual('EM');
+    });
+  });
+
+
+  describe('toggleTag()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('toggles a <b> tag', function() {
+      // <div><b>|a|</b></div>
+      host = $('<div><b>a</b></div>');
+      range.setStart(host.find('b')[0], 0);
+      range.setEnd(host.find('b')[0], 1);
+
+      range = content.toggleTag(host[0], range, $('<b>')[0])
+      expect(host.html()).toEqual('a');
+
+      content.toggleTag(host[0], range, $('<b>')[0])
+      expect(host.html()).toEqual('<b>a</b>');
+    });
   });
 
 
@@ -192,47 +322,46 @@ describe('Content', function() {
   });
 
 
-  describe('link()', function() {
+  describe('forceWrap()', function() {
 
     var range, host;
     beforeEach(function() {
       range = rangy.createRange();
     });
 
-    it('adds a link with href', function() {
+    it('adds a link with an href attribute', function() {
       // <div>|b|</div>
       host = $('<div>b</div>');
       range.setStart(host[0], 0);
       range.setEnd(host[0], 1);
-      var attrs = {
-        href: 'www.link.io',
-      };
-      content.link(host[0], range, attrs);
+
+      var $link = $('<a>');
+      $link.attr('href', 'www.link.io');
+
+      content.forceWrap(host[0], range, $link[0]);
       expect(host.html()).toEqual('<a href="www.link.io">b</a>');
     });
 
-    it('does not nest links', function() {
-      // <div>|<a>b</a>|</div>
-      host = $('<div><a>b</a></div>');
+    it('does not nest tags', function() {
+      // <div>|<em>b</em>|</div>
+      host = $('<div><em>b</em></div>');
       range.setStart(host[0], 0);
       range.setEnd(host[0], 1);
-      var attrs = {
-        href: 'www.link.io',
-      };
-      content.link(host[0], range, attrs);
-      expect(host.html()).toEqual('<a href="www.link.io">b</a>');
+
+      var $em = $('<em>');
+      content.forceWrap(host[0], range, $em[0]);
+      expect(host.html()).toEqual('<em>b</em>');
     });
 
-    it('removes partially selected links', function() {
-      // <div><a>b|c|</a></div>
-      host = $('<div><a>bc</a></div>');
-      range.setStart(host.find('a')[0].firstChild, 1);
-      range.setEnd(host.find('a')[0].firstChild, 2);
-      var attrs = {
-        href: 'www.link.io',
-      };
-      content.link(host[0], range, attrs);
-      expect(host.html()).toEqual('b<a href="www.link.io">c</a>');
+    it('removes partially selected tags', function() {
+      // <div><em>b|c|</em></div>
+      host = $('<div><em>bc</em></div>');
+      range.setStart(host.find('em')[0].firstChild, 1);
+      range.setEnd(host.find('em')[0].firstChild, 2);
+
+      var $em = $('<em>');
+      content.forceWrap(host[0], range, $em[0]);
+      expect(host.html()).toEqual('b<em>c</em>');
     });
   });
 
@@ -288,6 +417,84 @@ describe('Content', function() {
       expect(range.startOffset).toEqual(1);
       expect(range.endContainer).toEqual(host.find('i')[0]);
       expect(range.endOffset).toEqual(3);
+    });
+  });
+
+  describe('isExactSelection()', function() {
+
+    var range, host;
+    beforeEach(function() {
+      range = rangy.createRange();
+    });
+
+    it('is true if the selection is directly outside the tag', function() {
+      // <div>|<em>b</em>|</div>
+      host = $('<div><em>b</em></div>');
+      range.setStart(host[0], 0);
+      range.setEnd(host[0], 1);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(true);
+    });
+
+    it('is true if the selection is directly inside the tag', function() {
+      // <div><em>|b|</em></div>
+      host = $('<div><em>b</em></div>');
+      range.setStart(host.find('em')[0], 0);
+      range.setEnd(host.find('em')[0], 1);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(true);
+    });
+
+    it('is false if the selection goes beyond the tag', function() {
+      // <div>|a<em>b</em>|</div>
+      host = $('<div>a<em>b</em></div>');
+      range.setStart(host[0], 0);
+      range.setEnd(host[0], 2);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(false);
+    });
+
+    it('is false if the selection is only partial', function() {
+      // <div><em>a|b|</em></div>
+      host = $('<div><em>ab</em></div>');
+      range.setEnd(host.find('em')[0].firstChild, 1);
+      range.setEnd(host.find('em')[0].firstChild, 2);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(false);
+    });
+
+    it('is false for a collapsed range', function() {
+      // <div><em>a|b</em></div>
+      host = $('<div><em>ab</em></div>');
+      range.setEnd(host.find('em')[0].firstChild, 1);
+      range.setEnd(host.find('em')[0].firstChild, 1);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(false);
+    });
+
+    it('is false for a collapsed range in an empty tag', function() {
+      // <div><em>|</em></div>
+      host = $('<div><em></em></div>');
+      range.setEnd(host.find('em')[0], 0);
+      range.setEnd(host.find('em')[0], 0);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(false);
+    });
+
+    it('is false if range and elem do not overlap but have the same content', function() {
+      // <div>|b|<em>b</em></div>
+      host = $('<div>b<em>b</em></div>');
+      range.setEnd(host[0].firstChild, 0);
+      range.setEnd(host[0].firstChild, 1);
+
+      var exact = content.isExactSelection(range, host.find('em')[0]);
+      expect(exact).toEqual(false);
     });
   });
 });

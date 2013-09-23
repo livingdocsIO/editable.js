@@ -85,30 +85,31 @@ var content = (function() {
     /**
      * Get all tags that start or end inside the range
      */
-    getTags: function(host, range) {
-      var tags = this.getInnerTags(range);
+    getTags: function(host, range, filterFunc) {
+      var tags = this.getInnerTags(range, filterFunc);
 
       // get all tags that surround the range
       var node = range.commonAncestorContainer;
       while (node !== host) {
-        tags.push(node);
+        if (!filterFunc || filterFunc(node)) {
+          tags.push(node);
+        }
         node = node.parentNode;
       }
       return tags;
     },
 
+    getTagsByName: function(host, range, tagName) {
+      return this.getTags(host, range, function(node) {
+        return node.nodeName === tagName.toUpperCase();
+      });
+    },
+
     /**
      * Get all tags that start or end inside the range
      */
-    getInnerTags: function(range) {
-      var tags = [], node;
-
-      var iterator = range.createNodeIterator();
-      while( (node = iterator.next()) ) {
-        if (node.nodeType === 1)
-          tags.push(node);
-      }
-      return tags;
+    getInnerTags: function(range, filterFunc) {
+      return range.getNodes([1], filterFunc);
     },
 
     /**
@@ -119,10 +120,86 @@ var content = (function() {
      */
     getTagNames: function(elements) {
       var names = [];
-      for (var i=0; i < elements.length; i++) {
+      if (!elements) return names;
+
+      for (var i = 0; i < elements.length; i++) {
         names.push(elements[i].nodeName);
       }
       return names;
+    },
+
+    isAffectedBy: function(host, range, tagName) {
+      var elem;
+      var tags = this.getTags(host, range);
+      for (var i = 0; i < tags.length; i++) {
+        elem = tags[i];
+        if (elem.nodeName === tagName.toUpperCase()) {
+          return true;
+        }
+      }
+
+      return false;
+    },
+
+    /**
+     * Check if the range selects all of the elements contents,
+     * not less or more.
+     *
+     * @param visible: Only compare visible text. That way it does not
+     *   matter if the user selects an additional whitespace or not.
+     */
+    isExactSelection: function(range, elem, visible) {
+      var elemRange = rangy.createRange();
+      elemRange.selectNodeContents(elem);
+      if (range.intersectsRange(elemRange)) {
+        var rangeText = range.toString();
+        var elemText = $(elem).text();
+
+        if (visible) {
+          rangeText = string.trim(rangeText);
+          elemText = string.trim(elemText);
+        }
+
+        return rangeText !== '' && rangeText === elemText;
+      } else {
+        return false;
+      }
+    },
+
+    expandTo: function(host, range, elem) {
+      range.selectNodeContents(elem);
+      return range;
+    },
+
+    toggleTag: function(host, range, elem) {
+      var elems = this.getTagsByName(host, range, elem.nodeName);
+
+      if (elems.length === 1 &&
+          this.isExactSelection(range, elems[0], 'visible')) {
+        return this.removeFormatting(host, range, elem.nodeName);
+      }
+
+      return this.forceWrap(host, range, elem);
+    },
+
+    isWrappable: function(range) {
+      return range.canSurroundContents();
+    },
+
+    forceWrap: function(host, range, elem) {
+      range = restoreRange(host, range, function(){
+        this.nuke(host, range, elem.nodeName);
+      });
+
+      // remove all tags if the range is not wrappable
+      if (!this.isWrappable(range)) {
+        range = restoreRange(host, range, function(){
+          this.nuke(host, range);
+        });
+      }
+
+      this.wrap(range, elem);
+      return range;
     },
 
     wrap: function(range, elem) {
@@ -141,34 +218,6 @@ var content = (function() {
       $(elem).contents().unwrap();
     },
 
-    isWrappable: function(range) {
-      return range.canSurroundContents();
-    },
-
-    forceWrap: function(host, range, elem) {
-      range = restoreRange(host, range, function(){
-        this.nuke(host, range, elem.tagName);
-      });
-
-      // remove all tags if the range is not wrappable
-      if (!this.isWrappable(range)) {
-        range = restoreRange(host, range, function(){
-          this.nuke(host, range);
-        });
-      }
-
-      this.wrap(range, elem);
-      return range;
-    },
-
-    link: function(host, range, attrs) {
-      var $elem = $('<a>');
-      for (var name in attrs) {
-        $elem.attr(name, attrs[name]);
-      }
-      return this.forceWrap(host, range, $elem[0]);
-    },
-
     removeFormatting: function(host, range, tagName) {
       return restoreRange(host, range, function(){
         this.nuke(host, range, tagName);
@@ -183,7 +232,7 @@ var content = (function() {
       var tags = this.getTags(host, range);
       for (var i = 0; i < tags.length; i++) {
         var elem = tags[i];
-        if ( !tagName || elem.tagName === tagName.toUpperCase() ) {
+        if ( !tagName || elem.nodeName === tagName.toUpperCase() ) {
           this.unwrap(elem);
         }
       }
@@ -211,11 +260,45 @@ var content = (function() {
 
     /**
      * Surround the range with characters like start and end quotes.
+     *
+     * @method surround
      */
     surround: function(host, range, startCharacter, endCharacter) {
       if (!endCharacter) endCharacter = startCharacter;
       this.insertCharacter(range, endCharacter, false);
       this.insertCharacter(range, startCharacter, true);
+      return range;
+    },
+
+    /**
+     * Removes a character from the text within a range.
+     *
+     * @method deleteCharacter
+     */
+    deleteCharacter: function(host, range, character) {
+      if (this.containsString(range, character)) {
+        range.splitBoundaries();
+        range = restoreRange(host, range, function() {
+          var charRegexp = string.regexp(character);
+
+          var textNodes = range.getNodes([3], function(node) {
+            return node.nodeValue.search(charRegexp) >= 0;
+          });
+
+          for(var i = 0; i < textNodes.length; i++) {
+            var node = textNodes[i];
+            node.nodeValue = node.nodeValue.replace(charRegexp, '');
+          }
+        });
+        range.normalizeBoundaries();
+      }
+
+      return range;
+    },
+
+    containsString: function(range, str) {
+      var text = range.toString();
+      return text.indexOf(str) >= 0;
     },
 
     /**
@@ -226,7 +309,7 @@ var content = (function() {
       var tags = this.getTags(host, range);
       for (var i = 0; i < tags.length; i++) {
         var elem = tags[i];
-        if (elem.tagName === tagName)
+        if (elem.nodeName === tagName)
           this.unwrap(elem);
       }
     }
