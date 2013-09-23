@@ -16,15 +16,11 @@ var selectionWatcher = (function() {
    * otherwise return an empty RangeContainer
    */
   var getRangeContainer = function() {
-    if (rangySelection) {
-      rangySelection.refresh();
-    } else {
-      rangySelection = rangy.getSelection();
-    }
+    rangySelection = rangy.getSelection();
 
     // rangeCount is 0 or 1 in all browsers except firefox
     // firefox can work with multiple ranges
-    // (I don't know if this occurs from normal use though)
+    // (on a mac hold down the command key to select multiple ranges)
     if (rangySelection.rangeCount) {
       var range = rangySelection.getRangeAt(0);
       var editableSelector = '.' + config.editableClass;
