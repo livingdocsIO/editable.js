@@ -7,7 +7,7 @@ describe('Dispatcher', function() {
   // create a Cursor object and set the selection to it
   var createCursor = function(range) {
     var cursor = new Cursor(editable, range);
-    cursor.update();
+    cursor.setSelection();
     return cursor;
   };
 
