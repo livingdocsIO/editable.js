@@ -4,10 +4,10 @@ describe('Cursor', function() {
     expect(Cursor).toBeDefined();
   });
 
-  describe('with a range', function() {
+  describe('with a collapsed range at the end', function() {
 
     beforeEach(function() {
-      this.oneWord = $('<div>foobar</div>')[0];
+      this.oneWord = $('<div class="'+ config.editableClass +'">foobar</div>')[0];
       this.range = rangy.createRange();
       this.range.selectNodeContents(this.oneWord);
       this.range.collapse(false);
@@ -24,6 +24,32 @@ describe('Cursor', function() {
       expect(this.range.endContainer).toEqual(this.oneWord);
       expect(this.range.startOffset).toEqual(1);
       expect(this.range.endOffset).toEqual(1);
+    });
+
+    describe('isAtEnd()', function() {
+      it('is true', function() {
+        expect(this.cursor.isAtEnd()).toBe(true);
+      });
+    });
+
+    describe('isAtBeginning()', function() {
+      it('is false', function() {
+        expect(this.cursor.isAtBeginning()).toBe(false);
+      });
+    });
+
+    describe('save() and restore()', function() {
+
+      it('saves and restores the cursor', function() {
+        this.cursor.save();
+
+        // move the cursor so we can check the restore method.
+        this.cursor.moveAtBeginning();
+        expect(this.cursor.isAtBeginning()).toBe(true);
+
+        this.cursor.restore();
+        expect(this.cursor.isAtEnd()).toBe(true);
+      });
     });
   });
 

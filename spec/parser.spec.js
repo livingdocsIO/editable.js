@@ -31,6 +31,28 @@ describe('Parser', function() {
   var linkWithSpan = $('<div><a href="#">foo <span class="important">bar</span></a></div>')[0];
 
 
+  describe('getHost()', function() {
+
+    beforeEach(function() {
+      this.$host = $('<div class="'+ config.editableClass +'""></div>');
+    });
+
+    it('works if host is passed', function() {
+      expect( parser.getHost(this.$host[0]) ).toBe( this.$host[0] );
+    });
+
+    it('works if a child of host is passed', function() {
+      this.$host.html('a<em>b</em>');
+      expect( parser.getHost(this.$host.find('em')[0]) ).toBe( this.$host[0] );
+    });
+
+    it('works if a text node is passed', function() {
+      this.$host.html('a<em>b</em>');
+      expect( parser.getHost(this.$host[0].firstChild) ).toBe( this.$host[0] );
+    });
+  });
+
+
   describe('getNodeIndex()', function() {
 
     it('gets element index of link in text', function() {
