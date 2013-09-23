@@ -57,7 +57,7 @@ var dispatcher = (function() {
         return;
 
       cursor = selectionWatcher.getSelection();
-      if (cursor.isSelection) return;
+      if (!cursor || cursor.isSelection) return;
 
       // Detect if the browser moved the cursor in the next tick.
       // If the cursor stays at its position, fire the switch event.
