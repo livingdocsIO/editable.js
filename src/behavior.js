@@ -133,10 +133,11 @@ var behavior = (function() {
 
       merger.parentNode.removeChild(merger);
 
-      range = rangeSaveRestore.save(cursor.range);
+      cursor.save();
       content.normalizeTags(container);
       content.normalizeSpaces(container);
-      rangeSaveRestore.restore(element, range);
+      cursor.restore();
+      cursor.setSelection();
     },
 
     empty: function(element) {
