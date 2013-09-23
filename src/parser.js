@@ -32,6 +32,19 @@ var parser = (function() {
   return {
 
     /**
+     * Get the editableJS host block of a node.
+     *
+     * @method getHost
+     * @param {DOM Node}
+     * @return {DOM Node}
+     */
+    getHost: function(node) {
+      var editableSelector = '.' + config.editableClass;
+      var hostNode = $(node).closest(editableSelector);
+      return hostNode.length ? hostNode[0] : undefined;
+    },
+
+    /**
      * Get the index of a node.
      * So that parent.childNodes[ getIndex(node) ] would return the node again
      *
