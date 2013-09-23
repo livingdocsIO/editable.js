@@ -52,25 +52,25 @@
 
     $(document).on('click', '.js-format-bold', function(event) {
       if (lastSelection.isSelection) {
-        lastSelection.makeBold();
+        lastSelection.toggleBold();
       }
     });
 
     $(document).on('click', '.js-format-italic', function(event) {
       if (lastSelection.isSelection) {
-        lastSelection.giveEmphasis();
+        lastSelection.toggleEmphasis();
       }
     });
 
     $(document).on('click', '.js-format-link', function(event) {
       if (lastSelection.isSelection) {
-        lastSelection.link('www.upfront.io');
+        lastSelection.toggleLink('www.upfront.io');
       }
     });
 
     $(document).on('click', '.js-format-quote', function(event) {
       if (lastSelection.isSelection) {
-        lastSelection.surround('«', '»');
+        lastSelection.toggleSurround('«', '»');
       }
     });
 
