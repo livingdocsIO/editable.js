@@ -119,7 +119,7 @@ var behavior = (function() {
         return;
 
       if(container.childNodes.length > 0)
-        cursor.moveAtEnd(container);
+        cursor.moveAtEnd(parser.latestChild(container));
       else
         cursor.moveAtBeginning(container);
       cursor.setSelection();
