@@ -238,6 +238,20 @@ var parser = (function() {
       }
 
       return true;
+    },
+
+    /**
+     * Return the deepest last child of a node.
+     *
+     * @method  latestChild
+     * @param  {HTMLElement} container The container to iterate on.
+     * @return {HTMLElement}           THe deepest last child in the container.
+     */
+    latestChild: function(container) {
+      if(container.lastChild)
+        return this.latestChild(container.lastChild);
+      else
+        return container;
     }
   };
 })();

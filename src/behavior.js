@@ -119,7 +119,7 @@ var behavior = (function() {
         return;
 
       if(container.childNodes.length > 0)
-        cursor.moveAtEnd(container);
+        cursor.moveAtTextEnd(container);
       else
         cursor.moveAtBeginning(container);
       cursor.setSelection();
@@ -153,7 +153,7 @@ var behavior = (function() {
       case 'before':
         previous = block.previous(element);
         if (previous) {
-          cursor.moveAtEnd(previous);
+          cursor.moveAtTextEnd(previous);
           cursor.setSelection();
         }
         break;

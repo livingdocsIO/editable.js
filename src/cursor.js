@@ -147,6 +147,10 @@ var Cursor = (function() {
         if (this.isSelection) return new Cursor(this.host, this.range);
       },
 
+      moveAtTextEnd: function(element) {
+        return this.moveAtEnd(parser.latestChild(element));
+      },
+
       setHost: function(element) {
         this.host = parser.getHost(element);
         if (!this.host) {

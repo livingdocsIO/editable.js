@@ -351,5 +351,13 @@ describe('Parser', function() {
     });
   });
 
-});
 
+  describe('latestChild()', function() {
+    it('returns the deepest last child', function() {
+      var source = linkWithSpan;
+      var target = document.createTextNode('bar');
+      expect(parser.latestChild(source).isEqualNode(target)).toEqual(true);
+    });
+  });
+
+});
