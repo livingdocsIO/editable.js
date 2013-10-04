@@ -125,10 +125,10 @@ var dispatcher = (function() {
       var range = selectionWatcher.getFreshRange();
       var cursor = range.forceCursor();
 
-      if (cursor.isAtBeginning()) {
-        notifier('insert', this, 'before', cursor);
-      } else if(cursor.isAtTextEnd()) {
+      if (cursor.isAtTextEnd()) {
         notifier('insert', this, 'after', cursor);
+      } else if(cursor.isAtBeginning()) {
+        notifier('insert', this, 'before', cursor);
       } else {
         notifier('split', this, cursor.before(), cursor.after(), cursor);
       }
