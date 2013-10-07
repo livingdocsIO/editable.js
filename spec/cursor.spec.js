@@ -27,12 +27,14 @@ describe('Cursor', function() {
     });
 
     describe('isAtEnd()', function() {
+
       it('is true', function() {
         expect(this.cursor.isAtEnd()).toBe(true);
       });
     });
 
     describe('isAtBeginning()', function() {
+
       it('is false', function() {
         expect(this.cursor.isAtBeginning()).toBe(false);
       });
@@ -51,6 +53,28 @@ describe('Cursor', function() {
         expect(this.cursor.isAtEnd()).toBe(true);
       });
     });
-  });
 
+    describe('insertAfter()', function() {
+
+      it('can deal with an empty documentFragment', function() {
+        var test = function() {
+          var frag = window.document.createDocumentFragment();
+          this.cursor.insertAfter(frag);
+        }
+        expect($.proxy(test, this)).not.toThrow();
+      });
+    });
+
+    describe('insertBefore()', function() {
+
+      it('can deal with an empty documentFragment', function() {
+        var test = function() {
+          var frag = window.document.createDocumentFragment();
+          this.cursor.insertBefore(frag);
+        }
+        expect($.proxy(test, this)).not.toThrow();
+      });
+    });
+
+  });
 });

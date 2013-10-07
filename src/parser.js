@@ -252,6 +252,23 @@ var parser = (function() {
         return this.latestChild(container.lastChild);
       else
         return container;
+    },
+
+    /**
+     * Checks if a documentFragment has no children.
+     * Fragments without children can cause errors if inserted into ranges.
+     *
+     * @method  isDocumentFragmentWithoutChildren
+     * @param  {HTMLElement} DOM node.
+     * @return {Boolean}
+     */
+    isDocumentFragmentWithoutChildren: function(fragment) {
+      if (fragment &&
+          fragment.nodeType === 11 &&
+          fragment.childNodes.length === 0) {
+        return true;
+      }
+      return false;
     }
   };
 })();
