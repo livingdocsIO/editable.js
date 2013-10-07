@@ -7,7 +7,7 @@ var folderMount = function folderMount(connect, point) {
   return connect.static(path.resolve(point));
 };
 
-module.exports = function (grunt) {
+module.exports = function(grunt) {
 
   // load all grunt tasks
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
@@ -50,7 +50,7 @@ module.exports = function (grunt) {
         options: {
           port: 9001,
           hostname: '0.0.0.0',
-          middleware: function (connect, options) {
+          middleware: function(connect, options) {
             return [
               folderMount(connect, options.base)
             ];

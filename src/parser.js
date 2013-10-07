@@ -169,22 +169,22 @@ var parser = (function() {
       }
     },
 
-    isStartOffset: function (container, offset) {
+    isStartOffset: function(container, offset) {
       if (container.nodeType === 3) {
         return offset === 0;
       } else {
-        if(container.childNodes.length === 0)
+        if (container.childNodes.length === 0)
           return true;
         else
           return container.childNodes[offset] === container.firstChild;
       }
     },
 
-    isEndOffset: function (container, offset) {
+    isEndOffset: function(container, offset) {
       if (container.nodeType === 3) {
         return offset === container.length;
       } else {
-        if(container.childNodes.length === 0)
+        if (container.childNodes.length === 0)
           return true;
         else if (offset > 0)
           return container.childNodes[offset - 1] === container.lastChild;
@@ -210,7 +210,7 @@ var parser = (function() {
       }
     },
 
-    isTextEndOffset: function (container, offset) {
+    isTextEndOffset: function(container, offset) {
       if (container.nodeType === 3) {
         var text = string.trimRight(container.nodeValue);
         return offset >= text.length;
@@ -225,15 +225,15 @@ var parser = (function() {
     isSameNode: function(target, source) {
       var i, len, attr;
 
-      if(target.nodeType !== source.nodeType)
+      if (target.nodeType !== source.nodeType)
         return false;
 
-      if(target.nodeName !== source.nodeName)
+      if (target.nodeName !== source.nodeName)
         return false;
 
-      for(i = 0, len = target.attributes.length; i < len; i++) {
+      for (i = 0, len = target.attributes.length; i < len; i++) {
         attr = target.attributes[i];
-        if(source.getAttribute(attr.name) !== attr.value)
+        if (source.getAttribute(attr.name) !== attr.value)
           return false;
       }
 
@@ -248,7 +248,7 @@ var parser = (function() {
      * @return {HTMLElement}           THe deepest last child in the container.
      */
     latestChild: function(container) {
-      if(container.lastChild)
+      if (container.lastChild)
         return this.latestChild(container.lastChild);
       else
         return container;

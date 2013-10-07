@@ -24,10 +24,10 @@ var dispatcher = (function() {
    */
   var setupElementEvents = function($document, notifier) {
     $document.on('focus.editable', editableSelector, function(event) {
-      if(this.getAttribute(config.pastingAttribute)) return;
+      if (this.getAttribute(config.pastingAttribute)) return;
       notifier('focus', this);
     }).on('blur.editable', editableSelector, function(event) {
-      if(this.getAttribute(config.pastingAttribute)) return;
+      if (this.getAttribute(config.pastingAttribute)) return;
       notifier('blur', this);
     }).on('copy.editable', editableSelector, function(event) {
       log('Copy');
@@ -111,7 +111,7 @@ var dispatcher = (function() {
       var range = selectionWatcher.getFreshRange();
       if (range.isCursor) {
         var cursor = range.getCursor();
-        if(cursor.isAtTextEnd()) {
+        if (cursor.isAtTextEnd()) {
           event.preventDefault();
           event.stopPropagation();
           notifier('merge', this, 'after', cursor);
@@ -127,7 +127,7 @@ var dispatcher = (function() {
 
       if (cursor.isAtTextEnd()) {
         notifier('insert', this, 'after', cursor);
-      } else if(cursor.isAtBeginning()) {
+      } else if (cursor.isAtBeginning()) {
         notifier('insert', this, 'before', cursor);
       } else {
         notifier('split', this, cursor.before(), cursor.after(), cursor);
@@ -241,7 +241,7 @@ var dispatcher = (function() {
       if (eventListeners === undefined) return;
 
       for (var i=0, len=eventListeners.length; i < len; i++) {
-        if(eventListeners[i].apply(
+        if (eventListeners[i].apply(
             Editable,
             Array.prototype.slice.call(arguments).splice(1)
         ) === false)
@@ -263,7 +263,7 @@ var dispatcher = (function() {
       listeners = {};
       // TODO check the config.event object to prevent
       // registering invalid handlers
-      for(eventType in config.event) {
+      for (eventType in config.event) {
         this.addListener(eventType, config.event[eventType]);
       }
 

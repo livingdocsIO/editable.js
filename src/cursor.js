@@ -174,13 +174,13 @@ var Cursor = (function() {
       },
 
       equals: function(cursor) {
-        if(!cursor) return false;
+        if (!cursor) return false;
 
-        if(!cursor.host) return false;
-        if(!cursor.host.isEqualNode(this.host)) return false;
+        if (!cursor.host) return false;
+        if (!cursor.host.isEqualNode(this.host)) return false;
 
-        if(!cursor.range) return false;
-        if(!cursor.range.equals(this.range)) return false;
+        if (!cursor.range) return false;
+        if (!cursor.range.equals(this.range)) return false;
 
         return true;
       }

@@ -32,7 +32,7 @@ var keyboard = (function() {
     if (eventListeners === undefined) return;
 
     for (var i=0, len=eventListeners.length; i < len; i++) {
-      if(eventListeners[i].apply(
+      if (eventListeners[i].apply(
           context,
           Array.prototype.slice.call(arguments).splice(2)
       ) === false)

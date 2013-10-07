@@ -21,18 +21,18 @@ var content = (function() {
 
       for (i = 0; i < element.childNodes.length; i++) {
         node = element.childNodes[i];
-        if(!node) continue;
+        if (!node) continue;
 
         // skip empty tags, so they'll get removed
-        if(node.nodeName !== 'BR' && !node.textContent) continue;
+        if (node.nodeName !== 'BR' && !node.textContent) continue;
 
-        if(node.nodeType === 1 && node.nodeName !== 'BR') {
+        if (node.nodeType === 1 && node.nodeName !== 'BR') {
           sibling = node;
-          while((sibling = sibling.nextSibling) !== null) {
-            if(!parser.isSameNode(sibling, node))
+          while ((sibling = sibling.nextSibling) !== null) {
+            if (!parser.isSameNode(sibling, node))
               break;
 
-            for(j = 0; j < sibling.childNodes.length; j++) {
+            for (j = 0; j < sibling.childNodes.length; j++) {
               node.appendChild(sibling.childNodes[j].cloneNode(true));
             }
 
@@ -71,9 +71,9 @@ var content = (function() {
     normalizeSpaces: function(element) {
       var nonBreakingSpace = '\u00A0';
 
-      if(!element) return;
+      if (!element) return;
 
-      if(element.nodeType === 3) {
+      if (element.nodeType === 3) {
         element.nodeValue = element.nodeValue.replace(/^(\s)/, nonBreakingSpace).replace(/(\s)$/, nonBreakingSpace);
       }
       else {
@@ -207,7 +207,7 @@ var content = (function() {
         $(elem)[0] :
         elem;
 
-      if(this.isWrappable(range)) {
+      if (this.isWrappable(range)) {
         var a = range.surroundContents(elem);
       } else {
         console.log('content.wrap(): can not surround range');
@@ -285,7 +285,7 @@ var content = (function() {
             return node.nodeValue.search(charRegexp) >= 0;
           });
 
-          for(var i = 0; i < textNodes.length; i++) {
+          for (var i = 0; i < textNodes.length; i++) {
             var node = textNodes[i];
             node.nodeValue = node.nodeValue.replace(charRegexp, '');
           }

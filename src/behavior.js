@@ -55,7 +55,7 @@ var behavior = (function() {
       var br = document.createElement('br');
       cursor.insertBefore(br);
 
-      if(atEnd) {
+      if (atEnd) {
         log('at the end');
 
         var noWidthSpace = document.createTextNode('\u200B');
@@ -76,9 +76,9 @@ var behavior = (function() {
       log('Default insert ' + direction + ' behavior');
       var parent = element.parentNode;
       var newElement = element.cloneNode(false);
-      if(newElement.id) newElement.removeAttribute('id');
+      if (newElement.id) newElement.removeAttribute('id');
 
-      switch(direction) {
+      switch (direction) {
       case 'before':
         parent.insertBefore(newElement, element);
         element.focus();
@@ -104,7 +104,7 @@ var behavior = (function() {
       log('Default merge ' + direction + ' behavior');
       var container, merger, fragment, chunks, i, newChild, range;
 
-      switch(direction) {
+      switch (direction) {
       case 'before':
         container = block.previous(element);
         merger = element;
@@ -115,10 +115,10 @@ var behavior = (function() {
         break;
       }
 
-      if(!(container && merger))
+      if (!(container && merger))
         return;
 
-      if(container.childNodes.length > 0)
+      if (container.childNodes.length > 0)
         cursor.moveAtTextEnd(container);
       else
         cursor.moveAtBeginning(container);
@@ -126,7 +126,7 @@ var behavior = (function() {
 
       fragment = document.createDocumentFragment();
       chunks = merger.childNodes;
-      for(i = 0; i < chunks.length; i++) {
+      for (i = 0; i < chunks.length; i++) {
         fragment.appendChild(chunks[i].cloneNode(true));
       }
       newChild = container.appendChild(fragment);
@@ -149,7 +149,7 @@ var behavior = (function() {
 
       var next, previous;
 
-      switch(direction) {
+      switch (direction) {
       case 'before':
         previous = block.previous(element);
         if (previous) {
@@ -175,11 +175,11 @@ var behavior = (function() {
       log('Default clipboard behavior');
       var pasteHolder, sel;
 
-      if(action !== 'paste') return;
+      if (action !== 'paste') return;
 
       element.setAttribute(config.pastingAttribute, true);
 
-      if(cursor.isSelection) {
+      if (cursor.isSelection) {
         cursor = cursor.deleteContent();
       }
 
