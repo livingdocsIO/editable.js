@@ -361,3 +361,29 @@ describe('Parser', function() {
   });
 
 });
+
+describe('isDocumentFragmentWithoutChildren()', function() {
+
+  beforeEach(function() {
+    this.frag = window.document.createDocumentFragment();
+  });
+
+  it('returns truthy for a fragment with no children', function() {
+    expect(parser.isDocumentFragmentWithoutChildren(this.frag)).toBeTruthy()
+  });
+
+  it('returns falsy for a documentFragment with an empty text node as child', function() {
+    this.frag.appendChild(window.document.createTextNode());
+    expect(parser.isDocumentFragmentWithoutChildren(this.frag)).toBeFalsy()
+  });
+
+  it('returns falsy for undefined', function() {
+    expect(parser.isDocumentFragmentWithoutChildren(undefined)).toBeFalsy()
+  });
+
+  it('returns falsy for an element node', function() {
+    var node = $('<div>')[0];
+    expect(parser.isDocumentFragmentWithoutChildren(node)).toBeFalsy()
+  });
+
+});
