@@ -48,8 +48,9 @@ var Cursor = (function() {
        * @param DOM node or document fragment
        */
       insertBefore: function(element) {
-        var preceedingElement = element;
+        if (parser.isDocumentFragmentWithoutChildren(element)) return;
 
+        var preceedingElement = element;
         if (element.nodeType === 11) { // DOCUMENT_FRAGMENT_NODE
           var lastIndex = element.childNodes.length - 1;
           preceedingElement = element.childNodes[lastIndex];
@@ -66,6 +67,7 @@ var Cursor = (function() {
        * @param DOM node or document fragment
        */
       insertAfter: function(element) {
+        if (parser.isDocumentFragmentWithoutChildren(element)) return;
         this.range.insertNode(element);
       },
 
