@@ -1,4 +1,6 @@
 describe('TextRange', function() {
+  var toBeginning = true;
+  var toEnd = false;
 
   it('is defined', function() {
     expect(TextRange).toBeDefined();
@@ -11,7 +13,7 @@ describe('TextRange', function() {
       this.host = $('<div>ab</div>')[0]
       var range = rangy.createRange();
       range.selectNodeContents(this.host);
-      range.collapse(true);
+      range.collapse(toBeginning);
       this.textRange = new TextRange(this.host, range);
     });
 
@@ -45,7 +47,7 @@ describe('TextRange', function() {
       this.host = $('<div>ab</div>')[0]
       var range = rangy.createRange();
       range.selectNodeContents(this.host.firstChild);
-      range.collapse(true);
+      range.collapse(toBeginning);
       this.textRange = new TextRange(this.host, range);
     });
 
@@ -82,7 +84,7 @@ describe('TextRange', function() {
       this.host = $('<div>a</div>')[0]
       var range = rangy.createRange();
       range.selectNodeContents(this.host);
-      range.collapse(false);
+      range.collapse(toEnd);
       this.textRange = new TextRange(this.host, range);
     });
 
@@ -113,7 +115,7 @@ describe('TextRange', function() {
       this.host = $('<div>ab</div>')[0]
       var range = rangy.createRange();
       range.selectNodeContents(this.host.firstChild);
-      range.collapse(false);
+      range.collapse(toEnd);
       this.textRange = new TextRange(this.host, range);
     });
 
@@ -144,7 +146,7 @@ describe('TextRange', function() {
       this.host = $('<div><i>a</i>bc</div>')[0]
       var range = rangy.createRange();
       range.selectNodeContents($(this.host).find('i')[0]);
-      range.collapse(false);
+      range.collapse(toEnd);
       this.textRange = new TextRange(this.host, range);
     });
 
@@ -165,7 +167,7 @@ describe('TextRange', function() {
       this.host = $('<div>ab<i>c</i></div>')[0]
       var range = rangy.createRange();
       range.selectNodeContents($(this.host).find('i')[0]);
-      range.collapse(true);
+      range.collapse(toBeginning);
       this.textRange = new TextRange(this.host, range);
     });
 
