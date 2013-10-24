@@ -50,11 +50,11 @@ var TextRange = (function() {
       /**
        * Find the next TextNode with a length bigger than 0
        *
-       * Attention: if container should is a textNode
+       * Attention: if the container is a textNode
        * it will be included in the resutls
       **/
       findNextTextNode: function(container, offset) {
-        var textNodes = this.getTextNodes(container, offset, 'after')
+        var textNodes = this.getTextNodes(container, offset, 'after');
         for (var i = 0; i < textNodes.length; i++) {
           if (!parser.isVoidTextNode(textNodes[i])) {
             return textNodes[i];
@@ -65,11 +65,11 @@ var TextRange = (function() {
       /**
        * Find the previous TextNode with a length bigger than 0
        *
-       * Attention: if container should is a textNode
+       * Attention: if the container is a textNode
        * it will be included in the resutls
       **/
       findPreviousTextNode: function(container, offset) {
-        var textNodes = this.getTextNodes(container, offset, 'before')
+        var textNodes = this.getTextNodes(container, offset, 'before');
         for (var i = textNodes.length - 1; i >= 0; i--) {
           if (!parser.isVoidTextNode(textNodes[i])) {
             return textNodes[i];
@@ -80,7 +80,7 @@ var TextRange = (function() {
       getTextNodes: function(container, offset, beforeOrAfter) {
         var range = rangy.createRange();
         range.selectNodeContents(this.host);
-        var rangeMethod = beforeOrAfter === 'before' ? 'setEnd' : 'setStart'
+        var rangeMethod = beforeOrAfter === 'before' ? 'setEnd' : 'setStart';
         range[rangeMethod](container, offset);
         return range.getNodes([3]);
       },
@@ -96,7 +96,7 @@ var TextRange = (function() {
       isAtBeginningOfTextNode: function(textNode, offset) {
         return offset === 0;
       }
-    }
+    };
   })();
 
   return TextRange;
