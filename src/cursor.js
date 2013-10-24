@@ -42,6 +42,28 @@ var Cursor = (function() {
           this.range.startOffset);
       },
 
+      getPreviousCharacter: function() {
+        var textRange = new TextRange(this.host, this.range);
+        return textRange.previousCharacter();
+      },
+
+      getNextCharacter: function() {
+        var textRange = new TextRange(this.host, this.range);
+        return textRange.nextCharacter();
+      },
+
+      deletePreviousCharacter: function() {
+        var textRange = new TextRange(this.host, this.range);
+        textRange.expandLeft();
+        this.range.deleteContents();
+      },
+
+      deleteNextCharacter: function() {
+        var textRange = new TextRange(this.host, this.range);
+        textRange.expandRight();
+        this.range.deleteContents();
+      },
+
       /**
        * Insert content before the cursor
        *

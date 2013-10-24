@@ -94,5 +94,81 @@ describe('Cursor', function() {
       });
     });
 
+    describe('getPreviousCharacter()', function() {
+
+      it('gets an "r"', function() {
+        expect(this.cursor.getPreviousCharacter()).toEqual('r');
+      });
+    });
+
+    describe('getNextCharacter()', function() {
+
+      it('gets an empty string', function() {
+        expect(this.cursor.getNextCharacter()).toEqual('');
+      });
+    });
+
+    describe('deletePreviousCharacter()', function() {
+
+      it('deletes the previous character', function() {
+        expect($(this.oneWord).text()).toEqual('foobar');
+        this.cursor.deletePreviousCharacter();
+        expect(this.cursor.range.collapsed).toBe(true);
+        expect(this.cursor.range.isValid()).toBe(true);
+        expect($(this.oneWord).text()).toEqual('fooba');
+      });
+    });
+
+    describe('deleteNextCharacter()', function() {
+
+      it('does nothing', function() {
+        this.cursor.deleteNextCharacter();
+        expect($(this.oneWord).text()).toEqual('foobar');
+      });
+    });
+  });
+
+  describe('with a collapsed range at the beginning', function() {
+
+    beforeEach(function() {
+      this.oneWord = $('<div class="'+ config.editableClass +'">foobar</div>')[0];
+      this.range = rangy.createRange();
+      this.range.selectNodeContents(this.oneWord);
+      this.range.collapse(true);
+      this.cursor = new Cursor(this.oneWord, this.range);
+    });
+
+    describe('getPreviousCharacter()', function() {
+
+      it('gets an empty string', function() {
+        expect(this.cursor.getPreviousCharacter()).toEqual('');
+      });
+    });
+
+    describe('getNextCharacter()', function() {
+
+      it('gets an "f"', function() {
+        expect(this.cursor.getNextCharacter()).toEqual('f');
+      });
+    });
+
+    describe('deletePreviousCharacter()', function() {
+
+      it('does nothing', function() {
+        this.cursor.deletePreviousCharacter();
+        expect($(this.oneWord).text()).toEqual('foobar');
+      });
+    });
+
+    describe('deleteNextCharacter()', function() {
+
+      it('deletes the next character', function() {
+        expect($(this.oneWord).text()).toEqual('foobar');
+        this.cursor.deleteNextCharacter();
+        expect(this.cursor.range.collapsed).toBe(true);
+        expect(this.cursor.range.isValid()).toBe(true);
+        expect($(this.oneWord).text()).toEqual('oobar');
+      });
+    });
   });
 });

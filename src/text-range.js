@@ -19,8 +19,8 @@ var TextRange = (function() {
       },
 
       previousCharacter: function() {
-        var node = this.range.endContainer;
-        var offset = this.range.endOffset;
+        var node = this.range.startContainer;
+        var offset = this.range.startOffset;
         var pos = this.getPreviousPosition(node, offset);
         if (pos) {
           return pos.textNode.nodeValue[pos.offset];
@@ -30,8 +30,8 @@ var TextRange = (function() {
       },
 
       expandLeft: function() {
-        var node = this.range.endContainer;
-        var offset = this.range.endOffset;
+        var node = this.range.startContainer;
+        var offset = this.range.startOffset;
         var pos = this.getPreviousPosition(node, offset);
         if (pos) {
           this.range.setStart(pos.textNode, pos.offset);
