@@ -38,6 +38,20 @@ describe('TextRange', function() {
         expect(previous.equals(range)).toBe(true);
       });
     });
+
+    describe('nextCharacter()', function() {
+
+      it('to be an "a"', function() {
+        expect(this.textRange.nextCharacter()).toEqual('a');
+      });
+    });
+
+    describe('previousCharacter()', function() {
+
+      it('to be an empty string', function() {
+        expect(this.textRange.previousCharacter()).toEqual('');
+      });
+    });
   });
 
   describe('with a cursor at the beginning of a text node', function() {
@@ -106,6 +120,20 @@ describe('TextRange', function() {
         expect(range.toString()).toEqual('a');
       });
     });
+
+    describe('nextCharacter()', function() {
+
+      it('to be an empty string', function() {
+        expect(this.textRange.nextCharacter()).toEqual('');
+      });
+    });
+
+    describe('previousCharacter()', function() {
+
+      it('to be an "a"', function() {
+        expect(this.textRange.previousCharacter()).toEqual('a');
+      });
+    });
   });
 
   describe('with a cursor at the end of a textNode', function() {
@@ -156,6 +184,20 @@ describe('TextRange', function() {
         var range = this.textRange.range;
         this.textRange.expandRight();
         expect(range.toString()).toEqual('b');
+      });
+    });
+
+    describe('nextCharacter()', function() {
+
+      it('to be a "b"', function() {
+        expect(this.textRange.nextCharacter()).toEqual('b');
+      });
+    });
+
+    describe('previousCharacter()', function() {
+
+      it('to be an "a"', function() {
+        expect(this.textRange.previousCharacter()).toEqual('a');
       });
     });
   });

@@ -7,14 +7,49 @@ var TextRange = (function() {
 
   TextRange.prototype = (function() {
     return {
-      nextCharacter: function() {},
-      previousCharacter: function() {},
+      nextCharacter: function() {
+        var node = this.range.endContainer;
+        var offset = this.range.endOffset;
+        var pos = this.getNextPosition(node, offset);
+        if (pos) {
+          return pos.textNode.nodeValue[pos.offset - 1];
+        } else {
+          return '';
+        }
+      },
+
+      previousCharacter: function() {
+        var node = this.range.endContainer;
+        var offset = this.range.endOffset;
+        var pos = this.getPreviousPosition(node, offset);
+        if (pos) {
+          return pos.textNode.nodeValue[pos.offset];
+        } else {
+          return '';
+        }
+      },
+
+      expandLeft: function() {
+        var node = this.range.endContainer;
+        var offset = this.range.endOffset;
+        var pos = this.getPreviousPosition(node, offset);
+        if (pos) {
+          this.range.setStart(pos.textNode, pos.offset);
+        }
+      },
 
       expandRight: function() {
         var node = this.range.endContainer;
         var offset = this.range.endOffset;
+        var pos = this.getNextPosition(node, offset);
+        if (pos) {
+          this.range.setEnd(pos.textNode, pos.offset);
+        }
+      },
+
+      getNextPosition: function(node, offset) {
         if (this.isTextNode(node) && !this.isAtEndOfTextNode(node, offset)) {
-          this.range.setEnd(node, offset + 1);
+          return { textNode: node, offset: offset + 1 };
         } else {
           if (this.isTextNode(node)) {
             // position after textNode
@@ -23,16 +58,14 @@ var TextRange = (function() {
           }
           var next = this.findNextTextNode(node, offset);
           if (next) {
-            this.range.setEnd(next, 1);
+            return { textNode: next, offset: 1 };
           }
         }
       },
 
-      expandLeft: function() {
-        var node = this.range.startContainer;
-        var offset = this.range.startOffset;
+      getPreviousPosition: function(node, offset) {
         if (this.isTextNode(node) && !this.isAtBeginningOfTextNode(node, offset)) {
-          this.range.setStart(node, offset - 1);
+          return { textNode: node, offset: offset - 1 };
         } else {
           if (this.isTextNode(node)) {
             // position before textNode
@@ -41,8 +74,8 @@ var TextRange = (function() {
           }
           var prev = this.findPreviousTextNode(node, offset);
           if (prev) {
-            var secondLastIndex = prev.nodeValue.length - 1;
-            this.range.setStart(prev, secondLastIndex);
+            var secondLastOffset = prev.nodeValue.length - 1;
+            return { textNode: prev, offset: secondLastOffset };
           }
         }
       },
