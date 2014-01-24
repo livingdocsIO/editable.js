@@ -64,6 +64,18 @@ var Cursor = (function() {
         this.range.deleteContents();
       },
 
+      expandLeft: function() {
+        var textRange = new TextRange(this.host, this.range);
+        textRange.expandLeft();
+        return new Selection(this.host, this.range);
+      },
+
+      expandRight: function() {
+        var textRange = new TextRange(this.host, this.range);
+        textRange.expandRight();
+        return new Selection(this.host, this.range);
+      },
+
       /**
        * Insert content before the cursor
        *
