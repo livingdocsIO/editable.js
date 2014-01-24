@@ -14,7 +14,8 @@
     "grunt-regarde": "~0.1.1",
     "grunt-open": "~0.2.0",
     "matchdep": "~0.1.1",
-    "grunt-karma": "~0.3.0"
+    "grunt-karma": "~0.3.0",
+    "grunt-bump": "0.0.13"
   },
   "engines": {
     "node": ">=0.8.0"

@@ -139,6 +139,13 @@ module.exports = function(grunt) {
         }]
 
       }
+    },
+    bump: {
+      options: {
+        files: ['package.json', 'bower.json'],
+        commitFiles: ['package.json', 'bower.json'], // '-a' for all files
+        pushTo: 'origin'
+      }
     }
 
   });
@@ -186,4 +193,18 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('default', ['server']);
+
+
+  // Release a new version
+  // Only do this on the `master` branch.
+  //
+  // options:
+  // release:patch
+  // release:minor
+  // release:major
+  grunt.registerTask('release', function (type) {
+    type = type ? type : 'patch';
+    grunt.task.run('bump:' + type);
+  });
+
 };
