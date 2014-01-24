@@ -64,7 +64,6 @@ module.exports = function(grunt) {
       }
     },
     clean: {
-      dist: ['.tmp', 'dist'],
       server: '.tmp'
     },
     jshint: {
@@ -94,7 +93,7 @@ module.exports = function(grunt) {
     concat: {
       dist: {
         files: {
-          'dist/editable.js': [
+          'editable.js': [
             'vendor/rangy-1.2.3/rangy-core.js',
             'vendor/rangy-1.2.3/rangy-selectionsaverestore.js',
             'vendor/bowser.js',
@@ -125,8 +124,8 @@ module.exports = function(grunt) {
     uglify: {
       dist: {
         files: {
-          'dist/editable.min.js': [
-            'dist/editable.js'
+          'editable.min.js': [
+            'editable.js'
           ],
         }
       }
@@ -135,8 +134,7 @@ module.exports = function(grunt) {
       lukas: {
         files: [{
           expand: true,
-          cwd: 'dist/',
-          src: ['*'],
+          src: ['editable.js'],
           dest: '../livingdocs-engine/vendor/editableJS/'
         }]
 
@@ -175,7 +173,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build', [
     'jshint',
-    'clean:dist',
     'clean:server',
     'concat:editable',
     // 'karma:build',
