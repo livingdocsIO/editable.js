@@ -71,7 +71,14 @@ var Cursor = (function() {
         this.range.insertNode(element);
       },
 
+      /**
+       * Alias for #setVisibleSelection()
+       */
       setSelection: function() {
+        this.setVisibleSelection();
+      },
+
+      setVisibleSelection: function() {
         rangy.getSelection().setSingleRange(this.range);
       },
 
