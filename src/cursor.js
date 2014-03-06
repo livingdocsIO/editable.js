@@ -105,7 +105,7 @@ var Cursor = (function() {
        * The returned values are absolute to document.body.
        */
       getCoordinates: function(positioning) {
-        positioning = positioning || 'absolute'
+        positioning = positioning || 'absolute';
 
         var coords = this.range.nativeRange.getBoundingClientRect();
         if (positioning === 'fixed') return coords;
