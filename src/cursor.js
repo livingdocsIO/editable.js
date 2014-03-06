@@ -143,6 +143,9 @@ var Cursor = (function() {
         if (this.isSelection) return new Cursor(this.host, this.range);
       },
 
+      /**
+       * Move the cursor to the beginning of the host.
+       */
       moveAtBeginning: function(element) {
         if (!element) element = this.host;
         this.setHost(element);
@@ -151,6 +154,9 @@ var Cursor = (function() {
         if (this.isSelection) return new Cursor(this.host, this.range);
       },
 
+      /**
+       * Move the cursor to the end of the host.
+       */
       moveAtEnd: function(element) {
         if (!element) element = this.host;
         this.setHost(element);
@@ -159,6 +165,9 @@ var Cursor = (function() {
         if (this.isSelection) return new Cursor(this.host, this.range);
       },
 
+      /**
+       * Move the cursor after the last visible character of the host.
+       */
       moveAtTextEnd: function(element) {
         return this.moveAtEnd(parser.latestChild(element));
       },
