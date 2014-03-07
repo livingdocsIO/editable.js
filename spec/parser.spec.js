@@ -373,7 +373,7 @@ describe('isDocumentFragmentWithoutChildren()', function() {
   });
 
   it('returns falsy for a documentFragment with an empty text node as child', function() {
-    this.frag.appendChild(window.document.createTextNode());
+    this.frag.appendChild(window.document.createTextNode(''));
     expect(parser.isDocumentFragmentWithoutChildren(this.frag)).toBeFalsy()
   });
 
