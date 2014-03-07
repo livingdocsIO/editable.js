@@ -182,7 +182,7 @@ module.exports = function(grunt) {
     'jshint',
     'clean:server',
     'concat:editable',
-    // 'karma:build',
+    'karma:build',
     'concat:dist',
     'uglify'
   ]);
