@@ -71,7 +71,14 @@ var Cursor = (function() {
         this.range.insertNode(element);
       },
 
+      /**
+       * Alias for #setVisibleSelection()
+       */
       setSelection: function() {
+        this.setVisibleSelection();
+      },
+
+      setVisibleSelection: function() {
         rangy.getSelection().setSingleRange(this.range);
       },
 
@@ -97,8 +104,11 @@ var Cursor = (function() {
        * Get the BoundingClientRect of the cursor.
        * The returned values are absolute to document.body.
        */
-      getCoordinates: function() {
+      getCoordinates: function(positioning) {
+        positioning = positioning || 'absolute';
+
         var coords = this.range.nativeRange.getBoundingClientRect();
+        if (positioning === 'fixed') return coords;
 
         // code from mdn: https://developer.mozilla.org/en-US/docs/Web/API/window.scrollX
         var x = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
@@ -133,6 +143,9 @@ var Cursor = (function() {
         if (this.isSelection) return new Cursor(this.host, this.range);
       },
 
+      /**
+       * Move the cursor to the beginning of the host.
+       */
       moveAtBeginning: function(element) {
         if (!element) element = this.host;
         this.setHost(element);
@@ -141,6 +154,9 @@ var Cursor = (function() {
         if (this.isSelection) return new Cursor(this.host, this.range);
       },
 
+      /**
+       * Move the cursor to the end of the host.
+       */
       moveAtEnd: function(element) {
         if (!element) element = this.host;
         this.setHost(element);
@@ -149,6 +165,9 @@ var Cursor = (function() {
         if (this.isSelection) return new Cursor(this.host, this.range);
       },
 
+      /**
+       * Move the cursor after the last visible character of the host.
+       */
       moveAtTextEnd: function(element) {
         return this.moveAtEnd(parser.latestChild(element));
       },

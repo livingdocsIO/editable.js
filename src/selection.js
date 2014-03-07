@@ -195,6 +195,28 @@ var Selection = (function() {
     },
 
     /**
+     *  Collapse the selection at the beginning of the selection
+     *
+     *  @return Cursor instance
+     */
+    collapseAtBeginning: function(elem) {
+      this.range.collapse(true);
+      this.setSelection();
+      return new Cursor(this.host, this.range);
+    },
+
+    /**
+     *  Collapse the selection at the end of the selection
+     *
+     *  @return Cursor instance
+     */
+    collapseAtEnd: function(elem) {
+      this.range.collapse(false);
+      this.setSelection();
+      return new Cursor(this.host, this.range);
+    },
+
+    /**
      * Wrap the selection with the specified tag. If any other tag with
      * the same tagName is affecting the selection this tag will be
      * remove first.
