@@ -1,18 +1,25 @@
 describe("Editable configuration", function() {
+  var editable;
 
-  it("should not be exposed", function() {
-    expect(window.Editable.config).not.toBeDefined();
+  afterEach(function() {
+    if (editable) {
+      editable.off();
+      editable = undefined;
+    }
   });
 
-  it("should disable logging by default", function() {
-    expect(config.log).toEqual(false);
+  it("should use the default as base", function() {
+    editable = new Editable();
+    expect(editable.config.log).toEqual(false);
+    expect(editable.config.editableClass).toEqual('js-editable');
   });
 
-  it("init() should change configuration", function() {
-    Editable.init({
-      log: false
+  it("should override the default", function() {
+    editable = new Editable({
+      log: true
     });
-    expect(config.log).toEqual(false);
+    expect(editable.config.log).toEqual(true);
+    expect(editable.config.editableClass).toEqual('js-editable');
   });
 
 });
