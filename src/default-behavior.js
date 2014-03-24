@@ -9,7 +9,9 @@
  */
 
 
-var behavior = (function() {
+var createDefaultBehavior = function(editable) {
+  var document = editable.win.document;
+
   /**
     * Singleton for the behavior module.
     * Provides default behavior of the Editable.JS API.
@@ -195,7 +197,7 @@ var behavior = (function() {
         element.removeChild(pasteHolder);
 
         rangy.restoreSelection(sel);
-        cursor = selectionWatcher.forceCursor();
+        cursor = editable.dispatcher.selectionWatcher.forceCursor();
         pasteElement = document.createTextNode(pasteValue);
         content.normalizeSpaces(pasteElement);
         cursor.insertAfter(pasteElement);
@@ -206,4 +208,4 @@ var behavior = (function() {
       }, 0);
     }
   };
-})();
+};
