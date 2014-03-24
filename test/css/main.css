@@ -103,6 +103,10 @@ article {
     background-color: #eee;
 }
 
+.iframe-container iframe{
+    width: 100%;
+    height: 500px;
+}
 
 .selection-tip {
     position: absolute;
