@@ -16,10 +16,9 @@
  * @class Editable
  * @static
  */
-Editable = function(userConfiguration, win) {
-  this.win = win || window;
-  this.config = $.extend(true, {}, config, userConfiguration);
-  this.defaultEvents = createDefaultEvents(this);
+Editable = function(userConfig) {
+  this.config = $.extend(true, {}, config, userConfig);
+  this.win = this.config.window || window;
   this.editableSelector = '.' + this.config.editableClass;
 
   if (!rangy.initialized) {
@@ -27,6 +26,9 @@ Editable = function(userConfiguration, win) {
   }
 
   this.dispatcher = new Dispatcher(this);
+  if (this.config.defaultBehavior === false) {
+    this.dispatcher.addListeners(createDefaultEvents(this));
+  }
 };
 
 window.Editable = Editable;

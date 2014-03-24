@@ -22,15 +22,8 @@ var Dispatcher = function(editable) {
  * @method setup
  */
 Dispatcher.prototype.setup = function() {
-  var eventType = null;
   this.listeners = {};
   var $document = this.$document;
-
-  // TODO check the defaultEvents to prevent
-  // registering invalid handlers
-  for (eventType in this.editable.defaultEvents) {
-    this.addListener(eventType, this.editable.defaultEvents[eventType]);
-  }
 
   // setup all events notifications
   this.setupElementEvents();
@@ -42,7 +35,6 @@ Dispatcher.prototype.setup = function() {
     this.setupSelectionChangeFallback();
   }
 };
-
 
 /**
  * Sets up events that are triggered on modifying an element.
@@ -258,6 +250,13 @@ Dispatcher.prototype.addListener = function(event, listener) {
   }
 
   this.listeners[event].unshift(listener);
+};
+
+Dispatcher.prototype.addListeners = function(eventObj) {
+  var eventType = null;
+  for (eventType in eventObj) {
+    this.addListener(eventType, eventObj[eventType]);
+  }
 };
 
 Dispatcher.prototype.removeListener = function(event, listener) {

@@ -3642,620 +3642,394 @@ var string = (function() {
  * @module core
  */
 
-(function() {
-  var isInitialized = false,
-      editableSelector;
+/**
+ * Singleton for the Editable.JS API that is externally visible.
+ * Note that the Editable literal is defined
+ * first in editable.prefix in order for it to be the only externally visible
+ * variable.
+ *
+ * @class Editable
+ * @static
+ */
+Editable = function(userConfig) {
+  this.config = $.extend(true, {}, config, userConfig);
+  this.win = this.config.window || window;
+  this.editableSelector = '.' + this.config.editableClass;
 
-  var initialize = function() {
-    if (!isInitialized) {
-      isInitialized = true;
-      editableSelector = '.' + config.editableClass;
+  if (!rangy.initialized) {
+    rangy.init();
+  }
 
-      // make sure rangy is initialized. e.g Rangy doesn't initialize
-      // when loaded after the document is ready.
-      if (!rangy.initialized) {
-        rangy.init();
-      }
+  this.dispatcher = new Dispatcher(this);
+  if (this.config.defaultBehavior === false) {
+    this.dispatcher.addListeners(createDefaultEvents(this));
+  }
+};
 
-      dispatcher.setup();
-    }
-  };
-
-  /**
-   * Singleton for the Editable.JS API that is externally visible.
-   * Note that the Editable literal is defined
-   * first in editable.prefix in order for it to be the only externally visible
-   * variable.
-   *
-   * @class Editable
-   * @static
-   */
-  Editable = {
-    /**
-     * Initialzed Editable with a custom configuration
-     */
-    init: function(userConfiguration) {
-      if (isInitialized) {
-        error('Editable is already initialized');
-        return;
-      }
-
-      $.extend(true, config, userConfiguration);
-      initialize();
-    },
-
-
-    /**
-     * Adds the Editable.JS API to the given target elements.
-     * Opposite of {{#crossLink "Editable/remove"}}{{/crossLink}}.
-     * Calls dispatcher.setup to setup all event listeners.
-     *
-     * @method add
-     * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
-     *    array of HTMLElement or a query selector representing the target where
-     *    the API should be added on.
-     * @param {Object} [elementConfiguration={}] Configuration options override.
-     * @static
-     * @chainable
-     */
-    add: function(target, elementConfiguration) {
-      initialize();
-      var elemConfig = $.extend(true, {}, config, elementConfiguration);
-      // todo: store element configuration
-      this.enable($(target));
-
-      // todo: check css whitespace settings
-      return this;
-    },
-
-
-    /**
-     * Removes the Editable.JS API from the given target elements.
-     * Opposite of {{#crossLink "Editable/add"}}{{/crossLink}}.
-     *
-     * @method remove
-     * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
-     *    array of HTMLElement or a query selector representing the target where
-     *    the API should be removed from.
-     * @static
-     * @chainable
-     */
-    remove: function(target) {
-      var $target = $(target);
-      this.disable($target);
-      $target.removeClass(config.editableDisabledClass);
-      return this;
-    },
-
-
-    /**
-     * Removes the Editable.JS API from the given target elements.
-     * The target elements are marked as disabled.
-     *
-     * @method disable
-     * @param { jQuery element | undefined  } target editable root element(s)
-     *    If no param is specified all editables are disabled.
-     * @static
-     * @chainable
-     */
-    disable: function($elem) {
-      $elem = $elem || $('.' + config.editableClass);
-      $elem
-        .removeAttr('contenteditable')
-        .removeClass(config.editableClass)
-        .addClass(config.editableDisabledClass);
-
-      return this;
-    },
-
-
-    /**
-     * Adds the Editable.JS API to the given target elements.
-     *
-     * @method enable
-     * @param { jQuery element | undefined } target editable root element(s)
-     *    If no param is specified all editables marked as disabled are enabled.
-     * @static
-     * @chainable
-     */
-    enable: function($elem) {
-      $elem = $elem || $('.' + config.editableDisabledClass);
-      $elem
-        .attr('contenteditable', true)
-        .removeClass(config.editableDisabledClass)
-        .addClass(config.editableClass);
-
-      $elem.each(function(index, el) {
-        content.normalizeTags(el);
-        content.normalizeSpaces(el);
-      });
-
-      return this;
-    },
-
-    /**
-     * Set the cursor inside of an editable block.
-     *
-     * @method createCursor
-     * @param position 'beginning', 'end', 'before', 'after'
-     * @static
-     */
-    createCursor: function(element, position) {
-      var cursor;
-      var $host = $(element).closest(editableSelector);
-      position = position || 'beginning';
-
-      if ($host.length) {
-        var range = rangy.createRange();
-
-        if (position === 'beginning' || position === 'end') {
-          range.selectNodeContents(element);
-          range.collapse(position === 'beginning' ? true : false);
-        } else if (element !== $host[0]) {
-          if (position === 'before') {
-            range.setStartBefore(element);
-            range.setEndBefore(element);
-          } else if (position === 'after') {
-            range.setStartAfter(element);
-            range.setEndAfter(element);
-          }
-        } else {
-          error('EditableJS: cannot create cursor outside of an editable block.');
-        }
-
-        cursor = new Cursor($host[0], range);
-      }
-
-      return cursor;
-    },
-
-    createCursorAtBeginning: function(element) {
-      this.createCursor(element, 'beginning');
-    },
-
-    createCursorAtEnd: function(element) {
-      this.createCursor(element, 'end');
-    },
-
-    createCursorBefore: function(element) {
-      this.createCursor(element, 'before');
-    },
-
-    createCursorAfter: function(element) {
-      this.createCursor(element, 'after');
-    },
-
-
-    /**
-     * Subscribe a callback function to a custom event fired by the API.
-     * Opposite of {{#crossLink "Editable/off"}}{{/crossLink}}.
-     *
-     * @method on
-     * @param {String} event The name of the event.
-     * @param {Function} handler The callback to execute in response to the
-     *     event.
-     * @static
-     * @chainable
-     */
-    on: function(event, handler) {
-      initialize();
-      // TODO throw error if event is not one of EVENTS
-      // TODO throw error if handler is not a function
-      dispatcher.addListener(event, handler);
-      return this;
-    },
-
-    /**
-     * Unsubscribe a callback function from a custom event fired by the API.
-     * Opposite of {{#crossLink "Editable/on"}}{{/crossLink}}.
-     *
-     * @method off
-     * @param {String} event The name of the event.
-     * @param {Function|Boolean} handler The callback to remove from the
-     *     event or the special value false to remove all callbacks.
-     * @static
-     * @chainable
-     */
-    off: function(event, handler) {
-      // TODO throw error if event is not one of EVENTS
-      // TODO if handler is flase remove all callbacks
-      dispatcher.removeListener(event, handler);
-      return this;
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/focus:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method focus
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    focus: function(handler) {
-      return this.on('focus', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/blur:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method blur
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    blur: function(handler) {
-      return this.on('blur', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/flow:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method flow
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    flow: function(handler) {
-      return this.on('flow', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/selection:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method selection
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    selection: function(handler) {
-      return this.on('selection', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/cursor:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method cursor
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    cursor: function(handler) {
-      return this.on('cursor', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/newline:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method newline
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    newline: function(handler) {
-      return this.on('newline', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/insert:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method insert
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    insert: function(handler) {
-      return this.on('insert', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/split:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method split
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    split: function(handler) {
-      return this.on('split', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/merge:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method merge
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    merge: function(handler) {
-      return this.on('merge', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/empty:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method empty
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    empty: function(handler) {
-      return this.on('empty', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/switch:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method switch
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    'switch': function(handler) {
-      return this.on('switch', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/move:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method move
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    move: function(handler) {
-      return this.on('move', handler);
-    },
-
-    /**
-     * Subscribe to the {{#crossLink "Editable/clipboard:event"}}{{/crossLink}}
-     * event.
-     *
-     * @method clipboard
-     * @param {Function} handler The callback to execute in response to the
-     *   event.
-     * @static
-     * @chainable
-     */
-    clipboard: function(handler) {
-      return this.on('clipboard', handler);
-    }
-  };
-})();
+window.Editable = Editable;
 
 /**
- * The Behavior module defines the behavior triggered in response to the Editable.JS
- * events (see {{#crossLink "Editable"}}{{/crossLink}}).
- * The behavior can be overwritten by a user with Editable.init() or on
- * Editable.add() per element.
+ * Adds the Editable.JS API to the given target elements.
+ * Opposite of {{#crossLink "Editable/remove"}}{{/crossLink}}.
+ * Calls dispatcher.setup to setup all event listeners.
  *
- * @module core
- * @submodule behavior
+ * @method add
+ * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
+ *    array of HTMLElement or a query selector representing the target where
+ *    the API should be added on.
+ * @param {Object} [elementConfiguration={}] Configuration options override.
+ * @static
+ * @chainable
  */
+Editable.prototype.add = function(target, elementConfiguration) {
+  var elemConfig = $.extend(true, {}, config, elementConfiguration);
+  // todo: store element configuration
+  this.enable($(target));
+
+  // todo: check css whitespace settings
+  return this;
+};
 
 
-var behavior = (function() {
-  /**
-    * Singleton for the behavior module.
-    * Provides default behavior of the Editable.JS API.
-    *
-    * @class Behavior
-    * @static
-    */
-  return {
-    focus: function(element) {
-      log('Default focus behavior');
-    },
+/**
+ * Removes the Editable.JS API from the given target elements.
+ * Opposite of {{#crossLink "Editable/add"}}{{/crossLink}}.
+ *
+ * @method remove
+ * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
+ *    array of HTMLElement or a query selector representing the target where
+ *    the API should be removed from.
+ * @static
+ * @chainable
+ */
+Editable.prototype.remove = function(target) {
+  var $target = $(target);
+  this.disable($target);
+  $target.removeClass(config.editableDisabledClass);
+  return this;
+};
 
-    blur: function(element) {
-      log('Default blur behavior');
-      content.cleanInternals(element);
-    },
 
-    flow: function(element, action) {
-      log('Default flow behavior');
-    },
+/**
+ * Removes the Editable.JS API from the given target elements.
+ * The target elements are marked as disabled.
+ *
+ * @method disable
+ * @param { jQuery element | undefined  } target editable root element(s)
+ *    If no param is specified all editables are disabled.
+ * @static
+ * @chainable
+ */
+Editable.prototype.disable = function($elem) {
+  $elem = $elem || $('.' + config.editableClass);
+  $elem
+    .removeAttr('contenteditable')
+    .removeClass(config.editableClass)
+    .addClass(config.editableDisabledClass);
 
-    selection: function(element, selection) {
-      if (selection) {
-        log('Default selection behavior');
-      } else {
-        log('Default selection empty behavior');
+  return this;
+};
+
+
+/**
+ * Adds the Editable.JS API to the given target elements.
+ *
+ * @method enable
+ * @param { jQuery element | undefined } target editable root element(s)
+ *    If no param is specified all editables marked as disabled are enabled.
+ * @static
+ * @chainable
+ */
+Editable.prototype.enable = function($elem) {
+  $elem = $elem || $('.' + config.editableDisabledClass);
+  $elem
+    .attr('contenteditable', true)
+    .removeClass(config.editableDisabledClass)
+    .addClass(config.editableClass);
+
+  $elem.each(function(index, el) {
+    content.normalizeTags(el);
+    content.normalizeSpaces(el);
+  });
+
+  return this;
+};
+
+/**
+ * Set the cursor inside of an editable block.
+ *
+ * @method createCursor
+ * @param position 'beginning', 'end', 'before', 'after'
+ * @static
+ */
+Editable.prototype.createCursor = function(element, position) {
+  var cursor;
+  var $host = $(element).closest(this.editableSelector);
+  position = position || 'beginning';
+
+  if ($host.length) {
+    var range = rangy.createRange();
+
+    if (position === 'beginning' || position === 'end') {
+      range.selectNodeContents(element);
+      range.collapse(position === 'beginning' ? true : false);
+    } else if (element !== $host[0]) {
+      if (position === 'before') {
+        range.setStartBefore(element);
+        range.setEndBefore(element);
+      } else if (position === 'after') {
+        range.setStartAfter(element);
+        range.setEndAfter(element);
       }
-    },
-
-    cursor: function(element, cursor) {
-      if (cursor) {
-        log('Default cursor behavior');
-      } else {
-        log('Default cursor empty behavior');
-      }
-    },
-
-    newline: function(element, cursor) {
-      log(cursor);
-      log('Default newline behavior');
-
-      var atEnd = cursor.isAtEnd();
-      var br = document.createElement('br');
-      cursor.insertBefore(br);
-
-      if (atEnd) {
-        log('at the end');
-
-        var noWidthSpace = document.createTextNode('\u200B');
-        cursor.insertAfter(noWidthSpace);
-
-        // var trailingBr = document.createElement('br');
-        // trailingBr.setAttribute('type', '-editablejs');
-        // cursor.insertAfter(trailingBr);
-
-      } else {
-        log('not at the end');
-      }
-
-      cursor.setSelection();
-    },
-
-    insert: function(element, direction, cursor) {
-      log('Default insert ' + direction + ' behavior');
-      var parent = element.parentNode;
-      var newElement = element.cloneNode(false);
-      if (newElement.id) newElement.removeAttribute('id');
-
-      switch (direction) {
-      case 'before':
-        parent.insertBefore(newElement, element);
-        element.focus();
-        break;
-      case 'after':
-        parent.insertBefore(newElement, element.nextSibling);
-        newElement.focus();
-        break;
-      }
-    },
-
-    split: function(element, before, after, cursor) {
-      var parent = element.parentNode;
-      var newStart = after.firstChild;
-      parent.insertBefore(before, element);
-      parent.replaceChild(after, element);
-      content.normalizeTags(newStart);
-      content.normalizeSpaces(newStart);
-      newStart.focus();
-    },
-
-    merge: function(element, direction, cursor) {
-      log('Default merge ' + direction + ' behavior');
-      var container, merger, fragment, chunks, i, newChild, range;
-
-      switch (direction) {
-      case 'before':
-        container = block.previous(element);
-        merger = element;
-        break;
-      case 'after':
-        container = element;
-        merger = block.next(element);
-        break;
-      }
-
-      if (!(container && merger))
-        return;
-
-      if (container.childNodes.length > 0)
-        cursor.moveAtTextEnd(container);
-      else
-        cursor.moveAtBeginning(container);
-      cursor.setSelection();
-
-      fragment = document.createDocumentFragment();
-      chunks = merger.childNodes;
-      for (i = 0; i < chunks.length; i++) {
-        fragment.appendChild(chunks[i].cloneNode(true));
-      }
-      newChild = container.appendChild(fragment);
-
-      merger.parentNode.removeChild(merger);
-
-      cursor.save();
-      content.normalizeTags(container);
-      content.normalizeSpaces(container);
-      cursor.restore();
-      cursor.setSelection();
-    },
-
-    empty: function(element) {
-      log('Default empty behavior');
-    },
-
-    'switch': function(element, direction, cursor) {
-      log('Default switch behavior');
-
-      var next, previous;
-
-      switch (direction) {
-      case 'before':
-        previous = block.previous(element);
-        if (previous) {
-          cursor.moveAtTextEnd(previous);
-          cursor.setSelection();
-        }
-        break;
-      case 'after':
-        next = block.next(element);
-        if (next) {
-          cursor.moveAtBeginning(next);
-          cursor.setSelection();
-        }
-        break;
-      }
-    },
-
-    move: function(element, selection, direction) {
-      log('Default move behavior');
-    },
-
-    clipboard: function(element, action, cursor) {
-      log('Default clipboard behavior');
-      var pasteHolder, sel;
-
-      if (action !== 'paste') return;
-
-      element.setAttribute(config.pastingAttribute, true);
-
-      if (cursor.isSelection) {
-        cursor = cursor.deleteContent();
-      }
-
-      pasteHolder = document.createElement('textarea');
-      pasteHolder.setAttribute('style', 'position: absolute; left: -9999px');
-      cursor.insertAfter(pasteHolder);
-      sel = rangy.saveSelection();
-      pasteHolder.focus();
-
-      setTimeout(function() {
-        var pasteValue, pasteElement, cursor;
-        pasteValue = pasteHolder.value;
-        element.removeChild(pasteHolder);
-
-        rangy.restoreSelection(sel);
-        cursor = selectionWatcher.forceCursor();
-        pasteElement = document.createTextNode(pasteValue);
-        content.normalizeSpaces(pasteElement);
-        cursor.insertAfter(pasteElement);
-        cursor.moveAfter(pasteElement);
-        cursor.setSelection();
-
-        element.removeAttribute(config.pastingAttribute);
-      }, 0);
+    } else {
+      error('EditableJS: cannot create cursor outside of an editable block.');
     }
-  };
-})();
+
+    cursor = new Cursor($host[0], range);
+  }
+
+  return cursor;
+};
+
+Editable.prototype.createCursorAtBeginning = function(element) {
+  this.createCursor(element, 'beginning');
+};
+
+Editable.prototype.createCursorAtEnd = function(element) {
+  this.createCursor(element, 'end');
+};
+
+Editable.prototype.createCursorBefore = function(element) {
+  this.createCursor(element, 'before');
+};
+
+Editable.prototype.createCursorAfter = function(element) {
+  this.createCursor(element, 'after');
+};
+
+
+/**
+ * Subscribe a callback function to a custom event fired by the API.
+ * Opposite of {{#crossLink "Editable/off"}}{{/crossLink}}.
+ *
+ * @method on
+ * @param {String} event The name of the event.
+ * @param {Function} handler The callback to execute in response to the
+ *     event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.on = function(event, handler) {
+  // TODO throw error if event is not one of EVENTS
+  // TODO throw error if handler is not a function
+  this.dispatcher.addListener(event, handler);
+  return this;
+};
+
+/**
+ * Unsubscribe a callback function from a custom event fired by the API.
+ * Opposite of {{#crossLink "Editable/on"}}{{/crossLink}}.
+ *
+ * @method off
+ * @param {String} event The name of the event.
+ * @param {Function|Boolean} handler The callback to remove from the
+ *     event or the special value false to remove all callbacks.
+ * @static
+ * @chainable
+ */
+Editable.prototype.off = function(event, handler) {
+  if (arguments.length === 0) {
+    this.dispatcher.off();
+  } else {
+    // TODO throw error if event is not one of EVENTS
+    // TODO if handler is flase remove all callbacks
+    this.dispatcher.removeListener(event, handler);
+  }
+  return this;
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/focus:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method focus
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.focus = function(handler) {
+  return this.on('focus', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/blur:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method blur
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.blur = function(handler) {
+  return this.on('blur', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/flow:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method flow
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.flow = function(handler) {
+  return this.on('flow', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/selection:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method selection
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.selection = function(handler) {
+  return this.on('selection', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/cursor:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method cursor
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.cursor = function(handler) {
+  return this.on('cursor', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/newline:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method newline
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.newline = function(handler) {
+  return this.on('newline', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/insert:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method insert
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.insert = function(handler) {
+  return this.on('insert', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/split:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method split
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.split = function(handler) {
+  return this.on('split', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/merge:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method merge
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.merge = function(handler) {
+  return this.on('merge', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/empty:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method empty
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.empty = function(handler) {
+  return this.on('empty', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/switch:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method switch
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype['switch'] = function(handler) {
+  return this.on('switch', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/move:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method move
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.move = function(handler) {
+  return this.on('move', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/clipboard:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method clipboard
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @static
+ * @chainable
+ */
+Editable.prototype.clipboard = function(handler) {
+  return this.on('clipboard', handler);
+};
+
 
 var block = (function() {
   return {
@@ -4288,183 +4062,7 @@ var config = {
   pastingAttribute: 'data-editable-is-pasting',
   mouseMoveSelectionChanges: false,
   boldTag: '<strong>',
-  italicTag: '<em>',
-
-  event: {
-    /**
-     * The focus event is triggered when an element gains focus.
-     * The default behavior is to... TODO
-     *
-     * @event focus
-     * @param {HTMLElement} element The element triggering the event.
-     */
-    focus: function(element) {
-      behavior.focus(element);
-    },
-
-    /**
-     * The blur event is triggered when an element looses focus.
-     * The default behavior is to... TODO
-     *
-     * @event blur
-     * @param {HTMLElement} element The element triggering the event.
-     */
-    blur: function(element) {
-      behavior.blur(element);
-    },
-
-    /**
-     * The flow event is triggered when the user starts typing or pause typing.
-     * The default behavior is to... TODO
-     *
-     * @event flow
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {String} action The flow action: "start" or "pause".
-     */
-    flow: function(element, action) {
-      behavior.flow(element, action);
-    },
-
-    /**
-     * The selection event is triggered after the user has selected some
-     * content.
-     * The default behavior is to... TODO
-     *
-     * @event selection
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {Selection} selection The actual Selection object.
-     */
-    selection: function(element, selection) {
-      behavior.selection(element, selection);
-    },
-
-    /**
-     * The cursor event is triggered after cursor position has changed.
-     * The default behavior is to... TODO
-     *
-     * @event cursor
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {Cursor} cursor The actual Cursor object.
-     */
-    cursor: function(element, cursor) {
-      behavior.cursor(element, cursor);
-    },
-
-    /**
-     * The newline event is triggered when a newline should be inserted. This
-     * happens when SHIFT+ENTER key is pressed.
-     * The default behavior is to add a <br />
-     *
-     * @event newline
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {Cursor} cursor The actual cursor object.
-     */
-    newline: function(element, cursor) {
-      behavior.newline(element, cursor);
-    },
-
-    /**
-     * The split event is triggered when a block should be splitted into two
-     * blocks. This happens when ENTER is pressed within a non-empty block.
-     * The default behavior is to... TODO
-     *
-     * @event split
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {String} before The HTML string before the split.
-     * @param {String} after The HTML string after the split.
-     * @param {Cursor} cursor The actual cursor object.
-     */
-    split: function(element, before, after, cursor) {
-      behavior.split(element, before, after, cursor);
-    },
-
-
-    /**
-     * The insert event is triggered when a new block should be inserted. This
-     * happens when ENTER key is pressed at the beginning of a block (should
-     * insert before) or at the end of a block (should insert after).
-     * The default behavior is to... TODO
-     *
-     * @event insert
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {String} direction The insert direction: "before" or "after".
-     * @param {Cursor} cursor The actual cursor object.
-     */
-    insert: function(element, direction, cursor) {
-      behavior.insert(element, direction, cursor);
-    },
-
-
-    /**
-     * The merge event is triggered when two needs to be merged. This happens
-     * when BACKSPACE is pressed at the beginning of a block (should merge with
-     * the preceeding block) or DEL is pressed at the end of a block (should
-     * merge with the following block).
-     * The default behavior is to... TODO
-     *
-     * @event merge
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {String} direction The merge direction: "before" or "after".
-     * @param {Cursor} cursor The actual cursor object.
-     */
-    merge: function(element, direction, cursor) {
-      behavior.merge(element, direction, cursor);
-    },
-
-    /**
-     * The empty event is triggered when a block is emptied.
-     * The default behavior is to... TODO
-     *
-     * @event empty
-     * @param {HTMLElement} element The element triggering the event.
-     */
-    empty: function(element) {
-      behavior.empty(element);
-    },
-
-    /**
-     * The switch event is triggered when the user switches to another block.
-     * This happens when an ARROW key is pressed near the boundaries of a block.
-     * The default behavior is to... TODO
-     *
-     * @event switch
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {String} direction The switch direction: "before" or "after".
-     * @param {Cursor} cursor The actual cursor object.*
-     */
-    'switch': function(element, direction, cursor) {
-      behavior.switch(element, direction, cursor);
-    },
-
-    /**
-     * The move event is triggered when the user moves a selection in a block.
-     * This happens when the user selects some (or all) content in a block and
-     * an ARROW key is pressed (up: drag before, down: drag after).
-     * The default behavior is to... TODO
-     *
-     * @event move
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {Selection} selection The actual Selection object.
-     * @param {String} direction The move direction: "before" or "after".
-     */
-    move: function(element, selection, direction) {
-      behavior.move(element, selection, direction);
-    },
-
-    /**
-     * The clipboard event is triggered when the user copies, pastes or cuts
-     * a selection within a block.
-     * The default behavior is to... TODO
-     *
-     * @event clipboard
-     * @param {HTMLElement} element The element triggering the event.
-     * @param {String} action The clipboard action: "copy", "paste", "cut".
-     * @param {Cursor} cursor The actual cursor object.
-     */
-    clipboard: function(element, action, cursor) {
-      behavior.clipboard(element, action, cursor);
-    }
-  }
+  italicTag: '<em>'
 };
 
 
@@ -5001,289 +4599,692 @@ var Cursor = (function() {
 
 
 /**
+ * The Behavior module defines the behavior triggered in response to the Editable.JS
+ * events (see {{#crossLink "Editable"}}{{/crossLink}}).
+ * The behavior can be overwritten by a user with Editable.init() or on
+ * Editable.add() per element.
+ *
+ * @module core
+ * @submodule behavior
+ */
+
+
+var createDefaultBehavior = function(editable) {
+  var document = editable.win.document;
+  var config = editable.config;
+  var selectionWatcher = editable.dispatcher.selectionWatcher;
+
+  /**
+    * Singleton for the behavior module.
+    * Provides default behavior of the Editable.JS API.
+    *
+    * @class Behavior
+    * @static
+    */
+  return {
+    focus: function(element) {
+      log('Default focus behavior');
+    },
+
+    blur: function(element) {
+      log('Default blur behavior');
+      content.cleanInternals(element);
+    },
+
+    flow: function(element, action) {
+      log('Default flow behavior');
+    },
+
+    selection: function(element, selection) {
+      if (selection) {
+        log('Default selection behavior');
+      } else {
+        log('Default selection empty behavior');
+      }
+    },
+
+    cursor: function(element, cursor) {
+      if (cursor) {
+        log('Default cursor behavior');
+      } else {
+        log('Default cursor empty behavior');
+      }
+    },
+
+    newline: function(element, cursor) {
+      log(cursor);
+      log('Default newline behavior');
+
+      var atEnd = cursor.isAtEnd();
+      var br = document.createElement('br');
+      cursor.insertBefore(br);
+
+      if (atEnd) {
+        log('at the end');
+
+        var noWidthSpace = document.createTextNode('\u200B');
+        cursor.insertAfter(noWidthSpace);
+
+        // var trailingBr = document.createElement('br');
+        // trailingBr.setAttribute('type', '-editablejs');
+        // cursor.insertAfter(trailingBr);
+
+      } else {
+        log('not at the end');
+      }
+
+      cursor.setSelection();
+    },
+
+    insert: function(element, direction, cursor) {
+      log('Default insert ' + direction + ' behavior');
+      var parent = element.parentNode;
+      var newElement = element.cloneNode(false);
+      if (newElement.id) newElement.removeAttribute('id');
+
+      switch (direction) {
+      case 'before':
+        parent.insertBefore(newElement, element);
+        element.focus();
+        break;
+      case 'after':
+        parent.insertBefore(newElement, element.nextSibling);
+        newElement.focus();
+        break;
+      }
+    },
+
+    split: function(element, before, after, cursor) {
+      var parent = element.parentNode;
+      var newStart = after.firstChild;
+      parent.insertBefore(before, element);
+      parent.replaceChild(after, element);
+      content.normalizeTags(newStart);
+      content.normalizeSpaces(newStart);
+      newStart.focus();
+    },
+
+    merge: function(element, direction, cursor) {
+      log('Default merge ' + direction + ' behavior');
+      var container, merger, fragment, chunks, i, newChild, range;
+
+      switch (direction) {
+      case 'before':
+        container = block.previous(element);
+        merger = element;
+        break;
+      case 'after':
+        container = element;
+        merger = block.next(element);
+        break;
+      }
+
+      if (!(container && merger))
+        return;
+
+      if (container.childNodes.length > 0)
+        cursor.moveAtTextEnd(container);
+      else
+        cursor.moveAtBeginning(container);
+      cursor.setSelection();
+
+      fragment = document.createDocumentFragment();
+      chunks = merger.childNodes;
+      for (i = 0; i < chunks.length; i++) {
+        fragment.appendChild(chunks[i].cloneNode(true));
+      }
+      newChild = container.appendChild(fragment);
+
+      merger.parentNode.removeChild(merger);
+
+      cursor.save();
+      content.normalizeTags(container);
+      content.normalizeSpaces(container);
+      cursor.restore();
+      cursor.setSelection();
+    },
+
+    empty: function(element) {
+      log('Default empty behavior');
+    },
+
+    'switch': function(element, direction, cursor) {
+      log('Default switch behavior');
+
+      var next, previous;
+
+      switch (direction) {
+      case 'before':
+        previous = block.previous(element);
+        if (previous) {
+          cursor.moveAtTextEnd(previous);
+          cursor.setSelection();
+        }
+        break;
+      case 'after':
+        next = block.next(element);
+        if (next) {
+          cursor.moveAtBeginning(next);
+          cursor.setSelection();
+        }
+        break;
+      }
+    },
+
+    move: function(element, selection, direction) {
+      log('Default move behavior');
+    },
+
+    clipboard: function(element, action, cursor) {
+      log('Default clipboard behavior');
+      var pasteHolder, sel;
+
+      if (action !== 'paste') return;
+
+      element.setAttribute(config.pastingAttribute, true);
+
+      if (cursor.isSelection) {
+        cursor = cursor.deleteContent();
+      }
+
+      pasteHolder = document.createElement('textarea');
+      pasteHolder.setAttribute('style', 'position: absolute; left: -9999px');
+      cursor.insertAfter(pasteHolder);
+      sel = rangy.saveSelection();
+      pasteHolder.focus();
+
+      setTimeout(function() {
+        var pasteValue, pasteElement, cursor;
+        pasteValue = pasteHolder.value;
+        element.removeChild(pasteHolder);
+
+        rangy.restoreSelection(sel);
+        cursor = selectionWatcher.forceCursor();
+        pasteElement = document.createTextNode(pasteValue);
+        content.normalizeSpaces(pasteElement);
+        cursor.insertAfter(pasteElement);
+        cursor.moveAfter(pasteElement);
+        cursor.setSelection();
+
+        element.removeAttribute(config.pastingAttribute);
+      }, 0);
+    }
+  };
+};
+
+var createDefaultEvents = function (editable) {
+  var behavior = createDefaultBehavior(editable);
+
+  return {
+    /**
+     * The focus event is triggered when an element gains focus.
+     * The default behavior is to... TODO
+     *
+     * @event focus
+     * @param {HTMLElement} element The element triggering the event.
+     */
+    focus: function(element) {
+      behavior.focus(element);
+    },
+
+    /**
+     * The blur event is triggered when an element looses focus.
+     * The default behavior is to... TODO
+     *
+     * @event blur
+     * @param {HTMLElement} element The element triggering the event.
+     */
+    blur: function(element) {
+      behavior.blur(element);
+    },
+
+    /**
+     * The flow event is triggered when the user starts typing or pause typing.
+     * The default behavior is to... TODO
+     *
+     * @event flow
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {String} action The flow action: "start" or "pause".
+     */
+    flow: function(element, action) {
+      behavior.flow(element, action);
+    },
+
+    /**
+     * The selection event is triggered after the user has selected some
+     * content.
+     * The default behavior is to... TODO
+     *
+     * @event selection
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {Selection} selection The actual Selection object.
+     */
+    selection: function(element, selection) {
+      behavior.selection(element, selection);
+    },
+
+    /**
+     * The cursor event is triggered after cursor position has changed.
+     * The default behavior is to... TODO
+     *
+     * @event cursor
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {Cursor} cursor The actual Cursor object.
+     */
+    cursor: function(element, cursor) {
+      behavior.cursor(element, cursor);
+    },
+
+    /**
+     * The newline event is triggered when a newline should be inserted. This
+     * happens when SHIFT+ENTER key is pressed.
+     * The default behavior is to add a <br />
+     *
+     * @event newline
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {Cursor} cursor The actual cursor object.
+     */
+    newline: function(element, cursor) {
+      behavior.newline(element, cursor);
+    },
+
+    /**
+     * The split event is triggered when a block should be splitted into two
+     * blocks. This happens when ENTER is pressed within a non-empty block.
+     * The default behavior is to... TODO
+     *
+     * @event split
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {String} before The HTML string before the split.
+     * @param {String} after The HTML string after the split.
+     * @param {Cursor} cursor The actual cursor object.
+     */
+    split: function(element, before, after, cursor) {
+      behavior.split(element, before, after, cursor);
+    },
+
+
+    /**
+     * The insert event is triggered when a new block should be inserted. This
+     * happens when ENTER key is pressed at the beginning of a block (should
+     * insert before) or at the end of a block (should insert after).
+     * The default behavior is to... TODO
+     *
+     * @event insert
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {String} direction The insert direction: "before" or "after".
+     * @param {Cursor} cursor The actual cursor object.
+     */
+    insert: function(element, direction, cursor) {
+      behavior.insert(element, direction, cursor);
+    },
+
+
+    /**
+     * The merge event is triggered when two needs to be merged. This happens
+     * when BACKSPACE is pressed at the beginning of a block (should merge with
+     * the preceeding block) or DEL is pressed at the end of a block (should
+     * merge with the following block).
+     * The default behavior is to... TODO
+     *
+     * @event merge
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {String} direction The merge direction: "before" or "after".
+     * @param {Cursor} cursor The actual cursor object.
+     */
+    merge: function(element, direction, cursor) {
+      behavior.merge(element, direction, cursor);
+    },
+
+    /**
+     * The empty event is triggered when a block is emptied.
+     * The default behavior is to... TODO
+     *
+     * @event empty
+     * @param {HTMLElement} element The element triggering the event.
+     */
+    empty: function(element) {
+      behavior.empty(element);
+    },
+
+    /**
+     * The switch event is triggered when the user switches to another block.
+     * This happens when an ARROW key is pressed near the boundaries of a block.
+     * The default behavior is to... TODO
+     *
+     * @event switch
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {String} direction The switch direction: "before" or "after".
+     * @param {Cursor} cursor The actual cursor object.*
+     */
+    'switch': function(element, direction, cursor) {
+      behavior.switch(element, direction, cursor);
+    },
+
+    /**
+     * The move event is triggered when the user moves a selection in a block.
+     * This happens when the user selects some (or all) content in a block and
+     * an ARROW key is pressed (up: drag before, down: drag after).
+     * The default behavior is to... TODO
+     *
+     * @event move
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {Selection} selection The actual Selection object.
+     * @param {String} direction The move direction: "before" or "after".
+     */
+    move: function(element, selection, direction) {
+      behavior.move(element, selection, direction);
+    },
+
+    /**
+     * The clipboard event is triggered when the user copies, pastes or cuts
+     * a selection within a block.
+     * The default behavior is to... TODO
+     *
+     * @event clipboard
+     * @param {HTMLElement} element The element triggering the event.
+     * @param {String} action The clipboard action: "copy", "paste", "cut".
+     * @param {Cursor} cursor The actual cursor object.
+     */
+    clipboard: function(element, action, cursor) {
+      behavior.clipboard(element, action, cursor);
+    }
+  };
+};
+
+/**
  * The Dispatcher module is responsible for dealing with events and their handlers.
  *
  * @module core
  * @submodule dispatcher
  */
 
-var dispatcher = (function() {
-  /**
-   * Contains the list of event listeners grouped by event type.
-   *
-   * @private
-   * @type {Object}
-   */
-  var listeners = {},
-      editableSelector;
+var Dispatcher = function(editable) {
+  var win = editable.win;
+  this.$document = $(win.document);
+  this.editable = editable;
+  this.config = editable.config;
+  this.editableSelector = editable.editableSelector;
+  this.selectionWatcher = new SelectionWatcher(this, win);
+  this.setup();
+};
 
-  /**
-   * Sets up events that are triggered on modifying an element.
-   *
-   * @method setupElementEvents
-   * @param {HTMLElement} $document: The document element.
-   * @param {Function} notifier: The callback to be triggered when the event is caught.
-   */
-  var setupElementEvents = function($document, notifier) {
-    $document.on('focus.editable', editableSelector, function(event) {
-      if (this.getAttribute(config.pastingAttribute)) return;
-      notifier('focus', this);
-    }).on('blur.editable', editableSelector, function(event) {
-      if (this.getAttribute(config.pastingAttribute)) return;
-      notifier('blur', this);
-    }).on('copy.editable', editableSelector, function(event) {
-      log('Copy');
-      notifier('clipboard', this, 'copy', selectionWatcher.getFreshSelection());
-    }).on('cut.editable', editableSelector, function(event) {
-      log('Cut');
-      notifier('clipboard', this, 'cut', selectionWatcher.getFreshSelection());
-    }).on('paste.editable', editableSelector, function(event) {
-      log('Paste');
-      notifier('clipboard', this, 'paste', selectionWatcher.getFreshSelection());
-    });
-  };
 
-  /**
-   * Sets up events that are triggered on keyboard events.
-   * Keyboard definitions are in {{#crossLink "Keyboard"}}{{/crossLink}}.
-   *
-   * @method setupKeyboardEvents
-   * @param {HTMLElement} $document: The document element.
-   * @param {Function} notifier: The callback to be triggered when the event is caught.
-   */
-  var setupKeyboardEvents = function($document, notifier) {
-    var dispatchSwitchEvent = function(event, element, direction) {
-      var cursor;
+/**
+ * Sets up all events that Editable.JS is catching.
+ *
+ * @method setup
+ */
+Dispatcher.prototype.setup = function() {
+  this.listeners = {};
+  var $document = this.$document;
 
-      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
-        return;
+  // setup all events notifications
+  this.setupElementEvents();
+  this.setupKeyboardEvents();
 
-      cursor = selectionWatcher.getSelection();
-      if (!cursor || cursor.isSelection) return;
+  if (browserFeatures.selectionchange) {
+    this.setupSelectionChangeEvents();
+  } else {
+    this.setupSelectionChangeFallback();
+  }
+};
 
-      // Detect if the browser moved the cursor in the next tick.
-      // If the cursor stays at its position, fire the switch event.
-      setTimeout(function() {
-        var newCursor = selectionWatcher.forceCursor();
-        if (newCursor.equals(cursor)) {
-          event.preventDefault();
-          event.stopPropagation();
-          notifier('switch', element, direction, newCursor);
-        }
-      }, 1);
-    };
+/**
+ * Sets up events that are triggered on modifying an element.
+ *
+ * @method setupElementEvents
+ * @param {HTMLElement} $document: The document element.
+ * @param {Function} notifier: The callback to be triggered when the event is caught.
+ */
+Dispatcher.prototype.setupElementEvents = function() {
+  var _this = this;
+  this.$document.on('focus.editable', _this.editableSelector, function(event) {
+    if (this.getAttribute(_this.config.pastingAttribute)) return;
+    _this.notify('focus', this);
+  }).on('blur.editable', _this.editableSelector, function(event) {
+    if (this.getAttribute(_this.config.pastingAttribute)) return;
+    _this.notify('blur', this);
+  }).on('copy.editable', _this.editableSelector, function(event) {
+    log('Copy');
+    _this.notify('clipboard', this, 'copy', _this.selectionWatcher.getFreshSelection());
+  }).on('cut.editable', _this.editableSelector, function(event) {
+    log('Cut');
+    _this.notify('clipboard', this, 'cut', _this.selectionWatcher.getFreshSelection());
+  }).on('paste.editable', _this.editableSelector, function(event) {
+    log('Paste');
+    _this.notify('clipboard', this, 'paste', _this.selectionWatcher.getFreshSelection());
+  });
+};
 
-    $document.on('keydown.editable', editableSelector, function(event) {
-      keyboard.dispatchKeyEvent(event, this);
-    });
+Dispatcher.prototype.dispatchSwitchEvent = function(event, element, direction) {
+  var cursor;
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
+    return;
 
-    keyboard.on('left', function(event) {
-      log('Left key pressed');
-      dispatchSwitchEvent(event, this, 'before');
-    }).on('up', function(event) {
-      log('Up key pressed');
-      dispatchSwitchEvent(event, this, 'before');
-    }).on('right', function(event) {
-      log('Right key pressed');
-      dispatchSwitchEvent(event, this, 'after');
-    }).on('down', function(event) {
-      log('Down key pressed');
-      dispatchSwitchEvent(event, this, 'after');
-    }).on('tab', function(event) {
-      log('Tab key pressed');
-    }).on('shiftTab', function(event) {
-      log('Shift+Tab key pressed');
-    }).on('esc', function(event) {
-      log('Esc key pressed');
-    }).on('backspace', function(event) {
-      log('Backspace key pressed');
-
-      var range = selectionWatcher.getFreshRange();
-      if (range.isCursor) {
-        var cursor = range.getCursor();
-        if ( cursor.isAtBeginning() ) {
-          event.preventDefault();
-          event.stopPropagation();
-          notifier('merge', this, 'before', cursor);
-        }
-      }
-    }).on('delete', function(event) {
-      log('Delete key pressed');
-
-      var range = selectionWatcher.getFreshRange();
-      if (range.isCursor) {
-        var cursor = range.getCursor();
-        if (cursor.isAtTextEnd()) {
-          event.preventDefault();
-          event.stopPropagation();
-          notifier('merge', this, 'after', cursor);
-        }
-      }
-    }).on('enter', function(event) {
-      log('Enter key pressed');
-
+  cursor = this.selectionWatcher.getSelection();
+  if (!cursor || cursor.isSelection) return;
+  // Detect if the browser moved the cursor in the next tick.
+  // If the cursor stays at its position, fire the switch event.
+  var dispatcher = this;
+  setTimeout(function() {
+    var newCursor = dispatcher.selectionWatcher.forceCursor();
+    if (newCursor.equals(cursor)) {
       event.preventDefault();
       event.stopPropagation();
-      var range = selectionWatcher.getFreshRange();
-      var cursor = range.forceCursor();
+      dispatcher.notify('switch', element, direction, newCursor);
+    }
+  }, 1);
+};
 
-      if (cursor.isAtTextEnd()) {
-        notifier('insert', this, 'after', cursor);
-      } else if (cursor.isAtBeginning()) {
-        notifier('insert', this, 'before', cursor);
-      } else {
-        notifier('split', this, cursor.before(), cursor.after(), cursor);
-      }
+/**
+ * Sets up events that are triggered on keyboard events.
+ * Keyboard definitions are in {{#crossLink "Keyboard"}}{{/crossLink}}.
+ *
+ * @method setupKeyboardEvents
+ * @param {HTMLElement} $document: The document element.
+ * @param {Function} notifier: The callback to be triggered when the event is caught.
+ */
+Dispatcher.prototype.setupKeyboardEvents = function() {
+  var _this = this;
 
-    }).on('shiftEnter', function(event) {
-      log('Shift+Enter key pressed');
-      event.preventDefault();
-      event.stopPropagation();
-      var cursor = selectionWatcher.forceCursor();
-      notifier('newline', this, cursor);
-    });
-  };
+  this.$document.on('keydown.editable', this.editableSelector, function(event) {
+    keyboard.dispatchKeyEvent(event, this);
+  });
 
-  /**
-   * Sets up events that are triggered on a selection change.
-   *
-   * @method setupSelectionChangeEvents
-   * @param {HTMLElement} $document: The document element.
-   * @param {Function} notifier: The callback to be triggered when the event is caught.
-   */
-  var setupSelectionChangeEvents = function($document, notifier) {
-    var selectionDirty = false;
-    var suppressSelectionChanges = false;
+  keyboard.on('left', function(event) {
+    log('Left key pressed');
+    _this.dispatchSwitchEvent(event, this, 'before');
+  }).on('up', function(event) {
+    log('Up key pressed');
+    _this.dispatchSwitchEvent(event, this, 'before');
+  }).on('right', function(event) {
+    log('Right key pressed');
+    _this.dispatchSwitchEvent(event, this, 'after');
+  }).on('down', function(event) {
+    log('Down key pressed');
+    _this.dispatchSwitchEvent(event, this, 'after');
+  }).on('tab', function(event) {
+    log('Tab key pressed');
+  }).on('shiftTab', function(event) {
+    log('Shift+Tab key pressed');
+  }).on('esc', function(event) {
+    log('Esc key pressed');
+  }).on('backspace', function(event) {
+    log('Backspace key pressed');
 
-    // fires on mousemove (thats probably a bit too much)
-    // catches changes like 'select all' from context menu
-    $document.on('selectionchange.editable', function(event) {
-      if (suppressSelectionChanges) {
-        selectionDirty = true;
-      } else {
-        notifier();
-      }
-    });
-
-    // listen for selection changes by mouse so we can
-    // suppress the selectionchange event and only fire the
-    // change event on mouseup
-    $document.on('mousedown.editable', editableSelector, function(event) {
-      if (config.mouseMoveSelectionChanges === false) {
-        suppressSelectionChanges = true;
-
-        // Without this timeout the previous selection is active
-        // until the mouseup event (no. not good).
-        setTimeout(notifier, 0);
-      }
-
-      $document.on('mouseup.editableSelection', function(event) {
-        $document.off('.editableSelection');
-        suppressSelectionChanges = false;
-
-        if (selectionDirty) {
-          selectionDirty = false;
-          notifier();
-        }
-      });
-    });
-  };
-
-  /**
-   * Fallback solution to support selection change events on browsers that don't
-   * support selectionChange.
-   *
-   * @method setupSelectionChangeFallback
-   * @param {HTMLElement} $document: The document element.
-   * @param {Function} notifier: The callback to be triggered when the event is caught.
-   */
-  var setupSelectionChangeFallback = function($document, notifier) {
-    // listen for selection changes by mouse
-    $document.on('mouseup.editableSelection', function(event) {
-
-      // In Opera when clicking outside of a block
-      // it does not update the selection as it should
-      // without the timeout
-      setTimeout(notifier, 0);
-    });
-
-    // listen for selection changes by keys
-    $document.on('keyup.editable', editableSelector, function(event) {
-
-      // when pressing Command + Shift + Left for example the keyup is only triggered
-      // after at least two keys are released. Strange. The culprit seems to be the
-      // Command key. Do we need a workaround?
-      notifier();
-    });
-  };
-
-  return {
-    addListener: function(event, listener) {
-      if (listeners[event] === undefined) {
-        listeners[event] = [];
-      }
-
-      listeners[event].unshift(listener);
-    },
-
-    removeListener: function(event, listener) {
-      var eventListeners = listeners[event];
-      if (eventListeners === undefined) return;
-
-      for (var i=0, len=eventListeners.length; i < len; i++) {
-        if (eventListeners[i] === listener){
-          eventListeners.splice(i, 1);
-          break;
-        }
-      }
-    },
-
-    notifyListeners: function(event) {
-      var eventListeners = listeners[event];
-      if (eventListeners === undefined) return;
-
-      for (var i=0, len=eventListeners.length; i < len; i++) {
-        if (eventListeners[i].apply(
-            Editable,
-            Array.prototype.slice.call(arguments).splice(1)
-        ) === false)
-          break;
-      }
-    },
-
-    /**
-     * Sets up all events that Editable.JS is catching.
-     *
-     * @method setup
-     */
-    setup: function() {
-
-      var $document = $(document);
-      var eventType = null;
-      editableSelector = '.' + config.editableClass;
-
-      listeners = {};
-      // TODO check the config.event object to prevent
-      // registering invalid handlers
-      for (eventType in config.event) {
-        this.addListener(eventType, config.event[eventType]);
-      }
-
-      // setup all events notifications
-      setupElementEvents($document, this.notifyListeners);
-      setupKeyboardEvents($document, this.notifyListeners);
-
-      // cache selectionChanged function for simplicity
-      var selectionChanged = selectionWatcher.selectionChanged;
-
-      if (browserFeatures.selectionchange) {
-        setupSelectionChangeEvents($document, selectionChanged);
-      } else {
-        setupSelectionChangeFallback($document, selectionChanged);
+    var range = _this.selectionWatcher.getFreshRange();
+    if (range.isCursor) {
+      var cursor = range.getCursor();
+      if ( cursor.isAtBeginning() ) {
+        event.preventDefault();
+        event.stopPropagation();
+        _this.notify('merge', this, 'before', cursor);
       }
     }
-  };
-})();
+  }).on('delete', function(event) {
+    log('Delete key pressed');
+
+    var range = _this.selectionWatcher.getFreshRange();
+    if (range.isCursor) {
+      var cursor = range.getCursor();
+      if (cursor.isAtTextEnd()) {
+        event.preventDefault();
+        event.stopPropagation();
+        _this.notify('merge', this, 'after', cursor);
+      }
+    }
+  }).on('enter', function(event) {
+    log('Enter key pressed');
+    event.preventDefault();
+    event.stopPropagation();
+    var range = _this.selectionWatcher.getFreshRange();
+    var cursor = range.forceCursor();
+
+    if (cursor.isAtTextEnd()) {
+      _this.notify('insert', this, 'after', cursor);
+    } else if (cursor.isAtBeginning()) {
+      _this.notify('insert', this, 'before', cursor);
+    } else {
+      _this.notify('split', this, cursor.before(), cursor.after(), cursor);
+    }
+
+  }).on('shiftEnter', function(event) {
+    log('Shift+Enter key pressed');
+    event.preventDefault();
+    event.stopPropagation();
+    var cursor = _this.selectionWatcher.forceCursor();
+    _this.notify('newline', this, cursor);
+  });
+};
+
+/**
+ * Sets up events that are triggered on a selection change.
+ *
+ * @method setupSelectionChangeEvents
+ * @param {HTMLElement} $document: The document element.
+ * @param {Function} notifier: The callback to be triggered when the event is caught.
+ */
+Dispatcher.prototype.setupSelectionChangeEvents = function() {
+  var selectionDirty = false;
+  var suppressSelectionChanges = false;
+  var $document = this.$document;
+  var selectionWatcher = this.selectionWatcher;
+  var _this = this;
+
+  // fires on mousemove (thats probably a bit too much)
+  // catches changes like 'select all' from context menu
+  $document.on('selectionchange.editable', function(event) {
+    if (suppressSelectionChanges) {
+      selectionDirty = true;
+    } else {
+      selectionWatcher.selectionChanged();
+    }
+  });
+
+  // listen for selection changes by mouse so we can
+  // suppress the selectionchange event and only fire the
+  // change event on mouseup
+  $document.on('mousedown.editable', this.editableSelector, function(event) {
+    if (_this.config.mouseMoveSelectionChanges === false) {
+      suppressSelectionChanges = true;
+
+      // Without this timeout the previous selection is active
+      // until the mouseup event (no. not good).
+      setTimeout($.proxy(selectionWatcher, 'selectionChanged'), 0);
+    }
+
+    $document.on('mouseup.editableSelection', function(event) {
+      $document.off('.editableSelection');
+      suppressSelectionChanges = false;
+
+      if (selectionDirty) {
+        selectionDirty = false;
+        selectionWatcher.selectionChanged();
+      }
+    });
+  });
+};
+
+
+/**
+ * Fallback solution to support selection change events on browsers that don't
+ * support selectionChange.
+ *
+ * @method setupSelectionChangeFallback
+ * @param {HTMLElement} $document: The document element.
+ * @param {Function} notifier: The callback to be triggered when the event is caught.
+ */
+Dispatcher.prototype.setupSelectionChangeFallback = function() {
+  var $document = this.$document;
+  var selectionWatcher = this.selectionWatcher;
+
+  // listen for selection changes by mouse
+  $document.on('mouseup.editableSelection', function(event) {
+
+    // In Opera when clicking outside of a block
+    // it does not update the selection as it should
+    // without the timeout
+    setTimeout($.proxy(selectionWatcher, 'selectionChanged'), 0);
+  });
+
+  // listen for selection changes by keys
+  $document.on('keyup.editable', this.editableSelector, function(event) {
+
+    // when pressing Command + Shift + Left for example the keyup is only triggered
+    // after at least two keys are released. Strange. The culprit seems to be the
+    // Command key. Do we need a workaround?
+    selectionWatcher.selectionChanged();
+  });
+};
+
+Dispatcher.prototype.addListener = function(event, listener) {
+  if (this.listeners[event] === undefined) {
+    this.listeners[event] = [];
+  }
+
+  this.listeners[event].unshift(listener);
+};
+
+Dispatcher.prototype.addListeners = function(eventObj) {
+  var eventType = null;
+  for (eventType in eventObj) {
+    this.addListener(eventType, eventObj[eventType]);
+  }
+};
+
+Dispatcher.prototype.removeListener = function(event, listener) {
+  var eventListeners = this.listeners[event];
+  if (eventListeners === undefined) return;
+
+  for (var i=0, len=eventListeners.length; i < len; i++) {
+    if (eventListeners[i] === listener){
+      eventListeners.splice(i, 1);
+      break;
+    }
+  }
+};
+
+Dispatcher.prototype.removeListeners = function(event) {
+  this.listeners[event] = [];
+};
+
+Dispatcher.prototype.off = function(event) {
+  this.listeners = {};
+  this.$document.off('.editable');
+};
+
+Dispatcher.prototype.notify = function(event) {
+  var eventListeners = this.listeners[event];
+  if (eventListeners === undefined) return;
+  for (var i = 0, len = eventListeners.length; i < len; i++) {
+    if (eventListeners[i].apply(
+        this.editable,
+        Array.prototype.slice.call(arguments).splice(1)
+    ) === false)
+      break;
+  }
+};
 
 var browserFeatures = (function() {
   /**
@@ -5883,106 +5884,110 @@ var rangeSaveRestore = (function() {
  * @module core
  * @submodule selectionWatcher
  */
-var selectionWatcher = (function() {
+var SelectionWatcher = function(dispatcher, win) {
+  this.dispatcher = dispatcher;
+  this.win = win || window;
+  this.rangySelection = undefined;
+  this.currentSelection = undefined;
+  this.currentRange = undefined;
+};
 
-  var rangySelection,
-      currentSelection,
-      currentRange;
 
-  /**
-   * Return a RangeContainer if the current selection is within an editable
-   * otherwise return an empty RangeContainer
-   */
-  var getRangeContainer = function() {
-    rangySelection = rangy.getSelection();
+/**
+ * Return a RangeContainer if the current selection is within an editable
+ * otherwise return an empty RangeContainer
+ */
+SelectionWatcher.prototype.getRangeContainer = function() {
+  this.rangySelection = rangy.getSelection(this.win);
 
-    // rangeCount is 0 or 1 in all browsers except firefox
-    // firefox can work with multiple ranges
-    // (on a mac hold down the command key to select multiple ranges)
-    if (rangySelection.rangeCount) {
-      var range = rangySelection.getRangeAt(0);
-      var hostNode = parser.getHost(range.commonAncestorContainer);
-      if (hostNode) {
-        return new RangeContainer(hostNode, range);
+  // rangeCount is 0 or 1 in all browsers except firefox
+  // firefox can work with multiple ranges
+  // (on a mac hold down the command key to select multiple ranges)
+  if (this.rangySelection.rangeCount) {
+    var range = this.rangySelection.getRangeAt(0);
+    var hostNode = parser.getHost(range.commonAncestorContainer);
+    if (hostNode) {
+      return new RangeContainer(hostNode, range);
+    }
+  }
+
+  // return an empty range container
+  return new RangeContainer();
+};
+
+
+/**
+ * Gets a fresh RangeContainer with the current selection or cursor.
+ *
+ * @return RangeContainer instance
+ */
+SelectionWatcher.prototype.getFreshRange = function() {
+  return this.getRangeContainer();
+};
+
+
+/**
+ * Gets a fresh RangeContainer with the current selection or cursor.
+ *
+ * @return Either a Cursor or Selection instance or undefined if
+ * there is neither a selection or cursor.
+ */
+SelectionWatcher.prototype.getFreshSelection = function() {
+  var range = this.getRangeContainer();
+
+  return range.isCursor ?
+    range.getCursor(this.win) :
+    range.getSelection(this.win);
+};
+
+
+/**
+ * Get the selection set by the last selectionChanged event.
+ * Sometimes the event does not fire fast enough and the seleciton
+ * you get is not the one the user sees.
+ * In those cases use #getFreshSelection()
+ *
+ * @return Either a Cursor or Selection instance or undefined if
+ * there is neither a selection or cursor.
+ */
+SelectionWatcher.prototype.getSelection = function() {
+  return this.currentSelection;
+};
+
+
+SelectionWatcher.prototype.forceCursor = function() {
+  var range = this.getRangeContainer();
+  return range.forceCursor();
+};
+
+
+SelectionWatcher.prototype.selectionChanged = function() {
+  var newRange = this.getRangeContainer();
+  if (newRange.isDifferentFrom(this.currentRange)) {
+    var lastSelection = this.currentSelection;
+    this.currentRange = newRange;
+
+    // empty selection or cursor
+    if (lastSelection) {
+      if (lastSelection.isCursor && !this.currentRange.isCursor) {
+        this.dispatcher.notify('cursor', lastSelection.host);
+      } else if (lastSelection.isSelection && !this.currentRange.isSelection) {
+        this.dispatcher.notify('selection', lastSelection.host);
       }
     }
 
-    // return an empty range container
-    return new RangeContainer();
-  };
-
-  return {
-
-    /**
-     * Gets a fresh RangeContainer with the current selection or cursor.
-     *
-     * @return RangeContainer instance
-     */
-    getFreshRange: function() {
-      return getRangeContainer();
-    },
-
-    /**
-     * Gets a fresh RangeContainer with the current selection or cursor.
-     *
-     * @return Either a Cursor or Selection instance or undefined if
-     * there is neither a selection or cursor.
-     */
-    getFreshSelection: function() {
-      var range = getRangeContainer();
-
-      return range.isCursor ?
-        range.getCursor() :
-        range.getSelection();
-    },
-
-    /**
-     * Get the selection set by the last selectionChanged event.
-     * Sometimes the event does not fire fast enough and the seleciton
-     * you get is not the one the user sees.
-     * In those cases use #getFreshSelection()
-     *
-     * @return Either a Cursor or Selection instance or undefined if
-     * there is neither a selection or cursor.
-     */
-    getSelection: function() {
-      return currentSelection;
-    },
-
-    forceCursor: function() {
-      var range = getRangeContainer();
-      return range.forceCursor();
-    },
-
-    selectionChanged: function() {
-      var newRange = getRangeContainer();
-      if (newRange.isDifferentFrom(currentRange)) {
-        var lastSelection = currentSelection;
-        currentRange = newRange;
-
-        // empty selection or cursor
-        if (lastSelection) {
-          if (lastSelection.isCursor && !currentRange.isCursor) {
-            dispatcher.notifyListeners('cursor', lastSelection.host);
-          } else if (lastSelection.isSelection && !currentRange.isSelection) {
-            dispatcher.notifyListeners('selection', lastSelection.host);
-          }
-        }
-
-        // set new selection or cursor and fire event
-        if (currentRange.isCursor) {
-          currentSelection = new Cursor(currentRange.host, currentRange.range);
-          dispatcher.notifyListeners('cursor', currentSelection.host, currentSelection);
-        } else if (currentRange.isSelection) {
-          currentSelection = new Selection(currentRange.host, currentRange.range);
-          dispatcher.notifyListeners('selection', currentSelection.host, currentSelection);
-        } else {
-          currentSelection = undefined;
-        }
-      }
+    // set new selection or cursor and fire event
+    if (this.currentRange.isCursor) {
+      this.currentSelection = new Cursor(this.currentRange.host, this.currentRange.range);
+      this.dispatcher.notify('cursor', this.currentSelection.host, this.currentSelection);
+    } else if (this.currentRange.isSelection) {
+      this.currentSelection = new Selection(this.currentRange.host, this.currentRange.range);
+      this.dispatcher.notify('selection', this.currentSelection.host, this.currentSelection);
+    } else {
+      this.currentSelection = undefined;
     }
-  };
-})();
+  }
+};
 
 /**
  * The Selection module provides a cross-browser abstraction layer for range

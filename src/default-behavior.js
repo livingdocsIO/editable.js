@@ -11,6 +11,8 @@
 
 var createDefaultBehavior = function(editable) {
   var document = editable.win.document;
+  var config = editable.config;
+  var selectionWatcher = editable.dispatcher.selectionWatcher;
 
   /**
     * Singleton for the behavior module.
@@ -197,7 +199,7 @@ var createDefaultBehavior = function(editable) {
         element.removeChild(pasteHolder);
 
         rangy.restoreSelection(sel);
-        cursor = editable.dispatcher.selectionWatcher.forceCursor();
+        cursor = selectionWatcher.forceCursor();
         pasteElement = document.createTextNode(pasteValue);
         content.normalizeSpaces(pasteElement);
         cursor.insertAfter(pasteElement);
