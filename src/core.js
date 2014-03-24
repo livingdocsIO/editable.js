@@ -26,7 +26,7 @@ Editable = function(userConfig) {
   }
 
   this.dispatcher = new Dispatcher(this);
-  if (this.config.defaultBehavior === false) {
+  if (this.config.defaultBehavior === true) {
     this.dispatcher.addListeners(createDefaultEvents(this));
   }
 };

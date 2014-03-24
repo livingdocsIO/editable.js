@@ -13,6 +13,7 @@ var config = {
   pastingAttribute: 'data-editable-is-pasting',
   mouseMoveSelectionChanges: false,
   boldTag: '<strong>',
-  italicTag: '<em>'
+  italicTag: '<em>',
+  defaultBehavior: true
 };
 
