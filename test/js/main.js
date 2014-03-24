@@ -1,12 +1,10 @@
 ;(function($) {
 
-  // initalize Editable
-  Editable.init({
+  var editable = new Editable({
     log: false
   });
 
   var lastSelection;
-
   var setupTooltip = function() {
     var tooltip = $('<div class="selection-tip" style="display:none;">' +
       '<button class="js-format js-format-bold">b</button>' +
@@ -17,7 +15,7 @@
     '</div>');
     $(document.body).append(tooltip);
 
-    Editable.selection(function(el, selection) {
+    editable.selection(function(el, selection) {
       lastSelection = selection;
       if (selection) {
         coords = selection.getCoordinates()
@@ -81,9 +79,8 @@
     });
   };
 
-
   $(document).ready(function() {
-    $("article>div>p, article>div li").editable();
+    editable.add("article>div>p, article>div li");
     setupTooltip();
   });
 
