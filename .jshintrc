@@ -29,6 +29,7 @@
     "Cursor": true,
     "Dispatcher": true,
     "Editable": true,
+    "eventable": true,
     "error": true,
     "jQuery": true,
     "$": true,
