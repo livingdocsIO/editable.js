@@ -1,6 +1,6 @@
 describe('Dispatcher', function() {
 
-  var key = keyboard.key;
+  var key = Keyboard.key;
   var $elem, editable, event;
   var onListener;
 

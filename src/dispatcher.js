@@ -11,6 +11,7 @@ var Dispatcher = function(editable) {
   this.editable = editable;
   this.config = editable.config;
   this.editableSelector = editable.editableSelector;
+  this.keyboard = new Keyboard();
   this.selectionWatcher = new SelectionWatcher(this, win);
   this.setup();
 };
@@ -95,10 +96,10 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
   var _this = this;
 
   this.$document.on('keydown.editable', this.editableSelector, function(event) {
-    keyboard.dispatchKeyEvent(event, this);
+    _this.keyboard.dispatchKeyEvent(event, this);
   });
 
-  keyboard.on('left', function(event) {
+  this.keyboard.on('left', function(event) {
     log('Left key pressed');
     _this.dispatchSwitchEvent(event, this, 'before');
   }).on('up', function(event) {

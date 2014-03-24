@@ -32,7 +32,7 @@
     "error": true,
     "jQuery": true,
     "$": true,
-    "keyboard": true,
+    "Keyboard": true,
     "log": true,
     "parser": true,
     "rangy": true,
