@@ -1,6 +1,5 @@
 
-var getEventableModule = function() {
-
+var getEventableModule = function(notifyContext) {
   var listeners = {};
 
   var addListener = function(event, listener) {
@@ -47,11 +46,20 @@ var getEventableModule = function() {
     },
 
     notify: function(event, context) {
+      var args;
       var eventListeners = listeners[event];
       if (eventListeners === undefined) return;
 
-      var args = Array.prototype.slice.call(arguments).splice(2);
-      for (var i = 0, len = eventListeners.length; i < len; i++) {
+      if (notifyContext) {
+        context = notifyContext;
+        args = Array.prototype.slice.call(arguments).splice(1);
+      } else {
+        args = Array.prototype.slice.call(arguments).splice(2);
+      }
+
+      // Traverse backwards and execute the newest listeners first.
+      // Stop if a listener returns false.
+      for (var i = eventListeners.length - 1; i >= 0; i--) {
         if (eventListeners[i].apply(context, args) === false)
           break;
       }
@@ -60,8 +68,8 @@ var getEventableModule = function() {
 
 };
 
-var eventable = function(obj) {
-  var module = getEventableModule();
+var eventable = function(obj, notifyContext) {
+  var module = getEventableModule(notifyContext);
   for (var prop in module) {
     obj[prop] = module[prop];
   }
