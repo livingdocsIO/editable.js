@@ -1,4 +1,31 @@
 
+// Eventable Mixin.
+//
+// Simple mixin to add event emitter methods to an object (Publish/Subscribe).
+//
+// Add on, off and notify methods to an object:
+// eventable(obj);
+//
+// publish an event:
+// obj.notify('action', context, param1, param2);
+//
+// Optionally pass a context that will be applied to every event:
+// eventable(obj, context);
+//
+// With this publishing can omit the context argument:
+// obj.notify('action', param1, param2);
+//
+// Subscribe to a 'channel'
+// obj.on('action', funtion(param1, param2){ ... });
+//
+// Unsubscribe an individual listener:
+// obj.off('action', method);
+//
+// Unsubscribe all listeners of a channel:
+// obj.off('action');
+//
+// Unsubscribe all listeners of all channels:
+// obj.off();
 var getEventableModule = function(notifyContext) {
   var listeners = {};
 
