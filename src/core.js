@@ -27,7 +27,7 @@ Editable = function(userConfig) {
 
   this.dispatcher = new Dispatcher(this);
   if (this.config.defaultBehavior === true) {
-    this.dispatcher.addListeners(createDefaultEvents(this));
+    this.dispatcher.on(createDefaultEvents(this));
   }
 };
 
@@ -175,19 +175,17 @@ Editable.prototype.createCursorAfter = function(element) {
 
 /**
  * Subscribe a callback function to a custom event fired by the API.
- * Opposite of {{#crossLink "Editable/off"}}{{/crossLink}}.
  *
- * @method on
  * @param {String} event The name of the event.
  * @param {Function} handler The callback to execute in response to the
  *     event.
- * @static
+ *
  * @chainable
  */
 Editable.prototype.on = function(event, handler) {
   // TODO throw error if event is not one of EVENTS
   // TODO throw error if handler is not a function
-  this.dispatcher.addListener(event, handler);
+  this.dispatcher.on(event, handler);
   return this;
 };
 
@@ -195,21 +193,25 @@ Editable.prototype.on = function(event, handler) {
  * Unsubscribe a callback function from a custom event fired by the API.
  * Opposite of {{#crossLink "Editable/on"}}{{/crossLink}}.
  *
- * @method off
  * @param {String} event The name of the event.
- * @param {Function|Boolean} handler The callback to remove from the
+ * @param {Function} handler The callback to remove from the
  *     event or the special value false to remove all callbacks.
- * @static
+ *
  * @chainable
  */
 Editable.prototype.off = function(event, handler) {
-  if (arguments.length === 0) {
-    this.dispatcher.off();
-  } else {
-    // TODO throw error if event is not one of EVENTS
-    // TODO if handler is flase remove all callbacks
-    this.dispatcher.removeListener(event, handler);
-  }
+  var args = Array.prototype.slice.call(arguments);
+  this.dispatcher.off.apply(this.dispatcher, args);
+  return this;
+};
+
+/**
+ * Unsubscribe all callbacks and event listeners.
+ *
+ * @chainable
+ */
+Editable.prototype.unload = function() {
+  this.dispatcher.unload();
   return this;
 };
 

@@ -5,7 +5,7 @@
  */
 
 var Keyboard = function() {
-  this.listeners = {};
+  eventable(this);
 };
 
 Keyboard.prototype.dispatchKeyEvent = function(event, target) {
@@ -55,32 +55,6 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target) {
     }
     break;
 
-  }
-};
-
-Keyboard.prototype.on = function(event, handler) {
-  this.addListener(event, handler);
-  return this;
-};
-
-Keyboard.prototype.addListener = function(event, listener) {
-  if (this.listeners[event] === undefined) {
-    this.listeners[event] = [];
-  }
-
-  this.listeners[event].push(listener);
-};
-
-Keyboard.prototype.notify = function(event, context) {
-  var eventListeners = this.listeners[event];
-  if (eventListeners === undefined) return;
-
-  for (var i=0, len=eventListeners.length; i < len; i++) {
-    if (eventListeners[i].apply(
-        context,
-        Array.prototype.slice.call(arguments).splice(2)
-    ) === false)
-      break;
   }
 };
 

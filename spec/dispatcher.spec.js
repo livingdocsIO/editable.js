@@ -34,7 +34,7 @@ describe('Dispatcher', function() {
   // unregister the event listener registered with 'on'
   var off = function() {
     if (onListener) {
-      editable.off(onListener.event, onListener.listener);
+      editable.unload();
       onListener = undefined;
     }
   }

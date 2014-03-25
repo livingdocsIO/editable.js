@@ -7,9 +7,10 @@
 
 var Dispatcher = function(editable) {
   var win = editable.win;
+  eventable(this, editable);
   this.$document = $(win.document);
-  this.editable = editable;
   this.config = editable.config;
+  this.editable = editable;
   this.editableSelector = editable.editableSelector;
   this.keyboard = new Keyboard();
   this.selectionWatcher = new SelectionWatcher(this, win);
@@ -23,9 +24,6 @@ var Dispatcher = function(editable) {
  * @method setup
  */
 Dispatcher.prototype.setup = function() {
-  this.listeners = {};
-  var $document = this.$document;
-
   // setup all events notifications
   this.setupElementEvents();
   this.setupKeyboardEvents();
@@ -35,6 +33,11 @@ Dispatcher.prototype.setup = function() {
   } else {
     this.setupSelectionChangeFallback();
   }
+};
+
+Dispatcher.prototype.unload = function() {
+  this.off();
+  this.$document.off('.editable');
 };
 
 /**
@@ -243,52 +246,4 @@ Dispatcher.prototype.setupSelectionChangeFallback = function() {
     // Command key. Do we need a workaround?
     selectionWatcher.selectionChanged();
   });
-};
-
-Dispatcher.prototype.addListener = function(event, listener) {
-  if (this.listeners[event] === undefined) {
-    this.listeners[event] = [];
-  }
-
-  this.listeners[event].unshift(listener);
-};
-
-Dispatcher.prototype.addListeners = function(eventObj) {
-  var eventType = null;
-  for (eventType in eventObj) {
-    this.addListener(eventType, eventObj[eventType]);
-  }
-};
-
-Dispatcher.prototype.removeListener = function(event, listener) {
-  var eventListeners = this.listeners[event];
-  if (eventListeners === undefined) return;
-
-  for (var i=0, len=eventListeners.length; i < len; i++) {
-    if (eventListeners[i] === listener){
-      eventListeners.splice(i, 1);
-      break;
-    }
-  }
-};
-
-Dispatcher.prototype.removeListeners = function(event) {
-  this.listeners[event] = [];
-};
-
-Dispatcher.prototype.off = function(event) {
-  this.listeners = {};
-  this.$document.off('.editable');
-};
-
-Dispatcher.prototype.notify = function(event) {
-  var eventListeners = this.listeners[event];
-  if (eventListeners === undefined) return;
-  for (var i = 0, len = eventListeners.length; i < len; i++) {
-    if (eventListeners[i].apply(
-        this.editable,
-        Array.prototype.slice.call(arguments).splice(1)
-    ) === false)
-      break;
-  }
 };
