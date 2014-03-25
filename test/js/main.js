@@ -84,14 +84,17 @@
     setupTooltip();
   });
 
-  var $iframe = $('.iframe-container iframe');
-  $($iframe[0]).ready(function() {
-    var iframeWindow = $iframe[0].contentWindow;
-    var iframeEditable = new Editable({
-      window: iframeWindow
-    });
+  $(document).ready(function(){
+    var $iframe = $('.iframe-container iframe');
+    $($iframe[0].contentDocument).ready(function() {
+      var iframeWindow = $iframe[0].contentWindow;
+      var iframeEditable = new Editable({
+        window: iframeWindow
+      });
 
-    iframeEditable.add($('article>div>p, article>div li', $iframe[0].contentDocument.body));
+      console.log($('article>div>p, article>div li', $iframe[0].contentDocument.body))
+      iframeEditable.add($('article>div>p, article>div li', $iframe[0].contentDocument.body));
+    });
   });
 
 })(jQuery);
