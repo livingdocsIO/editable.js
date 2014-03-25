@@ -1,7 +1,5 @@
 /**
  * The Keyboard module defines an event API for key events.
- * @module core
- * @submodule keyboard
  */
 
 var Keyboard = function() {
@@ -12,46 +10,46 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target) {
   switch (event.keyCode) {
 
   case this.key.left:
-    this.notify('left', target, event);
+    this.notify(target, 'left', event);
     break;
 
   case this.key.right:
-    this.notify('right', target, event);
+    this.notify(target, 'right', event);
     break;
 
   case this.key.up:
-    this.notify('up', target, event);
+    this.notify(target, 'up', event);
     break;
 
   case this.key.down:
-    this.notify('down', target, event);
+    this.notify(target, 'down', event);
     break;
 
   case this.key.tab:
     if (event.shiftKey) {
-      this.notify('shiftTab', target, event);
+      this.notify(target, 'shiftTab', event);
     } else {
-      this.notify('tab', target, event);
+      this.notify(target, 'tab', event);
     }
     break;
 
   case this.key.esc:
-    this.notify('esc', target, event);
+    this.notify(target, 'esc', event);
     break;
 
   case this.key.backspace:
-    this.notify('backspace', target, event);
+    this.notify(target, 'backspace', event);
     break;
 
   case this.key['delete']:
-    this.notify('delete', target, event);
+    this.notify(target, 'delete', event);
     break;
 
   case this.key.enter:
     if (event.shiftKey) {
-      this.notify('shiftEnter', target, event);
+      this.notify(target, 'shiftEnter', event);
     } else {
-      this.notify('enter', target, event);
+      this.notify(target, 'enter', event);
     }
     break;
 

@@ -7,7 +7,7 @@
 // eventable(obj);
 //
 // publish an event:
-// obj.notify('action', context, param1, param2);
+// obj.notify(context, 'action', param1, param2);
 //
 // Optionally pass a context that will be applied to every event:
 // eventable(obj, context);
@@ -72,17 +72,18 @@ var getEventableModule = function(notifyContext) {
       }
     },
 
-    notify: function(event, context) {
+    notify: function(context, event) {
       var args;
-      var eventListeners = listeners[event];
-      if (eventListeners === undefined) return;
-
       if (notifyContext) {
+        event = context;
         context = notifyContext;
         args = Array.prototype.slice.call(arguments).splice(1);
       } else {
         args = Array.prototype.slice.call(arguments).splice(2);
       }
+      var eventListeners = listeners[event];
+      if (eventListeners === undefined) return;
+
 
       // Traverse backwards and execute the newest listeners first.
       // Stop if a listener returns false.
