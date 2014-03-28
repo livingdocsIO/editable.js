@@ -3661,8 +3661,8 @@ Editable = function(userConfig) {
   }
 
   this.dispatcher = new Dispatcher(this);
-  if (this.config.defaultBehavior === false) {
-    this.dispatcher.addListeners(createDefaultEvents(this));
+  if (this.config.defaultBehavior === true) {
+    this.dispatcher.on(createDefaultEvents(this));
   }
 };
 
@@ -3810,19 +3810,17 @@ Editable.prototype.createCursorAfter = function(element) {
 
 /**
  * Subscribe a callback function to a custom event fired by the API.
- * Opposite of {{#crossLink "Editable/off"}}{{/crossLink}}.
  *
- * @method on
  * @param {String} event The name of the event.
  * @param {Function} handler The callback to execute in response to the
  *     event.
- * @static
+ *
  * @chainable
  */
 Editable.prototype.on = function(event, handler) {
   // TODO throw error if event is not one of EVENTS
   // TODO throw error if handler is not a function
-  this.dispatcher.addListener(event, handler);
+  this.dispatcher.on(event, handler);
   return this;
 };
 
@@ -3830,21 +3828,25 @@ Editable.prototype.on = function(event, handler) {
  * Unsubscribe a callback function from a custom event fired by the API.
  * Opposite of {{#crossLink "Editable/on"}}{{/crossLink}}.
  *
- * @method off
  * @param {String} event The name of the event.
- * @param {Function|Boolean} handler The callback to remove from the
+ * @param {Function} handler The callback to remove from the
  *     event or the special value false to remove all callbacks.
- * @static
+ *
  * @chainable
  */
 Editable.prototype.off = function(event, handler) {
-  if (arguments.length === 0) {
-    this.dispatcher.off();
-  } else {
-    // TODO throw error if event is not one of EVENTS
-    // TODO if handler is flase remove all callbacks
-    this.dispatcher.removeListener(event, handler);
-  }
+  var args = Array.prototype.slice.call(arguments);
+  this.dispatcher.off.apply(this.dispatcher, args);
+  return this;
+};
+
+/**
+ * Unsubscribe all callbacks and event listeners.
+ *
+ * @chainable
+ */
+Editable.prototype.unload = function() {
+  this.dispatcher.unload();
   return this;
 };
 
@@ -4062,7 +4064,8 @@ var config = {
   pastingAttribute: 'data-editable-is-pasting',
   mouseMoveSelectionChanges: false,
   boldTag: '<strong>',
-  italicTag: '<em>'
+  italicTag: '<em>',
+  defaultBehavior: true
 };
 
 
@@ -4400,7 +4403,7 @@ var Cursor = (function() {
    * @constructor
    */
   var Cursor = function(editableHost, rangyRange) {
-    this.host = editableHost;
+    this.setHost(editableHost);
     this.range = rangyRange;
     this.isCursor = true;
   };
@@ -4488,7 +4491,8 @@ var Cursor = (function() {
 
       /**
        * Get the BoundingClientRect of the cursor.
-       * The returned values are absolute to document.body.
+       * The returned values are transformed to be absolute
+       # (relative to the document).
        */
       getCoordinates: function(positioning) {
         positioning = positioning || 'absolute';
@@ -4497,8 +4501,9 @@ var Cursor = (function() {
         if (positioning === 'fixed') return coords;
 
         // code from mdn: https://developer.mozilla.org/en-US/docs/Web/API/window.scrollX
-        var x = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-        var y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+        var win = this.win;
+        var x = (win.pageXOffset !== undefined) ? win.pageXOffset : (win.document.documentElement || win.document.body.parentNode || win.document.body).scrollLeft;
+        var y = (win.pageYOffset !== undefined) ? win.pageYOffset : (win.document.documentElement || win.document.body.parentNode || win.document.body).scrollTop;
 
         // translate into absolute positions
         return {
@@ -4516,14 +4521,14 @@ var Cursor = (function() {
       },
 
       moveBefore: function(element) {
-        this.setHost(element);
+        this.updateHost(element);
         this.range.setStartBefore(element);
         this.range.setEndBefore(element);
         if (this.isSelection) return new Cursor(this.host, this.range);
       },
 
       moveAfter: function(element) {
-        this.setHost(element);
+        this.updateHost(element);
         this.range.setStartAfter(element);
         this.range.setEndAfter(element);
         if (this.isSelection) return new Cursor(this.host, this.range);
@@ -4534,7 +4539,7 @@ var Cursor = (function() {
        */
       moveAtBeginning: function(element) {
         if (!element) element = this.host;
-        this.setHost(element);
+        this.updateHost(element);
         this.range.selectNodeContents(element);
         this.range.collapse(true);
         if (this.isSelection) return new Cursor(this.host, this.range);
@@ -4545,7 +4550,7 @@ var Cursor = (function() {
        */
       moveAtEnd: function(element) {
         if (!element) element = this.host;
-        this.setHost(element);
+        this.updateHost(element);
         this.range.selectNodeContents(element);
         this.range.collapse(false);
         if (this.isSelection) return new Cursor(this.host, this.range);
@@ -4559,10 +4564,17 @@ var Cursor = (function() {
       },
 
       setHost: function(element) {
-        this.host = parser.getHost(element);
-        if (!this.host) {
+        if (element.jquery) element = element[0];
+        this.host = element;
+        this.win = (element === undefined || element === null) ? window : element.ownerDocument.defaultView;
+      },
+
+      updateHost: function(element) {
+        var host = parser.getHost(element);
+        if (!host) {
           error('Can not set cursor outside of an editable block');
         }
+        this.setHost(host);
       },
 
       save: function() {
@@ -5001,10 +5013,12 @@ var createDefaultEvents = function (editable) {
 
 var Dispatcher = function(editable) {
   var win = editable.win;
+  eventable(this, editable);
   this.$document = $(win.document);
-  this.editable = editable;
   this.config = editable.config;
+  this.editable = editable;
   this.editableSelector = editable.editableSelector;
+  this.keyboard = new Keyboard();
   this.selectionWatcher = new SelectionWatcher(this, win);
   this.setup();
 };
@@ -5016,9 +5030,6 @@ var Dispatcher = function(editable) {
  * @method setup
  */
 Dispatcher.prototype.setup = function() {
-  this.listeners = {};
-  var $document = this.$document;
-
   // setup all events notifications
   this.setupElementEvents();
   this.setupKeyboardEvents();
@@ -5028,6 +5039,11 @@ Dispatcher.prototype.setup = function() {
   } else {
     this.setupSelectionChangeFallback();
   }
+};
+
+Dispatcher.prototype.unload = function() {
+  this.off();
+  this.$document.off('.editable');
 };
 
 /**
@@ -5089,10 +5105,10 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
   var _this = this;
 
   this.$document.on('keydown.editable', this.editableSelector, function(event) {
-    keyboard.dispatchKeyEvent(event, this);
+    _this.keyboard.dispatchKeyEvent(event, this);
   });
 
-  keyboard.on('left', function(event) {
+  this.keyboard.on('left', function(event) {
     log('Left key pressed');
     _this.dispatchSwitchEvent(event, this, 'before');
   }).on('up', function(event) {
@@ -5238,51 +5254,108 @@ Dispatcher.prototype.setupSelectionChangeFallback = function() {
   });
 };
 
-Dispatcher.prototype.addListener = function(event, listener) {
-  if (this.listeners[event] === undefined) {
-    this.listeners[event] = [];
-  }
 
-  this.listeners[event].unshift(listener);
-};
+// Eventable Mixin.
+//
+// Simple mixin to add event emitter methods to an object (Publish/Subscribe).
+//
+// Add on, off and notify methods to an object:
+// eventable(obj);
+//
+// publish an event:
+// obj.notify(context, 'action', param1, param2);
+//
+// Optionally pass a context that will be applied to every event:
+// eventable(obj, context);
+//
+// With this publishing can omit the context argument:
+// obj.notify('action', param1, param2);
+//
+// Subscribe to a 'channel'
+// obj.on('action', funtion(param1, param2){ ... });
+//
+// Unsubscribe an individual listener:
+// obj.off('action', method);
+//
+// Unsubscribe all listeners of a channel:
+// obj.off('action');
+//
+// Unsubscribe all listeners of all channels:
+// obj.off();
+var getEventableModule = function(notifyContext) {
+  var listeners = {};
 
-Dispatcher.prototype.addListeners = function(eventObj) {
-  var eventType = null;
-  for (eventType in eventObj) {
-    this.addListener(eventType, eventObj[eventType]);
-  }
-};
-
-Dispatcher.prototype.removeListener = function(event, listener) {
-  var eventListeners = this.listeners[event];
-  if (eventListeners === undefined) return;
-
-  for (var i=0, len=eventListeners.length; i < len; i++) {
-    if (eventListeners[i] === listener){
-      eventListeners.splice(i, 1);
-      break;
+  var addListener = function(event, listener) {
+    if (listeners[event] === undefined) {
+      listeners[event] = [];
     }
-  }
+    listeners[event].push(listener);
+  };
+
+  var removeListener = function(event, listener) {
+    var eventListeners = listeners[event];
+    if (eventListeners === undefined) return;
+
+    for (var i = 0, len = eventListeners.length; i < len; i++) {
+      if (eventListeners[i] === listener) {
+        eventListeners.splice(i, 1);
+        break;
+      }
+    }
+  };
+
+  // Public Methods
+  return {
+    on: function(event, listener) {
+      if (arguments.length === 2) {
+        addListener(event, listener);
+      } else if (arguments.length === 1) {
+        var eventObj = event;
+        for (var eventType in eventObj) {
+          addListener(eventType, eventObj[eventType]);
+        }
+      }
+      return this;
+    },
+
+    off: function(event, listener) {
+      if (arguments.length === 2) {
+        removeListener(event, listener);
+      } else if (arguments.length === 1) {
+        listeners[event] = [];
+      } else {
+        listeners = {};
+      }
+    },
+
+    notify: function(context, event) {
+      var args;
+      if (notifyContext) {
+        event = context;
+        context = notifyContext;
+        args = Array.prototype.slice.call(arguments).splice(1);
+      } else {
+        args = Array.prototype.slice.call(arguments).splice(2);
+      }
+      var eventListeners = listeners[event];
+      if (eventListeners === undefined) return;
+
+
+      // Traverse backwards and execute the newest listeners first.
+      // Stop if a listener returns false.
+      for (var i = eventListeners.length - 1; i >= 0; i--) {
+        if (eventListeners[i].apply(context, args) === false)
+          break;
+      }
+    }
+  };
+
 };
 
-Dispatcher.prototype.removeListeners = function(event) {
-  this.listeners[event] = [];
-};
-
-Dispatcher.prototype.off = function(event) {
-  this.listeners = {};
-  this.$document.off('.editable');
-};
-
-Dispatcher.prototype.notify = function(event) {
-  var eventListeners = this.listeners[event];
-  if (eventListeners === undefined) return;
-  for (var i = 0, len = eventListeners.length; i < len; i++) {
-    if (eventListeners[i].apply(
-        this.editable,
-        Array.prototype.slice.call(arguments).splice(1)
-    ) === false)
-      break;
+var eventable = function(obj, notifyContext) {
+  var module = getEventableModule(notifyContext);
+  for (var prop in module) {
+    obj[prop] = module[prop];
   }
 };
 
@@ -5317,125 +5390,77 @@ var browserFeatures = (function() {
 
 })();
 
-jQuery.fn.editable = function(add) {
-  if (add === undefined || add) {
-    Editable.add(this);
-  } else {
-    Editable.remove(this);
-  }
-
-  return this;
-};
-
 /**
  * The Keyboard module defines an event API for key events.
- * @module core
- * @submodule keyboard
  */
 
-var keyboard = (function() {
-  var key = {
-    left: 37,
-    up: 38,
-    right: 39,
-    down: 40,
-    tab: 9,
-    esc: 27,
-    backspace: 8,
-    'delete': 46,
-    enter: 13
-  };
+var Keyboard = function() {
+  eventable(this);
+};
 
-  var listeners = {};
+Keyboard.prototype.dispatchKeyEvent = function(event, target) {
+  switch (event.keyCode) {
 
-  var addListener = function(event, listener) {
-    if (listeners[event] === undefined) {
-      listeners[event] = [];
+  case this.key.left:
+    this.notify(target, 'left', event);
+    break;
+
+  case this.key.right:
+    this.notify(target, 'right', event);
+    break;
+
+  case this.key.up:
+    this.notify(target, 'up', event);
+    break;
+
+  case this.key.down:
+    this.notify(target, 'down', event);
+    break;
+
+  case this.key.tab:
+    if (event.shiftKey) {
+      this.notify(target, 'shiftTab', event);
+    } else {
+      this.notify(target, 'tab', event);
     }
+    break;
 
-    listeners[event].push(listener);
-  };
+  case this.key.esc:
+    this.notify(target, 'esc', event);
+    break;
 
-  var notifyListeners = function(event, context) {
-    var eventListeners = listeners[event];
-    if (eventListeners === undefined) return;
+  case this.key.backspace:
+    this.notify(target, 'backspace', event);
+    break;
 
-    for (var i=0, len=eventListeners.length; i < len; i++) {
-      if (eventListeners[i].apply(
-          context,
-          Array.prototype.slice.call(arguments).splice(2)
-      ) === false)
-        break;
+  case this.key['delete']:
+    this.notify(target, 'delete', event);
+    break;
+
+  case this.key.enter:
+    if (event.shiftKey) {
+      this.notify(target, 'shiftEnter', event);
+    } else {
+      this.notify(target, 'enter', event);
     }
-  };
+    break;
 
-  /**
-   * Singleton that defines its own API for keyboard events and dispatches
-   * keyboard events from the browser to this API.
-   * The keyboard API events are handled by {{#crossLink "Dispatcher"}}{{/crossLink}}.
-   * @class Keyboard
-   * @static
-   */
-  return {
-    dispatchKeyEvent: function(event, target) {
-      switch (event.keyCode) {
+  }
+};
 
-      case key.left:
-        notifyListeners('left', target, event);
-        break;
+Keyboard.prototype.key = {
+  left: 37,
+  up: 38,
+  right: 39,
+  down: 40,
+  tab: 9,
+  esc: 27,
+  backspace: 8,
+  'delete': 46,
+  enter: 13
+};
 
-      case key.right:
-        notifyListeners('right', target, event);
-        break;
-
-      case key.up:
-        notifyListeners('up', target, event);
-        break;
-
-      case key.down:
-        notifyListeners('down', target, event);
-        break;
-
-      case key.tab:
-        if (event.shiftKey) {
-          notifyListeners('shiftTab', target, event);
-        } else {
-          notifyListeners('tab', target, event);
-        }
-        break;
-
-      case key.esc:
-        notifyListeners('esc', target, event);
-        break;
-
-      case key.backspace:
-        notifyListeners('backspace', target, event);
-        break;
-
-      case key['delete']:
-        notifyListeners('delete', target, event);
-        break;
-
-      case key.enter:
-        if (event.shiftKey) {
-          notifyListeners('shiftEnter', target, event);
-        } else {
-          notifyListeners('enter', target, event);
-        }
-        break;
-
-      }
-    },
-
-    on: function(event, handler) {
-      addListener(event, handler);
-      return this;
-    },
-
-    // export key-codes for testing
-    key: key
-  };
-})();
+Keyboard.key = Keyboard.prototype.key;
 
 /**
  * The parser module provides helper methods to parse html-chunks
@@ -6007,7 +6032,7 @@ var Selection = (function() {
    * @constructor
    */
   var Selection = function(editableHost, rangyRange) {
-    this.host = editableHost;
+    this.setHost(editableHost);
     this.range = rangyRange;
     this.isSelection = true;
   };
