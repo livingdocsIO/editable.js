@@ -26,7 +26,6 @@
 var parser = (function() {
   /**
    * Singleton that provides DOM lookup helpers.
-   * @class Parser
    * @static
    */
   return {

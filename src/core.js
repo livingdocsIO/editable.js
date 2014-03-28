@@ -14,7 +14,6 @@
  * variable.
  *
  * @class Editable
- * @static
  */
 Editable = function(userConfig) {
   this.config = $.extend(true, {}, config, userConfig);
@@ -43,7 +42,6 @@ window.Editable = Editable;
  *    array of HTMLElement or a query selector representing the target where
  *    the API should be added on.
  * @param {Object} [elementConfiguration={}] Configuration options override.
- * @static
  * @chainable
  */
 Editable.prototype.add = function(target, elementConfiguration) {
@@ -64,7 +62,6 @@ Editable.prototype.add = function(target, elementConfiguration) {
  * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
  *    array of HTMLElement or a query selector representing the target where
  *    the API should be removed from.
- * @static
  * @chainable
  */
 Editable.prototype.remove = function(target) {
@@ -82,7 +79,6 @@ Editable.prototype.remove = function(target) {
  * @method disable
  * @param { jQuery element | undefined  } target editable root element(s)
  *    If no param is specified all editables are disabled.
- * @static
  * @chainable
  */
 Editable.prototype.disable = function($elem) {
@@ -102,7 +98,6 @@ Editable.prototype.disable = function($elem) {
  * @method enable
  * @param { jQuery element | undefined } target editable root element(s)
  *    If no param is specified all editables marked as disabled are enabled.
- * @static
  * @chainable
  */
 Editable.prototype.enable = function($elem) {
@@ -125,7 +120,6 @@ Editable.prototype.enable = function($elem) {
  *
  * @method createCursor
  * @param position 'beginning', 'end', 'before', 'after'
- * @static
  */
 Editable.prototype.createCursor = function(element, position) {
   var cursor;
@@ -222,7 +216,6 @@ Editable.prototype.unload = function() {
  * @method focus
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.focus = function(handler) {
@@ -236,7 +229,6 @@ Editable.prototype.focus = function(handler) {
  * @method blur
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.blur = function(handler) {
@@ -250,7 +242,6 @@ Editable.prototype.blur = function(handler) {
  * @method flow
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.flow = function(handler) {
@@ -264,7 +255,6 @@ Editable.prototype.flow = function(handler) {
  * @method selection
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.selection = function(handler) {
@@ -278,7 +268,6 @@ Editable.prototype.selection = function(handler) {
  * @method cursor
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.cursor = function(handler) {
@@ -292,7 +281,6 @@ Editable.prototype.cursor = function(handler) {
  * @method newline
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.newline = function(handler) {
@@ -306,7 +294,6 @@ Editable.prototype.newline = function(handler) {
  * @method insert
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.insert = function(handler) {
@@ -320,7 +307,6 @@ Editable.prototype.insert = function(handler) {
  * @method split
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.split = function(handler) {
@@ -334,7 +320,6 @@ Editable.prototype.split = function(handler) {
  * @method merge
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.merge = function(handler) {
@@ -348,7 +333,6 @@ Editable.prototype.merge = function(handler) {
  * @method empty
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.empty = function(handler) {
@@ -362,7 +346,6 @@ Editable.prototype.empty = function(handler) {
  * @method switch
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype['switch'] = function(handler) {
@@ -376,7 +359,6 @@ Editable.prototype['switch'] = function(handler) {
  * @method move
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.move = function(handler) {
@@ -390,7 +372,6 @@ Editable.prototype.move = function(handler) {
  * @method clipboard
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.clipboard = function(handler) {
