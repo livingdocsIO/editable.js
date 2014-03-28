@@ -4,6 +4,24 @@ describe('Cursor', function() {
     expect(Cursor).toBeDefined();
   });
 
+
+  describe('instantiation', function() {
+    beforeEach(function() {
+      var range = rangy.createRange();
+      this.$elem = $('<div>');
+      this.cursor = new Cursor(this.$elem, range);
+    });
+
+    it('creates an instance from a jQuery element', function() {
+      expect(this.cursor.host).toEqual(this.$elem[0]);
+    });
+
+    it('sets a reference to window', function() {
+      expect(this.cursor.win).toEqual(window);
+    });
+  });
+
+
   describe('with a collapsed range at the end', function() {
 
     beforeEach(function() {

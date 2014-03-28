@@ -6,7 +6,7 @@ describe('Dispatcher', function() {
 
   // create a Cursor object and set the selection to it
   var createCursor = function(range) {
-    var cursor = new Cursor($elem, range);
+    var cursor = new Cursor($elem[0], range);
     cursor.setSelection();
     return cursor;
   };

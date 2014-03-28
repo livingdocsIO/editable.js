@@ -175,8 +175,9 @@ var Cursor = (function() {
       },
 
       setHost: function(element) {
+        if (element.jquery) element = element[0];
         this.host = element;
-        this.win = element == undefined ? window : element.ownerDocument.defaultView;
+        this.win = (element === undefined || element === null) ? window : element.ownerDocument.defaultView;
       },
 
       updateHost: function(element) {
