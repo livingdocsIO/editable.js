@@ -86,15 +86,15 @@
 
   $(document).ready(function(){
     var $iframe = $('.iframe-container iframe');
-    $($iframe[0].contentDocument).ready(function() {
+
+    $iframe.on('load', function() {
       var iframeWindow = $iframe[0].contentWindow;
       var iframeEditable = new Editable({
         window: iframeWindow
       });
-
-      console.log($('article>div>p, article>div li', $iframe[0].contentDocument.body))
       iframeEditable.add($('article>div>p, article>div li', $iframe[0].contentDocument.body));
     });
+
   });
 
 })(jQuery);
