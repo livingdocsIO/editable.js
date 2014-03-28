@@ -16,7 +16,7 @@ var Selection = (function() {
    * @constructor
    */
   var Selection = function(editableHost, rangyRange) {
-    this.host = editableHost;
+    this.setHost(editableHost);
     this.range = rangyRange;
     this.isSelection = true;
   };
