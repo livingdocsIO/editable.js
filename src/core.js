@@ -82,7 +82,8 @@ Editable.prototype.remove = function(target) {
  * @chainable
  */
 Editable.prototype.disable = function($elem) {
-  $elem = $elem || $('.' + config.editableClass);
+  var body = this.win.document.body;
+  $elem = $elem || $('.' + config.editableClass, body);
   $elem
     .removeAttr('contenteditable')
     .removeClass(config.editableClass)
@@ -100,17 +101,20 @@ Editable.prototype.disable = function($elem) {
  *    If no param is specified all editables marked as disabled are enabled.
  * @chainable
  */
-Editable.prototype.enable = function($elem) {
-  $elem = $elem || $('.' + config.editableDisabledClass);
+Editable.prototype.enable = function($elem, normalize) {
+  var body = this.win.document.body;
+  $elem = $elem || $('.' + config.editableDisabledClass, body);
   $elem
     .attr('contenteditable', true)
     .removeClass(config.editableDisabledClass)
     .addClass(config.editableClass);
 
-  $elem.each(function(index, el) {
-    content.normalizeTags(el);
-    content.normalizeSpaces(el);
-  });
+  if (normalize) {
+    $elem.each(function(index, el) {
+      content.normalizeTags(el);
+      content.normalizeSpaces(el);
+    });
+  }
 
   return this;
 };
