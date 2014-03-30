@@ -187,6 +187,13 @@ module.exports = function(grunt) {
     'uglify'
   ]);
 
+  grunt.registerTask('devbuild', [
+    'clean:server',
+    'concat:editable',
+    'concat:dist',
+    'uglify'
+  ]);
+
   grunt.registerTask('build-lukas', [
     'build',
     'copy:lukas'
