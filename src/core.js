@@ -93,6 +93,7 @@ Editable.prototype.disable = function($elem) {
 };
 
 
+
 /**
  * Adds the Editable.JS API to the given target elements.
  *
@@ -116,6 +117,34 @@ Editable.prototype.enable = function($elem, normalize) {
     });
   }
 
+  return this;
+};
+
+/**
+ * Temporarily disable an editable.
+ * Can be used to prevent text selction while dragging an element
+ * for example.
+ *
+ * @method suspend
+ * @param jQuery object
+ */
+Editable.prototype.suspend = function($elem) {
+  var body = this.win.document.body;
+  $elem = $elem || $('.' + config.editableClass, body);
+  $elem.removeAttr('contenteditable');
+  return this;
+};
+
+/**
+ * Reverse the effects of suspend()
+ *
+ * @method continue
+ * @param jQuery object
+ */
+Editable.prototype.continue = function($elem) {
+  var body = this.win.document.body;
+  $elem = $elem || $('.' + config.editableClass, body);
+  $elem.attr('contenteditable', true)
   return this;
 };
 
