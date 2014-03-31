@@ -14,7 +14,7 @@ var Cursor = (function() {
    * @constructor
    */
   var Cursor = function(editableHost, rangyRange) {
-    this.host = editableHost;
+    this.setHost(editableHost);
     this.range = rangyRange;
     this.isCursor = true;
   };
@@ -102,7 +102,8 @@ var Cursor = (function() {
 
       /**
        * Get the BoundingClientRect of the cursor.
-       * The returned values are absolute to document.body.
+       * The returned values are transformed to be absolute
+       # (relative to the document).
        */
       getCoordinates: function(positioning) {
         positioning = positioning || 'absolute';
@@ -111,8 +112,9 @@ var Cursor = (function() {
         if (positioning === 'fixed') return coords;
 
         // code from mdn: https://developer.mozilla.org/en-US/docs/Web/API/window.scrollX
-        var x = (window.pageXOffset !== undefined) ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-        var y = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+        var win = this.win;
+        var x = (win.pageXOffset !== undefined) ? win.pageXOffset : (win.document.documentElement || win.document.body.parentNode || win.document.body).scrollLeft;
+        var y = (win.pageYOffset !== undefined) ? win.pageYOffset : (win.document.documentElement || win.document.body.parentNode || win.document.body).scrollTop;
 
         // translate into absolute positions
         return {
@@ -130,14 +132,14 @@ var Cursor = (function() {
       },
 
       moveBefore: function(element) {
-        this.setHost(element);
+        this.updateHost(element);
         this.range.setStartBefore(element);
         this.range.setEndBefore(element);
         if (this.isSelection) return new Cursor(this.host, this.range);
       },
 
       moveAfter: function(element) {
-        this.setHost(element);
+        this.updateHost(element);
         this.range.setStartAfter(element);
         this.range.setEndAfter(element);
         if (this.isSelection) return new Cursor(this.host, this.range);
@@ -148,7 +150,7 @@ var Cursor = (function() {
        */
       moveAtBeginning: function(element) {
         if (!element) element = this.host;
-        this.setHost(element);
+        this.updateHost(element);
         this.range.selectNodeContents(element);
         this.range.collapse(true);
         if (this.isSelection) return new Cursor(this.host, this.range);
@@ -159,7 +161,7 @@ var Cursor = (function() {
        */
       moveAtEnd: function(element) {
         if (!element) element = this.host;
-        this.setHost(element);
+        this.updateHost(element);
         this.range.selectNodeContents(element);
         this.range.collapse(false);
         if (this.isSelection) return new Cursor(this.host, this.range);
@@ -173,10 +175,17 @@ var Cursor = (function() {
       },
 
       setHost: function(element) {
-        this.host = parser.getHost(element);
-        if (!this.host) {
+        if (element.jquery) element = element[0];
+        this.host = element;
+        this.win = (element === undefined || element === null) ? window : element.ownerDocument.defaultView;
+      },
+
+      updateHost: function(element) {
+        var host = parser.getHost(element);
+        if (!host) {
           error('Can not set cursor outside of an editable block');
         }
+        this.setHost(host);
       },
 
       save: function() {

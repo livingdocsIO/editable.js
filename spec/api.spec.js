@@ -1,23 +1,20 @@
 describe('Global Object', function() {
+  var editable;
+
+  afterEach(function() {
+    if (editable) {
+      editable.off();
+      editable = undefined;
+    }
+  });
 
   it('defines Editable', function() {
     expect(window.Editable).toBeDefined();
   });
 
-  it('defines Editable.add', function() {
-    expect(window.Editable.add).toBeDefined();
-  });
-
-  it('defines Editable.remove', function() {
-    expect(window.Editable.remove).toBeDefined();
-  });
-
-  it('defines Editable.on', function() {
-    expect(window.Editable.on).toBeDefined();
-  });
-
-  it('defines Editable.off', function() {
-    expect(window.Editable.off).toBeDefined();
+  it('creates a new Editable instance', function() {
+    editable = new Editable();
+    expect(editable.on).toBeDefined();
   });
 
   // Test no variables are leaking into global namespace

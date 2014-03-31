@@ -9,12 +9,15 @@
  */
 
 
-var behavior = (function() {
+var createDefaultBehavior = function(editable) {
+  var document = editable.win.document;
+  var config = editable.config;
+  var selectionWatcher = editable.dispatcher.selectionWatcher;
+
   /**
-    * Singleton for the behavior module.
+    * Factory for the default behavior.
     * Provides default behavior of the Editable.JS API.
     *
-    * @class Behavior
     * @static
     */
   return {
@@ -206,4 +209,4 @@ var behavior = (function() {
       }, 0);
     }
   };
-})();
+};

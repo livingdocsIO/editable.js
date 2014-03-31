@@ -1,109 +1,71 @@
 /**
  * The Keyboard module defines an event API for key events.
- * @module core
- * @submodule keyboard
  */
 
-var keyboard = (function() {
-  var key = {
-    left: 37,
-    up: 38,
-    right: 39,
-    down: 40,
-    tab: 9,
-    esc: 27,
-    backspace: 8,
-    'delete': 46,
-    enter: 13
-  };
+var Keyboard = function() {
+  eventable(this);
+};
 
-  var listeners = {};
+Keyboard.prototype.dispatchKeyEvent = function(event, target) {
+  switch (event.keyCode) {
 
-  var addListener = function(event, listener) {
-    if (listeners[event] === undefined) {
-      listeners[event] = [];
+  case this.key.left:
+    this.notify(target, 'left', event);
+    break;
+
+  case this.key.right:
+    this.notify(target, 'right', event);
+    break;
+
+  case this.key.up:
+    this.notify(target, 'up', event);
+    break;
+
+  case this.key.down:
+    this.notify(target, 'down', event);
+    break;
+
+  case this.key.tab:
+    if (event.shiftKey) {
+      this.notify(target, 'shiftTab', event);
+    } else {
+      this.notify(target, 'tab', event);
     }
+    break;
 
-    listeners[event].push(listener);
-  };
+  case this.key.esc:
+    this.notify(target, 'esc', event);
+    break;
 
-  var notifyListeners = function(event, context) {
-    var eventListeners = listeners[event];
-    if (eventListeners === undefined) return;
+  case this.key.backspace:
+    this.notify(target, 'backspace', event);
+    break;
 
-    for (var i=0, len=eventListeners.length; i < len; i++) {
-      if (eventListeners[i].apply(
-          context,
-          Array.prototype.slice.call(arguments).splice(2)
-      ) === false)
-        break;
+  case this.key['delete']:
+    this.notify(target, 'delete', event);
+    break;
+
+  case this.key.enter:
+    if (event.shiftKey) {
+      this.notify(target, 'shiftEnter', event);
+    } else {
+      this.notify(target, 'enter', event);
     }
-  };
+    break;
 
-  /**
-   * Singleton that defines its own API for keyboard events and dispatches
-   * keyboard events from the browser to this API.
-   * The keyboard API events are handled by {{#crossLink "Dispatcher"}}{{/crossLink}}.
-   * @class Keyboard
-   * @static
-   */
-  return {
-    dispatchKeyEvent: function(event, target) {
-      switch (event.keyCode) {
+  }
+};
 
-      case key.left:
-        notifyListeners('left', target, event);
-        break;
+Keyboard.prototype.key = {
+  left: 37,
+  up: 38,
+  right: 39,
+  down: 40,
+  tab: 9,
+  esc: 27,
+  backspace: 8,
+  'delete': 46,
+  enter: 13
+};
 
-      case key.right:
-        notifyListeners('right', target, event);
-        break;
-
-      case key.up:
-        notifyListeners('up', target, event);
-        break;
-
-      case key.down:
-        notifyListeners('down', target, event);
-        break;
-
-      case key.tab:
-        if (event.shiftKey) {
-          notifyListeners('shiftTab', target, event);
-        } else {
-          notifyListeners('tab', target, event);
-        }
-        break;
-
-      case key.esc:
-        notifyListeners('esc', target, event);
-        break;
-
-      case key.backspace:
-        notifyListeners('backspace', target, event);
-        break;
-
-      case key['delete']:
-        notifyListeners('delete', target, event);
-        break;
-
-      case key.enter:
-        if (event.shiftKey) {
-          notifyListeners('shiftEnter', target, event);
-        } else {
-          notifyListeners('enter', target, event);
-        }
-        break;
-
-      }
-    },
-
-    on: function(event, handler) {
-      addListener(event, handler);
-      return this;
-    },
-
-    // export key-codes for testing
-    key: key
-  };
-})();
+Keyboard.key = Keyboard.prototype.key;

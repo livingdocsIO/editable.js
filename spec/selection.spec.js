@@ -14,6 +14,10 @@ describe('Selection', function() {
       this.selection = new Selection(this.oneWord, range);
     });
 
+    it('sets a reference to window', function() {
+      expect(this.selection.win).toEqual(window);
+    });
+
     it('sets #isSelection to true', function(){
       expect(this.selection.isSelection).toBe(true);
     });
