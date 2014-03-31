@@ -1,5 +1,5 @@
 /**
- * The Core module provides the Editable singleton that defines the Editable.JS
+ * The Core module provides the Editable class that defines the Editable.JS
  * API and is the main entry point for Editable.JS.
  * It also provides the cursor module for cross-browser cursors, and the dom
  * submodule.
@@ -8,7 +8,7 @@
  */
 
 /**
- * Singleton for the Editable.JS API that is externally visible.
+ * Constructor for the Editable.JS API that is externally visible.
  * Note that the Editable literal is defined
  * first in editable.prefix in order for it to be the only externally visible
  * variable.
@@ -144,7 +144,7 @@ Editable.prototype.suspend = function($elem) {
 Editable.prototype.continue = function($elem) {
   var body = this.win.document.body;
   $elem = $elem || $('.' + config.editableClass, body);
-  $elem.attr('contenteditable', true)
+  $elem.attr('contenteditable', true);
   return this;
 };
 

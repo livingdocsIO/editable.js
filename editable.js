@@ -3634,7 +3634,7 @@ var string = (function() {
 })();
 
 /**
- * The Core module provides the Editable singleton that defines the Editable.JS
+ * The Core module provides the Editable class that defines the Editable.JS
  * API and is the main entry point for Editable.JS.
  * It also provides the cursor module for cross-browser cursors, and the dom
  * submodule.
@@ -3643,13 +3643,12 @@ var string = (function() {
  */
 
 /**
- * Singleton for the Editable.JS API that is externally visible.
+ * Constructor for the Editable.JS API that is externally visible.
  * Note that the Editable literal is defined
  * first in editable.prefix in order for it to be the only externally visible
  * variable.
  *
  * @class Editable
- * @static
  */
 Editable = function(userConfig) {
   this.config = $.extend(true, {}, config, userConfig);
@@ -3678,7 +3677,6 @@ window.Editable = Editable;
  *    array of HTMLElement or a query selector representing the target where
  *    the API should be added on.
  * @param {Object} [elementConfiguration={}] Configuration options override.
- * @static
  * @chainable
  */
 Editable.prototype.add = function(target, elementConfiguration) {
@@ -3699,7 +3697,6 @@ Editable.prototype.add = function(target, elementConfiguration) {
  * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
  *    array of HTMLElement or a query selector representing the target where
  *    the API should be removed from.
- * @static
  * @chainable
  */
 Editable.prototype.remove = function(target) {
@@ -3717,11 +3714,11 @@ Editable.prototype.remove = function(target) {
  * @method disable
  * @param { jQuery element | undefined  } target editable root element(s)
  *    If no param is specified all editables are disabled.
- * @static
  * @chainable
  */
 Editable.prototype.disable = function($elem) {
-  $elem = $elem || $('.' + config.editableClass);
+  var body = this.win.document.body;
+  $elem = $elem || $('.' + config.editableClass, body);
   $elem
     .removeAttr('contenteditable')
     .removeClass(config.editableClass)
@@ -3731,27 +3728,58 @@ Editable.prototype.disable = function($elem) {
 };
 
 
+
 /**
  * Adds the Editable.JS API to the given target elements.
  *
  * @method enable
  * @param { jQuery element | undefined } target editable root element(s)
  *    If no param is specified all editables marked as disabled are enabled.
- * @static
  * @chainable
  */
-Editable.prototype.enable = function($elem) {
-  $elem = $elem || $('.' + config.editableDisabledClass);
+Editable.prototype.enable = function($elem, normalize) {
+  var body = this.win.document.body;
+  $elem = $elem || $('.' + config.editableDisabledClass, body);
   $elem
     .attr('contenteditable', true)
     .removeClass(config.editableDisabledClass)
     .addClass(config.editableClass);
 
-  $elem.each(function(index, el) {
-    content.normalizeTags(el);
-    content.normalizeSpaces(el);
-  });
+  if (normalize) {
+    $elem.each(function(index, el) {
+      content.normalizeTags(el);
+      content.normalizeSpaces(el);
+    });
+  }
 
+  return this;
+};
+
+/**
+ * Temporarily disable an editable.
+ * Can be used to prevent text selction while dragging an element
+ * for example.
+ *
+ * @method suspend
+ * @param jQuery object
+ */
+Editable.prototype.suspend = function($elem) {
+  var body = this.win.document.body;
+  $elem = $elem || $('.' + config.editableClass, body);
+  $elem.removeAttr('contenteditable');
+  return this;
+};
+
+/**
+ * Reverse the effects of suspend()
+ *
+ * @method continue
+ * @param jQuery object
+ */
+Editable.prototype.continue = function($elem) {
+  var body = this.win.document.body;
+  $elem = $elem || $('.' + config.editableClass, body);
+  $elem.attr('contenteditable', true);
   return this;
 };
 
@@ -3760,7 +3788,6 @@ Editable.prototype.enable = function($elem) {
  *
  * @method createCursor
  * @param position 'beginning', 'end', 'before', 'after'
- * @static
  */
 Editable.prototype.createCursor = function(element, position) {
   var cursor;
@@ -3857,7 +3884,6 @@ Editable.prototype.unload = function() {
  * @method focus
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.focus = function(handler) {
@@ -3871,7 +3897,6 @@ Editable.prototype.focus = function(handler) {
  * @method blur
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.blur = function(handler) {
@@ -3885,7 +3910,6 @@ Editable.prototype.blur = function(handler) {
  * @method flow
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.flow = function(handler) {
@@ -3899,7 +3923,6 @@ Editable.prototype.flow = function(handler) {
  * @method selection
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.selection = function(handler) {
@@ -3913,7 +3936,6 @@ Editable.prototype.selection = function(handler) {
  * @method cursor
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.cursor = function(handler) {
@@ -3927,7 +3949,6 @@ Editable.prototype.cursor = function(handler) {
  * @method newline
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.newline = function(handler) {
@@ -3941,7 +3962,6 @@ Editable.prototype.newline = function(handler) {
  * @method insert
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.insert = function(handler) {
@@ -3955,7 +3975,6 @@ Editable.prototype.insert = function(handler) {
  * @method split
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.split = function(handler) {
@@ -3969,7 +3988,6 @@ Editable.prototype.split = function(handler) {
  * @method merge
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.merge = function(handler) {
@@ -3983,7 +4001,6 @@ Editable.prototype.merge = function(handler) {
  * @method empty
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.empty = function(handler) {
@@ -3997,7 +4014,6 @@ Editable.prototype.empty = function(handler) {
  * @method switch
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype['switch'] = function(handler) {
@@ -4011,7 +4027,6 @@ Editable.prototype['switch'] = function(handler) {
  * @method move
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.move = function(handler) {
@@ -4025,7 +4040,6 @@ Editable.prototype.move = function(handler) {
  * @method clipboard
  * @param {Function} handler The callback to execute in response to the
  *   event.
- * @static
  * @chainable
  */
 Editable.prototype.clipboard = function(handler) {
@@ -4627,10 +4641,9 @@ var createDefaultBehavior = function(editable) {
   var selectionWatcher = editable.dispatcher.selectionWatcher;
 
   /**
-    * Singleton for the behavior module.
+    * Factory for the default behavior.
     * Provides default behavior of the Editable.JS API.
     *
-    * @class Behavior
     * @static
     */
   return {
@@ -5490,7 +5503,6 @@ Keyboard.key = Keyboard.prototype.key;
 var parser = (function() {
   /**
    * Singleton that provides DOM lookup helpers.
-   * @class Parser
    * @static
    */
   return {
