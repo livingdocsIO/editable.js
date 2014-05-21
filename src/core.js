@@ -373,6 +373,19 @@ Editable.prototype.empty = function(handler) {
 };
 
 /**
+ * Subscribe to the {{#crossLink "Editable/change:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method change
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @chainable
+ */
+Editable.prototype.change = function(handler) {
+  return this.on('change', handler);
+};
+
+/**
  * Subscribe to the {{#crossLink "Editable/switch:event"}}{{/crossLink}}
  * event.
  *

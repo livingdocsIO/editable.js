@@ -6,7 +6,7 @@ var Keyboard = function() {
   eventable(this);
 };
 
-Keyboard.prototype.dispatchKeyEvent = function(event, target) {
+Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEvent) {
   switch (event.keyCode) {
 
   case this.key.left:
@@ -52,7 +52,20 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target) {
       this.notify(target, 'enter', event);
     }
     break;
-
+  case this.key.ctrl:
+  case this.key.shift:
+  case this.key.alt:
+    break;
+  // Metakey
+  case 224: // Firefox: 224
+  case 17: // Opera: 17
+  case 91: // Chrome/Safari: 91 (Left)
+  case 93: // Chrome/Safari: 93 (Right)
+    break;
+  default:
+    if (notifyCharacterEvent) {
+      this.notify(target, 'character', event);
+    }
   }
 };
 
@@ -65,7 +78,10 @@ Keyboard.prototype.key = {
   esc: 27,
   backspace: 8,
   'delete': 46,
-  enter: 13
+  enter: 13,
+  shift: 16,
+  ctrl: 17,
+  alt: 18
 };
 
 Keyboard.key = Keyboard.prototype.key;
