@@ -141,26 +141,17 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
   });
 
   this.keyboard.on('left', function(event) {
-    log('Left key pressed');
     _this.dispatchSwitchEvent(event, this, 'before');
   }).on('up', function(event) {
-    log('Up key pressed');
     _this.dispatchSwitchEvent(event, this, 'before');
   }).on('right', function(event) {
-    log('Right key pressed');
     _this.dispatchSwitchEvent(event, this, 'after');
   }).on('down', function(event) {
-    log('Down key pressed');
     _this.dispatchSwitchEvent(event, this, 'after');
   }).on('tab', function(event) {
-    log('Tab key pressed');
   }).on('shiftTab', function(event) {
-    log('Shift+Tab key pressed');
   }).on('esc', function(event) {
-    log('Esc key pressed');
   }).on('backspace', function(event) {
-    log('Backspace key pressed');
-
     var range = _this.selectionWatcher.getFreshRange();
     if (range.isCursor) {
       var cursor = range.getCursor();
@@ -175,8 +166,6 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
       _this.triggerChangeEvent(this);
     }
   }).on('delete', function(event) {
-    log('Delete key pressed');
-
     var range = _this.selectionWatcher.getFreshRange();
     if (range.isCursor) {
       var cursor = range.getCursor();
@@ -191,7 +180,6 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
       _this.triggerChangeEvent(this);
     }
   }).on('enter', function(event) {
-    log('Enter key pressed');
     event.preventDefault();
     event.stopPropagation();
     var range = _this.selectionWatcher.getFreshRange();
@@ -206,7 +194,6 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
     }
 
   }).on('shiftEnter', function(event) {
-    log('Shift+Enter key pressed');
     event.preventDefault();
     event.stopPropagation();
     var cursor = _this.selectionWatcher.forceCursor();
