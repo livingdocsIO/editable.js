@@ -80,7 +80,7 @@
   };
 
   $(document).ready(function() {
-    editable.add("article>div>p, article>div li");
+    editable.add('.is-editable');
     setupTooltip();
   });
 
@@ -92,7 +92,7 @@
       var iframeEditable = new Editable({
         window: iframeWindow
       });
-      iframeEditable.add($('article>div>p, article>div li', $iframe[0].contentDocument.body));
+      iframeEditable.add($('.is-editable', $iframe[0].contentDocument.body));
     });
 
   });
