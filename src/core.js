@@ -199,6 +199,10 @@ Editable.prototype.createCursorAfter = function(element) {
   this.createCursor(element, 'after');
 };
 
+Editable.prototype.getContent = function(element) {
+  return content.removeInternals(element.innerHTML);
+};
+
 
 /**
  * Subscribe a callback function to a custom event fired by the API.

@@ -6,6 +6,7 @@ var content = (function() {
     return rangeSaveRestore.restore(host, range);
   };
 
+  var zeroWidthSpace = /\u200B/g;
   return {
     /**
      * Remove empty tags and merge consecutive tags (they must have the same
@@ -58,7 +59,13 @@ var content = (function() {
      * @param  {HTMLElement} element The element to process.
      */
     cleanInternals: function(element) {
-      element.innerHTML = element.innerHTML.replace(/\u200B/g, '<br />');
+      element.innerHTML = this.removeInternals(element.innerHTML);
+    },
+
+
+    removeInternals: function(innerHtml) {
+      innerHtml = innerHtml.replace(zeroWidthSpace, '<br />'); // Used for cross-browser newlines
+      return innerHtml;
     },
 
     /**
