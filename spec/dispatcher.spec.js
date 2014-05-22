@@ -11,10 +11,17 @@ describe('Dispatcher', function() {
     return cursor;
   };
 
-  var createRangyCursorAtEnd = function(node) {
+  var createRangeAtEnd = function(node) {
     var range = rangy.createRange();
     range.selectNodeContents(node);
     range.collapse(false);
+    return range;
+  };
+
+  var createRangeAtBeginning = function(node) {
+    var range = rangy.createRange();
+    range.selectNodeContents(node);
+    range.collapse(true);
     return range;
   };
 
@@ -59,14 +66,14 @@ describe('Dispatcher', function() {
     describe('on Enter', function() {
 
       beforeEach(function(){
-        event = jQuery.Event("keydown");
+        event = jQuery.Event('keydown');
         event.keyCode = key.enter;
       });
 
       it('fires insert "after" if cursor is at the end', function() {
         // <div>foo\</div>
         $elem.html('foo');
-        createCursor( createRangyCursorAtEnd($elem[0]) );
+        createCursor(createRangeAtEnd($elem[0]));
 
         var insert = on('insert', function(element, direction, cursor) {
           expect(element).toEqual($elem[0]);
@@ -114,6 +121,78 @@ describe('Dispatcher', function() {
         $elem.trigger(event);
         expect(insert.calls).toEqual(1);
       });
+
     });
+
+    describe('on backspace', function() {
+
+      beforeEach(function(){
+        event = jQuery.Event('keydown');
+        event.keyCode = key['backspace'];
+      });
+
+      it('fires "merge" if cursor is at the beginning', function(done) {
+        $elem.html('foo');
+        createCursor(createRangeAtBeginning($elem[0]));
+
+        on('merge', function(element) {
+          expect(element).toEqual($elem[0]);
+          done()
+        });
+
+        $elem.trigger(event);
+      });
+
+      it('fires "change" if cursor is not at the beginning', function(done) {
+        $elem.html('foo');
+        createCursor(createRangeAtEnd($elem[0]));
+
+        on('change', function(element) {
+          expect(element).toEqual($elem[0]);
+          done()
+        });
+
+        $elem.trigger(event);
+      });
+    });
+
+    describe('on delete', function() {
+      beforeEach(function(){
+        event = jQuery.Event('keydown');
+        event.keyCode = key['delete'];
+      });
+
+      it('fires "merge" if cursor is at the end', function(done) {
+        $elem.html('foo');
+        createCursor(createRangeAtEnd($elem[0]));
+
+        on('merge', function(element) {
+          expect(element).toEqual($elem[0]);
+          done()
+        });
+
+        $elem.trigger(event);
+      });
+
+      it('fires "change" if cursor is at the beginning', function(done) {
+        $elem.html('foo');
+        createCursor(createRangeAtBeginning($elem[0]));
+        on('change', done);
+        $elem.trigger(event);
+      });
+    });
+
+    describe('on keydown', function() {
+      beforeEach(function(){
+        event = jQuery.Event('keydown');
+      });
+
+      it('fires change when a character is pressed', function(done) {
+        event.keyCode = 'e'.charCodeAt(0);
+        on('change', done);
+        $elem.trigger(event);
+      });
+    });
+
   });
 });
