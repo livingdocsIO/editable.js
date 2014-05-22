@@ -7,6 +7,8 @@ var content = (function() {
   };
 
   var zeroWidthSpace = /\u200B/g;
+  var zeroWidthNonBreakingSpace = /\uFEFF/g;
+
   return {
     /**
      * Remove empty tags and merge consecutive tags (they must have the same
@@ -64,6 +66,7 @@ var content = (function() {
 
 
     removeInternals: function(innerHtml) {
+      innerHtml = innerHtml.replace(zeroWidthNonBreakingSpace, ''); // Used for forcing inline elments to have a height
       innerHtml = innerHtml.replace(zeroWidthSpace, '<br />'); // Used for cross-browser newlines
       return innerHtml;
     },

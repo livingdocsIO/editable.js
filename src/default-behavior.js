@@ -23,6 +23,12 @@ var createDefaultBehavior = function(editable) {
   return {
     focus: function(element) {
       log('Default focus behavior');
+      // Add a zero width non-breaking space before the cursor if the editable is empty
+      // to force inline elments to have a height.
+      if(parser.isVoid(element)) {
+        var zeroWidthNoBreakSpace = document.createTextNode('\uFEFF');
+        element.appendChild(zeroWidthNoBreakSpace);
+      }
     },
 
     blur: function(element) {
