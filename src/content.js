@@ -255,7 +255,13 @@ var content = (function() {
     },
 
     unwrap: function(elem) {
-      $(elem).contents().unwrap();
+      var $elem = $(elem);
+      var contents = $elem.contents();
+      if (contents.length) {
+        contents.unwrap();
+      } else {
+        $elem.remove();
+      }
     },
 
     removeFormatting: function(host, range, tagName) {

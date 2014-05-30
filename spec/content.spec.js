@@ -536,5 +536,11 @@ describe('Content', function() {
       var result = content.extractContent($host[0])
       expect($host[0].innerHTML).toEqual('<span id="editable-range-boundary-1">a</span>')
     });
+
+    it('removes a saved range in an otherwise empty host', function() {
+      $host.html('<span id="editable-range-boundary-1"></span>')
+      var result = content.extractContent($host[0])
+      expect(result).toEqual('')
+    });
   });
 });
