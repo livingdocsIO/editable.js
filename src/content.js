@@ -61,14 +61,44 @@ var content = (function() {
      * @param  {HTMLElement} element The element to process.
      */
     cleanInternals: function(element) {
-      element.innerHTML = this.removeInternals(element.innerHTML);
+      // Uses extract content for simplicity. A custom method
+      // that does not clone the element could be faster if needed.
+      element.innerHTML = this.extractContent(element);
     },
 
-
-    removeInternals: function(innerHtml) {
+    /**
+     * Extracts the content from a host element.
+     * Does not touch or change the host. Just returns
+     * the content without anything inserted by editable or for
+     * the user interface.
+     */
+    extractContent: function(element) {
+      var innerHtml = element.innerHTML;
       innerHtml = innerHtml.replace(zeroWidthNonBreakingSpace, ''); // Used for forcing inline elments to have a height
-      innerHtml = innerHtml.replace(zeroWidthSpace, '<br />'); // Used for cross-browser newlines
-      return innerHtml;
+      innerHtml = innerHtml.replace(zeroWidthSpace, '<br>'); // Used for cross-browser newlines
+
+      var clone = document.createElement('div');
+      clone.innerHTML = innerHtml;
+      this.unwrapInternalNodes(clone);
+      return clone.innerHTML;
+    },
+
+    /**
+     * Remove elements that were inserted for internal or user interface purposes
+     *
+     * Currently:
+     * - Saved ranges
+     */
+    unwrapInternalNodes: function(sibling) {
+      while (sibling != null) {
+        if (sibling.nodeType === 1 && sibling.firstChild) {
+          this.unwrapInternalNodes(sibling.firstChild);
+        }
+        if (/editable-range-boundary-/.test(sibling.id)) {
+          this.unwrap(sibling);
+        }
+        sibling = sibling.nextSibling;
+      }
     },
 
     /**

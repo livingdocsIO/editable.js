@@ -497,4 +497,44 @@ describe('Content', function() {
       expect(exact).toEqual(false);
     });
   });
+
+  describe('extractContent()', function() {
+    var $host;
+
+    beforeEach(function() {
+      $host = $('<div></div>');
+    });
+
+    it('extracts the content', function() {
+      $host.html('a')
+      var result = content.extractContent($host[0])
+      // escape to show invisible characters
+      expect(escape(result)).toEqual('a')
+    });
+
+    it('replaces a zeroWidthSpace with a <br> tag', function() {
+      $host.html('a\u200B')
+      var result = content.extractContent($host[0])
+      expect(result).toEqual('a<br>')
+    });
+
+    it('removes zeroWidthNonBreakingSpaces', function() {
+      $host.html('a\uFEFF')
+      var result = content.extractContent($host[0])
+      // escape to show invisible characters
+      expect(escape(result)).toEqual('a')
+    });
+
+    it('removes saved ranges', function() {
+      $host.html('<span id="editable-range-boundary-1">a</span>')
+      var result = content.extractContent($host[0])
+      expect(result).toEqual('a')
+    });
+
+    it('removes saved ranges but leaves them in the host', function() {
+      $host.html('<span id="editable-range-boundary-1">a</span>')
+      var result = content.extractContent($host[0])
+      expect($host[0].innerHTML).toEqual('<span id="editable-range-boundary-1">a</span>')
+    });
+  });
 });

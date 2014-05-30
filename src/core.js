@@ -200,7 +200,7 @@ Editable.prototype.createCursorAfter = function(element) {
 };
 
 Editable.prototype.getContent = function(element) {
-  return content.removeInternals(element.innerHTML);
+  return content.extractContent(element);
 };
 
 
