@@ -90,7 +90,7 @@ var content = (function() {
      * - Saved ranges
      */
     unwrapInternalNodes: function(sibling) {
-      while (sibling != null) {
+      while (sibling) {
         if (sibling.nodeType === 1 && sibling.firstChild) {
           this.unwrapInternalNodes(sibling.firstChild);
         }

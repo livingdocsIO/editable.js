@@ -3834,6 +3834,10 @@ Editable.prototype.createCursorAfter = function(element) {
   this.createCursor(element, 'after');
 };
 
+Editable.prototype.getContent = function(element) {
+  return content.extractContent(element);
+};
+
 
 /**
  * Subscribe a callback function to a custom event fired by the API.
@@ -4008,6 +4012,19 @@ Editable.prototype.empty = function(handler) {
 };
 
 /**
+ * Subscribe to the {{#crossLink "Editable/change:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method change
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @chainable
+ */
+Editable.prototype.change = function(handler) {
+  return this.on('change', handler);
+};
+
+/**
  * Subscribe to the {{#crossLink "Editable/switch:event"}}{{/crossLink}}
  * event.
  *
@@ -4091,6 +4108,9 @@ var content = (function() {
     return rangeSaveRestore.restore(host, range);
   };
 
+  var zeroWidthSpace = /\u200B/g;
+  var zeroWidthNonBreakingSpace = /\uFEFF/g;
+
   return {
     /**
      * Remove empty tags and merge consecutive tags (they must have the same
@@ -4143,7 +4163,44 @@ var content = (function() {
      * @param  {HTMLElement} element The element to process.
      */
     cleanInternals: function(element) {
-      element.innerHTML = element.innerHTML.replace(/\u200B/g, '<br />');
+      // Uses extract content for simplicity. A custom method
+      // that does not clone the element could be faster if needed.
+      element.innerHTML = this.extractContent(element);
+    },
+
+    /**
+     * Extracts the content from a host element.
+     * Does not touch or change the host. Just returns
+     * the content without anything inserted by editable or for
+     * the user interface.
+     */
+    extractContent: function(element) {
+      var innerHtml = element.innerHTML;
+      innerHtml = innerHtml.replace(zeroWidthNonBreakingSpace, ''); // Used for forcing inline elments to have a height
+      innerHtml = innerHtml.replace(zeroWidthSpace, '<br>'); // Used for cross-browser newlines
+
+      var clone = document.createElement('div');
+      clone.innerHTML = innerHtml;
+      this.unwrapInternalNodes(clone);
+      return clone.innerHTML;
+    },
+
+    /**
+     * Remove elements that were inserted for internal or user interface purposes
+     *
+     * Currently:
+     * - Saved ranges
+     */
+    unwrapInternalNodes: function(sibling) {
+      while (sibling) {
+        if (sibling.nodeType === 1 && sibling.firstChild) {
+          this.unwrapInternalNodes(sibling.firstChild);
+        }
+        if (/editable-range-boundary-/.test(sibling.id)) {
+          this.unwrap(sibling);
+        }
+        sibling = sibling.nextSibling;
+      }
     },
 
     /**
@@ -4300,7 +4357,13 @@ var content = (function() {
     },
 
     unwrap: function(elem) {
-      $(elem).contents().unwrap();
+      var $elem = $(elem);
+      var contents = $elem.contents();
+      if (contents.length) {
+        contents.unwrap();
+      } else {
+        $elem.remove();
+      }
     },
 
     removeFormatting: function(host, range, tagName) {
@@ -4317,7 +4380,7 @@ var content = (function() {
       var tags = this.getTags(host, range);
       for (var i = 0; i < tags.length; i++) {
         var elem = tags[i];
-        if ( !tagName || elem.nodeName === tagName.toUpperCase() ) {
+        if ( elem.nodeName !== 'BR' && (!tagName || elem.nodeName === tagName.toUpperCase()) ) {
           this.unwrap(elem);
         }
       }
@@ -4649,6 +4712,12 @@ var createDefaultBehavior = function(editable) {
   return {
     focus: function(element) {
       log('Default focus behavior');
+      // Add a zero width non-breaking space before the cursor if the editable is empty
+      // to force inline elments to have a height.
+      if(parser.isVoid(element)) {
+        var zeroWidthNoBreakSpace = document.createTextNode('\uFEFF');
+        element.appendChild(zeroWidthNoBreakSpace);
+      }
     },
 
     blur: function(element) {
@@ -4698,7 +4767,7 @@ var createDefaultBehavior = function(editable) {
         log('not at the end');
       }
 
-      cursor.setSelection();
+      cursor.setVisibleSelection();
     },
 
     insert: function(element, direction, cursor) {
@@ -4751,7 +4820,7 @@ var createDefaultBehavior = function(editable) {
         cursor.moveAtTextEnd(container);
       else
         cursor.moveAtBeginning(container);
-      cursor.setSelection();
+      cursor.setVisibleSelection();
 
       fragment = document.createDocumentFragment();
       chunks = merger.childNodes;
@@ -4766,7 +4835,7 @@ var createDefaultBehavior = function(editable) {
       content.normalizeTags(container);
       content.normalizeSpaces(container);
       cursor.restore();
-      cursor.setSelection();
+      cursor.setVisibleSelection();
     },
 
     empty: function(element) {
@@ -4783,14 +4852,14 @@ var createDefaultBehavior = function(editable) {
         previous = block.previous(element);
         if (previous) {
           cursor.moveAtTextEnd(previous);
-          cursor.setSelection();
+          cursor.setVisibleSelection();
         }
         break;
       case 'after':
         next = block.next(element);
         if (next) {
           cursor.moveAtBeginning(next);
-          cursor.setSelection();
+          cursor.setVisibleSelection();
         }
         break;
       }
@@ -4829,7 +4898,7 @@ var createDefaultBehavior = function(editable) {
         content.normalizeSpaces(pasteElement);
         cursor.insertAfter(pasteElement);
         cursor.moveAfter(pasteElement);
-        cursor.setSelection();
+        cursor.setVisibleSelection();
 
         element.removeAttribute(config.pastingAttribute);
       }, 0);
@@ -5027,6 +5096,7 @@ var createDefaultEvents = function (editable) {
 var Dispatcher = function(editable) {
   var win = editable.win;
   eventable(this, editable);
+  this.supportsInputEvent = false;
   this.$document = $(win.document);
   this.config = editable.config;
   this.editable = editable;
@@ -5036,6 +5106,10 @@ var Dispatcher = function(editable) {
   this.setup();
 };
 
+// This will be set to true once we detect the input event is working.
+// Input event description on MDN:
+// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/input
+var isInputEventSupported = false;
 
 /**
  * Sets up all events that Editable.JS is catching.
@@ -5080,10 +5154,42 @@ Dispatcher.prototype.setupElementEvents = function() {
   }).on('cut.editable', _this.editableSelector, function(event) {
     log('Cut');
     _this.notify('clipboard', this, 'cut', _this.selectionWatcher.getFreshSelection());
+    _this.triggerChangeEvent(this);
   }).on('paste.editable', _this.editableSelector, function(event) {
     log('Paste');
     _this.notify('clipboard', this, 'paste', _this.selectionWatcher.getFreshSelection());
+    _this.triggerChangeEvent(this);
+  }).on('input.editable', _this.editableSelector, function(event) {
+    log('Input');
+    if (isInputEventSupported) {
+      _this.notify('change', this);
+    } else {
+      // Most likely the event was already handled manually by
+      // triggerChangeEvent so the first time we just switch the
+      // isInputEventSupported flag without notifiying the change event.
+      isInputEventSupported = true;
+    }
   });
+};
+
+/**
+ * Trigger a change event
+ *
+ * This should be done in these cases:
+ * - typing a letter
+ * - delete (backspace and delete keys)
+ * - cut
+ * - paste
+ * - copy and paste (not easily possible manually as far as I know)
+ *
+ * Preferrably this is done using the input event. But the input event is not
+ * supported on all browsers for contenteditable elements.
+ * To make things worse it is not detectable either. So instead of detecting
+ * we set 'isInputEventSupported' when the input event fires the first time.
+ */
+Dispatcher.prototype.triggerChangeEvent = function(target){
+  if (isInputEventSupported) return;
+  this.notify('change', target);
 };
 
 Dispatcher.prototype.dispatchSwitchEvent = function(event, element, direction) {
@@ -5118,30 +5224,22 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
   var _this = this;
 
   this.$document.on('keydown.editable', this.editableSelector, function(event) {
-    _this.keyboard.dispatchKeyEvent(event, this);
+    var notifyCharacterEvent = !isInputEventSupported;
+    _this.keyboard.dispatchKeyEvent(event, this, notifyCharacterEvent);
   });
 
   this.keyboard.on('left', function(event) {
-    log('Left key pressed');
     _this.dispatchSwitchEvent(event, this, 'before');
   }).on('up', function(event) {
-    log('Up key pressed');
     _this.dispatchSwitchEvent(event, this, 'before');
   }).on('right', function(event) {
-    log('Right key pressed');
     _this.dispatchSwitchEvent(event, this, 'after');
   }).on('down', function(event) {
-    log('Down key pressed');
     _this.dispatchSwitchEvent(event, this, 'after');
   }).on('tab', function(event) {
-    log('Tab key pressed');
   }).on('shiftTab', function(event) {
-    log('Shift+Tab key pressed');
   }).on('esc', function(event) {
-    log('Esc key pressed');
   }).on('backspace', function(event) {
-    log('Backspace key pressed');
-
     var range = _this.selectionWatcher.getFreshRange();
     if (range.isCursor) {
       var cursor = range.getCursor();
@@ -5149,11 +5247,13 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
         event.preventDefault();
         event.stopPropagation();
         _this.notify('merge', this, 'before', cursor);
+      } else {
+        _this.triggerChangeEvent(this);
       }
+    } else {
+      _this.triggerChangeEvent(this);
     }
   }).on('delete', function(event) {
-    log('Delete key pressed');
-
     var range = _this.selectionWatcher.getFreshRange();
     if (range.isCursor) {
       var cursor = range.getCursor();
@@ -5161,10 +5261,13 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
         event.preventDefault();
         event.stopPropagation();
         _this.notify('merge', this, 'after', cursor);
+      } else {
+        _this.triggerChangeEvent(this);
       }
+    } else {
+      _this.triggerChangeEvent(this);
     }
   }).on('enter', function(event) {
-    log('Enter key pressed');
     event.preventDefault();
     event.stopPropagation();
     var range = _this.selectionWatcher.getFreshRange();
@@ -5179,11 +5282,12 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
     }
 
   }).on('shiftEnter', function(event) {
-    log('Shift+Enter key pressed');
     event.preventDefault();
     event.stopPropagation();
     var cursor = _this.selectionWatcher.forceCursor();
     _this.notify('newline', this, cursor);
+  }).on('character', function(event) {
+    _this.notify('change', this);
   });
 };
 
@@ -5411,7 +5515,7 @@ var Keyboard = function() {
   eventable(this);
 };
 
-Keyboard.prototype.dispatchKeyEvent = function(event, target) {
+Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEvent) {
   switch (event.keyCode) {
 
   case this.key.left:
@@ -5457,7 +5561,20 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target) {
       this.notify(target, 'enter', event);
     }
     break;
-
+  case this.key.ctrl:
+  case this.key.shift:
+  case this.key.alt:
+    break;
+  // Metakey
+  case 224: // Firefox: 224
+  case 17: // Opera: 17
+  case 91: // Chrome/Safari: 91 (Left)
+  case 93: // Chrome/Safari: 93 (Right)
+    break;
+  default:
+    if (notifyCharacterEvent) {
+      this.notify(target, 'character', event);
+    }
   }
 };
 
@@ -5470,7 +5587,10 @@ Keyboard.prototype.key = {
   esc: 27,
   backspace: 8,
   'delete': 46,
-  enter: 13
+  enter: 13,
+  shift: 16,
+  ctrl: 17,
+  alt: 18
 };
 
 Keyboard.key = Keyboard.prototype.key;
