@@ -78,7 +78,7 @@ var createDefaultBehavior = function(editable) {
         log('not at the end');
       }
 
-      cursor.setSelection();
+      cursor.setVisibleSelection();
     },
 
     insert: function(element, direction, cursor) {
@@ -131,7 +131,7 @@ var createDefaultBehavior = function(editable) {
         cursor.moveAtTextEnd(container);
       else
         cursor.moveAtBeginning(container);
-      cursor.setSelection();
+      cursor.setVisibleSelection();
 
       fragment = document.createDocumentFragment();
       chunks = merger.childNodes;
@@ -146,7 +146,7 @@ var createDefaultBehavior = function(editable) {
       content.normalizeTags(container);
       content.normalizeSpaces(container);
       cursor.restore();
-      cursor.setSelection();
+      cursor.setVisibleSelection();
     },
 
     empty: function(element) {
@@ -163,14 +163,14 @@ var createDefaultBehavior = function(editable) {
         previous = block.previous(element);
         if (previous) {
           cursor.moveAtTextEnd(previous);
-          cursor.setSelection();
+          cursor.setVisibleSelection();
         }
         break;
       case 'after':
         next = block.next(element);
         if (next) {
           cursor.moveAtBeginning(next);
-          cursor.setSelection();
+          cursor.setVisibleSelection();
         }
         break;
       }
@@ -209,7 +209,7 @@ var createDefaultBehavior = function(editable) {
         content.normalizeSpaces(pasteElement);
         cursor.insertAfter(pasteElement);
         cursor.moveAfter(pasteElement);
-        cursor.setSelection();
+        cursor.setVisibleSelection();
 
         element.removeAttribute(config.pastingAttribute);
       }, 0);
