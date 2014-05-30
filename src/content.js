@@ -278,7 +278,7 @@ var content = (function() {
       var tags = this.getTags(host, range);
       for (var i = 0; i < tags.length; i++) {
         var elem = tags[i];
-        if ( !tagName || elem.nodeName === tagName.toUpperCase() ) {
+        if ( elem.nodeName !== 'BR' && (!tagName || elem.nodeName === tagName.toUpperCase()) ) {
           this.unwrap(elem);
         }
       }

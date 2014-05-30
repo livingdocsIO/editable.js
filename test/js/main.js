@@ -1,8 +1,6 @@
 ;(function($) {
 
-  var editable = new Editable({
-    log: false
-  });
+  var editable = new Editable({});
 
   var lastSelection;
   var setupTooltip = function() {
