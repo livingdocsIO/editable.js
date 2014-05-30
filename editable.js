@@ -4713,8 +4713,8 @@ var createDefaultBehavior = function(editable) {
     focus: function(element) {
       log('Default focus behavior');
       // Add a zero width non-breaking space before the cursor if the editable is empty
-      // to force inline elments to have a height.
-      if(parser.isVoid(element)) {
+      // and an inline element to force it to have a height.
+      if(parser.isVoid(element) && parser.isInlineElement(editable.win, element)) {
         var zeroWidthNoBreakSpace = document.createTextNode('\uFEFF');
         element.appendChild(zeroWidthNoBreakSpace);
       }
@@ -5865,6 +5865,21 @@ var parser = (function() {
         return true;
       }
       return false;
+    },
+
+    /**
+     * Determine if an element behaves like an inline element.
+     */
+    isInlineElement: function(window, element) {
+      var styles = element.currentStyle || window.getComputedStyle(element, '');
+      var display = styles.display;
+      switch (display) {
+      case 'inline':
+      case 'inline-block':
+        return true;
+      default:
+        return false;
+      }
     }
   };
 })();
