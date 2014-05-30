@@ -50,13 +50,5 @@ describe('Editable', function() {
       });
     });
 
-    describe('focus event', function(){
-
-      it('fires on focus', function(done) {
-        editable.on('focus', done);
-        $div.focus();
-      });
-    });
-
   });
 });
