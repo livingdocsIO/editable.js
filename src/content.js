@@ -69,8 +69,7 @@ var content = (function() {
     /**
      * Extracts the content from a host element.
      * Does not touch or change the host. Just returns
-     * the content without anything inserted by editable or for
-     * the user interface.
+     * the content and removes elements marked for removal by editable.
      */
     extractContent: function(element) {
       var innerHtml = element.innerHTML;
@@ -80,6 +79,7 @@ var content = (function() {
       var clone = document.createElement('div');
       clone.innerHTML = innerHtml;
       this.unwrapInternalNodes(clone);
+
       return clone.innerHTML;
     },
 
@@ -91,12 +91,17 @@ var content = (function() {
      */
     unwrapInternalNodes: function(sibling) {
       while (sibling) {
-        if (sibling.nodeType === 1 && sibling.firstChild) {
-          this.unwrapInternalNodes(sibling.firstChild);
+        if (sibling.nodeType === 1) {
+          var attr = sibling.getAttribute('data-editable');
+
+          if (sibling.firstChild) {
+            this.unwrapInternalNodes(sibling.firstChild);
+          }
+          if (attr === 'remove') {
+            this.unwrap(sibling);
+          }
         }
-        if (/editable-range-boundary-/.test(sibling.id)) {
-          this.unwrap(sibling);
-        }
+
         sibling = sibling.nextSibling;
       }
     },

@@ -26,6 +26,7 @@ var rangeSaveRestore = (function() {
       // Create the marker element containing a single invisible character using DOM methods and insert it
       markerEl = doc.createElement('span');
       markerEl.id = markerId;
+      markerEl.setAttribute('data-editable', 'remove');
       markerEl.style.lineHeight = '0';
       markerEl.style.display = 'none';
       // markerEl.className = "rangySelectionBoundary";
@@ -47,7 +48,6 @@ var rangeSaveRestore = (function() {
     },
 
     save: function(range) {
-      var doc = window.document;
       var rangeInfo, startEl, endEl;
 
       // insert markers
