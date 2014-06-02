@@ -23,11 +23,13 @@ var createDefaultBehavior = function(editable) {
   return {
     focus: function(element) {
       log('Default focus behavior');
-      // Add a zero width non-breaking space before the cursor if the editable is empty
-      // and an inline element to force it to have a height.
-      if(parser.isVoid(element) && parser.isInlineElement(editable.win, element)) {
-        var zeroWidthNoBreakSpace = document.createTextNode('\uFEFF');
-        element.appendChild(zeroWidthNoBreakSpace);
+      // Add a <br> element if the editable is empty to force it to have height
+      // E.g. Firefox does not render empty block elements and most browsers do
+      // not render  empty inline elements.
+      if (parser.isVoid(element)) {
+        var br = document.createElement('br');
+        br.setAttribute('data-editable', 'remove');
+        element.appendChild(br);
       }
     },
 
