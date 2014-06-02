@@ -49,30 +49,35 @@
     $(document).on('click', '.js-format-bold', function(event) {
       if (lastSelection.isSelection) {
         lastSelection.toggleBold();
+        lastSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-italic', function(event) {
       if (lastSelection.isSelection) {
         lastSelection.toggleEmphasis();
+        lastSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-link', function(event) {
       if (lastSelection.isSelection) {
         lastSelection.toggleLink('www.upfront.io');
+        lastSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-quote', function(event) {
       if (lastSelection.isSelection) {
         lastSelection.toggleSurround('«', '»');
+        lastSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-clear', function(event) {
       if (lastSelection.isSelection) {
         lastSelection.removeFormatting();
+        lastSelection.triggerChange();
       }
     });
   };

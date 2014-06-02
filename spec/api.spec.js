@@ -9,7 +9,7 @@ describe('Editable', function() {
   });
 
 
-  describe('global variable', function(){
+  describe('global variable', function() {
 
     it('is defined', function() {
       expect(window.Editable).toBeDefined();
@@ -27,19 +27,18 @@ describe('Editable', function() {
   });
 
 
-  describe('with an element added', function(){
-    beforeEach(function(){
-      $div = $('<div></div>')
-      $div.appendTo(document.body);
+  describe('with an element added', function() {
+    beforeEach(function() {
+      $div = $('<div>').appendTo(document.body);
       editable = new Editable();
       editable.add($div);
     });
 
-    afterEach(function(){
+    afterEach(function() {
       $div.remove();
     });
 
-    describe('getContent()', function(){
+    describe('getContent()', function() {
 
       it('getContent() returns its content', function() {
         $div.html('a');
@@ -47,6 +46,19 @@ describe('Editable', function() {
 
         // escape to show invisible characters
         expect(escape(content)).toEqual('a')
+      });
+    });
+
+    describe('change event', function() {
+
+      it('gets triggered after format change', function(done) {
+        editable.change(function(element) {
+          expect(element).toEqual($div[0]);
+          done();
+        });
+
+        var cursor = editable.createCursorAtBeginning($div[0]);
+        cursor.triggerChange();
       });
     });
 

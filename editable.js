@@ -3819,19 +3819,19 @@ Editable.prototype.createCursor = function(element, position) {
 };
 
 Editable.prototype.createCursorAtBeginning = function(element) {
-  this.createCursor(element, 'beginning');
+  return this.createCursor(element, 'beginning');
 };
 
 Editable.prototype.createCursorAtEnd = function(element) {
-  this.createCursor(element, 'end');
+  return this.createCursor(element, 'end');
 };
 
 Editable.prototype.createCursorBefore = function(element) {
-  this.createCursor(element, 'before');
+  return this.createCursor(element, 'before');
 };
 
 Editable.prototype.createCursorAfter = function(element) {
-  this.createCursor(element, 'after');
+  return this.createCursor(element, 'after');
 };
 
 Editable.prototype.getContent = function(element) {
@@ -4685,6 +4685,13 @@ var Cursor = (function() {
         if (!cursor.range.equals(this.range)) return false;
 
         return true;
+      },
+
+      // Currently we call triggerChange manually after format changes.
+      // This is to prevent excessive triggering of the change event during
+      // merge or split operations or other manipulations by scripts.
+      triggerChange: function() {
+        $(this.host).trigger('formatEditable');
       }
     };
   })();
@@ -5163,6 +5170,8 @@ Dispatcher.prototype.setupElementEvents = function() {
       // isInputEventSupported flag without notifiying the change event.
       isInputEventSupported = true;
     }
+  }).on('formatEditable.editable', _this.editableSelector, function(event) {
+    _this.notify('change', this);
   });
 };
 

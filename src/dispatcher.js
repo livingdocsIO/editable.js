@@ -81,6 +81,8 @@ Dispatcher.prototype.setupElementEvents = function() {
       // isInputEventSupported flag without notifiying the change event.
       isInputEventSupported = true;
     }
+  }).on('formatEditable.editable', _this.editableSelector, function(event) {
+    _this.notify('change', this);
   });
 };
 
