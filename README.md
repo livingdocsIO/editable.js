@@ -66,3 +66,14 @@ YUIDoc:
 # build and run the documentation
 yuidoc --server src/
 ```
+
+License
+-------
+
+Editable.JS is licensed under the [MIT License](LICENSE)
+
+In Short:
+
+- You can use, copy and modify the software however you want.
+- You can give the software away for free or sell it.
+- The only restriction is that it be accompanied by the license agreement.
