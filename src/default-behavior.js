@@ -22,7 +22,6 @@ var createDefaultBehavior = function(editable) {
     */
   return {
     focus: function(element) {
-      log('Default focus behavior');
       // Add a <br> element if the editable is empty to force it to have height
       // E.g. Firefox does not render empty block elements and most browsers do
       // not render  empty inline elements.
@@ -34,12 +33,7 @@ var createDefaultBehavior = function(editable) {
     },
 
     blur: function(element) {
-      log('Default blur behavior');
       content.cleanInternals(element);
-    },
-
-    flow: function(element, action) {
-      log('Default flow behavior');
     },
 
     selection: function(element, selection) {
@@ -59,9 +53,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     newline: function(element, cursor) {
-      log(cursor);
-      log('Default newline behavior');
-
       var atEnd = cursor.isAtEnd();
       var br = document.createElement('br');
       cursor.insertBefore(br);
@@ -84,7 +75,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     insert: function(element, direction, cursor) {
-      log('Default insert ' + direction + ' behavior');
       var parent = element.parentNode;
       var newElement = element.cloneNode(false);
       if (newElement.id) newElement.removeAttribute('id');
@@ -112,7 +102,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     merge: function(element, direction, cursor) {
-      log('Default merge ' + direction + ' behavior');
       var container, merger, fragment, chunks, i, newChild, range;
 
       switch (direction) {
@@ -156,8 +145,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     'switch': function(element, direction, cursor) {
-      log('Default switch behavior');
-
       var next, previous;
 
       switch (direction) {
@@ -183,7 +170,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     clipboard: function(element, action, cursor) {
-      log('Default clipboard behavior');
       var pasteHolder, sel;
 
       if (action !== 'paste') return;

@@ -4171,8 +4171,7 @@ var content = (function() {
     /**
      * Extracts the content from a host element.
      * Does not touch or change the host. Just returns
-     * the content without anything inserted by editable or for
-     * the user interface.
+     * the content and removes elements marked for removal by editable.
      */
     extractContent: function(element) {
       var innerHtml = element.innerHTML;
@@ -4182,6 +4181,7 @@ var content = (function() {
       var clone = document.createElement('div');
       clone.innerHTML = innerHtml;
       this.unwrapInternalNodes(clone);
+
       return clone.innerHTML;
     },
 
@@ -4193,12 +4193,17 @@ var content = (function() {
      */
     unwrapInternalNodes: function(sibling) {
       while (sibling) {
-        if (sibling.nodeType === 1 && sibling.firstChild) {
-          this.unwrapInternalNodes(sibling.firstChild);
+        if (sibling.nodeType === 1) {
+          var attr = sibling.getAttribute('data-editable');
+
+          if (sibling.firstChild) {
+            this.unwrapInternalNodes(sibling.firstChild);
+          }
+          if (attr === 'remove') {
+            this.unwrap(sibling);
+          }
         }
-        if (/editable-range-boundary-/.test(sibling.id)) {
-          this.unwrap(sibling);
-        }
+
         sibling = sibling.nextSibling;
       }
     },
@@ -4712,22 +4717,18 @@ var createDefaultBehavior = function(editable) {
     */
   return {
     focus: function(element) {
-      log('Default focus behavior');
-      // Add a zero width non-breaking space before the cursor if the editable is empty
-      // and an inline element to force it to have a height.
-      if(parser.isVoid(element) && parser.isInlineElement(editable.win, element)) {
-        var zeroWidthNoBreakSpace = document.createTextNode('\uFEFF');
-        element.appendChild(zeroWidthNoBreakSpace);
+      // Add a <br> element if the editable is empty to force it to have height
+      // E.g. Firefox does not render empty block elements and most browsers do
+      // not render  empty inline elements.
+      if (parser.isVoid(element)) {
+        var br = document.createElement('br');
+        br.setAttribute('data-editable', 'remove');
+        element.appendChild(br);
       }
     },
 
     blur: function(element) {
-      log('Default blur behavior');
       content.cleanInternals(element);
-    },
-
-    flow: function(element, action) {
-      log('Default flow behavior');
     },
 
     selection: function(element, selection) {
@@ -4747,9 +4748,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     newline: function(element, cursor) {
-      log(cursor);
-      log('Default newline behavior');
-
       var atEnd = cursor.isAtEnd();
       var br = document.createElement('br');
       cursor.insertBefore(br);
@@ -4772,7 +4770,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     insert: function(element, direction, cursor) {
-      log('Default insert ' + direction + ' behavior');
       var parent = element.parentNode;
       var newElement = element.cloneNode(false);
       if (newElement.id) newElement.removeAttribute('id');
@@ -4800,7 +4797,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     merge: function(element, direction, cursor) {
-      log('Default merge ' + direction + ' behavior');
       var container, merger, fragment, chunks, i, newChild, range;
 
       switch (direction) {
@@ -4844,8 +4840,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     'switch': function(element, direction, cursor) {
-      log('Default switch behavior');
-
       var next, previous;
 
       switch (direction) {
@@ -4871,7 +4865,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     clipboard: function(element, action, cursor) {
-      log('Default clipboard behavior');
       var pasteHolder, sel;
 
       if (action !== 'paste') return;
@@ -5965,6 +5958,7 @@ var rangeSaveRestore = (function() {
       // Create the marker element containing a single invisible character using DOM methods and insert it
       markerEl = doc.createElement('span');
       markerEl.id = markerId;
+      markerEl.setAttribute('data-editable', 'remove');
       markerEl.style.lineHeight = '0';
       markerEl.style.display = 'none';
       // markerEl.className = "rangySelectionBoundary";
@@ -5986,7 +5980,6 @@ var rangeSaveRestore = (function() {
     },
 
     save: function(range) {
-      var doc = window.document;
       var rangeInfo, startEl, endEl;
 
       // insert markers
