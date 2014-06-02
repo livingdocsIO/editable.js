@@ -184,19 +184,19 @@ Editable.prototype.createCursor = function(element, position) {
 };
 
 Editable.prototype.createCursorAtBeginning = function(element) {
-  this.createCursor(element, 'beginning');
+  return this.createCursor(element, 'beginning');
 };
 
 Editable.prototype.createCursorAtEnd = function(element) {
-  this.createCursor(element, 'end');
+  return this.createCursor(element, 'end');
 };
 
 Editable.prototype.createCursorBefore = function(element) {
-  this.createCursor(element, 'before');
+  return this.createCursor(element, 'before');
 };
 
 Editable.prototype.createCursorAfter = function(element) {
-  this.createCursor(element, 'after');
+  return this.createCursor(element, 'after');
 };
 
 Editable.prototype.getContent = function(element) {
