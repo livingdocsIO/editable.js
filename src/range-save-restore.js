@@ -20,7 +20,7 @@ var rangeSaveRestore = (function() {
       var container = range.commonAncestorContainer;
 
       // If ownerDocument is null the commonAncestorContainer is window.document
-      if (container.ownerDocument == null) {
+      if (container.ownerDocument === null || container.ownerDocument === undefined) {
         error('Cannot save range: range is emtpy');
       }
       var doc = container.ownerDocument.defaultView.document;
