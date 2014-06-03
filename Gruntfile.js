@@ -129,16 +129,6 @@ module.exports = function(grunt) {
         }
       }
     },
-    copy: {
-      lukas: {
-        files: [{
-          expand: true,
-          src: ['editable.js'],
-          dest: '../livingdocs-engine/vendor/editableJS/'
-        }]
-
-      }
-    },
     bump: {
       options: {
         files: ['package.json', 'bower.json'],
@@ -191,11 +181,6 @@ module.exports = function(grunt) {
     'concat:editable',
     'concat:dist',
     'uglify'
-  ]);
-
-  grunt.registerTask('build-lukas', [
-    'build',
-    'copy:lukas'
   ]);
 
   grunt.registerTask('default', ['server']);
