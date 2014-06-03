@@ -91,6 +91,8 @@ var content = (function() {
      */
     unwrapInternalNodes: function(sibling) {
       while (sibling) {
+        var nextSibling = sibling.nextSibling;
+
         if (sibling.nodeType === 1) {
           var attr = sibling.getAttribute('data-editable');
 
@@ -101,8 +103,7 @@ var content = (function() {
             this.unwrap(sibling);
           }
         }
-
-        sibling = sibling.nextSibling;
+        sibling = nextSibling;
       }
     },
 

@@ -537,6 +537,18 @@ describe('Content', function() {
       expect(result).toEqual('a');
     });
 
+    it('removes two adjacent marked spans', function() {
+      $host.html('<span data-editable="remove"></span><span data-editable="remove"></span>');
+      var result = content.extractContent($host[0]);
+      expect(result).toEqual('');
+    });
+
+    it('removes two marked spans around text', function() {
+      $host.html('|<span data-editable="remove">a</span>|<span data-editable="remove">b</span>|');
+      var result = content.extractContent($host[0]);
+      expect(result).toEqual('|a|b|');
+    });
+
     describe('with ranges', function() {
       var range;
 
