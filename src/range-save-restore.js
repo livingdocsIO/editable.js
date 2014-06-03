@@ -17,7 +17,13 @@ var rangeSaveRestore = (function() {
     insertRangeBoundaryMarker: function(range, atStart) {
       var markerId = 'editable-range-boundary-' + (boundaryMarkerId += 1);
       var markerEl;
-      var doc = window.document;
+      var container = range.commonAncestorContainer;
+
+      // If ownerDocument is null the commonAncestorContainer is window.document
+      if (container.ownerDocument == null) {
+        error('Cannot save range: range is emtpy');
+      }
+      var doc = container.ownerDocument.defaultView.document;
 
       // Clone the Range and collapse to the appropriate boundary point
       var boundaryRange = range.cloneRange();
@@ -29,7 +35,6 @@ var rangeSaveRestore = (function() {
       markerEl.setAttribute('data-editable', 'remove');
       markerEl.style.lineHeight = '0';
       markerEl.style.display = 'none';
-      // markerEl.className = "rangySelectionBoundary";
       markerEl.appendChild(doc.createTextNode(markerTextChar));
 
       boundaryRange.insertNode(markerEl);
