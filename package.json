@@ -1,10 +1,16 @@
 {
-  "name": "EditableJS",
+  "name": "upfront-editable",
   "version": "0.3.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/upfrontIO/Editable.JS.git"
   },
+  "keywords": [
+    "contenteditable",
+    "editable"
+  ],
+  "description": "Friendly contenteditable API",
+  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.5",

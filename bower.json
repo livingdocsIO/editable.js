@@ -1,10 +1,14 @@
 {
-  "name": "EditableJS",
+  "name": "editable",
   "version": "0.3.0",
   "homepage": "https://github.com/upfrontIO/Editable.JS",
   "authors": [
     "Matteo Agosti<matteo@upfront.io>",
     "Lukas Peyer<lukas@upfront.io>"
+  ],
+  "keywords": [
+    "contenteditable",
+    "editable"
   ],
   "description": "Friendly contenteditable API",
   "license": "MIT",
