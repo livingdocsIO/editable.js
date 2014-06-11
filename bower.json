@@ -1,7 +1,7 @@
 {
   "name": "editable",
-  "version": "0.3.1",
-  "homepage": "https://github.com/upfrontIO/Editable.JS",
+  "version": "0.3.2",
+  "homepage": "https://github.com/upfrontIO/editable.js",
   "authors": [
     "Matteo Agosti<matteo@upfront.io>",
     "Lukas Peyer<lukas@upfront.io>"
