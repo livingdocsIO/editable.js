@@ -16,7 +16,7 @@
     editable.selection(function(el, selection) {
       lastSelection = selection;
       if (selection) {
-        coords = selection.getCoordinates()
+        coords = selection.getCoordinates();
 
         // position tooltip
         var top = coords.top - tooltip.outerHeight() - 15;
