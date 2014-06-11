@@ -5,6 +5,10 @@ JavaScript API that defines a browser-consistent content editable interface
 
 Editable is built for block level elements containing only phrasing content. This normally means `p`, `h1`-`h6`, `blockquote` etc. elements. This allows editable to be lean and mean since it is only concerned with formatting and not with layouting.
 
+#### Demo
+
+You can check out a simple demo of Editable.JS on this [plnkr](http://plnkr.co/edit/12OUl7)
+
 #### To Start
 
 To make an element editable:
@@ -16,27 +20,27 @@ editalbe.add($elem)
 
 #### Events Overview
 
-- **focus**  
+- **focus**
   Fired when an editable element gets focus.
-- **blur**  
+- **blur**
   Fired when an editable element looses focus.
-- **selection**  
+- **selection**
   Fired when the user selects some text inside an editable element.
-- **cursor**  
+- **cursor**
   Fired when the cursor position changes.
-- **change**  
+- **change**
   Fired when the user has made a change.
-- **clipboard**  
+- **clipboard**
   Fired for `copy`, `cut` and `paste` events.
-- **insert**  
+- **insert**
   Fired when the user presses `ENTER` at the beginning or end of an editable (For example you can insert a new paragraph after the element if this happens).
-- **split**  
+- **split**
   Fired when the user presses `ENTER` in the middle of an element.
-- **merge**  
+- **merge**
   Fired when the user pressed `FORWARD DELETE` at the end or `BACKSPACE` at the beginning of an element.
-- **switch**  
+- **switch**
   Fired when the user pressed an `ARROW KEY` at the top or bottom so that you may want to set the cursor into the preceeding or following element.
-- **newline**  
+- **newline**
   Fired when the user presses `SHIFT+ENTER` to insert a newline.
 
 #### Example for Selection Changes
