@@ -8,6 +8,7 @@
 var Dispatcher = function(editable) {
   var win = editable.win;
   eventable(this, editable);
+  this.supportsInputEvent = false;
   this.$document = $(win.document);
   this.config = editable.config;
   this.editable = editable;
@@ -17,6 +18,10 @@ var Dispatcher = function(editable) {
   this.setup();
 };
 
+// This will be set to true once we detect the input event is working.
+// Input event description on MDN:
+// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/input
+var isInputEventSupported = false;
 
 /**
  * Sets up all events that Editable.JS is catching.
@@ -61,10 +66,44 @@ Dispatcher.prototype.setupElementEvents = function() {
   }).on('cut.editable', _this.editableSelector, function(event) {
     log('Cut');
     _this.notify('clipboard', this, 'cut', _this.selectionWatcher.getFreshSelection());
+    _this.triggerChangeEvent(this);
   }).on('paste.editable', _this.editableSelector, function(event) {
     log('Paste');
     _this.notify('clipboard', this, 'paste', _this.selectionWatcher.getFreshSelection());
+    _this.triggerChangeEvent(this);
+  }).on('input.editable', _this.editableSelector, function(event) {
+    log('Input');
+    if (isInputEventSupported) {
+      _this.notify('change', this);
+    } else {
+      // Most likely the event was already handled manually by
+      // triggerChangeEvent so the first time we just switch the
+      // isInputEventSupported flag without notifiying the change event.
+      isInputEventSupported = true;
+    }
+  }).on('formatEditable.editable', _this.editableSelector, function(event) {
+    _this.notify('change', this);
   });
+};
+
+/**
+ * Trigger a change event
+ *
+ * This should be done in these cases:
+ * - typing a letter
+ * - delete (backspace and delete keys)
+ * - cut
+ * - paste
+ * - copy and paste (not easily possible manually as far as I know)
+ *
+ * Preferrably this is done using the input event. But the input event is not
+ * supported on all browsers for contenteditable elements.
+ * To make things worse it is not detectable either. So instead of detecting
+ * we set 'isInputEventSupported' when the input event fires the first time.
+ */
+Dispatcher.prototype.triggerChangeEvent = function(target){
+  if (isInputEventSupported) return;
+  this.notify('change', target);
 };
 
 Dispatcher.prototype.dispatchSwitchEvent = function(event, element, direction) {
@@ -99,30 +138,22 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
   var _this = this;
 
   this.$document.on('keydown.editable', this.editableSelector, function(event) {
-    _this.keyboard.dispatchKeyEvent(event, this);
+    var notifyCharacterEvent = !isInputEventSupported;
+    _this.keyboard.dispatchKeyEvent(event, this, notifyCharacterEvent);
   });
 
   this.keyboard.on('left', function(event) {
-    log('Left key pressed');
     _this.dispatchSwitchEvent(event, this, 'before');
   }).on('up', function(event) {
-    log('Up key pressed');
     _this.dispatchSwitchEvent(event, this, 'before');
   }).on('right', function(event) {
-    log('Right key pressed');
     _this.dispatchSwitchEvent(event, this, 'after');
   }).on('down', function(event) {
-    log('Down key pressed');
     _this.dispatchSwitchEvent(event, this, 'after');
   }).on('tab', function(event) {
-    log('Tab key pressed');
   }).on('shiftTab', function(event) {
-    log('Shift+Tab key pressed');
   }).on('esc', function(event) {
-    log('Esc key pressed');
   }).on('backspace', function(event) {
-    log('Backspace key pressed');
-
     var range = _this.selectionWatcher.getFreshRange();
     if (range.isCursor) {
       var cursor = range.getCursor();
@@ -130,11 +161,13 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
         event.preventDefault();
         event.stopPropagation();
         _this.notify('merge', this, 'before', cursor);
+      } else {
+        _this.triggerChangeEvent(this);
       }
+    } else {
+      _this.triggerChangeEvent(this);
     }
   }).on('delete', function(event) {
-    log('Delete key pressed');
-
     var range = _this.selectionWatcher.getFreshRange();
     if (range.isCursor) {
       var cursor = range.getCursor();
@@ -142,10 +175,13 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
         event.preventDefault();
         event.stopPropagation();
         _this.notify('merge', this, 'after', cursor);
+      } else {
+        _this.triggerChangeEvent(this);
       }
+    } else {
+      _this.triggerChangeEvent(this);
     }
   }).on('enter', function(event) {
-    log('Enter key pressed');
     event.preventDefault();
     event.stopPropagation();
     var range = _this.selectionWatcher.getFreshRange();
@@ -160,11 +196,12 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
     }
 
   }).on('shiftEnter', function(event) {
-    log('Shift+Enter key pressed');
     event.preventDefault();
     event.stopPropagation();
     var cursor = _this.selectionWatcher.forceCursor();
     _this.notify('newline', this, cursor);
+  }).on('character', function(event) {
+    _this.notify('change', this);
   });
 };
 

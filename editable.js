@@ -3223,202 +3223,6 @@ rangy.createModule("DomUtil", function(api, module) {
     });
 });
 
-/**
- * @license Selection save and restore module for Rangy.
- * Saves and restores user selections using marker invisible elements in the DOM.
- *
- * Part of Rangy, a cross-browser JavaScript range and selection library
- * http://code.google.com/p/rangy/
- *
- * Depends on Rangy core.
- *
- * Copyright 2012, Tim Down
- * Licensed under the MIT license.
- * Version: 1.2.3
- * Build date: 26 February 2012
- */
-rangy.createModule("SaveRestore", function(api, module) {
-    api.requireModules( ["DomUtil", "DomRange", "WrappedRange"] );
-
-    var dom = api.dom;
-
-    var markerTextChar = "\ufeff";
-
-    function gEBI(id, doc) {
-        return (doc || document).getElementById(id);
-    }
-
-    function insertRangeBoundaryMarker(range, atStart) {
-        var markerId = "selectionBoundary_" + (+new Date()) + "_" + ("" + Math.random()).slice(2);
-        var markerEl;
-        var doc = dom.getDocument(range.startContainer);
-
-        // Clone the Range and collapse to the appropriate boundary point
-        var boundaryRange = range.cloneRange();
-        boundaryRange.collapse(atStart);
-
-        // Create the marker element containing a single invisible character using DOM methods and insert it
-        markerEl = doc.createElement("span");
-        markerEl.id = markerId;
-        markerEl.style.lineHeight = "0";
-        markerEl.style.display = "none";
-        markerEl.className = "rangySelectionBoundary";
-        markerEl.appendChild(doc.createTextNode(markerTextChar));
-
-        boundaryRange.insertNode(markerEl);
-        boundaryRange.detach();
-        return markerEl;
-    }
-
-    function setRangeBoundary(doc, range, markerId, atStart) {
-        var markerEl = gEBI(markerId, doc);
-        if (markerEl) {
-            range[atStart ? "setStartBefore" : "setEndBefore"](markerEl);
-            markerEl.parentNode.removeChild(markerEl);
-        } else {
-            module.warn("Marker element has been removed. Cannot restore selection.");
-        }
-    }
-
-    function compareRanges(r1, r2) {
-        return r2.compareBoundaryPoints(r1.START_TO_START, r1);
-    }
-
-    function saveSelection(win) {
-        win = win || window;
-        var doc = win.document;
-        if (!api.isSelectionValid(win)) {
-            module.warn("Cannot save selection. This usually happens when the selection is collapsed and the selection document has lost focus.");
-            return;
-        }
-        var sel = api.getSelection(win);
-        var ranges = sel.getAllRanges();
-        var rangeInfos = [], startEl, endEl, range;
-
-        // Order the ranges by position within the DOM, latest first
-        ranges.sort(compareRanges);
-
-        for (var i = 0, len = ranges.length; i < len; ++i) {
-            range = ranges[i];
-            if (range.collapsed) {
-                endEl = insertRangeBoundaryMarker(range, false);
-                rangeInfos.push({
-                    markerId: endEl.id,
-                    collapsed: true
-                });
-            } else {
-                endEl = insertRangeBoundaryMarker(range, false);
-                startEl = insertRangeBoundaryMarker(range, true);
-
-                rangeInfos[i] = {
-                    startMarkerId: startEl.id,
-                    endMarkerId: endEl.id,
-                    collapsed: false,
-                    backwards: ranges.length == 1 && sel.isBackwards()
-                };
-            }
-        }
-
-        // Now that all the markers are in place and DOM manipulation over, adjust each range's boundaries to lie
-        // between its markers
-        for (i = len - 1; i >= 0; --i) {
-            range = ranges[i];
-            if (range.collapsed) {
-                range.collapseBefore(gEBI(rangeInfos[i].markerId, doc));
-            } else {
-                range.setEndBefore(gEBI(rangeInfos[i].endMarkerId, doc));
-                range.setStartAfter(gEBI(rangeInfos[i].startMarkerId, doc));
-            }
-        }
-
-        // Ensure current selection is unaffected
-        sel.setRanges(ranges);
-        return {
-            win: win,
-            doc: doc,
-            rangeInfos: rangeInfos,
-            restored: false
-        };
-    }
-
-    function restoreSelection(savedSelection, preserveDirection) {
-        if (!savedSelection.restored) {
-            var rangeInfos = savedSelection.rangeInfos;
-            var sel = api.getSelection(savedSelection.win);
-            var ranges = [];
-
-            // Ranges are in reverse order of appearance in the DOM. We want to restore earliest first to avoid
-            // normalization affecting previously restored ranges.
-            for (var len = rangeInfos.length, i = len - 1, rangeInfo, range; i >= 0; --i) {
-                rangeInfo = rangeInfos[i];
-                range = api.createRange(savedSelection.doc);
-                if (rangeInfo.collapsed) {
-                    var markerEl = gEBI(rangeInfo.markerId, savedSelection.doc);
-                    if (markerEl) {
-                        markerEl.style.display = "inline";
-                        var previousNode = markerEl.previousSibling;
-
-                        // Workaround for issue 17
-                        if (previousNode && previousNode.nodeType == 3) {
-                            markerEl.parentNode.removeChild(markerEl);
-                            range.collapseToPoint(previousNode, previousNode.length);
-                        } else {
-                            range.collapseBefore(markerEl);
-                            markerEl.parentNode.removeChild(markerEl);
-                        }
-                    } else {
-                        module.warn("Marker element has been removed. Cannot restore selection.");
-                    }
-                } else {
-                    setRangeBoundary(savedSelection.doc, range, rangeInfo.startMarkerId, true);
-                    setRangeBoundary(savedSelection.doc, range, rangeInfo.endMarkerId, false);
-                }
-
-                // Normalizing range boundaries is only viable if the selection contains only one range. For example,
-                // if the selection contained two ranges that were both contained within the same single text node,
-                // both would alter the same text node when restoring and break the other range.
-                if (len == 1) {
-                    range.normalizeBoundaries();
-                }
-                ranges[i] = range;
-            }
-            if (len == 1 && preserveDirection && api.features.selectionHasExtend && rangeInfos[0].backwards) {
-                sel.removeAllRanges();
-                sel.addRange(ranges[0], true);
-            } else {
-                sel.setRanges(ranges);
-            }
-
-            savedSelection.restored = true;
-        }
-    }
-
-    function removeMarkerElement(doc, markerId) {
-        var markerEl = gEBI(markerId, doc);
-        if (markerEl) {
-            markerEl.parentNode.removeChild(markerEl);
-        }
-    }
-
-    function removeMarkers(savedSelection) {
-        var rangeInfos = savedSelection.rangeInfos;
-        for (var i = 0, len = rangeInfos.length, rangeInfo; i < len; ++i) {
-            rangeInfo = rangeInfos[i];
-            if (rangeInfo.collapsed) {
-                removeMarkerElement(savedSelection.doc, rangeInfo.markerId);
-            } else {
-                removeMarkerElement(savedSelection.doc, rangeInfo.startMarkerId);
-                removeMarkerElement(savedSelection.doc, rangeInfo.endMarkerId);
-            }
-        }
-    }
-
-    api.saveSelection = saveSelection;
-    api.restoreSelection = restoreSelection;
-    api.removeMarkerElement = removeMarkerElement;
-    api.removeMarkers = removeMarkers;
-});
-
 /*!
   * Bowser - a browser detector
   * https://github.com/ded/bowser
@@ -3819,19 +3623,23 @@ Editable.prototype.createCursor = function(element, position) {
 };
 
 Editable.prototype.createCursorAtBeginning = function(element) {
-  this.createCursor(element, 'beginning');
+  return this.createCursor(element, 'beginning');
 };
 
 Editable.prototype.createCursorAtEnd = function(element) {
-  this.createCursor(element, 'end');
+  return this.createCursor(element, 'end');
 };
 
 Editable.prototype.createCursorBefore = function(element) {
-  this.createCursor(element, 'before');
+  return this.createCursor(element, 'before');
 };
 
 Editable.prototype.createCursorAfter = function(element) {
-  this.createCursor(element, 'after');
+  return this.createCursor(element, 'after');
+};
+
+Editable.prototype.getContent = function(element) {
+  return content.extractContent(element);
 };
 
 
@@ -4008,6 +3816,19 @@ Editable.prototype.empty = function(handler) {
 };
 
 /**
+ * Subscribe to the {{#crossLink "Editable/change:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method change
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @chainable
+ */
+Editable.prototype.change = function(handler) {
+  return this.on('change', handler);
+};
+
+/**
  * Subscribe to the {{#crossLink "Editable/switch:event"}}{{/crossLink}}
  * event.
  *
@@ -4091,6 +3912,9 @@ var content = (function() {
     return rangeSaveRestore.restore(host, range);
   };
 
+  var zeroWidthSpace = /\u200B/g;
+  var zeroWidthNonBreakingSpace = /\uFEFF/g;
+
   return {
     /**
      * Remove empty tags and merge consecutive tags (they must have the same
@@ -4143,7 +3967,50 @@ var content = (function() {
      * @param  {HTMLElement} element The element to process.
      */
     cleanInternals: function(element) {
-      element.innerHTML = element.innerHTML.replace(/\u200B/g, '<br />');
+      // Uses extract content for simplicity. A custom method
+      // that does not clone the element could be faster if needed.
+      element.innerHTML = this.extractContent(element);
+    },
+
+    /**
+     * Extracts the content from a host element.
+     * Does not touch or change the host. Just returns
+     * the content and removes elements marked for removal by editable.
+     */
+    extractContent: function(element) {
+      var innerHtml = element.innerHTML;
+      innerHtml = innerHtml.replace(zeroWidthNonBreakingSpace, ''); // Used for forcing inline elments to have a height
+      innerHtml = innerHtml.replace(zeroWidthSpace, '<br>'); // Used for cross-browser newlines
+
+      var clone = document.createElement('div');
+      clone.innerHTML = innerHtml;
+      this.unwrapInternalNodes(clone);
+
+      return clone.innerHTML;
+    },
+
+    /**
+     * Remove elements that were inserted for internal or user interface purposes
+     *
+     * Currently:
+     * - Saved ranges
+     */
+    unwrapInternalNodes: function(sibling) {
+      while (sibling) {
+        var nextSibling = sibling.nextSibling;
+
+        if (sibling.nodeType === 1) {
+          var attr = sibling.getAttribute('data-editable');
+
+          if (sibling.firstChild) {
+            this.unwrapInternalNodes(sibling.firstChild);
+          }
+          if (attr === 'remove') {
+            this.unwrap(sibling);
+          }
+        }
+        sibling = nextSibling;
+      }
     },
 
     /**
@@ -4300,7 +4167,13 @@ var content = (function() {
     },
 
     unwrap: function(elem) {
-      $(elem).contents().unwrap();
+      var $elem = $(elem);
+      var contents = $elem.contents();
+      if (contents.length) {
+        contents.unwrap();
+      } else {
+        $elem.remove();
+      }
     },
 
     removeFormatting: function(host, range, tagName) {
@@ -4317,7 +4190,7 @@ var content = (function() {
       var tags = this.getTags(host, range);
       for (var i = 0; i < tags.length; i++) {
         var elem = tags[i];
-        if ( !tagName || elem.nodeName === tagName.toUpperCase() ) {
+        if ( elem.nodeName !== 'BR' && (!tagName || elem.nodeName === tagName.toUpperCase()) ) {
           this.unwrap(elem);
         }
       }
@@ -4482,7 +4355,8 @@ var Cursor = (function() {
       },
 
       setVisibleSelection: function() {
-        rangy.getSelection().setSingleRange(this.range);
+        $(this.host).focus(); // Without this Firefox is not happy (seems setting a selection is not enough. probably because Firefox can handle multiple selections)
+        rangy.getSelection(this.win).setSingleRange(this.range);
       },
 
       before: function() {
@@ -4616,6 +4490,13 @@ var Cursor = (function() {
         if (!cursor.range.equals(this.range)) return false;
 
         return true;
+      },
+
+      // Currently we call triggerChange manually after format changes.
+      // This is to prevent excessive triggering of the change event during
+      // merge or split operations or other manipulations by scripts.
+      triggerChange: function() {
+        $(this.host).trigger('formatEditable');
       }
     };
   })();
@@ -4648,16 +4529,18 @@ var createDefaultBehavior = function(editable) {
     */
   return {
     focus: function(element) {
-      log('Default focus behavior');
+      // Add a <br> element if the editable is empty to force it to have height
+      // E.g. Firefox does not render empty block elements and most browsers do
+      // not render  empty inline elements.
+      if (parser.isVoid(element)) {
+        var br = document.createElement('br');
+        br.setAttribute('data-editable', 'remove');
+        element.appendChild(br);
+      }
     },
 
     blur: function(element) {
-      log('Default blur behavior');
       content.cleanInternals(element);
-    },
-
-    flow: function(element, action) {
-      log('Default flow behavior');
     },
 
     selection: function(element, selection) {
@@ -4677,9 +4560,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     newline: function(element, cursor) {
-      log(cursor);
-      log('Default newline behavior');
-
       var atEnd = cursor.isAtEnd();
       var br = document.createElement('br');
       cursor.insertBefore(br);
@@ -4698,11 +4578,10 @@ var createDefaultBehavior = function(editable) {
         log('not at the end');
       }
 
-      cursor.setSelection();
+      cursor.setVisibleSelection();
     },
 
     insert: function(element, direction, cursor) {
-      log('Default insert ' + direction + ' behavior');
       var parent = element.parentNode;
       var newElement = element.cloneNode(false);
       if (newElement.id) newElement.removeAttribute('id');
@@ -4730,7 +4609,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     merge: function(element, direction, cursor) {
-      log('Default merge ' + direction + ' behavior');
       var container, merger, fragment, chunks, i, newChild, range;
 
       switch (direction) {
@@ -4751,7 +4629,7 @@ var createDefaultBehavior = function(editable) {
         cursor.moveAtTextEnd(container);
       else
         cursor.moveAtBeginning(container);
-      cursor.setSelection();
+      cursor.setVisibleSelection();
 
       fragment = document.createDocumentFragment();
       chunks = merger.childNodes;
@@ -4766,7 +4644,7 @@ var createDefaultBehavior = function(editable) {
       content.normalizeTags(container);
       content.normalizeSpaces(container);
       cursor.restore();
-      cursor.setSelection();
+      cursor.setVisibleSelection();
     },
 
     empty: function(element) {
@@ -4774,8 +4652,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     'switch': function(element, direction, cursor) {
-      log('Default switch behavior');
-
       var next, previous;
 
       switch (direction) {
@@ -4783,14 +4659,14 @@ var createDefaultBehavior = function(editable) {
         previous = block.previous(element);
         if (previous) {
           cursor.moveAtTextEnd(previous);
-          cursor.setSelection();
+          cursor.setVisibleSelection();
         }
         break;
       case 'after':
         next = block.next(element);
         if (next) {
           cursor.moveAtBeginning(next);
-          cursor.setSelection();
+          cursor.setVisibleSelection();
         }
         break;
       }
@@ -4801,7 +4677,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     clipboard: function(element, action, cursor) {
-      log('Default clipboard behavior');
       var pasteHolder, sel;
 
       if (action !== 'paste') return;
@@ -4829,7 +4704,7 @@ var createDefaultBehavior = function(editable) {
         content.normalizeSpaces(pasteElement);
         cursor.insertAfter(pasteElement);
         cursor.moveAfter(pasteElement);
-        cursor.setSelection();
+        cursor.setVisibleSelection();
 
         element.removeAttribute(config.pastingAttribute);
       }, 0);
@@ -5027,6 +4902,7 @@ var createDefaultEvents = function (editable) {
 var Dispatcher = function(editable) {
   var win = editable.win;
   eventable(this, editable);
+  this.supportsInputEvent = false;
   this.$document = $(win.document);
   this.config = editable.config;
   this.editable = editable;
@@ -5036,6 +4912,10 @@ var Dispatcher = function(editable) {
   this.setup();
 };
 
+// This will be set to true once we detect the input event is working.
+// Input event description on MDN:
+// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/input
+var isInputEventSupported = false;
 
 /**
  * Sets up all events that Editable.JS is catching.
@@ -5080,10 +4960,44 @@ Dispatcher.prototype.setupElementEvents = function() {
   }).on('cut.editable', _this.editableSelector, function(event) {
     log('Cut');
     _this.notify('clipboard', this, 'cut', _this.selectionWatcher.getFreshSelection());
+    _this.triggerChangeEvent(this);
   }).on('paste.editable', _this.editableSelector, function(event) {
     log('Paste');
     _this.notify('clipboard', this, 'paste', _this.selectionWatcher.getFreshSelection());
+    _this.triggerChangeEvent(this);
+  }).on('input.editable', _this.editableSelector, function(event) {
+    log('Input');
+    if (isInputEventSupported) {
+      _this.notify('change', this);
+    } else {
+      // Most likely the event was already handled manually by
+      // triggerChangeEvent so the first time we just switch the
+      // isInputEventSupported flag without notifiying the change event.
+      isInputEventSupported = true;
+    }
+  }).on('formatEditable.editable', _this.editableSelector, function(event) {
+    _this.notify('change', this);
   });
+};
+
+/**
+ * Trigger a change event
+ *
+ * This should be done in these cases:
+ * - typing a letter
+ * - delete (backspace and delete keys)
+ * - cut
+ * - paste
+ * - copy and paste (not easily possible manually as far as I know)
+ *
+ * Preferrably this is done using the input event. But the input event is not
+ * supported on all browsers for contenteditable elements.
+ * To make things worse it is not detectable either. So instead of detecting
+ * we set 'isInputEventSupported' when the input event fires the first time.
+ */
+Dispatcher.prototype.triggerChangeEvent = function(target){
+  if (isInputEventSupported) return;
+  this.notify('change', target);
 };
 
 Dispatcher.prototype.dispatchSwitchEvent = function(event, element, direction) {
@@ -5118,30 +5032,22 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
   var _this = this;
 
   this.$document.on('keydown.editable', this.editableSelector, function(event) {
-    _this.keyboard.dispatchKeyEvent(event, this);
+    var notifyCharacterEvent = !isInputEventSupported;
+    _this.keyboard.dispatchKeyEvent(event, this, notifyCharacterEvent);
   });
 
   this.keyboard.on('left', function(event) {
-    log('Left key pressed');
     _this.dispatchSwitchEvent(event, this, 'before');
   }).on('up', function(event) {
-    log('Up key pressed');
     _this.dispatchSwitchEvent(event, this, 'before');
   }).on('right', function(event) {
-    log('Right key pressed');
     _this.dispatchSwitchEvent(event, this, 'after');
   }).on('down', function(event) {
-    log('Down key pressed');
     _this.dispatchSwitchEvent(event, this, 'after');
   }).on('tab', function(event) {
-    log('Tab key pressed');
   }).on('shiftTab', function(event) {
-    log('Shift+Tab key pressed');
   }).on('esc', function(event) {
-    log('Esc key pressed');
   }).on('backspace', function(event) {
-    log('Backspace key pressed');
-
     var range = _this.selectionWatcher.getFreshRange();
     if (range.isCursor) {
       var cursor = range.getCursor();
@@ -5149,11 +5055,13 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
         event.preventDefault();
         event.stopPropagation();
         _this.notify('merge', this, 'before', cursor);
+      } else {
+        _this.triggerChangeEvent(this);
       }
+    } else {
+      _this.triggerChangeEvent(this);
     }
   }).on('delete', function(event) {
-    log('Delete key pressed');
-
     var range = _this.selectionWatcher.getFreshRange();
     if (range.isCursor) {
       var cursor = range.getCursor();
@@ -5161,10 +5069,13 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
         event.preventDefault();
         event.stopPropagation();
         _this.notify('merge', this, 'after', cursor);
+      } else {
+        _this.triggerChangeEvent(this);
       }
+    } else {
+      _this.triggerChangeEvent(this);
     }
   }).on('enter', function(event) {
-    log('Enter key pressed');
     event.preventDefault();
     event.stopPropagation();
     var range = _this.selectionWatcher.getFreshRange();
@@ -5179,11 +5090,12 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
     }
 
   }).on('shiftEnter', function(event) {
-    log('Shift+Enter key pressed');
     event.preventDefault();
     event.stopPropagation();
     var cursor = _this.selectionWatcher.forceCursor();
     _this.notify('newline', this, cursor);
+  }).on('character', function(event) {
+    _this.notify('change', this);
   });
 };
 
@@ -5411,7 +5323,7 @@ var Keyboard = function() {
   eventable(this);
 };
 
-Keyboard.prototype.dispatchKeyEvent = function(event, target) {
+Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEvent) {
   switch (event.keyCode) {
 
   case this.key.left:
@@ -5457,7 +5369,20 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target) {
       this.notify(target, 'enter', event);
     }
     break;
-
+  case this.key.ctrl:
+  case this.key.shift:
+  case this.key.alt:
+    break;
+  // Metakey
+  case 224: // Firefox: 224
+  case 17: // Opera: 17
+  case 91: // Chrome/Safari: 91 (Left)
+  case 93: // Chrome/Safari: 93 (Right)
+    break;
+  default:
+    if (notifyCharacterEvent) {
+      this.notify(target, 'character', event);
+    }
   }
 };
 
@@ -5470,7 +5395,10 @@ Keyboard.prototype.key = {
   esc: 27,
   backspace: 8,
   'delete': 46,
-  enter: 13
+  enter: 13,
+  shift: 16,
+  ctrl: 17,
+  alt: 18
 };
 
 Keyboard.key = Keyboard.prototype.key;
@@ -5745,6 +5673,21 @@ var parser = (function() {
         return true;
       }
       return false;
+    },
+
+    /**
+     * Determine if an element behaves like an inline element.
+     */
+    isInlineElement: function(window, element) {
+      var styles = element.currentStyle || window.getComputedStyle(element, '');
+      var display = styles.display;
+      switch (display) {
+      case 'inline':
+      case 'inline-block':
+        return true;
+      default:
+        return false;
+      }
     }
   };
 })();
@@ -5820,7 +5763,13 @@ var rangeSaveRestore = (function() {
     insertRangeBoundaryMarker: function(range, atStart) {
       var markerId = 'editable-range-boundary-' + (boundaryMarkerId += 1);
       var markerEl;
-      var doc = window.document;
+      var container = range.commonAncestorContainer;
+
+      // If ownerDocument is null the commonAncestorContainer is window.document
+      if (container.ownerDocument === null || container.ownerDocument === undefined) {
+        error('Cannot save range: range is emtpy');
+      }
+      var doc = container.ownerDocument.defaultView.document;
 
       // Clone the Range and collapse to the appropriate boundary point
       var boundaryRange = range.cloneRange();
@@ -5829,9 +5778,9 @@ var rangeSaveRestore = (function() {
       // Create the marker element containing a single invisible character using DOM methods and insert it
       markerEl = doc.createElement('span');
       markerEl.id = markerId;
+      markerEl.setAttribute('data-editable', 'remove');
       markerEl.style.lineHeight = '0';
       markerEl.style.display = 'none';
-      // markerEl.className = "rangySelectionBoundary";
       markerEl.appendChild(doc.createTextNode(markerTextChar));
 
       boundaryRange.insertNode(markerEl);
@@ -5850,7 +5799,6 @@ var rangeSaveRestore = (function() {
     },
 
     save: function(range) {
-      var doc = window.document;
       var rangeInfo, startEl, endEl;
 
       // insert markers

@@ -22,16 +22,18 @@ var createDefaultBehavior = function(editable) {
     */
   return {
     focus: function(element) {
-      log('Default focus behavior');
+      // Add a <br> element if the editable is empty to force it to have height
+      // E.g. Firefox does not render empty block elements and most browsers do
+      // not render  empty inline elements.
+      if (parser.isVoid(element)) {
+        var br = document.createElement('br');
+        br.setAttribute('data-editable', 'remove');
+        element.appendChild(br);
+      }
     },
 
     blur: function(element) {
-      log('Default blur behavior');
       content.cleanInternals(element);
-    },
-
-    flow: function(element, action) {
-      log('Default flow behavior');
     },
 
     selection: function(element, selection) {
@@ -51,9 +53,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     newline: function(element, cursor) {
-      log(cursor);
-      log('Default newline behavior');
-
       var atEnd = cursor.isAtEnd();
       var br = document.createElement('br');
       cursor.insertBefore(br);
@@ -72,11 +71,10 @@ var createDefaultBehavior = function(editable) {
         log('not at the end');
       }
 
-      cursor.setSelection();
+      cursor.setVisibleSelection();
     },
 
     insert: function(element, direction, cursor) {
-      log('Default insert ' + direction + ' behavior');
       var parent = element.parentNode;
       var newElement = element.cloneNode(false);
       if (newElement.id) newElement.removeAttribute('id');
@@ -104,7 +102,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     merge: function(element, direction, cursor) {
-      log('Default merge ' + direction + ' behavior');
       var container, merger, fragment, chunks, i, newChild, range;
 
       switch (direction) {
@@ -125,7 +122,7 @@ var createDefaultBehavior = function(editable) {
         cursor.moveAtTextEnd(container);
       else
         cursor.moveAtBeginning(container);
-      cursor.setSelection();
+      cursor.setVisibleSelection();
 
       fragment = document.createDocumentFragment();
       chunks = merger.childNodes;
@@ -140,7 +137,7 @@ var createDefaultBehavior = function(editable) {
       content.normalizeTags(container);
       content.normalizeSpaces(container);
       cursor.restore();
-      cursor.setSelection();
+      cursor.setVisibleSelection();
     },
 
     empty: function(element) {
@@ -148,8 +145,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     'switch': function(element, direction, cursor) {
-      log('Default switch behavior');
-
       var next, previous;
 
       switch (direction) {
@@ -157,14 +152,14 @@ var createDefaultBehavior = function(editable) {
         previous = block.previous(element);
         if (previous) {
           cursor.moveAtTextEnd(previous);
-          cursor.setSelection();
+          cursor.setVisibleSelection();
         }
         break;
       case 'after':
         next = block.next(element);
         if (next) {
           cursor.moveAtBeginning(next);
-          cursor.setSelection();
+          cursor.setVisibleSelection();
         }
         break;
       }
@@ -175,7 +170,6 @@ var createDefaultBehavior = function(editable) {
     },
 
     clipboard: function(element, action, cursor) {
-      log('Default clipboard behavior');
       var pasteHolder, sel;
 
       if (action !== 'paste') return;
@@ -203,7 +197,7 @@ var createDefaultBehavior = function(editable) {
         content.normalizeSpaces(pasteElement);
         cursor.insertAfter(pasteElement);
         cursor.moveAfter(pasteElement);
-        cursor.setSelection();
+        cursor.setVisibleSelection();
 
         element.removeAttribute(config.pastingAttribute);
       }, 0);

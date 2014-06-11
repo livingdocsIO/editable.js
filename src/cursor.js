@@ -79,7 +79,8 @@ var Cursor = (function() {
       },
 
       setVisibleSelection: function() {
-        rangy.getSelection().setSingleRange(this.range);
+        $(this.host).focus(); // Without this Firefox is not happy (seems setting a selection is not enough. probably because Firefox can handle multiple selections)
+        rangy.getSelection(this.win).setSingleRange(this.range);
       },
 
       before: function() {
@@ -213,6 +214,13 @@ var Cursor = (function() {
         if (!cursor.range.equals(this.range)) return false;
 
         return true;
+      },
+
+      // Currently we call triggerChange manually after format changes.
+      // This is to prevent excessive triggering of the change event during
+      // merge or split operations or other manipulations by scripts.
+      triggerChange: function() {
+        $(this.host).trigger('formatEditable');
       }
     };
   })();

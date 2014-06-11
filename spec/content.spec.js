@@ -497,4 +497,95 @@ describe('Content', function() {
       expect(exact).toEqual(false);
     });
   });
+
+  describe('extractContent()', function() {
+    var $host;
+
+    beforeEach(function() {
+      $host = $('<div></div>');
+    });
+
+    it('extracts the content', function() {
+      $host.html('a');
+      var result = content.extractContent($host[0]);
+      // escape to show invisible characters
+      expect(escape(result)).toEqual('a');
+    });
+
+    it('replaces a zeroWidthSpace with a <br> tag', function() {
+      $host.html('a\u200B');
+      var result = content.extractContent($host[0]);
+      expect(result).toEqual('a<br>');
+    });
+
+    it('removes zeroWidthNonBreakingSpaces', function() {
+      $host.html('a\uFEFF');
+      var result = content.extractContent($host[0]);
+      // escape to show invisible characters
+      expect(escape(result)).toEqual('a');
+    });
+
+    it('removes a marked linebreak', function() {
+      $host.html('<br data-editable="remove">');
+      var result = content.extractContent($host[0]);
+      expect(result).toEqual('');
+    });
+
+    it('removes two nested marked spans', function() {
+      $host.html('<span data-editable="remove"><span data-editable="remove">a</span></span>');
+      var result = content.extractContent($host[0]);
+      expect(result).toEqual('a');
+    });
+
+    it('removes two adjacent marked spans', function() {
+      $host.html('<span data-editable="remove"></span><span data-editable="remove"></span>');
+      var result = content.extractContent($host[0]);
+      expect(result).toEqual('');
+    });
+
+    it('removes two marked spans around text', function() {
+      $host.html('|<span data-editable="remove">a</span>|<span data-editable="remove">b</span>|');
+      var result = content.extractContent($host[0]);
+      expect(result).toEqual('|a|b|');
+    });
+
+    describe('with ranges', function() {
+      var range;
+
+      beforeEach(function() {
+        $host.appendTo(document.body);
+        range = rangy.createRange();
+      });
+
+      afterEach(function() {
+        $host.remove();
+      });
+
+      it('removes saved ranges', function() {
+        $host.html('a');
+        range.setStart($host[0], 0);
+        range.setEnd($host[0], 0);
+        var savedRange = rangeSaveRestore.save(range);
+        var result = content.extractContent($host[0]);
+        expect(result).toEqual('a')
+      });
+
+      it('leaves the saved ranges in the host', function() {
+        range.setStart($host[0], 0);
+        range.setEnd($host[0], 0);
+        var savedRange = rangeSaveRestore.save(range);
+        var result = content.extractContent($host[0]);
+        expect($host[0].firstChild.nodeName).toEqual('SPAN');
+      });
+
+      it('removes a saved range in an otherwise empty host', function() {
+        range.setStart($host[0], 0);
+        range.setEnd($host[0], 0);
+        var savedRange = rangeSaveRestore.save(range);
+        var result = content.extractContent($host[0]);
+        expect(result).toEqual('');
+      });
+
+    });
+  });
 });

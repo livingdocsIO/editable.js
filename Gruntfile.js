@@ -82,11 +82,11 @@ module.exports = function(grunt) {
       },
       browsers: {
         configFile: 'karma.conf.js',
-        browsers: ['Chrome', 'Firefox', 'Safari', 'Opera']
+        browsers: ['Chrome', 'Firefox', 'Safari']
       },
       build: {
         configFile: 'karma.conf.js',
-        browsers: ['Chrome', 'Firefox', 'Safari', 'Opera'],
+        browsers: ['Chrome', 'Firefox', 'Safari'],
         singleRun: true
       }
     },
@@ -95,7 +95,6 @@ module.exports = function(grunt) {
         files: {
           'editable.js': [
             'vendor/rangy-1.2.3/rangy-core.js',
-            'vendor/rangy-1.2.3/rangy-selectionsaverestore.js',
             'vendor/bowser.js',
             '.tmp/editable.js'
           ]
@@ -128,16 +127,6 @@ module.exports = function(grunt) {
             'editable.js'
           ],
         }
-      }
-    },
-    copy: {
-      lukas: {
-        files: [{
-          expand: true,
-          src: ['editable.js'],
-          dest: '../livingdocs-engine/vendor/editableJS/'
-        }]
-
       }
     },
     bump: {
@@ -192,11 +181,6 @@ module.exports = function(grunt) {
     'concat:editable',
     'concat:dist',
     'uglify'
-  ]);
-
-  grunt.registerTask('build-lukas', [
-    'build',
-    'copy:lukas'
   ]);
 
   grunt.registerTask('default', ['server']);

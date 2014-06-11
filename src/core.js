@@ -184,19 +184,23 @@ Editable.prototype.createCursor = function(element, position) {
 };
 
 Editable.prototype.createCursorAtBeginning = function(element) {
-  this.createCursor(element, 'beginning');
+  return this.createCursor(element, 'beginning');
 };
 
 Editable.prototype.createCursorAtEnd = function(element) {
-  this.createCursor(element, 'end');
+  return this.createCursor(element, 'end');
 };
 
 Editable.prototype.createCursorBefore = function(element) {
-  this.createCursor(element, 'before');
+  return this.createCursor(element, 'before');
 };
 
 Editable.prototype.createCursorAfter = function(element) {
-  this.createCursor(element, 'after');
+  return this.createCursor(element, 'after');
+};
+
+Editable.prototype.getContent = function(element) {
+  return content.extractContent(element);
 };
 
 
@@ -370,6 +374,19 @@ Editable.prototype.merge = function(handler) {
  */
 Editable.prototype.empty = function(handler) {
   return this.on('empty', handler);
+};
+
+/**
+ * Subscribe to the {{#crossLink "Editable/change:event"}}{{/crossLink}}
+ * event.
+ *
+ * @method change
+ * @param {Function} handler The callback to execute in response to the
+ *   event.
+ * @chainable
+ */
+Editable.prototype.change = function(handler) {
+  return this.on('change', handler);
 };
 
 /**

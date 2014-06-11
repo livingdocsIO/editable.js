@@ -360,6 +360,36 @@ describe('Parser', function() {
     });
   });
 
+  describe('isInlineElement()', function() {
+    var $elem;
+
+    afterEach(function() {
+      if ($elem) {
+        $elem.remove();
+        $elem = undefined;
+      }
+    });
+
+    it('returns false for a div', function() {
+      $elem = $('<div>');
+      $(document.body).append($elem);
+      expect(parser.isInlineElement(window, $elem[0])).toEqual(false);
+    });
+
+    it('returns true for a span', function() {
+      $elem = $('<span>');
+      $(document.body).append($elem);
+      expect(parser.isInlineElement(window, $elem[0])).toEqual(true);
+    });
+
+    it('returns true for a div with display set to "inline-block"', function() {
+      $elem = $('<div style="display:inline-block;">');
+      $(document.body).append($elem);
+      expect(parser.isInlineElement(window, $elem[0])).toEqual(true);
+    });
+
+  });
+
 });
 
 describe('isDocumentFragmentWithoutChildren()', function() {

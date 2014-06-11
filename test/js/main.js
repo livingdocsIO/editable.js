@@ -1,8 +1,6 @@
 ;(function($) {
 
-  var editable = new Editable({
-    log: false
-  });
+  var editable = new Editable({});
 
   var lastSelection;
   var setupTooltip = function() {
@@ -51,36 +49,41 @@
     $(document).on('click', '.js-format-bold', function(event) {
       if (lastSelection.isSelection) {
         lastSelection.toggleBold();
+        lastSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-italic', function(event) {
       if (lastSelection.isSelection) {
         lastSelection.toggleEmphasis();
+        lastSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-link', function(event) {
       if (lastSelection.isSelection) {
         lastSelection.toggleLink('www.upfront.io');
+        lastSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-quote', function(event) {
       if (lastSelection.isSelection) {
         lastSelection.toggleSurround('«', '»');
+        lastSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-clear', function(event) {
       if (lastSelection.isSelection) {
         lastSelection.removeFormatting();
+        lastSelection.triggerChange();
       }
     });
   };
 
   $(document).ready(function() {
-    editable.add("article>div>p, article>div li");
+    editable.add('.is-editable');
     setupTooltip();
   });
 
@@ -92,7 +95,7 @@
       var iframeEditable = new Editable({
         window: iframeWindow
       });
-      iframeEditable.add($('article>div>p, article>div li', $iframe[0].contentDocument.body));
+      iframeEditable.add($('.is-editable', $iframe[0].contentDocument.body));
     });
 
   });

@@ -268,6 +268,21 @@ var parser = (function() {
         return true;
       }
       return false;
+    },
+
+    /**
+     * Determine if an element behaves like an inline element.
+     */
+    isInlineElement: function(window, element) {
+      var styles = element.currentStyle || window.getComputedStyle(element, '');
+      var display = styles.display;
+      switch (display) {
+      case 'inline':
+      case 'inline-block':
+        return true;
+      default:
+        return false;
+      }
     }
   };
 })();

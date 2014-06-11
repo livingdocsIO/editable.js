@@ -6,6 +6,9 @@ var content = (function() {
     return rangeSaveRestore.restore(host, range);
   };
 
+  var zeroWidthSpace = /\u200B/g;
+  var zeroWidthNonBreakingSpace = /\uFEFF/g;
+
   return {
     /**
      * Remove empty tags and merge consecutive tags (they must have the same
@@ -58,7 +61,50 @@ var content = (function() {
      * @param  {HTMLElement} element The element to process.
      */
     cleanInternals: function(element) {
-      element.innerHTML = element.innerHTML.replace(/\u200B/g, '<br />');
+      // Uses extract content for simplicity. A custom method
+      // that does not clone the element could be faster if needed.
+      element.innerHTML = this.extractContent(element);
+    },
+
+    /**
+     * Extracts the content from a host element.
+     * Does not touch or change the host. Just returns
+     * the content and removes elements marked for removal by editable.
+     */
+    extractContent: function(element) {
+      var innerHtml = element.innerHTML;
+      innerHtml = innerHtml.replace(zeroWidthNonBreakingSpace, ''); // Used for forcing inline elments to have a height
+      innerHtml = innerHtml.replace(zeroWidthSpace, '<br>'); // Used for cross-browser newlines
+
+      var clone = document.createElement('div');
+      clone.innerHTML = innerHtml;
+      this.unwrapInternalNodes(clone);
+
+      return clone.innerHTML;
+    },
+
+    /**
+     * Remove elements that were inserted for internal or user interface purposes
+     *
+     * Currently:
+     * - Saved ranges
+     */
+    unwrapInternalNodes: function(sibling) {
+      while (sibling) {
+        var nextSibling = sibling.nextSibling;
+
+        if (sibling.nodeType === 1) {
+          var attr = sibling.getAttribute('data-editable');
+
+          if (sibling.firstChild) {
+            this.unwrapInternalNodes(sibling.firstChild);
+          }
+          if (attr === 'remove') {
+            this.unwrap(sibling);
+          }
+        }
+        sibling = nextSibling;
+      }
     },
 
     /**
@@ -215,7 +261,13 @@ var content = (function() {
     },
 
     unwrap: function(elem) {
-      $(elem).contents().unwrap();
+      var $elem = $(elem);
+      var contents = $elem.contents();
+      if (contents.length) {
+        contents.unwrap();
+      } else {
+        $elem.remove();
+      }
     },
 
     removeFormatting: function(host, range, tagName) {
@@ -232,7 +284,7 @@ var content = (function() {
       var tags = this.getTags(host, range);
       for (var i = 0; i < tags.length; i++) {
         var elem = tags[i];
-        if ( !tagName || elem.nodeName === tagName.toUpperCase() ) {
+        if ( elem.nodeName !== 'BR' && (!tagName || elem.nodeName === tagName.toUpperCase()) ) {
           this.unwrap(elem);
         }
       }
