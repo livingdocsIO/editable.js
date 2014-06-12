@@ -1,24 +1,30 @@
-Editable.JS
-==========
+editable.js
+===========
 
-JavaScript API that defines a browser-consistent content editable interface
+## What is it about?
+
+A JavaScript API that defines a friendly and browser-consistent content editable interface.
 
 Editable is built for block level elements containing only phrasing content. This normally means `p`, `h1`-`h6`, `blockquote` etc. elements. This allows editable to be lean and mean since it is only concerned with formatting and not with layouting.
 
-#### Demo
 
-You can check out a simple demo of Editable.JS on this [plnkr](http://plnkr.co/edit/12OUl7)
+## Installation
 
-#### To Start
+Via bower:
 
-To make an element editable:
-
-```javascript
-var editable = new Editable()
-editalbe.add($elem)
+```shell
+bower install editable
 ```
 
-#### Events Overview
+Otherwise you can just grab the [editable.js](editable.js) or [editable.min.js](editable.min.js) files from this repo.
+
+
+## Plnkr Demo
+
+You can check out a [simple demo](http://plnkr.co/edit/12OUl7) of editable.js on plnkr. It features a formatting toolbar and the default insert, split and merge behavior that allow to add an remove content blocks like paragraphs easily.
+
+
+## Events Overview
 
 - **focus**  
   Fired when an editable element gets focus.
@@ -43,6 +49,16 @@ editalbe.add($elem)
 - **newline**  
   Fired when the user presses `SHIFT+ENTER` to insert a newline.
 
+
+## How to use
+
+To make an element editable:
+
+```javascript
+var editable = new Editable()
+editalbe.add($elem)
+```
+
 #### Example for Selection Changes
 
 In a `selection` event you get the editable element that triggered the event as well as a selection object. Through the selection object you can get information about the selection like coordinates or the text it contains and you can manipulate the selection.
@@ -65,12 +81,17 @@ editable.selection(function(editableElement, selection) {
 });
 ```
 
+#### Dive Deeper
 
-Development
------------
+We havent got around to make this documentation comprehensive enough. In the meantime you can find the API methods in [src/core.js](src/core.js) and the default implemnetation in [src/default-behavior.js](src/default-behavior.js).
+
+To find out what you can do with the the editable.js `cursor` and `selection` objects see [src/cursor.js](src/cursor.js) and [src/selection.js](src/selection.js).
+
+
+## Development
 
 Organization:
-All files of Editable.JS share the same closure. This is in order to allow all classes inside the Editable.JS API to use global objects, but only expose the Editable singleton as the only externally visible variable of Editable.JS. To get a shared closure the files editable.prefix and editable.suffix wrap all code.
+All files of editable.js share the same closure. This is in order to allow all classes inside the editable.js API to use global objects, but only expose the Editable singleton as the only externally visible variable of editable.js. To get a shared closure the files editable.prefix and editable.suffix wrap all code.
 
 **JSHint** does not know this, so all variables defined directly in this editable.js scope have to be added to the globals in .jshintrc
 
@@ -111,10 +132,9 @@ grunt jshint
 grunt build
 ```
 
-License
--------
+## License
 
-Editable.JS is licensed under the [MIT License](LICENSE)
+editable.js is licensed under the [MIT License](LICENSE).
 
 In Short:
 
