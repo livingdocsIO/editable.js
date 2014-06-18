@@ -21,7 +21,7 @@ Otherwise you can just grab the [editable.js](editable.js) or [editable.min.js](
 
 ## Plnkr Demo
 
-You can check out a [simple demo](http://plnkr.co/edit/12OUl7) of editable.js on plnkr. It features a formatting toolbar and the default insert, split and merge behavior that allow to add an remove content blocks like paragraphs easily.
+You can check out a [simple demo](http://plnkr.co/edit/12OUl7) of editable.js on plnkr. It features a formatting toolbar and the default insert, split and merge behavior that allow to add and remove content blocks like paragraphs easily.
 
 
 ## Events Overview
@@ -29,7 +29,7 @@ You can check out a [simple demo](http://plnkr.co/edit/12OUl7) of editable.js on
 - **focus**  
   Fired when an editable element gets focus.
 - **blur**  
-  Fired when an editable element looses focus.
+  Fired when an editable element loses focus.
 - **selection**  
   Fired when the user selects some text inside an editable element.
 - **cursor**  
@@ -45,7 +45,7 @@ You can check out a [simple demo](http://plnkr.co/edit/12OUl7) of editable.js on
 - **merge**  
   Fired when the user pressed `FORWARD DELETE` at the end or `BACKSPACE` at the beginning of an element.
 - **switch**  
-  Fired when the user pressed an `ARROW KEY` at the top or bottom so that you may want to set the cursor into the preceeding or following element.
+  Fired when the user pressed an `ARROW KEY` at the top or bottom so that you may want to set the cursor into the preceding or following element.
 - **newline**  
   Fired when the user presses `SHIFT+ENTER` to insert a newline.
 
@@ -83,7 +83,7 @@ editable.selection(function(editableElement, selection) {
 
 #### Dive Deeper
 
-We havent got around to make this documentation comprehensive enough. In the meantime you can find the API methods in [src/core.js](src/core.js) and the default implemnetation in [src/default-behavior.js](src/default-behavior.js).
+We haven't got around to make this documentation comprehensive enough. In the meantime you can find the API methods in [src/core.js](src/core.js) and the default implemnetation in [src/default-behavior.js](src/default-behavior.js).
 
 To find out what you can do with the the editable.js `cursor` and `selection` objects see [src/cursor.js](src/cursor.js) and [src/selection.js](src/selection.js).
 
