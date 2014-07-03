@@ -7,6 +7,7 @@ A JavaScript API that defines a friendly and browser-consistent content editable
 
 Editable is built for block level elements containing only phrasing content. This normally means `p`, `h1`-`h6`, `blockquote` etc. elements. This allows editable to be lean and mean since it is only concerned with formatting and not with layouting.
 
+We made editable.js to support our vision of online document editing. Have a look at [livingdocs.io](http://livingdocs.io/).
 
 ## Installation
 
