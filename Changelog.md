@@ -1,4 +1,10 @@
 
+# v0.3.2 (2014-06-11)
+
+- publish package in bower and npm
+- Change naming of github repo (change to lowercase)
+
+
 # v0.3.0 (2014-06-11)
 
 #### Features
