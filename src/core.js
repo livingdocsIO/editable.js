@@ -247,184 +247,24 @@ Editable.prototype.unload = function() {
 };
 
 /**
- * Subscribe to the {{#crossLink "Editable/focus:event"}}{{/crossLink}}
- * event.
+ * Generate a callback function to subscribe to an event.
  *
- * @method focus
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
+ * @method createEventSubscriber
+ * @param {String} Event name
  */
-Editable.prototype.focus = function(handler) {
-  return this.on('focus', handler);
+var createEventSubscriber = function(name) {
+  Editable.prototype[name] = function(handler) {
+    return this.on(name, handler);
+  };
 };
 
 /**
- * Subscribe to the {{#crossLink "Editable/blur:event"}}{{/crossLink}}
- * event.
- *
- * @method blur
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
+ * Set up callback functions for several events.
  */
-Editable.prototype.blur = function(handler) {
-  return this.on('blur', handler);
-};
+var events = ['focus', 'blur', 'flow', 'selection', 'cursor', 'newline', 'insert',
+              'split', 'merge', 'empty', 'change', 'switch', 'move', 'clipboard'];
 
-/**
- * Subscribe to the {{#crossLink "Editable/flow:event"}}{{/crossLink}}
- * event.
- *
- * @method flow
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.flow = function(handler) {
-  return this.on('flow', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/selection:event"}}{{/crossLink}}
- * event.
- *
- * @method selection
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.selection = function(handler) {
-  return this.on('selection', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/cursor:event"}}{{/crossLink}}
- * event.
- *
- * @method cursor
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.cursor = function(handler) {
-  return this.on('cursor', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/newline:event"}}{{/crossLink}}
- * event.
- *
- * @method newline
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.newline = function(handler) {
-  return this.on('newline', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/insert:event"}}{{/crossLink}}
- * event.
- *
- * @method insert
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.insert = function(handler) {
-  return this.on('insert', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/split:event"}}{{/crossLink}}
- * event.
- *
- * @method split
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.split = function(handler) {
-  return this.on('split', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/merge:event"}}{{/crossLink}}
- * event.
- *
- * @method merge
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.merge = function(handler) {
-  return this.on('merge', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/empty:event"}}{{/crossLink}}
- * event.
- *
- * @method empty
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.empty = function(handler) {
-  return this.on('empty', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/change:event"}}{{/crossLink}}
- * event.
- *
- * @method change
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.change = function(handler) {
-  return this.on('change', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/switch:event"}}{{/crossLink}}
- * event.
- *
- * @method switch
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype['switch'] = function(handler) {
-  return this.on('switch', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/move:event"}}{{/crossLink}}
- * event.
- *
- * @method move
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.move = function(handler) {
-  return this.on('move', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/clipboard:event"}}{{/crossLink}}
- * event.
- *
- * @method clipboard
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.clipboard = function(handler) {
-  return this.on('clipboard', handler);
-};
-
+for (var i = 0; i < events.length; ++i) {
+  var eventName = events[i];
+  createEventSubscriber(eventName);
+}

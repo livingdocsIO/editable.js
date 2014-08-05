@@ -1,15 +1,15 @@
 var block = (function() {
-  return {
-    next: function(element) {
-      var next = element.nextElementSibling;
-      if (next && next.getAttribute('contenteditable')) return next;
-      return null;
-    },
 
-    previous: function(element) {
-      var previous = element.previousElementSibling;
-      if (previous && previous.getAttribute('contenteditable')) return previous;
+  var getSibling = function(type) {
+    return function(element) {
+      var sibling = element[type];
+      if (sibling && sibling.getAttribute('contenteditable')) return sibling;
       return null;
-    }
+    };
+  };
+
+  return {
+    next: getSibling('nextElementSibling'),
+    previous: getSibling('previousElementSibling'),
   };
 })();
