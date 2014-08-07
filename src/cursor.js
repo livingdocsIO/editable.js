@@ -79,7 +79,7 @@ var Cursor = (function() {
       },
 
       setVisibleSelection: function() {
-        $(this.host).focus(); // Without this Firefox is not happy (seems setting a selection is not enough. probably because Firefox can handle multiple selections)
+        $(this.host).focus(); // Without setting focus() Firefox is not happy (seems setting a selection is not enough. Probably because Firefox can handle multiple selections)
         rangy.getSelection(this.win).setSingleRange(this.range);
       },
 
@@ -187,6 +187,13 @@ var Cursor = (function() {
           error('Can not set cursor outside of an editable block');
         }
         this.setHost(host);
+      },
+
+      retainVisibleSelection: function(callback) {
+        this.save();
+        callback();
+        this.restore();
+        this.setVisibleSelection();
       },
 
       save: function() {
