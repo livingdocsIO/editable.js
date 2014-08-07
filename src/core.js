@@ -203,6 +203,22 @@ Editable.prototype.getContent = function(element) {
   return content.extractContent(element);
 };
 
+Editable.prototype.getSelection = function(element) {
+  return this.dispatcher.selectionWatcher.getFreshSelection();
+};
+
+
+/**
+ * Enable spellchecking
+ *
+ * @chainable
+ */
+Editable.prototype.spellcheck = function(element) {
+  this.spellcheck = new Spellcheck(this);
+
+  return this;
+};
+
 
 /**
  * Subscribe a callback function to a custom event fired by the API.

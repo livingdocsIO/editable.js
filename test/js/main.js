@@ -1,6 +1,7 @@
 ;(function($) {
 
   var editable = new Editable({});
+  editable.spellcheck();
 
   var lastSelection;
   var setupTooltip = function() {
