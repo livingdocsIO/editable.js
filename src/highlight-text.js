@@ -5,20 +5,20 @@ var highlightText = (function() {
       return range.toString();
     },
 
-    getRange: function(element) {
-      var range = rangy.createRange();
-      range.selectNodeContents(element);
-      return range;
+    find: function(range, regex) {
+      var text = this.extractText(range);
+      var match;
+      var matches = [];
+      var matchIndex = 0;
+      while (match = regex.exec(text)) {
+        matches.push(this.prepareMatch(match, matchIndex));
+        matchIndex += 1;
+      }
+
+      return matches;
     },
 
-    getTextIterator: function(range) {
-      return range.createNodeIterator([3], function(node) {
-        // no filter needed right now.
-        return true;
-      });
-    },
-
-    iterate: function(range, matches) {
+    highlightMatches: function(range, matches) {
       var textNode, length, firstPortion, lastPortion;
       var currentMatchIndex = 0;
       var currentMatch = matches[currentMatchIndex];
@@ -80,6 +80,19 @@ var highlightText = (function() {
       }
     },
 
+    getRange: function(element) {
+      var range = rangy.createRange();
+      range.selectNodeContents(element);
+      return range;
+    },
+
+    getTextIterator: function(range) {
+      return range.createNodeIterator([3], function(node) {
+        // no filter needed right now.
+        return true;
+      });
+    },
+
     wrapWord: function(portions) {
       var element;
       for (var i = 0; i < portions.length; i++) {
@@ -96,20 +109,6 @@ var highlightText = (function() {
       range.setEnd(portion.element, portion.offset + portion.length);
       var node = $('<span data-awesome="crazy">')[0];
       return range.surroundContents(node);
-    },
-
-    find: function(element, regex) {
-      var range = this.getRange(element);
-      var text = this.extractText(range);
-      var match;
-      var matches = [];
-      var matchIndex = 0;
-      while (match = regex.exec(text)) {
-        matches.push(this.prepareMatch(match, matchIndex));
-        matchIndex += 1;
-      }
-
-      return matches;
     },
 
     prepareMatch: function (match, matchIndex) {

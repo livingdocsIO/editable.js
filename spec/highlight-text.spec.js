@@ -15,27 +15,27 @@ describe('highlightText', function() {
   };
 
   var iterateOverElement = function(elem, regex) {
-    var matches = highlightText.find(elem, regex);
     var range = highlightText.getRange(elem);
-    highlightText.iterate(range, matches);
+    var matches = highlightText.find(range, regex);
+    highlightText.highlightMatches(range, matches);
   };
-
 
   describe('minimal case', function() {
 
     beforeEach(function() {
       this.textNode = $('<div>a</div>')[0];
+      this.range = highlightText.getRange(this.textNode);
       this.regex = /a/g;
+
     });
 
     it('extracts the text', function(){
-      var range = highlightText.getRange(this.textNode);
-      var text = highlightText.extractText(range);
+      var text = highlightText.extractText(this.range);
       expect(text).toEqual('a');
     });
 
     it('finds the letter "a"', function() {
-      var matches = highlightText.find(this.textNode, this.regex);
+      var matches = highlightText.find(this.range, this.regex);
       var firstMatch = matches[0];
       expect(firstMatch.search).toEqual('a');
       expect(firstMatch.matchIndex).toEqual(0);
@@ -44,7 +44,7 @@ describe('highlightText', function() {
     });
 
     it('does not find the letter "b"', function() {
-      var matches = highlightText.find(this.textNode, /b/g);
+      var matches = highlightText.find(this.range, /b/g);
       expect(matches.length).toEqual(0);
     });
   });
@@ -53,11 +53,12 @@ describe('highlightText', function() {
 
     beforeEach(function() {
       this.textNode = $('<div>Some juice.</div>')[0];
+      this.range = highlightText.getRange(this.textNode);
       this.regex = /juice/g;
     });
 
     it('finds the word "juice"', function() {
-      var matches = highlightText.find(this.textNode, this.regex);
+      var matches = highlightText.find(this.range, this.regex);
       var firstMatch = matches[0];
       expect(firstMatch.search).toEqual('juice');
       expect(firstMatch.matchIndex).toEqual(0);
@@ -160,20 +161,20 @@ describe('highlightText', function() {
 
     it('wraps a word in a single text node', function() {
       var elem = $('<div>Some juice.</div>')[0];
-      var matches = highlightText.find(elem, /juice/g);
       var range = highlightText.getRange(elem);
-      highlightText.iterate(range, matches);
+      var matches = highlightText.find(range, /juice/g);
+      highlightText.highlightMatches(range, matches);
       expect(range.commonAncestorContainer.outerHTML)
         .toEqual('<div>Some <span data-awesome="crazy">juice</span>.</div>')
     });
 
     it('wraps a word with a partial <em> element', function() {
-      var elem = $('<div>Some jui<em>ce</em>.</div>')[0];
-      var matches = highlightText.find(elem, /juice/g);
+      var elem = $('<div>Some jui<em>ce.</em></div>')[0];
       var range = highlightText.getRange(elem);
-      highlightText.iterate(range, matches);
+      var matches = highlightText.find(range, /juice/g);
+      highlightText.highlightMatches(range, matches);
       expect(range.commonAncestorContainer.outerHTML)
-        .toEqual('<div>Some <span data-awesome="crazy">jui</span><em><span data-awesome="crazy">ce</span></em>.</div>')
+        .toEqual('<div>Some <span data-awesome="crazy">jui</span><em><span data-awesome="crazy">ce</span>.</em></div>')
     });
   });
 
