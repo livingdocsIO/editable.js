@@ -14,6 +14,9 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      // test helpers
+      'vendor/sinon-*.js',
+
       // vendor files
       'vendor/jquery-*.js',
       'vendor/rangy-1.2.3/rangy-core.js',
