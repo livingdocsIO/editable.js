@@ -22,19 +22,18 @@ describe('highlightText', function() {
   describe('minimal case', function() {
 
     beforeEach(function() {
-      this.textNode = $('<div>a</div>')[0];
-      this.range = highlightText.getRange(this.textNode);
+      this.element = $('<div>a</div>')[0];
       this.regex = /a/g;
 
     });
 
     it('extracts the text', function(){
-      var text = highlightText.extractText(this.range);
+      var text = highlightText.extractText(this.element);
       expect(text).toEqual('a');
     });
 
     it('finds the letter "a"', function() {
-      var matches = highlightText.find(this.range, this.regex);
+      var matches = highlightText.find(this.element, this.regex);
       var firstMatch = matches[0];
       expect(firstMatch.search).toEqual('a');
       expect(firstMatch.matchIndex).toEqual(0);
@@ -43,7 +42,7 @@ describe('highlightText', function() {
     });
 
     it('does not find the letter "b"', function() {
-      var matches = highlightText.find(this.range, /b/g);
+      var matches = highlightText.find(this.element, /b/g);
       expect(matches.length).toEqual(0);
     });
   });
@@ -51,13 +50,12 @@ describe('highlightText', function() {
   describe('Some juice.', function() {
 
     beforeEach(function() {
-      this.textNode = $('<div>Some juice.</div>')[0];
-      this.range = highlightText.getRange(this.textNode);
+      this.element = $('<div>Some juice.</div>')[0];
       this.regex = /juice/g;
     });
 
     it('finds the word "juice"', function() {
-      var matches = highlightText.find(this.range, this.regex);
+      var matches = highlightText.find(this.element, this.regex);
       var firstMatch = matches[0];
       expect(firstMatch.search).toEqual('juice');
       expect(firstMatch.matchIndex).toEqual(0);

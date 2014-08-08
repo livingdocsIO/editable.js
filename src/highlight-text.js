@@ -1,18 +1,18 @@
 var highlightText = (function() {
 
   return {
-    extractText: function(range) {
+    extractText: function(element) {
+      var range = this.getRange(element);
       return range.toString();
     },
 
     highlight: function(element, regex, stencilElement) {
-      var range = highlightText.getRange(element);
-      var matches = highlightText.find(range, regex);
-      highlightText.highlightMatches(range, matches, stencilElement);
+      var matches = this.find(element, regex);
+      this.highlightMatches(element, matches, stencilElement);
     },
 
-    find: function(range, regex) {
-      var text = this.extractText(range);
+    find: function(element, regex) {
+      var text = this.extractText(element);
       var match;
       var matches = [];
       var matchIndex = 0;
@@ -24,7 +24,7 @@ var highlightText = (function() {
       return matches;
     },
 
-    highlightMatches: function(range, matches, stencilElement) {
+    highlightMatches: function(element, matches, stencilElement) {
       if (!matches || matches.length == 0) {
         return;
       }
@@ -33,7 +33,7 @@ var highlightText = (function() {
       var currentMatchIndex = 0;
       var currentMatch = matches[currentMatchIndex];
       var totalOffset = 0;
-      var iterator = this.getTextIterator(range);
+      var iterator = this.getTextIterator(element);
       var portions = [];
       var portionsLength = 0;
       while ( textNode = iterator.getNextTextNode() ) {
@@ -104,9 +104,8 @@ var highlightText = (function() {
       return range;
     },
 
-    getTextIterator: function(range) {
-      var root = range.commonAncestorContainer;
-      var iterator = new Iterator(root);
+    getTextIterator: function(element) {
+      var iterator = new Iterator(element);
       return iterator;
     },
 
