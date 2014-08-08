@@ -14,8 +14,8 @@ describe('highlightText', function() {
     return elem;
   };
 
-  var highlight = function(elem, regex) {
-    var stencil = $('<span data-awesome="crazy">')[0];
+  var highlight = function(elem, regex, stencil) {
+    if (!stencil) stencil = $('<span data-awesome="crazy">')[0];
     highlightText.highlight(elem, regex, stencil);
   };
 
@@ -189,6 +189,14 @@ describe('highlightText', function() {
       highlight(elem, /xxx/g);
       expect(elem.outerHTML)
         .toEqual('<div><em>word</em></div>')
+    });
+
+    it('works with a more complex regex', function() {
+      var elem = $('<div><em>a</em> or b</div>')[0];
+      var regex = Spellcheck.prototype.createRegex(['b', 'a']);
+      highlight(elem, regex);
+      expect(elem.outerHTML)
+        .toEqual('<div><em><span data-awesome="crazy">a</span></em> or <span data-awesome="crazy">b</span></div>');
     });
   });
 

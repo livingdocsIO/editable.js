@@ -139,9 +139,25 @@ var highlightText = (function() {
     },
 
     prepareMatch: function (match, matchIndex) {
+      // Quickfix for the spellcheck regex where we need to match the second subgroup.
+      if (match[2]) {
+        return this.prepareMatchForSecondSubgroup(match, matchIndex);
+      }
+
       return {
         startIndex: match.index,
         endIndex: match.index + match[0].length,
+        matchIndex: matchIndex,
+        search: match[0]
+      }
+    },
+
+    prepareMatchForSecondSubgroup: function (match, matchIndex) {
+      var index = match.index;
+      index += match[1].length;
+      return {
+        startIndex: index,
+        endIndex: index + match[2].length,
         matchIndex: matchIndex,
         search: match[0]
       }
