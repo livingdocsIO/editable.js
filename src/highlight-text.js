@@ -5,6 +5,12 @@ var highlightText = (function() {
       return range.toString();
     },
 
+    highlight: function(element, regex, stencilElement) {
+      var range = highlightText.getRange(element);
+      var matches = highlightText.find(range, regex);
+      highlightText.highlightMatches(range, matches, stencilElement);
+    },
+
     find: function(range, regex) {
       var text = this.extractText(range);
       var match;
@@ -18,7 +24,7 @@ var highlightText = (function() {
       return matches;
     },
 
-    highlightMatches: function(range, matches) {
+    highlightMatches: function(range, matches, stencilElement) {
       if (!matches || matches.length == 0) {
         return;
       }
@@ -72,7 +78,7 @@ var highlightText = (function() {
           portions.push(portion);
 
           if (lastPortion) {
-            var lastNode = this.wrapWord(portions);
+            var lastNode = this.wrapWord(portions, stencilElement);
             iterator.replaceCurrent(lastNode);
 
             // recalculate nodeEndOffset if we have to replace the current node.
@@ -105,21 +111,21 @@ var highlightText = (function() {
     },
 
     // @return the last wrapped element
-    wrapWord: function(portions) {
+    wrapWord: function(portions, stencilElement) {
       var element;
       for (var i = 0; i < portions.length; i++) {
         var portion = portions[i];
-        element = this.wrapPortion(portion);
+        element = this.wrapPortion(portion, stencilElement);
       }
 
       return element;
     },
 
-    wrapPortion: function(portion) {
+    wrapPortion: function(portion, stencilElement) {
       var range = rangy.createRange();
       range.setStart(portion.element, portion.offset);
       range.setEnd(portion.element, portion.offset + portion.length);
-      var node = $('<span data-awesome="crazy">')[0];
+      var node = stencilElement.cloneNode(true);
       range.surroundContents(node);
 
       // Fix a weird behaviour where an empty text node is inserted after the range

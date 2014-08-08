@@ -62,7 +62,7 @@ describe('Iterator', function() {
         element: current,
         offset: 0,
         length: 1
-      });
+      }, $('<span>')[0]);
 
       this.iterator.replaceCurrent(replacement);
       expect(this.iterator.current).toEqual(replacement);
@@ -77,7 +77,7 @@ describe('Iterator', function() {
         element: current,
         offset: 0,
         length: 1
-      });
+      }, $('<span>')[0]);
 
       this.iterator.replaceCurrent(replacement);
       current = this.iterator.getNext();

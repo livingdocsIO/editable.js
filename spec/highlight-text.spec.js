@@ -14,10 +14,9 @@ describe('highlightText', function() {
     return elem;
   };
 
-  var iterateOverElement = function(elem, regex) {
-    var range = highlightText.getRange(elem);
-    var matches = highlightText.find(range, regex);
-    highlightText.highlightMatches(range, matches);
+  var highlight = function(elem, regex) {
+    var stencil = $('<span data-awesome="crazy">')[0];
+    highlightText.highlight(elem, regex, stencil);
   };
 
   describe('minimal case', function() {
@@ -80,7 +79,7 @@ describe('highlightText', function() {
 
     it('finds a letter that is its own text node', function() {
       var elem = createParagraphWithTextNodes('a', 'b', 'c');
-      iterateOverElement(elem, /b/g);
+      highlight(elem, /b/g);
       var portions = this.wrapWord.firstCall.args[0];
 
       expect(portions.length).toEqual(1);
@@ -92,7 +91,7 @@ describe('highlightText', function() {
 
     it('finds a letter that is in a text node with a letter before', function() {
       var elem = createParagraphWithTextNodes('a', 'xb', 'c');
-      iterateOverElement(elem, /b/g);
+      highlight(elem, /b/g);
       var portions = this.wrapWord.firstCall.args[0];
 
       expect(portions.length).toEqual(1);
@@ -104,7 +103,7 @@ describe('highlightText', function() {
 
     it('finds a letter that is in a text node with a letter after', function() {
       var elem = createParagraphWithTextNodes('a', 'bx', 'c');
-      iterateOverElement(elem, /b/g);
+      highlight(elem, /b/g);
       var portions = this.wrapWord.firstCall.args[0];
 
       expect(portions.length).toEqual(1);
@@ -116,7 +115,7 @@ describe('highlightText', function() {
 
     it('finds two letters that span over two text nodes', function() {
       var elem = createParagraphWithTextNodes('a', 'b', 'c');
-      iterateOverElement(elem, /bc/g);
+      highlight(elem, /bc/g);
       var portions = this.wrapWord.firstCall.args[0];
 
       expect(portions.length).toEqual(2);
@@ -129,7 +128,7 @@ describe('highlightText', function() {
 
     it('finds three letters that span over three text nodes', function() {
       var elem = createParagraphWithTextNodes('a', 'b', 'c');
-      iterateOverElement(elem, /abc/g);
+      highlight(elem, /abc/g);
       var portions = this.wrapWord.firstCall.args[0];
 
       expect(portions.length).toEqual(3);
@@ -140,7 +139,7 @@ describe('highlightText', function() {
 
     it('finds a word that is partially contained in two text nodes', function() {
       var elem = createParagraphWithTextNodes('a', 'bxx', 'xxe');
-      iterateOverElement(elem, /xxxx/g);
+      highlight(elem, /xxxx/g);
       var portions = this.wrapWord.firstCall.args[0];
 
       expect(portions.length).toEqual(2);
@@ -161,46 +160,36 @@ describe('highlightText', function() {
 
     it('wraps a word in a single text node', function() {
       var elem = $('<div>Some juice.</div>')[0];
-      var range = highlightText.getRange(elem);
-      var matches = highlightText.find(range, /juice/g);
-      highlightText.highlightMatches(range, matches);
-      expect(range.commonAncestorContainer.outerHTML)
+      highlight(elem, /juice/g);
+      expect(elem.outerHTML)
         .toEqual('<div>Some <span data-awesome="crazy">juice</span>.</div>')
     });
 
     it('wraps a word with a partial <em> element', function() {
       var elem = $('<div>Some jui<em>ce.</em></div>')[0];
-      var range = highlightText.getRange(elem);
-      var matches = highlightText.find(range, /juice/g);
-      highlightText.highlightMatches(range, matches);
-      expect(range.commonAncestorContainer.outerHTML)
+      highlight(elem, /juice/g);
+      expect(elem.outerHTML)
         .toEqual('<div>Some <span data-awesome="crazy">jui</span><em><span data-awesome="crazy">ce</span>.</em></div>')
     });
 
     it('wraps two words in the same text node', function() {
       var elem = $('<div>a or b</div>')[0];
-      var range = highlightText.getRange(elem);
-      var matches = highlightText.find(range, /a|b/g);
-      highlightText.highlightMatches(range, matches);
-      expect(range.commonAncestorContainer.outerHTML)
+      highlight(elem, /a|b/g);
+      expect(elem.outerHTML)
         .toEqual('<div><span data-awesome="crazy">a</span> or <span data-awesome="crazy">b</span></div>')
     });
 
     it('wraps a word in a <em> element', function() {
       var elem = $('<div><em>word</em></div>')[0];
-      var range = highlightText.getRange(elem);
-      var matches = highlightText.find(range, /word/g);
-      highlightText.highlightMatches(range, matches);
-      expect(range.commonAncestorContainer.outerHTML)
+      highlight(elem, /word/g);
+      expect(elem.outerHTML)
         .toEqual('<div><em><span data-awesome="crazy">word</span></em></div>')
     });
 
     it('can handle a non-match', function() {
       var elem = $('<div><em>word</em></div>')[0];
-      var range = highlightText.getRange(elem);
-      var matches = highlightText.find(range, /xxx/g);
-      highlightText.highlightMatches(range, matches);
-      expect(range.commonAncestorContainer.outerHTML)
+      highlight(elem, /xxx/g);
+      expect(elem.outerHTML)
         .toEqual('<div><em>word</em></div>')
     });
   });
