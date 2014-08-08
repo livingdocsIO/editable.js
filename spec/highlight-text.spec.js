@@ -71,14 +71,14 @@ describe('highlightText', function() {
   describe('iterator', function() {
 
     beforeEach(function() {
-      this.wrapWord = sinon.stub(highlightText, 'wrapWord');
+      this.wrapWord = sinon.spy(highlightText, 'wrapWord');
     });
 
     afterEach(function() {
       this.wrapWord.restore();
     });
 
-    it('finds a letter that it is own text node', function() {
+    it('finds a letter that is its own text node', function() {
       var elem = createParagraphWithTextNodes('a', 'b', 'c');
       iterateOverElement(elem, /b/g);
       var portions = this.wrapWord.firstCall.args[0];
@@ -175,6 +175,33 @@ describe('highlightText', function() {
       highlightText.highlightMatches(range, matches);
       expect(range.commonAncestorContainer.outerHTML)
         .toEqual('<div>Some <span data-awesome="crazy">jui</span><em><span data-awesome="crazy">ce</span>.</em></div>')
+    });
+
+    it('wraps two words in the same text node', function() {
+      var elem = $('<div>a or b</div>')[0];
+      var range = highlightText.getRange(elem);
+      var matches = highlightText.find(range, /a|b/g);
+      highlightText.highlightMatches(range, matches);
+      expect(range.commonAncestorContainer.outerHTML)
+        .toEqual('<div><span data-awesome="crazy">a</span> or <span data-awesome="crazy">b</span></div>')
+    });
+
+    it('wraps a word in a <em> element', function() {
+      var elem = $('<div><em>word</em></div>')[0];
+      var range = highlightText.getRange(elem);
+      var matches = highlightText.find(range, /word/g);
+      highlightText.highlightMatches(range, matches);
+      expect(range.commonAncestorContainer.outerHTML)
+        .toEqual('<div><em><span data-awesome="crazy">word</span></em></div>')
+    });
+
+    it('can handle a non-match', function() {
+      var elem = $('<div><em>word</em></div>')[0];
+      var range = highlightText.getRange(elem);
+      var matches = highlightText.find(range, /xxx/g);
+      highlightText.highlightMatches(range, matches);
+      expect(range.commonAncestorContainer.outerHTML)
+        .toEqual('<div><em>word</em></div>')
     });
   });
 

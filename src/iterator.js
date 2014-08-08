@@ -5,6 +5,15 @@ var Iterator = (function() {
     this.current = this.next = this.root;
   };
 
+  Iterator.prototype.getNextTextNode = function() {
+    var next;
+    while (next = this.getNext()) {
+      if (next.nodeType === 3 && next.data !== '') {
+        return next;
+      }
+    }
+  },
+
   Iterator.prototype.getNext = function() {
     var child, n;
     n = this.current = this.next;

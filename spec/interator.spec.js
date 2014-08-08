@@ -3,9 +3,6 @@ describe('Iterator', function() {
   // Helper methods
   // --------------
 
-  // todo: remove
-  rangy.init()
-
   var callnTimes = function(object, methodName, count) {
     var returnValue;
     while (count--) {

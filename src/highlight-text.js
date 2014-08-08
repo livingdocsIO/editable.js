@@ -19,13 +19,18 @@ var highlightText = (function() {
     },
 
     highlightMatches: function(range, matches) {
+      if (!matches || matches.length == 0) {
+        return;
+      }
+
       var textNode, length, firstPortion, lastPortion;
       var currentMatchIndex = 0;
       var currentMatch = matches[currentMatchIndex];
       var totalOffset = 0;
       var iterator = this.getTextIterator(range);
       var portions = [];
-      while ( (textNode = iterator.next()) ) {
+      var portionsLength = 0;
+      while ( textNode = iterator.getNextTextNode() ) {
         var nodeText = textNode.data;
         var nodeEndOffset = totalOffset + nodeText.length;
         if (nodeEndOffset > currentMatch.startIndex && totalOffset < currentMatch.endIndex) {
@@ -63,11 +68,18 @@ var highlightText = (function() {
             lastPortion: lastPortion
           }
 
+          portionsLength += portion.length;
           portions.push(portion);
 
           if (lastPortion) {
-            this.wrapWord(portions);
+            var lastNode = this.wrapWord(portions);
+            iterator.replaceCurrent(lastNode);
+
+            // recalculate nodeEndOffset if we have to replace the current node.
+            nodeEndOffset = totalOffset + portionsLength;
+
             portions = [];
+            portionsLength = 0;
             currentMatchIndex += 1;
             if (currentMatchIndex < matches.length) {
               currentMatch = matches[currentMatchIndex];
@@ -87,12 +99,12 @@ var highlightText = (function() {
     },
 
     getTextIterator: function(range) {
-      return range.createNodeIterator([3], function(node) {
-        // no filter needed right now.
-        return true;
-      });
+      var root = range.commonAncestorContainer;
+      var iterator = new Iterator(root);
+      return iterator;
     },
 
+    // @return the last wrapped element
     wrapWord: function(portions) {
       var element;
       for (var i = 0; i < portions.length; i++) {
@@ -108,7 +120,17 @@ var highlightText = (function() {
       range.setStart(portion.element, portion.offset);
       range.setEnd(portion.element, portion.offset + portion.length);
       var node = $('<span data-awesome="crazy">')[0];
-      return range.surroundContents(node);
+      range.surroundContents(node);
+
+      // Fix a weird behaviour where an empty text node is inserted after the range
+      if (node.nextSibling) {
+        var next = node.nextSibling;
+        if (next.nodeType === 3 && next.data === '') {
+          next.parentNode.removeChild(next);
+        }
+      }
+
+      return node;
     },
 
     prepareMatch: function (match, matchIndex) {
