@@ -49,8 +49,6 @@ var Spellcheck = (function() {
         that.checkSpelling(editableHost);
       })
     }
-
-    // todo: keep cursor position intact
   };
 
   Spellcheck.prototype.createWrapperNode = function() {
@@ -86,10 +84,7 @@ var Spellcheck = (function() {
 
     // Create new highlights
     var span = this.createWrapperNode();
-    findAndReplaceDOMText(editableHost, {
-      find: regex,
-      wrap: span
-    });
+    highlightText.highlight(editableHost, regex, span);
   };
 
   Spellcheck.prototype.checkSpelling = function(editableHost) {
