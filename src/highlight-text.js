@@ -20,7 +20,6 @@ var highlightText = (function() {
         matches.push(this.prepareMatch(match, matchIndex));
         matchIndex += 1;
       }
-
       return matches;
     },
 
@@ -35,7 +34,6 @@ var highlightText = (function() {
       var totalOffset = 0;
       var iterator = this.getTextIterator(element);
       var portions = [];
-      var portionsLength = 0;
       while ( textNode = iterator.getNextTextNode() ) {
         var nodeText = textNode.data;
         var nodeEndOffset = totalOffset + nodeText.length;
@@ -74,7 +72,6 @@ var highlightText = (function() {
             lastPortion: lastPortion
           }
 
-          portionsLength += portion.length;
           portions.push(portion);
 
           if (lastPortion) {
@@ -82,16 +79,14 @@ var highlightText = (function() {
             iterator.replaceCurrent(lastNode);
 
             // recalculate nodeEndOffset if we have to replace the current node.
-            nodeEndOffset = totalOffset + portionsLength;
+            nodeEndOffset = totalOffset + portion.length + portion.offset;
 
             portions = [];
-            portionsLength = 0;
             currentMatchIndex += 1;
             if (currentMatchIndex < matches.length) {
               currentMatch = matches[currentMatchIndex];
             }
           }
-
         }
 
         totalOffset = nodeEndOffset;

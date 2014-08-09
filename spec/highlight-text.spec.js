@@ -198,6 +198,22 @@ describe('highlightText', function() {
       expect(elem.outerHTML)
         .toEqual('<div><em><span data-awesome="crazy">a</span></em> or <span data-awesome="crazy">b</span></div>');
     });
+
+    it('wraps two words with a tag in between', function() {
+      var elem = $('<div>A word <em>is</em> not necessary</div>')[0];
+      var regex = Spellcheck.prototype.createRegex(['word', 'not']);
+      highlight(elem, regex);
+      expect(elem.outerHTML)
+        .toEqual('<div>A <span data-awesome="crazy">word</span> <em>is</em> <span data-awesome="crazy">not</span> necessary</div>');
+    });
+
+    it('wraps two characters in the same textnode, when the first match has an offset', function() {
+      var elem = $('<div>a, b or c, d</div>')[0];
+      var regex = Spellcheck.prototype.createRegex(['b', 'c']);
+      highlight(elem, regex);
+      expect(elem.outerHTML)
+        .toEqual('<div>a, <span data-awesome="crazy">b</span> or <span data-awesome="crazy">c</span>, d</div>');
+    });
   });
 
 });
