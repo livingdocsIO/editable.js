@@ -79,7 +79,11 @@ var Cursor = (function() {
       },
 
       setVisibleSelection: function() {
-        $(this.host).focus(); // Without setting focus() Firefox is not happy (seems setting a selection is not enough. Probably because Firefox can handle multiple selections)
+        // Without setting focus() Firefox is not happy (seems setting a selection is not enough.
+        // Probably because Firefox can handle multiple selections).
+        if (this.win.document.activeElement !== this.host) {
+          $(this.host).focus();
+        }
         rangy.getSelection(this.win).setSingleRange(this.range);
       },
 
