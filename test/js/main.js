@@ -1,11 +1,25 @@
 ;(function($) {
 
   var editable = new Editable({});
-  editable.spellcheck(function(text, callback) {
+
+
+  // Spellcheck
+  // ----------
+
+  var spellcheckService = function(text, callback) {
     var words = [];
     words = ['test', 'xxxx', 'Lorem', 'dolor', 'ante', 'nunc.'];
     callback(words);
+  };
+
+  editable.spellcheck({
+    spellcheckService: spellcheckService,
+    throttle: 1000
   });
+
+
+  // Text Formatting
+  // ---------------
 
   var lastSelection;
   var setupTooltip = function() {
@@ -91,6 +105,10 @@
     editable.add('.is-editable');
     setupTooltip();
   });
+
+
+  // IFrame Setup
+  // ------------
 
   $(document).ready(function(){
     var $iframe = $('.iframe-container iframe');

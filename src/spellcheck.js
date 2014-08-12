@@ -26,9 +26,14 @@ var Spellcheck = (function() {
    * @class Spellcheck
    * @constructor
    */
-  var Spellcheck = function(editable, spellcheckService) {
+  var Spellcheck = function(editable, configuration) {
+    var defaultConfig = {
+      spellcheckService: undefined,
+      throttle: 1000 // delay after changes stop before calling the spellcheck service
+    };
+
+    this.config = $.extend(defaultConfig, configuration);
     this.editable = editable;
-    this.spellcheckService = spellcheckService;
     this.setup();
   };
 
@@ -101,7 +106,7 @@ var Spellcheck = (function() {
       that.checkSpelling(editableHost);
       that.currentEditableHost == undefined;
       that.timeoutId = undefined;
-    }, 1000);
+    }, this.config.throttle);
 
     this.currentEditableHost = editableHost;
   };
@@ -109,7 +114,7 @@ var Spellcheck = (function() {
   Spellcheck.prototype.checkSpelling = function(editableHost) {
     var that = this;
     var text = highlightText.extractText(editableHost);
-    this.spellcheckService(text, function(misspelledWords) {
+    this.config.spellcheckService(text, function(misspelledWords) {
       var selection = that.editable.getSelection();
       if (selection) {
         selection.save();
