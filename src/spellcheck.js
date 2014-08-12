@@ -34,6 +34,7 @@ var Spellcheck = (function() {
 
   Spellcheck.prototype.setup = function(editable) {
     this.editable.on('focus', $.proxy(this, 'onFocus'));
+    this.editable.on('blur', $.proxy(this, 'onBlur'));
     this.editable.on('change', $.proxy(this, 'onChange'));
   }
 
@@ -41,6 +42,12 @@ var Spellcheck = (function() {
     if (this.focusedEditable != editableHost) {
       this.focusedEditable = editableHost;
       this.editableHasChanged(editableHost);
+    }
+  };
+
+  Spellcheck.prototype.onBlur = function(editableHost) {
+    if (this.focusedEditable == editableHost) {
+      this.focusedEditable = undefined;
     }
   };
 
@@ -107,7 +114,7 @@ var Spellcheck = (function() {
       if (selection) {
         selection.save();
 
-        // highight
+        // highlight
         var regex = that.createRegex(misspelledWords);
         that.highlight(editableHost, regex);
 
