@@ -41,17 +41,17 @@ var Spellcheck = (function() {
     this.editable.on('focus', $.proxy(this, 'onFocus'));
     this.editable.on('blur', $.proxy(this, 'onBlur'));
     this.editable.on('change', $.proxy(this, 'onChange'));
-  }
+  };
 
   Spellcheck.prototype.onFocus = function(editableHost) {
-    if (this.focusedEditable != editableHost) {
+    if (this.focusedEditable !== editableHost) {
       this.focusedEditable = editableHost;
       this.editableHasChanged(editableHost);
     }
   };
 
   Spellcheck.prototype.onBlur = function(editableHost) {
-    if (this.focusedEditable == editableHost) {
+    if (this.focusedEditable === editableHost) {
       this.focusedEditable = undefined;
     }
   };
@@ -104,7 +104,7 @@ var Spellcheck = (function() {
     var that = this;
     this.timeoutId = setTimeout(function() {
       that.checkSpelling(editableHost);
-      that.currentEditableHost == undefined;
+      that.currentEditableHost = undefined;
       that.timeoutId = undefined;
     }, this.config.throttle);
 

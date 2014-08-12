@@ -7,7 +7,7 @@ var Iterator = (function() {
 
   Iterator.prototype.getNextTextNode = function() {
     var next;
-    while (next = this.getNext()) {
+    while ( (next = this.getNext()) ) {
       if (next.nodeType === 3 && next.data !== '') {
         return next;
       }
@@ -19,7 +19,8 @@ var Iterator = (function() {
     n = this.current = this.next;
     child = this.next = undefined;
     if (this.current) {
-      if (child = n.firstChild) {
+      child = n.firstChild;
+      if (child) {
         this.next = child;
       } else {
         while ((n !== this.root) && !(this.next = n.nextSibling)) {

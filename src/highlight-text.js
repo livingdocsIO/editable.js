@@ -16,7 +16,7 @@ var highlightText = (function() {
       var match;
       var matches = [];
       var matchIndex = 0;
-      while (match = regex.exec(text)) {
+      while ( (match = regex.exec(text)) ) {
         matches.push(this.prepareMatch(match, matchIndex));
         matchIndex += 1;
       }
@@ -24,7 +24,7 @@ var highlightText = (function() {
     },
 
     highlightMatches: function(element, matches, stencilElement) {
-      if (!matches || matches.length == 0) {
+      if (!matches || matches.length === 0) {
         return;
       }
 
@@ -34,7 +34,7 @@ var highlightText = (function() {
       var totalOffset = 0;
       var iterator = this.getTextIterator(element);
       var portions = [];
-      while ( textNode = iterator.getNextTextNode() ) {
+      while ( (textNode = iterator.getNextTextNode()) ) {
         var nodeText = textNode.data;
         var nodeEndOffset = totalOffset + nodeText.length;
         if (nodeEndOffset > currentMatch.startIndex && totalOffset < currentMatch.endIndex) {
@@ -56,7 +56,6 @@ var highlightText = (function() {
             offset = 0;
           }
 
-          var length;
           if (lastPortion) {
             length = (currentMatch.endIndex - totalOffset) - offset;
           } else {
@@ -70,7 +69,7 @@ var highlightText = (function() {
             offset: offset,
             length: length,
             lastPortion: lastPortion
-          }
+          };
 
           portions.push(portion);
 
@@ -144,7 +143,7 @@ var highlightText = (function() {
         endIndex: match.index + match[0].length,
         matchIndex: matchIndex,
         search: match[0]
-      }
+      };
     },
 
     prepareMatchForSecondSubgroup: function (match, matchIndex) {
@@ -155,8 +154,8 @@ var highlightText = (function() {
         endIndex: index + match[2].length,
         matchIndex: matchIndex,
         search: match[0]
-      }
+      };
     }
 
-  }
+  };
 })();
