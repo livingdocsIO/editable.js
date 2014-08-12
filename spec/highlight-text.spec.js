@@ -216,4 +216,29 @@ describe('highlightText', function() {
     });
   });
 
+  // describe('retain cursor position', function() {
+  //   rangy.init();
+
+  //   var createCursor = function(host, elem, offset) {
+  //     var range = rangy.createRange();
+  //     range.setStart(elem, 2);
+  //     range.setEnd(elem, 2);
+  //     return new Cursor(host, range);
+  //   };
+
+  //   it('in the middle of a text node', function(){
+  //     var elem = $('<div>dolor</div>')[0];
+  //     var cursor = createCursor(elem, elem.firstChild, 2);
+  //     cursor.save();
+
+  //     var regex = Spellcheck.prototype.createRegex(['dolor']);
+  //     highlight(elem, regex);
+  //     cursor.restore();
+
+  //     expect(elem.innerHTML)
+  //       .toEqual('<span data-awesome="crazy">do</span><span data-awesome="crazy">lor</span>');
+
+  //   });
+  // });
+
 });
