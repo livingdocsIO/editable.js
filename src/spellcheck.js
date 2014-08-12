@@ -38,18 +38,14 @@ var Spellcheck = (function() {
   }
 
   Spellcheck.prototype.onFocus = function(editableHost) {
-    this.checkSpelling(editableHost);
+    if (this.focusedEditable != editableHost) {
+      this.focusedEditable = editableHost;
+      this.editableHasChanged(editableHost);
+    }
   };
 
   Spellcheck.prototype.onChange = function(editableHost) {
-    // todo: get the editable instance here (transform spellchecker into a class)
-    var selection = this.editable.getSelection();
-    var that = this;
-    if (selection.isCursor) {
-      selection.retainVisibleSelection(function() {
-        that.checkSpelling(editableHost);
-      })
-    }
+    this.editableHasChanged(editableHost);
   };
 
   Spellcheck.prototype.createWrapperNode = function() {
@@ -88,10 +84,38 @@ var Spellcheck = (function() {
     highlightText.highlight(editableHost, regex, span);
   };
 
+  Spellcheck.prototype.editableHasChanged = function(editableHost) {
+    if (this.timeoutId && this.currentEditableHost === editableHost) {
+      clearTimeout(this.timeoutId);
+    }
+
+    var that = this;
+    this.timeoutId = setTimeout(function() {
+      that.checkSpelling(editableHost);
+      that.currentEditableHost == undefined;
+      that.timeoutId = undefined;
+    }, 1000);
+
+    this.currentEditableHost = editableHost;
+  };
+
   Spellcheck.prototype.checkSpelling = function(editableHost) {
-    var regex = this.createRegex(['test', 'xxx', 'Lorem', 'dolor', 'ante', 'nunc.']);
-    this.highlight(editableHost, regex);
-  }
+    var that = this;
+    var text = highlightText.extractText(editableHost);
+    this.spellcheckService(text, function(misspelledWords) {
+      var selection = that.editable.getSelection();
+      if (selection) {
+        selection.save();
+
+        // highight
+        var regex = that.createRegex(misspelledWords);
+        that.highlight(editableHost, regex);
+
+        selection.restore();
+        selection.setVisibleSelection();
+      }
+    });
+  };
 
   return Spellcheck;
 })();
