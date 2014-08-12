@@ -26,8 +26,9 @@ var Spellcheck = (function() {
    * @class Spellcheck
    * @constructor
    */
-  var Spellcheck = function(editable) {
+  var Spellcheck = function(editable, spellcheckService) {
     this.editable = editable;
+    this.spellcheckService = spellcheckService;
     this.setup();
   };
 

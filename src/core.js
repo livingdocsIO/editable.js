@@ -213,8 +213,8 @@ Editable.prototype.getSelection = function(element) {
  *
  * @chainable
  */
-Editable.prototype.spellcheck = function(element) {
-  this.spellcheck = new Spellcheck(this);
+Editable.prototype.spellcheck = function(spellcheckService) {
+  this.spellcheck = new Spellcheck(this, spellcheckService);
 
   return this;
 };

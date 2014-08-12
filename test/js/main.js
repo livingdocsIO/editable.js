@@ -1,7 +1,11 @@
 ;(function($) {
 
   var editable = new Editable({});
-  editable.spellcheck();
+  editable.spellcheck(function(text, callback) {
+    var words = [];
+    words = ['test', 'xxxx', 'Lorem', 'dolor', 'ante', 'nunc.'];
+    callback(words);
+  });
 
   var lastSelection;
   var setupTooltip = function() {
