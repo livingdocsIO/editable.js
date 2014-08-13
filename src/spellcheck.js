@@ -28,6 +28,8 @@ var Spellcheck = (function() {
    */
   var Spellcheck = function(editable, configuration) {
     var defaultConfig = {
+      checkOnChange: true,
+      checkOnFocus: false,
       spellcheckService: undefined,
       throttle: 1000 // delay after changes stop before calling the spellcheck service
     };
@@ -38,9 +40,13 @@ var Spellcheck = (function() {
   };
 
   Spellcheck.prototype.setup = function(editable) {
-    this.editable.on('focus', $.proxy(this, 'onFocus'));
-    this.editable.on('blur', $.proxy(this, 'onBlur'));
-    this.editable.on('change', $.proxy(this, 'onChange'));
+    if (this.config.checkOnFocus) {
+      this.editable.on('focus', $.proxy(this, 'onFocus'));
+      this.editable.on('blur', $.proxy(this, 'onBlur'));
+    }
+    if (this.config.checkOnChange) {
+      this.editable.on('change', $.proxy(this, 'onChange'));
+    }
   };
 
   Spellcheck.prototype.onFocus = function(editableHost) {
