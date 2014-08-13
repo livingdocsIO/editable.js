@@ -21,7 +21,6 @@ module.exports = function(config) {
       'vendor/jquery-*.js',
       'vendor/rangy-1.2.3/rangy-core.js',
       'vendor/bowser.js',
-      'vendor/findAndReplaceDomText.js',
 
       // source files
       '.tmp/editable-test.js',

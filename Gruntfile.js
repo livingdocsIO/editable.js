@@ -96,7 +96,6 @@ module.exports = function(grunt) {
           'editable.js': [
             'vendor/rangy-1.2.3/rangy-core.js',
             'vendor/bowser.js',
-            'vendor/findAndReplaceDomText.js',
             '.tmp/editable.js'
           ]
         }
