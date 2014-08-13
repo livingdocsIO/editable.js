@@ -121,16 +121,14 @@ var Spellcheck = (function() {
     var that = this;
     var text = highlightText.extractText(editableHost);
     this.config.spellcheckService(text, function(misspelledWords) {
+      var regex = that.createRegex(misspelledWords);
       var selection = that.editable.getSelection();
       if (selection) {
-        selection.save();
-
-        // highlight
-        var regex = that.createRegex(misspelledWords);
+        selection.retainVisibleSelection(function() {
+          that.highlight(editableHost, regex);
+        });
+      } else {
         that.highlight(editableHost, regex);
-
-        selection.restore();
-        selection.setVisibleSelection();
       }
     });
   };
