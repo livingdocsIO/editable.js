@@ -12,7 +12,7 @@
     callback(words);
   };
 
-  editable.spellcheck({
+  editable.setupSpellcheck({
     spellcheckService: spellcheckService,
     throttle: 1000
   });
