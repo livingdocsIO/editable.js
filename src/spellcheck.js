@@ -69,7 +69,7 @@ var Spellcheck = (function() {
   Spellcheck.prototype.createWrapperNode = function() {
     var marker = document.createElement('span');
     marker.className = 'spellcheck';
-    marker.setAttribute('data-editable', 'remove');
+    marker.setAttribute('data-editable', 'ui-unwrap');
     return marker;
   };
 

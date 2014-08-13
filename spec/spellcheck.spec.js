@@ -27,11 +27,11 @@ describe('Spellcheck', function() {
       expect( $(this.div).find('.spellcheck').length ).toEqual(1);
     });
 
-    it('match highlights are marked with "remove"', function() {
+    it('match highlights are marked with "ui-unwrap"', function() {
       this.spellcheck.checkSpelling(this.div);
       var $spellcheck = $(this.div).find('.spellcheck').first();
       var dataEditable = $spellcheck.attr('data-editable');
-      expect(dataEditable).toEqual('remove');
+      expect(dataEditable).toEqual('ui-unwrap');
     });
   });
 });
