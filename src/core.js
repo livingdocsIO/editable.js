@@ -216,8 +216,13 @@ Editable.prototype.getSelection = function(editableHost) {
   var selection = this.dispatcher.selectionWatcher.getFreshSelection();
   if (editableHost && selection) {
     var range = selection.range;
-    // check if the selection is inside the editableHost
-    if (range.compareNode(editableHost) !== range.NODE_BEFORE_AND_AFTER) {
+    // Check if the selection is inside the editableHost
+    // The try...catch is required if the editableHost was removed from the DOM.
+    try {
+      if (range.compareNode(editableHost) !== range.NODE_BEFORE_AND_AFTER) {
+        selection = undefined;
+      }
+    } catch (e) {
       selection = undefined;
     }
   }
