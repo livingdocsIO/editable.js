@@ -122,7 +122,7 @@ var Spellcheck = (function() {
     var text = highlightText.extractText(editableHost);
     this.config.spellcheckService(text, function(misspelledWords) {
       var regex = that.createRegex(misspelledWords);
-      var selection = that.editable.getSelection();
+      var selection = that.editable.getSelection(editableHost);
       if (selection) {
         selection.retainVisibleSelection(function() {
           that.highlight(editableHost, regex);

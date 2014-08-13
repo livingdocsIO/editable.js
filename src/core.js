@@ -203,8 +203,25 @@ Editable.prototype.getContent = function(element) {
   return content.extractContent(element);
 };
 
-Editable.prototype.getSelection = function(element) {
-  return this.dispatcher.selectionWatcher.getFreshSelection();
+/**
+ * Get the current selection.
+ * Only returns something if the selection is within an editable element.
+ * If you pass an editable host as param it only returns something if the selection is inside this
+ * very editable element.
+ *
+ * @param {DOMNode} Optional. An editable host where the selection needs to be contained.
+ * @returns A Cursor or Selection object or undefined.
+ */
+Editable.prototype.getSelection = function(editableHost) {
+  var selection = this.dispatcher.selectionWatcher.getFreshSelection();
+  if (editableHost && selection) {
+    var range = selection.range;
+    // check if the selection is inside the editableHost
+    if (range.compareNode(editableHost) !== range.NODE_BEFORE_AND_AFTER) {
+      selection = undefined;
+    }
+  }
+  return selection;
 };
 
 
