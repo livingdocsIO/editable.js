@@ -6,23 +6,6 @@
  * @submodule parser
  */
 
-
-/** DOM NODE TYPES:
-  *
-  * 'ELEMENT_NODE': 1
-  * 'ATTRIBUTE_NODE': 2
-  * 'TEXT_NODE': 3
-  * 'CDATA_SECTION_NODE': 4
-  * 'ENTITY_REFERENCE_NODE': 5
-  * 'ENTITY_NODE': 6
-  * 'PROCESSING_INSTRUCTION_NODE': 7
-  * 'COMMENT_NODE': 8
-  * 'DOCUMENT_NODE': 9
-  * 'DOCUMENT_TYPE_NODE': 10
-  * 'DOCUMENT_FRAGMENT_NODE': 11
-  * 'NOTATION_NODE': 12
-  */
-
 var parser = (function() {
   /**
    * Singleton that provides DOM lookup helpers.
@@ -72,9 +55,9 @@ var parser = (function() {
       for (i = 0, len = childNodes.length; i < len; i++) {
         child = childNodes[i];
 
-        if (child.nodeType === 3 && !this.isVoidTextNode(child)) {
+        if (child.nodeType === nodeType.textNode && !this.isVoidTextNode(child)) {
           return false;
-        } else if (child.nodeType === 1) {
+        } else if (child.nodeType === nodeType.elementNode) {
           return false;
         }
       }
@@ -88,7 +71,7 @@ var parser = (function() {
      * @param {HTMLElement}
      */
     isVoidTextNode: function(node) {
-      return node.nodeType === 3 && !node.nodeValue;
+      return node.nodeType === nodeType.textNode && !node.nodeValue;
     },
 
     /**
@@ -98,11 +81,11 @@ var parser = (function() {
      * @param {HTMLElement}
      */
     isWhitespaceOnly: function(node) {
-      return node.nodeType === 3 && this.lastOffsetWithContent(node) === 0;
+      return node.nodeType === nodeType.textNode && this.lastOffsetWithContent(node) === 0;
     },
 
     isLinebreak: function(node) {
-      return node.nodeType === 1 && node.tagName === 'BR';
+      return node.nodeType === nodeType.elementNode && node.tagName === 'BR';
     },
 
     /**
@@ -114,7 +97,7 @@ var parser = (function() {
      * @param {HTMLElement}
      */
     lastOffsetWithContent: function(node) {
-      if (node.nodeType === 3) {
+      if (node.nodeType === nodeType.textNode) {
         return string.trimRight(node.nodeValue).length;
       } else {
         var i,
@@ -169,7 +152,7 @@ var parser = (function() {
     },
 
     isStartOffset: function(container, offset) {
-      if (container.nodeType === 3) {
+      if (container.nodeType === nodeType.textNode) {
         return offset === 0;
       } else {
         if (container.childNodes.length === 0)
@@ -180,7 +163,7 @@ var parser = (function() {
     },
 
     isEndOffset: function(container, offset) {
-      if (container.nodeType === 3) {
+      if (container.nodeType === nodeType.textNode) {
         return offset === container.length;
       } else {
         if (container.childNodes.length === 0)
@@ -210,7 +193,7 @@ var parser = (function() {
     },
 
     isTextEndOffset: function(container, offset) {
-      if (container.nodeType === 3) {
+      if (container.nodeType === nodeType.textNode) {
         var text = string.trimRight(container.nodeValue);
         return offset >= text.length;
       } else if (container.childNodes.length === 0) {
@@ -263,7 +246,7 @@ var parser = (function() {
      */
     isDocumentFragmentWithoutChildren: function(fragment) {
       if (fragment &&
-          fragment.nodeType === 11 &&
+          fragment.nodeType === nodeType.documentFragmentNode &&
           fragment.childNodes.length === 0) {
         return true;
       }

@@ -118,7 +118,7 @@ var highlightText = (function() {
       // Fix a weird behaviour where an empty text node is inserted after the range
       if (node.nextSibling) {
         var next = node.nextSibling;
-        if (next.nodeType === 3 && next.data === '') {
+        if (next.nodeType === nodeType.textNode && next.data === '') {
           next.parentNode.removeChild(next);
         }
       }

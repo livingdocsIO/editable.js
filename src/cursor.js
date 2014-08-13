@@ -51,7 +51,7 @@ var Cursor = (function() {
         if (parser.isDocumentFragmentWithoutChildren(element)) return;
 
         var preceedingElement = element;
-        if (element.nodeType === 11) { // DOCUMENT_FRAGMENT_NODE
+        if (element.nodeType === nodeType.documentFragmentNode) {
           var lastIndex = element.childNodes.length - 1;
           preceedingElement = element.childNodes[lastIndex];
         }

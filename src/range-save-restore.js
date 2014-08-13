@@ -95,7 +95,7 @@ var rangeSaveRestore = (function() {
           var previousNode = markerEl.previousSibling;
 
           // Workaround for rangy issue 17
-          if (previousNode && previousNode.nodeType === 3) {
+          if (previousNode && previousNode.nodeType === nodeType.textNode) {
             markerEl.parentNode.removeChild(markerEl);
             range.collapseToPoint(previousNode, previousNode.length);
           } else {

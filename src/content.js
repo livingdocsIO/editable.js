@@ -29,7 +29,7 @@ var content = (function() {
         // skip empty tags, so they'll get removed
         if (node.nodeName !== 'BR' && !node.textContent) continue;
 
-        if (node.nodeType === 1 && node.nodeName !== 'BR') {
+        if (node.nodeType === nodeType.elementNode && node.nodeName !== 'BR') {
           sibling = node;
           while ((sibling = sibling.nextSibling) !== null) {
             if (!parser.isSameNode(sibling, node))
@@ -93,7 +93,7 @@ var content = (function() {
       while (sibling) {
         var nextSibling = sibling.nextSibling;
 
-        if (sibling.nodeType === 1) {
+        if (sibling.nodeType === nodeType.elementNode) {
           var attr = sibling.getAttribute('data-editable');
 
           if (sibling.firstChild) {
@@ -119,7 +119,7 @@ var content = (function() {
 
       if (!element) return;
 
-      if (element.nodeType === 3) {
+      if (element.nodeType === nodeType.textNode) {
         element.nodeValue = element.nodeValue.replace(/^(\s)/, nonBreakingSpace).replace(/(\s)$/, nonBreakingSpace);
       }
       else {
@@ -155,7 +155,7 @@ var content = (function() {
      * Get all tags that start or end inside the range
      */
     getInnerTags: function(range, filterFunc) {
-      return range.getNodes([1], filterFunc);
+      return range.getNodes([nodeType.elementNode], filterFunc);
     },
 
     /**
@@ -333,7 +333,7 @@ var content = (function() {
         range = restoreRange(host, range, function() {
           var charRegexp = string.regexp(character);
 
-          var textNodes = range.getNodes([3], function(node) {
+          var textNodes = range.getNodes([nodeType.textNode], function(node) {
             return node.nodeValue.search(charRegexp) >= 0;
           });
 

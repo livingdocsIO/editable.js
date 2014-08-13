@@ -12,7 +12,7 @@ var NodeIterator = (function() {
   NodeIterator.prototype.getNextTextNode = function() {
     var next;
     while ( (next = this.getNext()) ) {
-      if (next.nodeType === 3 && next.data !== '') {
+      if (next.nodeType === nodeType.textNode && next.data !== '') {
         return next;
       }
     }
