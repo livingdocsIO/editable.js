@@ -32,7 +32,7 @@ var highlightText = (function() {
       var currentMatchIndex = 0;
       var currentMatch = matches[currentMatchIndex];
       var totalOffset = 0;
-      var iterator = this.getTextIterator(element);
+      var iterator = new NodeIterator(element);
       var portions = [];
       while ( (textNode = iterator.getNextTextNode()) ) {
         var nodeText = textNode.data;
@@ -96,11 +96,6 @@ var highlightText = (function() {
       var range = rangy.createRange();
       range.selectNodeContents(element);
       return range;
-    },
-
-    getTextIterator: function(element) {
-      var iterator = new Iterator(element);
-      return iterator;
     },
 
     // @return the last wrapped element

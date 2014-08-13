@@ -1,4 +1,4 @@
-describe('Iterator', function() {
+describe('NodeIterator', function() {
 
   // Helper methods
   // --------------
@@ -16,7 +16,7 @@ describe('Iterator', function() {
 
     beforeEach(function() {
       this.element = $('<div>a</div>')[0];
-      this.iterator = new Iterator(this.element);
+      this.iterator = new NodeIterator(this.element);
     });
 
     it('sets its properties', function() {
@@ -31,7 +31,7 @@ describe('Iterator', function() {
 
     beforeEach(function() {
       this.element = $('<div>a</div>')[0];
-      this.iterator = new Iterator(this.element);
+      this.iterator = new NodeIterator(this.element);
     });
 
     it('returns the root on the first call', function() {
@@ -56,7 +56,7 @@ describe('Iterator', function() {
 
     it('replaces the text node', function() {
       this.element = $('<div>a</div>')[0];
-      this.iterator = new Iterator(this.element);
+      this.iterator = new NodeIterator(this.element);
       var current = callnTimes(this.iterator, 'getNext', 2);
       var replacement = highlightText.wrapPortion({
         element: current,
@@ -71,7 +71,7 @@ describe('Iterator', function() {
 
     it('replaces the first character of longer a text node', function() {
       this.element = $('<div>word</div>')[0];
-      this.iterator = new Iterator(this.element);
+      this.iterator = new NodeIterator(this.element);
       var current = callnTimes(this.iterator, 'getNext', 2);
       var replacement = highlightText.wrapPortion({
         element: current,

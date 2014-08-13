@@ -44,7 +44,7 @@
     "string": true,
     "toString": true,
     "Spellcheck": true,
-    "Iterator": true,
+    "NodeIterator": true,
     "highlightText": true
   }
 }

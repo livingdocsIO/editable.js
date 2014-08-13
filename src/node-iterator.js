@@ -1,11 +1,11 @@
-var Iterator = (function() {
+var NodeIterator = (function() {
 
-  var Iterator = function(root) {
+  var NodeIterator = function(root) {
     this.root = root;
     this.current = this.next = this.root;
   };
 
-  Iterator.prototype.getNextTextNode = function() {
+  NodeIterator.prototype.getNextTextNode = function() {
     var next;
     while ( (next = this.getNext()) ) {
       if (next.nodeType === 3 && next.data !== '') {
@@ -14,7 +14,7 @@ var Iterator = (function() {
     }
   },
 
-  Iterator.prototype.getNext = function() {
+  NodeIterator.prototype.getNext = function() {
     var child, n;
     n = this.current = this.next;
     child = this.next = undefined;
@@ -31,7 +31,7 @@ var Iterator = (function() {
     return this.current;
   };
 
-  Iterator.prototype.replaceCurrent = function(replacement) {
+  NodeIterator.prototype.replaceCurrent = function(replacement) {
     this.current = replacement;
     this.next = undefined;
     var n = this.current;
@@ -40,5 +40,5 @@ var Iterator = (function() {
     }
   };
 
-  return Iterator;
+  return NodeIterator;
 })();
