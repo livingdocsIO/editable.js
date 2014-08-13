@@ -84,7 +84,7 @@ describe('highlightText', function() {
       expect(portions[0].text).toEqual('b');
       expect(portions[0].offset).toEqual(0);
       expect(portions[0].length).toEqual(1);
-      expect(portions[0].lastPortion).toEqual(true);
+      expect(portions[0].isLastPortion).toEqual(true);
     });
 
     it('finds a letter that is in a text node with a letter before', function() {
@@ -96,7 +96,7 @@ describe('highlightText', function() {
       expect(portions[0].text).toEqual('b');
       expect(portions[0].offset).toEqual(1);
       expect(portions[0].length).toEqual(1);
-      expect(portions[0].lastPortion).toEqual(true);
+      expect(portions[0].isLastPortion).toEqual(true);
     });
 
     it('finds a letter that is in a text node with a letter after', function() {
@@ -108,7 +108,7 @@ describe('highlightText', function() {
       expect(portions[0].text).toEqual('b');
       expect(portions[0].offset).toEqual(0);
       expect(portions[0].length).toEqual(1);
-      expect(portions[0].lastPortion).toEqual(true);
+      expect(portions[0].isLastPortion).toEqual(true);
     });
 
     it('finds two letters that span over two text nodes', function() {
@@ -118,10 +118,10 @@ describe('highlightText', function() {
 
       expect(portions.length).toEqual(2);
       expect(portions[0].text).toEqual('b');
-      expect(portions[0].lastPortion).toEqual(false);
+      expect(portions[0].isLastPortion).toEqual(false);
 
       expect(portions[1].text).toEqual('c');
-      expect(portions[1].lastPortion).toEqual(true);
+      expect(portions[1].isLastPortion).toEqual(true);
     });
 
     it('finds three letters that span over three text nodes', function() {
@@ -144,12 +144,12 @@ describe('highlightText', function() {
       expect(portions[0].text).toEqual('xx');
       expect(portions[0].offset).toEqual(1);
       expect(portions[0].length).toEqual(2);
-      expect(portions[0].lastPortion).toEqual(false);
+      expect(portions[0].isLastPortion).toEqual(false);
 
       expect(portions[1].text).toEqual('xx');
       expect(portions[1].offset).toEqual(0);
       expect(portions[1].length).toEqual(2);
-      expect(portions[1].lastPortion).toEqual(true);
+      expect(portions[1].isLastPortion).toEqual(true);
     });
 
   });

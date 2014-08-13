@@ -28,7 +28,7 @@ var highlightText = (function() {
         return;
       }
 
-      var textNode, length, firstPortion, lastPortion;
+      var textNode, length, offset, isFirstPortion, isLastPortion;
       var currentMatchIndex = 0;
       var currentMatch = matches[currentMatchIndex];
       var totalOffset = 0;
@@ -40,23 +40,22 @@ var highlightText = (function() {
         if (nodeEndOffset > currentMatch.startIndex && totalOffset < currentMatch.endIndex) {
 
           // get portion position
-          firstPortion = lastPortion = false;
+          isFirstPortion = isLastPortion = false;
           if (totalOffset <= currentMatch.startIndex) {
-            firstPortion = true;
+            isFirstPortion = true;
           }
           if (nodeEndOffset >= currentMatch.endIndex) {
-            lastPortion = true;
+            isLastPortion = true;
           }
 
           // calculate offset and length
-          var offset;
-          if (firstPortion) {
+          if (isFirstPortion) {
             offset = currentMatch.startIndex - totalOffset;
           } else {
             offset = 0;
           }
 
-          if (lastPortion) {
+          if (isLastPortion) {
             length = (currentMatch.endIndex - totalOffset) - offset;
           } else {
             length = textNode.data.length - offset;
@@ -68,12 +67,12 @@ var highlightText = (function() {
             text: textNode.data.substring(offset, offset + length),
             offset: offset,
             length: length,
-            lastPortion: lastPortion
+            isLastPortion: isLastPortion
           };
 
           portions.push(portion);
 
-          if (lastPortion) {
+          if (isLastPortion) {
             var lastNode = this.wrapWord(portions, stencilElement);
             iterator.replaceCurrent(lastNode);
 
