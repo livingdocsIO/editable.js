@@ -31,10 +31,12 @@ var Spellcheck = (function() {
       checkOnChange: true,
       checkOnFocus: false,
       spellcheckService: undefined,
+      markerNode: $('<span class="spellcheck"></span>')[0],
       throttle: 1000 // delay after changes stop before calling the spellcheck service
     };
 
     this.config = $.extend(defaultConfig, configuration);
+    this.prepareMarkerNode();
     this.editable = editable;
     this.setup();
   };
@@ -66,15 +68,21 @@ var Spellcheck = (function() {
     this.editableHasChanged(editableHost);
   };
 
-  Spellcheck.prototype.createWrapperNode = function() {
-    var marker = document.createElement('span');
-    marker.className = 'spellcheck';
+  Spellcheck.prototype.prepareMarkerNode = function() {
+    var marker = this.config.markerNode;
+    if (marker.jquery) {
+      this.config.markerNode = marker = marker[0];
+    }
     marker.setAttribute('data-editable', 'ui-unwrap');
-    return marker;
+    marker.setAttribute('data-spellcheck', 'spellcheck');
+  };
+
+  Spellcheck.prototype.createMarkerNode = function() {
+    return this.config.markerNode.cloneNode();
   };
 
   Spellcheck.prototype.removeHighlights = function(editableHost) {
-    $(editableHost).find('.spellcheck').each(function(index, elem) {
+    $(editableHost).find('[data-spellcheck=spellcheck]').each(function(index, elem) {
       content.unwrap(elem);
     });
   };
@@ -98,7 +106,7 @@ var Spellcheck = (function() {
     this.removeHighlights(editableHost);
 
     // Create new highlights
-    var span = this.createWrapperNode();
+    var span = this.createMarkerNode();
     highlightText.highlight(editableHost, regex, span);
   };
 

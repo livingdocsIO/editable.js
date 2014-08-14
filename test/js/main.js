@@ -8,12 +8,13 @@
 
   var spellcheckService = function(text, callback) {
     var words = [];
-    words = ['test', 'xxxx', 'Lorem', 'dolor', 'ante', 'nunc.'];
+    words = ['test', 'xxx', 'Lorem', 'dolor', 'ante', 'nunc.'];
     callback(words);
   };
 
   editable.setupSpellcheck({
     spellcheckService: spellcheckService,
+    markerNode: $('<span class="spellcheck"></span>'),
     throttle: 1000
   });
 
