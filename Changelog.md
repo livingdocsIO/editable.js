@@ -1,4 +1,11 @@
 
+# v0.4.0
+
+#### Features
+
+- Spellchecking Module [#71](https://github.com/upfrontIO/editable.js/pull/71)
+
+
 # v0.3.2 (2014-06-11)
 
 - publish package in bower and npm

@@ -3642,6 +3642,44 @@ Editable.prototype.getContent = function(element) {
   return content.extractContent(element);
 };
 
+/**
+ * Get the current selection.
+ * Only returns something if the selection is within an editable element.
+ * If you pass an editable host as param it only returns something if the selection is inside this
+ * very editable element.
+ *
+ * @param {DOMNode} Optional. An editable host where the selection needs to be contained.
+ * @returns A Cursor or Selection object or undefined.
+ */
+Editable.prototype.getSelection = function(editableHost) {
+  var selection = this.dispatcher.selectionWatcher.getFreshSelection();
+  if (editableHost && selection) {
+    var range = selection.range;
+    // Check if the selection is inside the editableHost
+    // The try...catch is required if the editableHost was removed from the DOM.
+    try {
+      if (range.compareNode(editableHost) !== range.NODE_BEFORE_AND_AFTER) {
+        selection = undefined;
+      }
+    } catch (e) {
+      selection = undefined;
+    }
+  }
+  return selection;
+};
+
+
+/**
+ * Enable spellchecking
+ *
+ * @chainable
+ */
+Editable.prototype.setupSpellcheck = function(spellcheckConfig) {
+  this.spellcheck = new Spellcheck(this, spellcheckConfig);
+
+  return this;
+};
+
 
 /**
  * Subscribe a callback function to a custom event fired by the API.
@@ -3686,201 +3724,41 @@ Editable.prototype.unload = function() {
 };
 
 /**
- * Subscribe to the {{#crossLink "Editable/focus:event"}}{{/crossLink}}
- * event.
+ * Generate a callback function to subscribe to an event.
  *
- * @method focus
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
+ * @method createEventSubscriber
+ * @param {String} Event name
  */
-Editable.prototype.focus = function(handler) {
-  return this.on('focus', handler);
+var createEventSubscriber = function(name) {
+  Editable.prototype[name] = function(handler) {
+    return this.on(name, handler);
+  };
 };
 
 /**
- * Subscribe to the {{#crossLink "Editable/blur:event"}}{{/crossLink}}
- * event.
- *
- * @method blur
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
+ * Set up callback functions for several events.
  */
-Editable.prototype.blur = function(handler) {
-  return this.on('blur', handler);
-};
+var events = ['focus', 'blur', 'flow', 'selection', 'cursor', 'newline', 'insert',
+              'split', 'merge', 'empty', 'change', 'switch', 'move', 'clipboard'];
 
-/**
- * Subscribe to the {{#crossLink "Editable/flow:event"}}{{/crossLink}}
- * event.
- *
- * @method flow
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.flow = function(handler) {
-  return this.on('flow', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/selection:event"}}{{/crossLink}}
- * event.
- *
- * @method selection
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.selection = function(handler) {
-  return this.on('selection', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/cursor:event"}}{{/crossLink}}
- * event.
- *
- * @method cursor
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.cursor = function(handler) {
-  return this.on('cursor', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/newline:event"}}{{/crossLink}}
- * event.
- *
- * @method newline
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.newline = function(handler) {
-  return this.on('newline', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/insert:event"}}{{/crossLink}}
- * event.
- *
- * @method insert
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.insert = function(handler) {
-  return this.on('insert', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/split:event"}}{{/crossLink}}
- * event.
- *
- * @method split
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.split = function(handler) {
-  return this.on('split', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/merge:event"}}{{/crossLink}}
- * event.
- *
- * @method merge
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.merge = function(handler) {
-  return this.on('merge', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/empty:event"}}{{/crossLink}}
- * event.
- *
- * @method empty
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.empty = function(handler) {
-  return this.on('empty', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/change:event"}}{{/crossLink}}
- * event.
- *
- * @method change
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.change = function(handler) {
-  return this.on('change', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/switch:event"}}{{/crossLink}}
- * event.
- *
- * @method switch
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype['switch'] = function(handler) {
-  return this.on('switch', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/move:event"}}{{/crossLink}}
- * event.
- *
- * @method move
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.move = function(handler) {
-  return this.on('move', handler);
-};
-
-/**
- * Subscribe to the {{#crossLink "Editable/clipboard:event"}}{{/crossLink}}
- * event.
- *
- * @method clipboard
- * @param {Function} handler The callback to execute in response to the
- *   event.
- * @chainable
- */
-Editable.prototype.clipboard = function(handler) {
-  return this.on('clipboard', handler);
-};
-
+for (var i = 0; i < events.length; ++i) {
+  var eventName = events[i];
+  createEventSubscriber(eventName);
+}
 
 var block = (function() {
-  return {
-    next: function(element) {
-      var next = element.nextElementSibling;
-      if (next && next.getAttribute('contenteditable')) return next;
-      return null;
-    },
 
-    previous: function(element) {
-      var previous = element.previousElementSibling;
-      if (previous && previous.getAttribute('contenteditable')) return previous;
+  var getSibling = function(type) {
+    return function(element) {
+      var sibling = element[type];
+      if (sibling && sibling.getAttribute('contenteditable')) return sibling;
       return null;
-    }
+    };
+  };
+
+  return {
+    next: getSibling('nextElementSibling'),
+    previous: getSibling('previousElementSibling'),
   };
 })();
 
@@ -3935,7 +3813,7 @@ var content = (function() {
         // skip empty tags, so they'll get removed
         if (node.nodeName !== 'BR' && !node.textContent) continue;
 
-        if (node.nodeType === 1 && node.nodeName !== 'BR') {
+        if (node.nodeType === nodeType.elementNode && node.nodeName !== 'BR') {
           sibling = node;
           while ((sibling = sibling.nextSibling) !== null) {
             if (!parser.isSameNode(sibling, node))
@@ -3969,7 +3847,7 @@ var content = (function() {
     cleanInternals: function(element) {
       // Uses extract content for simplicity. A custom method
       // that does not clone the element could be faster if needed.
-      element.innerHTML = this.extractContent(element);
+      element.innerHTML = this.extractContent(element, true);
     },
 
     /**
@@ -3977,14 +3855,14 @@ var content = (function() {
      * Does not touch or change the host. Just returns
      * the content and removes elements marked for removal by editable.
      */
-    extractContent: function(element) {
+    extractContent: function(element, keepUiElements) {
       var innerHtml = element.innerHTML;
       innerHtml = innerHtml.replace(zeroWidthNonBreakingSpace, ''); // Used for forcing inline elments to have a height
       innerHtml = innerHtml.replace(zeroWidthSpace, '<br>'); // Used for cross-browser newlines
 
       var clone = document.createElement('div');
       clone.innerHTML = innerHtml;
-      this.unwrapInternalNodes(clone);
+      this.unwrapInternalNodes(clone, keepUiElements);
 
       return clone.innerHTML;
     },
@@ -3992,20 +3870,29 @@ var content = (function() {
     /**
      * Remove elements that were inserted for internal or user interface purposes
      *
+     * @param [DOM node}
+     * @param {Boolean} whether to keep ui elements like spellchecking highlights
      * Currently:
      * - Saved ranges
      */
-    unwrapInternalNodes: function(sibling) {
+    unwrapInternalNodes: function(sibling, keepUiElements) {
       while (sibling) {
         var nextSibling = sibling.nextSibling;
 
-        if (sibling.nodeType === 1) {
+        if (sibling.nodeType === nodeType.elementNode) {
           var attr = sibling.getAttribute('data-editable');
 
           if (sibling.firstChild) {
-            this.unwrapInternalNodes(sibling.firstChild);
+            this.unwrapInternalNodes(sibling.firstChild, keepUiElements);
           }
+
           if (attr === 'remove') {
+            $(sibling).remove();
+          } else if (attr === 'unwrap') {
+            this.unwrap(sibling);
+          } else if (attr === 'ui-remove' && !keepUiElements) {
+            $(sibling).remove();
+          } else if (attr === 'ui-unwrap' && !keepUiElements) {
             this.unwrap(sibling);
           }
         }
@@ -4025,7 +3912,7 @@ var content = (function() {
 
       if (!element) return;
 
-      if (element.nodeType === 3) {
+      if (element.nodeType === nodeType.textNode) {
         element.nodeValue = element.nodeValue.replace(/^(\s)/, nonBreakingSpace).replace(/(\s)$/, nonBreakingSpace);
       }
       else {
@@ -4061,7 +3948,7 @@ var content = (function() {
      * Get all tags that start or end inside the range
      */
     getInnerTags: function(range, filterFunc) {
-      return range.getNodes([1], filterFunc);
+      return range.getNodes([nodeType.elementNode], filterFunc);
     },
 
     /**
@@ -4239,7 +4126,7 @@ var content = (function() {
         range = restoreRange(host, range, function() {
           var charRegexp = string.regexp(character);
 
-          var textNodes = range.getNodes([3], function(node) {
+          var textNodes = range.getNodes([nodeType.textNode], function(node) {
             return node.nodeValue.search(charRegexp) >= 0;
           });
 
@@ -4327,7 +4214,7 @@ var Cursor = (function() {
         if (parser.isDocumentFragmentWithoutChildren(element)) return;
 
         var preceedingElement = element;
-        if (element.nodeType === 11) { // DOCUMENT_FRAGMENT_NODE
+        if (element.nodeType === nodeType.documentFragmentNode) {
           var lastIndex = element.childNodes.length - 1;
           preceedingElement = element.childNodes[lastIndex];
         }
@@ -4355,7 +4242,11 @@ var Cursor = (function() {
       },
 
       setVisibleSelection: function() {
-        $(this.host).focus(); // Without this Firefox is not happy (seems setting a selection is not enough. probably because Firefox can handle multiple selections)
+        // Without setting focus() Firefox is not happy (seems setting a selection is not enough.
+        // Probably because Firefox can handle multiple selections).
+        if (this.win.document.activeElement !== this.host) {
+          $(this.host).focus();
+        }
         rangy.getSelection(this.win).setSingleRange(this.range);
       },
 
@@ -4463,6 +4354,13 @@ var Cursor = (function() {
           error('Can not set cursor outside of an editable block');
         }
         this.setHost(host);
+      },
+
+      retainVisibleSelection: function(callback) {
+        this.save();
+        callback();
+        this.restore();
+        this.setVisibleSelection();
       },
 
       save: function() {
@@ -5315,6 +5213,162 @@ var browserFeatures = (function() {
 
 })();
 
+var highlightText = (function() {
+
+  return {
+    extractText: function(element) {
+      var range = this.getRange(element);
+      return range.toString();
+    },
+
+    highlight: function(element, regex, stencilElement) {
+      var matches = this.find(element, regex);
+      this.highlightMatches(element, matches, stencilElement);
+    },
+
+    find: function(element, regex) {
+      var text = this.extractText(element);
+      var match;
+      var matches = [];
+      var matchIndex = 0;
+      while ( (match = regex.exec(text)) ) {
+        matches.push(this.prepareMatch(match, matchIndex));
+        matchIndex += 1;
+      }
+      return matches;
+    },
+
+    highlightMatches: function(element, matches, stencilElement) {
+      if (!matches || matches.length === 0) {
+        return;
+      }
+
+      var textNode, length, offset, isFirstPortion, isLastPortion;
+      var currentMatchIndex = 0;
+      var currentMatch = matches[currentMatchIndex];
+      var totalOffset = 0;
+      var iterator = new NodeIterator(element);
+      var portions = [];
+      while ( (textNode = iterator.getNextTextNode()) ) {
+        var nodeText = textNode.data;
+        var nodeEndOffset = totalOffset + nodeText.length;
+        if (nodeEndOffset > currentMatch.startIndex && totalOffset < currentMatch.endIndex) {
+
+          // get portion position
+          isFirstPortion = isLastPortion = false;
+          if (totalOffset <= currentMatch.startIndex) {
+            isFirstPortion = true;
+          }
+          if (nodeEndOffset >= currentMatch.endIndex) {
+            isLastPortion = true;
+          }
+
+          // calculate offset and length
+          if (isFirstPortion) {
+            offset = currentMatch.startIndex - totalOffset;
+          } else {
+            offset = 0;
+          }
+
+          if (isLastPortion) {
+            length = (currentMatch.endIndex - totalOffset) - offset;
+          } else {
+            length = textNode.data.length - offset;
+          }
+
+          // create portion object
+          var portion = {
+            element: textNode,
+            text: textNode.data.substring(offset, offset + length),
+            offset: offset,
+            length: length,
+            isLastPortion: isLastPortion
+          };
+
+          portions.push(portion);
+
+          if (isLastPortion) {
+            var lastNode = this.wrapWord(portions, stencilElement);
+            iterator.replaceCurrent(lastNode);
+
+            // recalculate nodeEndOffset if we have to replace the current node.
+            nodeEndOffset = totalOffset + portion.length + portion.offset;
+
+            portions = [];
+            currentMatchIndex += 1;
+            if (currentMatchIndex < matches.length) {
+              currentMatch = matches[currentMatchIndex];
+            }
+          }
+        }
+
+        totalOffset = nodeEndOffset;
+      }
+    },
+
+    getRange: function(element) {
+      var range = rangy.createRange();
+      range.selectNodeContents(element);
+      return range;
+    },
+
+    // @return the last wrapped element
+    wrapWord: function(portions, stencilElement) {
+      var element;
+      for (var i = 0; i < portions.length; i++) {
+        var portion = portions[i];
+        element = this.wrapPortion(portion, stencilElement);
+      }
+
+      return element;
+    },
+
+    wrapPortion: function(portion, stencilElement) {
+      var range = rangy.createRange();
+      range.setStart(portion.element, portion.offset);
+      range.setEnd(portion.element, portion.offset + portion.length);
+      var node = stencilElement.cloneNode(true);
+      range.surroundContents(node);
+
+      // Fix a weird behaviour where an empty text node is inserted after the range
+      if (node.nextSibling) {
+        var next = node.nextSibling;
+        if (next.nodeType === nodeType.textNode && next.data === '') {
+          next.parentNode.removeChild(next);
+        }
+      }
+
+      return node;
+    },
+
+    prepareMatch: function (match, matchIndex) {
+      // Quickfix for the spellcheck regex where we need to match the second subgroup.
+      if (match[2]) {
+        return this.prepareMatchForSecondSubgroup(match, matchIndex);
+      }
+
+      return {
+        startIndex: match.index,
+        endIndex: match.index + match[0].length,
+        matchIndex: matchIndex,
+        search: match[0]
+      };
+    },
+
+    prepareMatchForSecondSubgroup: function (match, matchIndex) {
+      var index = match.index;
+      index += match[1].length;
+      return {
+        startIndex: index,
+        endIndex: index + match[2].length,
+        matchIndex: matchIndex,
+        search: match[0]
+      };
+    }
+
+  };
+})();
+
 /**
  * The Keyboard module defines an event API for key events.
  */
@@ -5403,6 +5457,73 @@ Keyboard.prototype.key = {
 
 Keyboard.key = Keyboard.prototype.key;
 
+// A DOM node iterator.
+//
+// Has the ability to replace nodes on the fly and continue
+// the iteration.
+var NodeIterator = (function() {
+
+  var NodeIterator = function(root) {
+    this.root = root;
+    this.current = this.next = this.root;
+  };
+
+  NodeIterator.prototype.getNextTextNode = function() {
+    var next;
+    while ( (next = this.getNext()) ) {
+      if (next.nodeType === nodeType.textNode && next.data !== '') {
+        return next;
+      }
+    }
+  },
+
+  NodeIterator.prototype.getNext = function() {
+    var child, n;
+    n = this.current = this.next;
+    child = this.next = undefined;
+    if (this.current) {
+      child = n.firstChild;
+      if (child) {
+        this.next = child;
+      } else {
+        while ((n !== this.root) && !(this.next = n.nextSibling)) {
+          n = n.parentNode;
+        }
+      }
+    }
+    return this.current;
+  };
+
+  NodeIterator.prototype.replaceCurrent = function(replacement) {
+    this.current = replacement;
+    this.next = undefined;
+    var n = this.current;
+    while ((n !== this.root) && !(this.next = n.nextSibling)) {
+      n = n.parentNode;
+    }
+  };
+
+  return NodeIterator;
+})();
+
+// DOM node types
+// https://developer.mozilla.org/en-US/docs/Web/API/Node.nodeType
+
+var nodeType = {
+  elementNode: 1,
+  attributeNode: 2,
+  textNode: 3,
+  cdataSectionNode: 4,
+  entityReferenceNode: 5,
+  entityNode: 6,
+  processingInstructionNode: 7,
+  commentNode: 8,
+  documentNode: 9,
+  documentTypeNode: 10,
+  documentFragmentNode: 11,
+  notationNode: 12
+};
+
 /**
  * The parser module provides helper methods to parse html-chunks
  * manipulations and helpers for common tasks.
@@ -5410,23 +5531,6 @@ Keyboard.key = Keyboard.prototype.key;
  * @module core
  * @submodule parser
  */
-
-
-/** DOM NODE TYPES:
-  *
-  * 'ELEMENT_NODE': 1
-  * 'ATTRIBUTE_NODE': 2
-  * 'TEXT_NODE': 3
-  * 'CDATA_SECTION_NODE': 4
-  * 'ENTITY_REFERENCE_NODE': 5
-  * 'ENTITY_NODE': 6
-  * 'PROCESSING_INSTRUCTION_NODE': 7
-  * 'COMMENT_NODE': 8
-  * 'DOCUMENT_NODE': 9
-  * 'DOCUMENT_TYPE_NODE': 10
-  * 'DOCUMENT_FRAGMENT_NODE': 11
-  * 'NOTATION_NODE': 12
-  */
 
 var parser = (function() {
   /**
@@ -5477,9 +5581,9 @@ var parser = (function() {
       for (i = 0, len = childNodes.length; i < len; i++) {
         child = childNodes[i];
 
-        if (child.nodeType === 3 && !this.isVoidTextNode(child)) {
+        if (child.nodeType === nodeType.textNode && !this.isVoidTextNode(child)) {
           return false;
-        } else if (child.nodeType === 1) {
+        } else if (child.nodeType === nodeType.elementNode) {
           return false;
         }
       }
@@ -5493,7 +5597,7 @@ var parser = (function() {
      * @param {HTMLElement}
      */
     isVoidTextNode: function(node) {
-      return node.nodeType === 3 && !node.nodeValue;
+      return node.nodeType === nodeType.textNode && !node.nodeValue;
     },
 
     /**
@@ -5503,11 +5607,11 @@ var parser = (function() {
      * @param {HTMLElement}
      */
     isWhitespaceOnly: function(node) {
-      return node.nodeType === 3 && this.lastOffsetWithContent(node) === 0;
+      return node.nodeType === nodeType.textNode && this.lastOffsetWithContent(node) === 0;
     },
 
     isLinebreak: function(node) {
-      return node.nodeType === 1 && node.tagName === 'BR';
+      return node.nodeType === nodeType.elementNode && node.tagName === 'BR';
     },
 
     /**
@@ -5519,7 +5623,7 @@ var parser = (function() {
      * @param {HTMLElement}
      */
     lastOffsetWithContent: function(node) {
-      if (node.nodeType === 3) {
+      if (node.nodeType === nodeType.textNode) {
         return string.trimRight(node.nodeValue).length;
       } else {
         var i,
@@ -5574,7 +5678,7 @@ var parser = (function() {
     },
 
     isStartOffset: function(container, offset) {
-      if (container.nodeType === 3) {
+      if (container.nodeType === nodeType.textNode) {
         return offset === 0;
       } else {
         if (container.childNodes.length === 0)
@@ -5585,7 +5689,7 @@ var parser = (function() {
     },
 
     isEndOffset: function(container, offset) {
-      if (container.nodeType === 3) {
+      if (container.nodeType === nodeType.textNode) {
         return offset === container.length;
       } else {
         if (container.childNodes.length === 0)
@@ -5615,7 +5719,7 @@ var parser = (function() {
     },
 
     isTextEndOffset: function(container, offset) {
-      if (container.nodeType === 3) {
+      if (container.nodeType === nodeType.textNode) {
         var text = string.trimRight(container.nodeValue);
         return offset >= text.length;
       } else if (container.childNodes.length === 0) {
@@ -5668,7 +5772,7 @@ var parser = (function() {
      */
     isDocumentFragmentWithoutChildren: function(fragment) {
       if (fragment &&
-          fragment.nodeType === 11 &&
+          fragment.nodeType === nodeType.documentFragmentNode &&
           fragment.childNodes.length === 0) {
         return true;
       }
@@ -5841,7 +5945,7 @@ var rangeSaveRestore = (function() {
           var previousNode = markerEl.previousSibling;
 
           // Workaround for rangy issue 17
-          if (previousNode && previousNode.nodeType === 3) {
+          if (previousNode && previousNode.nodeType === nodeType.textNode) {
             markerEl.parentNode.removeChild(markerEl);
             range.collapseToPoint(previousNode, previousNode.length);
           } else {
@@ -6266,6 +6370,152 @@ var Selection = (function() {
 
   return Selection;
 })();
+
+var Spellcheck = (function() {
+
+  // Unicode character blocks for letters.
+  // See: http://jrgraphix.net/research/unicode_blocks.php
+  //
+  // \\u0041-\\u005A    A-Z (Basic Latin)
+  // \\u0061-\\u007A    a-z (Basic Latin)
+  // \\u0030-\\u0039    0-9 (Basic Latin)
+  // \\u00AA            ª   (Latin-1 Supplement)
+  // \\u00B5            µ   (Latin-1 Supplement)
+  // \\u00BA            º   (Latin-1 Supplement)
+  // \\u00C0-\\u00D6    À-Ö (Latin-1 Supplement)
+  // \\u00D8-\\u00F6    Ø-ö (Latin-1 Supplement)
+  // \\u00F8-\\u00FF    ø-ÿ (Latin-1 Supplement)
+  // \\u0100-\\u017F    Ā-ſ (Latin Extended-A)
+  // \\u0180-\\u024F    ƀ-ɏ (Latin Extended-B)
+  var letterChars = '\\u0041-\\u005A\\u0061-\\u007A\\u0030-\\u0039\\u00AA\\u00B5\\u00BA\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u00FF\\u0100-\\u017F\\u0180-\\u024F';
+
+  var escapeRegEx = function(s) {
+    return String(s).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
+  };
+
+  /**
+   * Spellcheck class.
+   *
+   * todo:
+   *   - When splitting a text the spellchecked stuff is not cleared out properly
+   *   - Check merging of blocks as well. Just to be safe.
+   *   - Cursor position prevents highlighting of the word under the cursor.
+   *
+   * @class Spellcheck
+   * @constructor
+   */
+  var Spellcheck = function(editable, configuration) {
+    var defaultConfig = {
+      checkOnChange: true,
+      checkOnFocus: false,
+      spellcheckService: undefined,
+      throttle: 1000 // delay after changes stop before calling the spellcheck service
+    };
+
+    this.config = $.extend(defaultConfig, configuration);
+    this.editable = editable;
+    this.setup();
+  };
+
+  Spellcheck.prototype.setup = function(editable) {
+    if (this.config.checkOnFocus) {
+      this.editable.on('focus', $.proxy(this, 'onFocus'));
+      this.editable.on('blur', $.proxy(this, 'onBlur'));
+    }
+    if (this.config.checkOnChange) {
+      this.editable.on('change', $.proxy(this, 'onChange'));
+    }
+  };
+
+  Spellcheck.prototype.onFocus = function(editableHost) {
+    if (this.focusedEditable !== editableHost) {
+      this.focusedEditable = editableHost;
+      this.editableHasChanged(editableHost);
+    }
+  };
+
+  Spellcheck.prototype.onBlur = function(editableHost) {
+    if (this.focusedEditable === editableHost) {
+      this.focusedEditable = undefined;
+    }
+  };
+
+  Spellcheck.prototype.onChange = function(editableHost) {
+    this.editableHasChanged(editableHost);
+  };
+
+  Spellcheck.prototype.createWrapperNode = function() {
+    var marker = document.createElement('span');
+    marker.className = 'spellcheck';
+    marker.setAttribute('data-editable', 'ui-unwrap');
+    return marker;
+  };
+
+  Spellcheck.prototype.removeHighlights = function(editableHost) {
+    $(editableHost).find('.spellcheck').each(function(index, elem) {
+      content.unwrap(elem);
+    });
+  };
+
+  Spellcheck.prototype.createRegex = function(words) {
+    var escapedWords = $.map(words, function(word) {
+      return escapeRegEx(word);
+    });
+
+    var regex = '';
+    regex += '([^' + letterChars + ']|^)';
+    regex += '(' + escapedWords.join('|') + ')';
+    regex += '(?=[^' + letterChars + ']|$)';
+
+    return new RegExp(regex, 'g');
+  };
+
+  Spellcheck.prototype.highlight = function(editableHost, regex) {
+
+    // Remove old highlights
+    this.removeHighlights(editableHost);
+
+    // Create new highlights
+    var span = this.createWrapperNode();
+    highlightText.highlight(editableHost, regex, span);
+  };
+
+  Spellcheck.prototype.editableHasChanged = function(editableHost) {
+    if (this.timeoutId && this.currentEditableHost === editableHost) {
+      clearTimeout(this.timeoutId);
+    }
+
+    var that = this;
+    this.timeoutId = setTimeout(function() {
+      that.checkSpelling(editableHost);
+      that.currentEditableHost = undefined;
+      that.timeoutId = undefined;
+    }, this.config.throttle);
+
+    this.currentEditableHost = editableHost;
+  };
+
+  Spellcheck.prototype.checkSpelling = function(editableHost) {
+    var that = this;
+    var text = highlightText.extractText(editableHost);
+    this.config.spellcheckService(text, function(misspelledWords) {
+      if (!misspelledWords || misspelledWords.length === 0) return;
+
+      var regex = that.createRegex(misspelledWords);
+      var selection = that.editable.getSelection(editableHost);
+      if (selection) {
+        selection.retainVisibleSelection(function() {
+          that.highlight(editableHost, regex);
+        });
+      } else {
+        that.highlight(editableHost, regex);
+      }
+    });
+  };
+
+  return Spellcheck;
+})();
+
 
   window.Editable = Editable;
 })(window, document, window.jQuery);
