@@ -24,7 +24,10 @@ var NodeIterator = (function() {
     child = this.next = undefined;
     if (this.current) {
       child = n.firstChild;
-      if (child) {
+
+      // Skip the children of elements with the attribute data-editable="remove"
+      // This prevents text nodes that are not part of the content to be included.
+      if (child && n.getAttribute('data-editable') !== 'remove') {
         this.next = child;
       } else {
         while ((n !== this.root) && !(this.next = n.nextSibling)) {

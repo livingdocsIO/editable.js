@@ -15,7 +15,7 @@ describe('Spellcheck', function() {
   describe('with a simple sentence', function() {
     beforeEach(function() {
       var that = this;
-      this.div = $('<p>A simple sentence.</p>')[0];
+      this.p = $('<p>A simple sentence.</p>')[0];
       this.errors = ['simple'];
       this.spellcheck = new Spellcheck(this.editable, {
         markerNode: $('<span class="misspelled-word"></span>')[0],
@@ -29,32 +29,32 @@ describe('Spellcheck', function() {
 
       it('calls highlight()', function() {
         var highlight = sinon.spy(this.spellcheck, 'highlight');
-        this.spellcheck.checkSpelling(this.div);
+        this.spellcheck.checkSpelling(this.p);
         expect(highlight.called).toEqual(true);
       });
 
       it('highlights a match with the given marker node', function() {
-        this.spellcheck.checkSpelling(this.div);
-        expect( $(this.div).find('.misspelled-word').length ).toEqual(1);
+        this.spellcheck.checkSpelling(this.p);
+        expect( $(this.p).find('.misspelled-word').length ).toEqual(1);
       });
 
       it('removes a corrected highlighted match.', function() {
-        this.spellcheck.checkSpelling(this.div);
-        var $misspelledWord = $(this.div).find('.misspelled-word');
+        this.spellcheck.checkSpelling(this.p);
+        var $misspelledWord = $(this.p).find('.misspelled-word');
         expect($misspelledWord.length).toEqual(1);
 
         // correct the error
         $misspelledWord.html('simpler');
         this.errors = [];
 
-        this.spellcheck.checkSpelling(this.div);
-        $misspelledWord = $(this.div).find('.misspelled-word');
+        this.spellcheck.checkSpelling(this.p);
+        $misspelledWord = $(this.p).find('.misspelled-word');
         expect($misspelledWord.length).toEqual(0);
       });
 
       it('match highlights are marked with "ui-unwrap"', function() {
-        this.spellcheck.checkSpelling(this.div);
-        var $spellcheck = $(this.div).find('.misspelled-word').first();
+        this.spellcheck.checkSpelling(this.p);
+        var $spellcheck = $(this.p).find('.misspelled-word').first();
         var dataEditable = $spellcheck.attr('data-editable');
         expect(dataEditable).toEqual('ui-unwrap');
       });
@@ -64,7 +64,7 @@ describe('Spellcheck', function() {
         this.spellcheck.config.spellcheckService = function(text, callback) {
           callback([]);
         };
-        this.spellcheck.checkSpelling(this.div);
+        this.spellcheck.checkSpelling(this.p);
         expect(highlight.called).toEqual(true);
       });
 
@@ -73,7 +73,7 @@ describe('Spellcheck', function() {
         this.spellcheck.config.spellcheckService = function(text, callback) {
           callback();
         };
-        this.spellcheck.checkSpelling(this.div);
+        this.spellcheck.checkSpelling(this.p);
         expect(highlight.called).toEqual(true);
       });
     });
@@ -82,10 +82,40 @@ describe('Spellcheck', function() {
     describe('removeHighlights()', function() {
 
       it('removes the highlights', function() {
-        this.spellcheck.checkSpelling(this.div);
-        expect( $(this.div).find('.misspelled-word').length ).toEqual(1);
-        this.spellcheck.removeHighlights(this.div);
-        expect( $(this.div).find('.misspelled-word').length ).toEqual(0);
+        this.spellcheck.checkSpelling(this.p);
+        expect( $(this.p).find('.misspelled-word').length ).toEqual(1);
+        this.spellcheck.removeHighlights(this.p);
+        expect( $(this.p).find('.misspelled-word').length ).toEqual(0);
+      });
+    });
+
+
+    describe('retains cursor position', function() {
+
+      var createCursor = function(host, elem, offset) {
+        var range = rangy.createRange();
+        range.setStart(elem, offset);
+        range.setEnd(elem, offset);
+        return new Cursor(host, range);
+      };
+
+      it('in the middle of a text node', function() {
+        var cursor = createCursor(this.p, this.p.firstChild, 4);
+        cursor.save();
+        this.spellcheck.checkSpelling(this.p);
+        cursor.restore();
+
+        // These are the child nodes of the paragraph we expect after restoring the cursor:
+        // 'A |span|span| sentence.'
+        //
+        // The cursor should be positioned between the two marker <span> elements.
+        expect(cursor.range.startContainer).toEqual(this.p);
+        expect(cursor.range.startOffset).toEqual(2);
+
+        // The storing of the cursor position will have split up the text node,
+        // so now we have two markers in the editable.
+        expect( $(this.p).find('.misspelled-word').length ).toEqual(2);
+
       });
     });
   });

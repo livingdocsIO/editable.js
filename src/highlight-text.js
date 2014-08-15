@@ -2,8 +2,13 @@ var highlightText = (function() {
 
   return {
     extractText: function(element) {
-      var range = this.getRange(element);
-      return range.toString();
+      var textNode;
+      var text = '';
+      var iterator = new NodeIterator(element);
+      while ( (textNode = iterator.getNextTextNode()) ) {
+        text = text + textNode.data;
+      }
+      return text;
     },
 
     highlight: function(element, regex, stencilElement) {

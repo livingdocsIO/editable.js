@@ -19,17 +19,58 @@ describe('highlightText', function() {
     highlightText.highlight(elem, regex, stencil);
   };
 
+  var createCursor = function(host, elem, offset) {
+    var range = rangy.createRange();
+    range.setStart(elem, offset);
+    range.setEnd(elem, offset);
+    return new Cursor(host, range);
+  };
+
+  describe('extractText()', function() {
+
+    beforeEach(function() {
+      this.element = $('<div></div>')[0];
+    });
+
+    it('extracts the text', function() {
+      this.element.innerHTML = 'a'
+      var text = highlightText.extractText(this.element);
+      expect(text).toEqual('a');
+    });
+
+    it('extracts the text with nested elements', function() {
+      this.element.innerHTML = 'a<span>b</span><span></span>c';
+      var text = highlightText.extractText(this.element);
+      expect(text).toEqual('abc');
+    });
+
+    it('extracts a &nbsp; entity', function() {
+      this.element.innerHTML = '&nbsp;';
+      var text = highlightText.extractText(this.element);
+      expect(text).toEqual('\u00A0'); // \u00A0 is utf8 for the '&nbsp;' html entity
+    });
+
+    it('extracts a zero width no-break space', function() {
+      this.element.innerHTML = '\ufeff';
+      var text = highlightText.extractText(this.element);
+      expect(text).toEqual('\ufeff');
+    });
+
+    it('skips stored cursor positions', function() {
+      this.element = $('<div>ab</div>')[0];
+      var cursor = createCursor(this.element, this.element.firstChild, 1);
+      cursor.save();
+      var text = highlightText.extractText(this.element);
+      expect(text).toEqual('ab');
+    });
+
+  });
+
   describe('minimal case', function() {
 
     beforeEach(function() {
       this.element = $('<div>a</div>')[0];
       this.regex = /a/g;
-
-    });
-
-    it('extracts the text', function(){
-      var text = highlightText.extractText(this.element);
-      expect(text).toEqual('a');
     });
 
     it('finds the letter "a"', function() {
@@ -215,30 +256,4 @@ describe('highlightText', function() {
         .toEqual('<div>a, <span data-awesome="crazy">b</span> or <span data-awesome="crazy">c</span>, d</div>');
     });
   });
-
-  // describe('retain cursor position', function() {
-  //   rangy.init();
-
-  //   var createCursor = function(host, elem, offset) {
-  //     var range = rangy.createRange();
-  //     range.setStart(elem, 2);
-  //     range.setEnd(elem, 2);
-  //     return new Cursor(host, range);
-  //   };
-
-  //   it('in the middle of a text node', function(){
-  //     var elem = $('<div>dolor</div>')[0];
-  //     var cursor = createCursor(elem, elem.firstChild, 2);
-  //     cursor.save();
-
-  //     var regex = Spellcheck.prototype.createRegex(['dolor']);
-  //     highlight(elem, regex);
-  //     cursor.restore();
-
-  //     expect(elem.innerHTML)
-  //       .toEqual('<span data-awesome="crazy">do</span><span data-awesome="crazy">lor</span>');
-
-  //   });
-  // });
-
 });
