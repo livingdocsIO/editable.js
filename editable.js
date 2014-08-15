@@ -5217,9 +5217,12 @@ var highlightText = (function() {
 
   return {
     extractText: function(element) {
-      var range = this.getRange(element);
-      var text = range.toString();
-      text = text.replace(/\ufeff/g, '');
+      var textNode;
+      var text = '';
+      var iterator = new NodeIterator(element);
+      while ( (textNode = iterator.getNextTextNode()) ) {
+        text = text + textNode.data;
+      }
       return text;
     },
 
@@ -5485,6 +5488,9 @@ var NodeIterator = (function() {
     child = this.next = undefined;
     if (this.current) {
       child = n.firstChild;
+
+      // Skip the children of elements with the attribute data-editable="remove"
+      // This prevents text nodes that are not part of the content to be included.
       if (child && n.getAttribute('data-editable') !== 'remove') {
         this.next = child;
       } else {
@@ -6397,11 +6403,6 @@ var Spellcheck = (function() {
 
   /**
    * Spellcheck class.
-   *
-   * todo:
-   *   - When splitting a text the spellchecked stuff is not cleared out properly
-   *   - Check merging of blocks as well. Just to be safe.
-   *   - Cursor position prevents highlighting of the word under the cursor.
    *
    * @class Spellcheck
    * @constructor
