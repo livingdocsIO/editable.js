@@ -92,7 +92,6 @@ var Cursor = (function() {
         var range = this.range.cloneRange();
         range.setStartBefore(this.host);
         fragment = range.cloneContents();
-        range.detach();
         return fragment;
       },
 
@@ -101,7 +100,6 @@ var Cursor = (function() {
         var range = this.range.cloneRange();
         range.setEndAfter(this.host);
         fragment = range.cloneContents();
-        range.detach();
         return fragment;
       },
 
@@ -130,10 +128,6 @@ var Cursor = (function() {
           height: coords.height,
           width: coords.width
         };
-      },
-
-      detach: function() {
-        this.range.detach();
       },
 
       moveBefore: function(element) {

@@ -309,7 +309,6 @@ var content = (function() {
       var boundaryRange = range.cloneRange();
       boundaryRange.collapse(atStart);
       boundaryRange.insertNode(insertEl);
-      boundaryRange.detach();
 
       if (atStart) {
         range.setStartBefore(insertEl);
