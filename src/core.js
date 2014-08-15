@@ -199,6 +199,13 @@ Editable.prototype.createCursorAfter = function(element) {
   return this.createCursor(element, 'after');
 };
 
+/**
+ * Extract the content from an editable host or document fragment.
+ * This method will remove all internal elements and ui-elements.
+ *
+ * @param {DOM node or Document Fragment} The innerHTML of this element or fragment will be extracted.
+ * @returns {String} The cleaned innerHTML.
+ */
 Editable.prototype.getContent = function(element) {
   return content.extractContent(element);
 };

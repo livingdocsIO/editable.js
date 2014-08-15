@@ -87,6 +87,9 @@ var Cursor = (function() {
         rangy.getSelection(this.win).setSingleRange(this.range);
       },
 
+      /**
+       * @returns {Document Fragment} content before the cursor or selection.
+       */
       before: function() {
         var fragment = null;
         var range = this.range.cloneRange();
@@ -95,6 +98,9 @@ var Cursor = (function() {
         return fragment;
       },
 
+      /**
+       * @returns {Document Fragment} content after the cursor or selection.
+       */
       after: function() {
         var fragment = null;
         var range = this.range.cloneRange();
