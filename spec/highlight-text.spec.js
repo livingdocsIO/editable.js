@@ -203,9 +203,18 @@ describe('highlightText', function() {
 
   describe('wrapWord', function() {
 
+    // A word-id is stored on matches so that
+    // spans belonging to the same match can be identified.
+    // But this is not of interest in many tests,
+    // and this is where this helper comes in.
+    var removeWordId = function(elem) {
+      $(elem).find('[data-word-id]').removeAttr('data-word-id');
+    };
+
     it('wraps a word in a single text node', function() {
       var elem = $('<div>Some juice.</div>')[0];
       highlight(elem, /juice/g);
+      removeWordId(elem);
       expect(elem.outerHTML)
         .toEqual('<div>Some <span data-awesome="crazy">juice</span>.</div>')
     });
@@ -213,6 +222,7 @@ describe('highlightText', function() {
     it('wraps a word with a partial <em> element', function() {
       var elem = $('<div>Some jui<em>ce.</em></div>')[0];
       highlight(elem, /juice/g);
+      removeWordId(elem);
       expect(elem.outerHTML)
         .toEqual('<div>Some <span data-awesome="crazy">jui</span><em><span data-awesome="crazy">ce</span>.</em></div>')
     });
@@ -220,6 +230,7 @@ describe('highlightText', function() {
     it('wraps two words in the same text node', function() {
       var elem = $('<div>a or b</div>')[0];
       highlight(elem, /a|b/g);
+      removeWordId(elem);
       expect(elem.outerHTML)
         .toEqual('<div><span data-awesome="crazy">a</span> or <span data-awesome="crazy">b</span></div>')
     });
@@ -227,6 +238,7 @@ describe('highlightText', function() {
     it('wraps a word in a <em> element', function() {
       var elem = $('<div><em>word</em></div>')[0];
       highlight(elem, /word/g);
+      removeWordId(elem);
       expect(elem.outerHTML)
         .toEqual('<div><em><span data-awesome="crazy">word</span></em></div>')
     });
@@ -234,6 +246,7 @@ describe('highlightText', function() {
     it('can handle a non-match', function() {
       var elem = $('<div><em>word</em></div>')[0];
       highlight(elem, /xxx/g);
+      removeWordId(elem);
       expect(elem.outerHTML)
         .toEqual('<div><em>word</em></div>')
     });
@@ -242,6 +255,7 @@ describe('highlightText', function() {
       var elem = $('<div><em>a</em> or b</div>')[0];
       var regex = Spellcheck.prototype.createRegex(['b', 'a']);
       highlight(elem, regex);
+      removeWordId(elem);
       expect(elem.outerHTML)
         .toEqual('<div><em><span data-awesome="crazy">a</span></em> or <span data-awesome="crazy">b</span></div>');
     });
@@ -250,6 +264,7 @@ describe('highlightText', function() {
       var elem = $('<div>A word <em>is</em> not necessary</div>')[0];
       var regex = Spellcheck.prototype.createRegex(['word', 'not']);
       highlight(elem, regex);
+      removeWordId(elem);
       expect(elem.outerHTML)
         .toEqual('<div>A <span data-awesome="crazy">word</span> <em>is</em> <span data-awesome="crazy">not</span> necessary</div>');
     });
@@ -258,6 +273,7 @@ describe('highlightText', function() {
       var elem = $('<div>a, b or c, d</div>')[0];
       var regex = Spellcheck.prototype.createRegex(['b', 'c']);
       highlight(elem, regex);
+      removeWordId(elem);
       expect(elem.outerHTML)
         .toEqual('<div>a, <span data-awesome="crazy">b</span> or <span data-awesome="crazy">c</span>, d</div>');
     });
@@ -266,8 +282,33 @@ describe('highlightText', function() {
       var elem = $('<div>a<br>b</div>')[0];
       var regex = Spellcheck.prototype.createRegex(['b']);
       highlight(elem, regex);
+      removeWordId(elem);
       expect(elem.outerHTML)
         .toEqual('<div>a<br><span data-awesome="crazy">b</span></div>');
+    });
+
+    it('stores data-word-id on a highlight', function() {
+      var elem = $('<div>a</div>')[0];
+      var regex = Spellcheck.prototype.createRegex(['a']);
+      highlight(elem, regex);
+      expect(elem.outerHTML)
+        .toEqual('<div><span data-awesome="crazy" data-word-id="0">a</span></div>');
+    });
+
+    it('stores data-word-id on different matches', function() {
+      var elem = $('<div>a b</div>')[0];
+      var regex = Spellcheck.prototype.createRegex(['a', 'b']);
+      highlight(elem, regex);
+      expect(elem.outerHTML)
+        .toEqual('<div><span data-awesome="crazy" data-word-id="0">a</span> <span data-awesome="crazy" data-word-id="2">b</span></div>');
+    });
+
+    it('stores same data-word-id on multiple highlights for the same match', function() {
+      var elem = $('<div>a<i>b</i></div>')[0];
+      var regex = Spellcheck.prototype.createRegex(['ab']);
+      highlight(elem, regex);
+      expect(elem.outerHTML)
+        .toEqual('<div><span data-awesome="crazy" data-word-id="0">a</span><i><span data-awesome="crazy" data-word-id="0">b</span></i></div>');
     });
   });
 });

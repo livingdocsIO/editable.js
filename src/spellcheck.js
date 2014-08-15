@@ -66,6 +66,11 @@ var Spellcheck = (function() {
 
   Spellcheck.prototype.onChange = function(editableHost) {
     this.editableHasChanged(editableHost);
+
+    var that = this;
+    setTimeout(function() {
+      that.removeHighlightsAtCursor(editableHost);
+    }, 0);
   };
 
   Spellcheck.prototype.prepareMarkerNode = function() {
@@ -85,6 +90,26 @@ var Spellcheck = (function() {
     $(editableHost).find('[data-spellcheck=spellcheck]').each(function(index, elem) {
       content.unwrap(elem);
     });
+  };
+
+  Spellcheck.prototype.removeHighlightsAtCursor = function(editableHost) {
+    var selection = this.editable.getSelection(editableHost);
+    if (selection && selection.isCursor) {
+      selection.retainVisibleSelection(function() {
+        var elementAtCursor = selection.range.startContainer;
+        if (elementAtCursor.nodeType === nodeType.textNode) {
+          elementAtCursor = elementAtCursor.parentNode;
+          if (elementAtCursor === editableHost) return;
+        }
+
+        var $highlight = $(elementAtCursor).closest('[data-spellcheck=spellcheck]');
+        var wordId = $highlight.data('word-id');
+        console.log(wordId);
+        $(editableHost).find('[data-word-id='+ wordId +']').each(function(index, elem) {
+          content.unwrap(elem);
+        });
+      });
+    }
   };
 
   Spellcheck.prototype.createRegex = function(words) {
