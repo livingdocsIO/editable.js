@@ -70,9 +70,21 @@ var content = (function() {
      * Extracts the content from a host element.
      * Does not touch or change the host. Just returns
      * the content and removes elements marked for removal by editable.
+     *
+     * @param {DOM node or document framgent} Element where to clean out the innerHTML. If you pass a document fragment it will be empty after this call.
+     * @param {Boolean} Flag whether to keep ui elements like spellchecking highlights.
+     * @returns {String} The cleaned innerHTML of the passed element or document fragment.
      */
     extractContent: function(element, keepUiElements) {
-      var innerHtml = element.innerHTML;
+      var innerHtml;
+      if (element.nodeType === nodeType.documentFragmentNode) {
+        var div = document.createElement('div');
+        div.appendChild(element);
+        innerHtml = div.innerHTML;
+      } else {
+        innerHtml = element.innerHTML;
+      }
+
       innerHtml = innerHtml.replace(zeroWidthNonBreakingSpace, ''); // Used for forcing inline elments to have a height
       innerHtml = innerHtml.replace(zeroWidthSpace, '<br>'); // Used for cross-browser newlines
 
