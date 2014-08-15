@@ -14,11 +14,13 @@ describe('Spellcheck', function() {
 
   describe('with a simple sentence', function() {
     beforeEach(function() {
+      var that = this;
       this.div = $('<p>A simple sentence.</p>')[0];
+      this.errors = ['simple'];
       this.spellcheck = new Spellcheck(this.editable, {
         markerNode: $('<span class="misspelled-word"></span>')[0],
         spellcheckService: function(text, callback) {
-          callback(['simple']);
+          callback(that.errors);
         }
       });
     });
@@ -36,6 +38,20 @@ describe('Spellcheck', function() {
         expect( $(this.div).find('.misspelled-word').length ).toEqual(1);
       });
 
+      it('removes a corrected highlighted match.', function() {
+        this.spellcheck.checkSpelling(this.div);
+        var $misspelledWord = $(this.div).find('.misspelled-word');
+        expect($misspelledWord.length).toEqual(1);
+
+        // correct the error
+        $misspelledWord.html('simpler');
+        this.errors = [];
+
+        this.spellcheck.checkSpelling(this.div);
+        $misspelledWord = $(this.div).find('.misspelled-word');
+        expect($misspelledWord.length).toEqual(0);
+      });
+
       it('match highlights are marked with "ui-unwrap"', function() {
         this.spellcheck.checkSpelling(this.div);
         var $spellcheck = $(this.div).find('.misspelled-word').first();
@@ -43,22 +59,22 @@ describe('Spellcheck', function() {
         expect(dataEditable).toEqual('ui-unwrap');
       });
 
-      it('does not call highlight() for an empty wordlist', function() {
+      it('calls highlight() for an empty wordlist', function() {
         var highlight = sinon.spy(this.spellcheck, 'highlight');
         this.spellcheck.config.spellcheckService = function(text, callback) {
           callback([]);
         };
         this.spellcheck.checkSpelling(this.div);
-        expect(highlight.called).toEqual(false);
+        expect(highlight.called).toEqual(true);
       });
 
-      it('does not call highlight() for an undefined wordlist', function() {
+      it('calls highlight() for an undefined wordlist', function() {
         var highlight = sinon.spy(this.spellcheck, 'highlight');
         this.spellcheck.config.spellcheckService = function(text, callback) {
           callback();
         };
         this.spellcheck.checkSpelling(this.div);
-        expect(highlight.called).toEqual(false);
+        expect(highlight.called).toEqual(true);
       });
     });
 

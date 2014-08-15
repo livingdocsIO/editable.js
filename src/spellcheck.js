@@ -100,14 +100,17 @@ var Spellcheck = (function() {
     return new RegExp(regex, 'g');
   };
 
-  Spellcheck.prototype.highlight = function(editableHost, regex) {
+  Spellcheck.prototype.highlight = function(editableHost, misspelledWords) {
 
     // Remove old highlights
     this.removeHighlights(editableHost);
 
     // Create new highlights
-    var span = this.createMarkerNode();
-    highlightText.highlight(editableHost, regex, span);
+    if (misspelledWords && misspelledWords.length > 0) {
+      var regex = this.createRegex(misspelledWords);
+      var span = this.createMarkerNode();
+      highlightText.highlight(editableHost, regex, span);
+    }
   };
 
   Spellcheck.prototype.editableHasChanged = function(editableHost) {
@@ -129,16 +132,13 @@ var Spellcheck = (function() {
     var that = this;
     var text = highlightText.extractText(editableHost);
     this.config.spellcheckService(text, function(misspelledWords) {
-      if (!misspelledWords || misspelledWords.length === 0) return;
-
-      var regex = that.createRegex(misspelledWords);
       var selection = that.editable.getSelection(editableHost);
       if (selection) {
         selection.retainVisibleSelection(function() {
-          that.highlight(editableHost, regex);
+          that.highlight(editableHost, misspelledWords);
         });
       } else {
-        that.highlight(editableHost, regex);
+        that.highlight(editableHost, misspelledWords);
       }
     });
   };

@@ -5218,7 +5218,9 @@ var highlightText = (function() {
   return {
     extractText: function(element) {
       var range = this.getRange(element);
-      return range.toString();
+      var text = range.toString();
+      text = text.replace(/\ufeff/g, '');
+      return text;
     },
 
     highlight: function(element, regex, stencilElement) {
@@ -5483,7 +5485,7 @@ var NodeIterator = (function() {
     child = this.next = undefined;
     if (this.current) {
       child = n.firstChild;
-      if (child) {
+      if (child && n.getAttribute('data-editable') !== 'remove') {
         this.next = child;
       } else {
         while ((n !== this.root) && !(this.next = n.nextSibling)) {
@@ -6409,10 +6411,12 @@ var Spellcheck = (function() {
       checkOnChange: true,
       checkOnFocus: false,
       spellcheckService: undefined,
+      markerNode: $('<span class="spellcheck"></span>')[0],
       throttle: 1000 // delay after changes stop before calling the spellcheck service
     };
 
     this.config = $.extend(defaultConfig, configuration);
+    this.prepareMarkerNode();
     this.editable = editable;
     this.setup();
   };
@@ -6444,15 +6448,21 @@ var Spellcheck = (function() {
     this.editableHasChanged(editableHost);
   };
 
-  Spellcheck.prototype.createWrapperNode = function() {
-    var marker = document.createElement('span');
-    marker.className = 'spellcheck';
+  Spellcheck.prototype.prepareMarkerNode = function() {
+    var marker = this.config.markerNode;
+    if (marker.jquery) {
+      this.config.markerNode = marker = marker[0];
+    }
     marker.setAttribute('data-editable', 'ui-unwrap');
-    return marker;
+    marker.setAttribute('data-spellcheck', 'spellcheck');
+  };
+
+  Spellcheck.prototype.createMarkerNode = function() {
+    return this.config.markerNode.cloneNode();
   };
 
   Spellcheck.prototype.removeHighlights = function(editableHost) {
-    $(editableHost).find('.spellcheck').each(function(index, elem) {
+    $(editableHost).find('[data-spellcheck=spellcheck]').each(function(index, elem) {
       content.unwrap(elem);
     });
   };
@@ -6470,14 +6480,17 @@ var Spellcheck = (function() {
     return new RegExp(regex, 'g');
   };
 
-  Spellcheck.prototype.highlight = function(editableHost, regex) {
+  Spellcheck.prototype.highlight = function(editableHost, misspelledWords) {
 
     // Remove old highlights
     this.removeHighlights(editableHost);
 
     // Create new highlights
-    var span = this.createWrapperNode();
-    highlightText.highlight(editableHost, regex, span);
+    if (misspelledWords && misspelledWords.length > 0) {
+      var regex = this.createRegex(misspelledWords);
+      var span = this.createMarkerNode();
+      highlightText.highlight(editableHost, regex, span);
+    }
   };
 
   Spellcheck.prototype.editableHasChanged = function(editableHost) {
@@ -6499,16 +6512,13 @@ var Spellcheck = (function() {
     var that = this;
     var text = highlightText.extractText(editableHost);
     this.config.spellcheckService(text, function(misspelledWords) {
-      if (!misspelledWords || misspelledWords.length === 0) return;
-
-      var regex = that.createRegex(misspelledWords);
       var selection = that.editable.getSelection(editableHost);
       if (selection) {
         selection.retainVisibleSelection(function() {
-          that.highlight(editableHost, regex);
+          that.highlight(editableHost, misspelledWords);
         });
       } else {
-        that.highlight(editableHost, regex);
+        that.highlight(editableHost, misspelledWords);
       }
     });
   };
