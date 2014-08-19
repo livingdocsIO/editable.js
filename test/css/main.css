@@ -152,7 +152,9 @@ article {
             margin: 0;
         }
 
-
+.spellcheck {
+    border-bottom: 2px dotted orange;
+}
 
 /* ==========================================================================
    Helper classes

@@ -203,6 +203,44 @@ Editable.prototype.getContent = function(element) {
   return content.extractContent(element);
 };
 
+/**
+ * Get the current selection.
+ * Only returns something if the selection is within an editable element.
+ * If you pass an editable host as param it only returns something if the selection is inside this
+ * very editable element.
+ *
+ * @param {DOMNode} Optional. An editable host where the selection needs to be contained.
+ * @returns A Cursor or Selection object or undefined.
+ */
+Editable.prototype.getSelection = function(editableHost) {
+  var selection = this.dispatcher.selectionWatcher.getFreshSelection();
+  if (editableHost && selection) {
+    var range = selection.range;
+    // Check if the selection is inside the editableHost
+    // The try...catch is required if the editableHost was removed from the DOM.
+    try {
+      if (range.compareNode(editableHost) !== range.NODE_BEFORE_AND_AFTER) {
+        selection = undefined;
+      }
+    } catch (e) {
+      selection = undefined;
+    }
+  }
+  return selection;
+};
+
+
+/**
+ * Enable spellchecking
+ *
+ * @chainable
+ */
+Editable.prototype.setupSpellcheck = function(spellcheckConfig) {
+  this.spellcheck = new Spellcheck(this, spellcheckConfig);
+
+  return this;
+};
+
 
 /**
  * Subscribe a callback function to a custom event fired by the API.

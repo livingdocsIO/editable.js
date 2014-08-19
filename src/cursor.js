@@ -51,7 +51,7 @@ var Cursor = (function() {
         if (parser.isDocumentFragmentWithoutChildren(element)) return;
 
         var preceedingElement = element;
-        if (element.nodeType === 11) { // DOCUMENT_FRAGMENT_NODE
+        if (element.nodeType === nodeType.documentFragmentNode) {
           var lastIndex = element.childNodes.length - 1;
           preceedingElement = element.childNodes[lastIndex];
         }
@@ -79,7 +79,11 @@ var Cursor = (function() {
       },
 
       setVisibleSelection: function() {
-        $(this.host).focus(); // Without this Firefox is not happy (seems setting a selection is not enough. probably because Firefox can handle multiple selections)
+        // Without setting focus() Firefox is not happy (seems setting a selection is not enough.
+        // Probably because Firefox can handle multiple selections).
+        if (this.win.document.activeElement !== this.host) {
+          $(this.host).focus();
+        }
         rangy.getSelection(this.win).setSingleRange(this.range);
       },
 
@@ -187,6 +191,13 @@ var Cursor = (function() {
           error('Can not set cursor outside of an editable block');
         }
         this.setHost(host);
+      },
+
+      retainVisibleSelection: function(callback) {
+        this.save();
+        callback();
+        this.restore();
+        this.setVisibleSelection();
       },
 
       save: function() {

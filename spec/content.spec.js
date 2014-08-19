@@ -532,7 +532,7 @@ describe('Content', function() {
     });
 
     it('removes two nested marked spans', function() {
-      $host.html('<span data-editable="remove"><span data-editable="remove">a</span></span>');
+      $host.html('<span data-editable="unwrap"><span data-editable="unwrap">a</span></span>');
       var result = content.extractContent($host[0]);
       expect(result).toEqual('a');
     });
@@ -543,11 +543,41 @@ describe('Content', function() {
       expect(result).toEqual('');
     });
 
-    it('removes two marked spans around text', function() {
-      $host.html('|<span data-editable="remove">a</span>|<span data-editable="remove">b</span>|');
+    it('unwraps two marked spans around text', function() {
+      $host.html('|<span data-editable="unwrap">a</span>|<span data-editable="unwrap">b</span>|');
       var result = content.extractContent($host[0]);
       expect(result).toEqual('|a|b|');
     });
+
+    it('unwraps a "ui-unwrap" span', function() {
+      $host.html('a<span data-editable="ui-unwrap">b</span>c');
+      var result = content.extractContent($host[0]);
+      expect(result).toEqual('abc');
+    });
+
+    it('removes a "ui-remove" span', function() {
+      $host.html('a<span data-editable="ui-remove">b</span>c');
+      var result = content.extractContent($host[0]);
+      expect(result).toEqual('ac');
+    });
+
+
+    describe('called with keepUiElements', function() {
+
+      it('does not unwrap a "ui-unwrap" span', function() {
+        $host.html('a<span data-editable="ui-unwrap">b</span>c');
+        var result = content.extractContent($host[0], true);
+        expect(result).toEqual('a<span data-editable="ui-unwrap">b</span>c');
+      });
+
+      it('does not remove a "ui-remove" span', function() {
+        $host.html('a<span data-editable="ui-remove">b</span>c');
+        var result = content.extractContent($host[0], true);
+        expect(result).toEqual('a<span data-editable="ui-remove">b</span>c');
+      });
+
+    })
+
 
     describe('with ranges', function() {
       var range;

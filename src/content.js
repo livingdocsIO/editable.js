@@ -29,7 +29,7 @@ var content = (function() {
         // skip empty tags, so they'll get removed
         if (node.nodeName !== 'BR' && !node.textContent) continue;
 
-        if (node.nodeType === 1 && node.nodeName !== 'BR') {
+        if (node.nodeType === nodeType.elementNode && node.nodeName !== 'BR') {
           sibling = node;
           while ((sibling = sibling.nextSibling) !== null) {
             if (!parser.isSameNode(sibling, node))
@@ -63,7 +63,7 @@ var content = (function() {
     cleanInternals: function(element) {
       // Uses extract content for simplicity. A custom method
       // that does not clone the element could be faster if needed.
-      element.innerHTML = this.extractContent(element);
+      element.innerHTML = this.extractContent(element, true);
     },
 
     /**
@@ -71,14 +71,14 @@ var content = (function() {
      * Does not touch or change the host. Just returns
      * the content and removes elements marked for removal by editable.
      */
-    extractContent: function(element) {
+    extractContent: function(element, keepUiElements) {
       var innerHtml = element.innerHTML;
       innerHtml = innerHtml.replace(zeroWidthNonBreakingSpace, ''); // Used for forcing inline elments to have a height
       innerHtml = innerHtml.replace(zeroWidthSpace, '<br>'); // Used for cross-browser newlines
 
       var clone = document.createElement('div');
       clone.innerHTML = innerHtml;
-      this.unwrapInternalNodes(clone);
+      this.unwrapInternalNodes(clone, keepUiElements);
 
       return clone.innerHTML;
     },
@@ -86,20 +86,29 @@ var content = (function() {
     /**
      * Remove elements that were inserted for internal or user interface purposes
      *
+     * @param [DOM node}
+     * @param {Boolean} whether to keep ui elements like spellchecking highlights
      * Currently:
      * - Saved ranges
      */
-    unwrapInternalNodes: function(sibling) {
+    unwrapInternalNodes: function(sibling, keepUiElements) {
       while (sibling) {
         var nextSibling = sibling.nextSibling;
 
-        if (sibling.nodeType === 1) {
+        if (sibling.nodeType === nodeType.elementNode) {
           var attr = sibling.getAttribute('data-editable');
 
           if (sibling.firstChild) {
-            this.unwrapInternalNodes(sibling.firstChild);
+            this.unwrapInternalNodes(sibling.firstChild, keepUiElements);
           }
+
           if (attr === 'remove') {
+            $(sibling).remove();
+          } else if (attr === 'unwrap') {
+            this.unwrap(sibling);
+          } else if (attr === 'ui-remove' && !keepUiElements) {
+            $(sibling).remove();
+          } else if (attr === 'ui-unwrap' && !keepUiElements) {
             this.unwrap(sibling);
           }
         }
@@ -119,7 +128,7 @@ var content = (function() {
 
       if (!element) return;
 
-      if (element.nodeType === 3) {
+      if (element.nodeType === nodeType.textNode) {
         element.nodeValue = element.nodeValue.replace(/^(\s)/, nonBreakingSpace).replace(/(\s)$/, nonBreakingSpace);
       }
       else {
@@ -155,7 +164,7 @@ var content = (function() {
      * Get all tags that start or end inside the range
      */
     getInnerTags: function(range, filterFunc) {
-      return range.getNodes([1], filterFunc);
+      return range.getNodes([nodeType.elementNode], filterFunc);
     },
 
     /**
@@ -333,7 +342,7 @@ var content = (function() {
         range = restoreRange(host, range, function() {
           var charRegexp = string.regexp(character);
 
-          var textNodes = range.getNodes([3], function(node) {
+          var textNodes = range.getNodes([nodeType.textNode], function(node) {
             return node.nodeValue.search(charRegexp) >= 0;
           });
 
