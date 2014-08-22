@@ -78,9 +78,7 @@ var content = (function() {
     extractContent: function(element, keepUiElements) {
       var innerHtml;
       if (element.nodeType === nodeType.documentFragmentNode) {
-        var div = document.createElement('div');
-        div.appendChild(element);
-        innerHtml = div.innerHTML;
+        innerHtml = this.getInnerHtmlOfFragment(element);
       } else {
         innerHtml = element.innerHTML;
       }
@@ -93,6 +91,12 @@ var content = (function() {
       this.unwrapInternalNodes(clone, keepUiElements);
 
       return clone.innerHTML;
+    },
+
+    getInnerHtmlOfFragment: function(documentFragment) {
+      var div = document.createElement('div');
+      div.appendChild(documentFragment);
+      return div.innerHTML;
     },
 
     /**
