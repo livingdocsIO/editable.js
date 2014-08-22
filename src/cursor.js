@@ -88,24 +88,36 @@ var Cursor = (function() {
       },
 
       /**
+       * Take the following example:
+       * (The character '|' represents the cursor position)
+       *
+       * <div contenteditable="true">fo|o</div>
+       * before() will return a document frament containing a text node 'fo'.
+       *
        * @returns {Document Fragment} content before the cursor or selection.
        */
       before: function() {
         var fragment = null;
         var range = this.range.cloneRange();
         range.setStartBefore(this.host);
-        fragment = range.cloneContents();
+        fragment = content.cloneRangeContents(range);
         return fragment;
       },
 
       /**
+       * Take the following example:
+       * (The character '|' represents the cursor position)
+       *
+       * <div contenteditable="true">fo|o</div>
+       * after() will return a document frament containing a text node 'o'.
+       *
        * @returns {Document Fragment} content after the cursor or selection.
        */
       after: function() {
         var fragment = null;
         var range = this.range.cloneRange();
         range.setEndAfter(this.host);
-        fragment = range.cloneContents();
+        fragment = content.cloneRangeContents(range);
         return fragment;
       },
 

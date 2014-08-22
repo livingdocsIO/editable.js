@@ -92,13 +92,22 @@ var createDefaultBehavior = function(editable) {
     },
 
     split: function(element, before, after, cursor) {
+      var newNode = element.cloneNode();
+      newNode.appendChild(before);
+
       var parent = element.parentNode;
-      var newStart = after.firstChild;
-      parent.insertBefore(before, element);
-      parent.replaceChild(after, element);
-      content.normalizeTags(newStart);
-      content.normalizeSpaces(newStart);
-      newStart.focus();
+      parent.insertBefore(newNode, element);
+
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+      element.appendChild(after);
+
+      content.normalizeTags(newNode);
+      content.normalizeSpaces(newNode);
+      content.normalizeTags(element);
+      content.normalizeSpaces(element);
+      element.focus();
     },
 
     merge: function(element, direction, cursor) {

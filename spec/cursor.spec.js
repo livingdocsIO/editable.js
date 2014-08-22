@@ -94,5 +94,21 @@ describe('Cursor', function() {
       });
     });
 
+    describe('before()', function() {
+
+      it('gets the content before', function() {
+        var fragment = this.cursor.before();
+        expect(content.getInnerHtmlOfFragment(fragment)).toEqual('foobar');
+      });
+    });
+
+    describe('after()', function() {
+
+      it('gets the content after', function() {
+        var fragment = this.cursor.after();
+        expect(content.getInnerHtmlOfFragment(fragment)).toEqual('');
+      });
+    });
+
   });
 });

@@ -100,9 +100,27 @@ var content = (function() {
     },
 
     /**
+     * This is a slight variation of the cloneContents method of a rangyRange.
+     * It will return a fragment with the cloned contents of the range
+     * without the commonAncestorElement.
+     *
+     * @param {rangyRange}
+     * @return {DocumentFragment}
+     */
+    cloneRangeContents: function(range) {
+      var rangeFragment = range.cloneContents();
+      var parent = rangeFragment.childNodes[0];
+      var fragment = document.createDocumentFragment();
+      while (parent.childNodes.length) {
+        fragment.appendChild(parent.childNodes[0]);
+      }
+      return fragment;
+    },
+
+    /**
      * Remove elements that were inserted for internal or user interface purposes
      *
-     * @param [DOM node}
+     * @param {DOM node}
      * @param {Boolean} whether to keep ui elements like spellchecking highlights
      * Currently:
      * - Saved ranges
