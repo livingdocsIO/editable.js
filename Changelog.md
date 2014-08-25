@@ -5,6 +5,15 @@
 
 - Spellchecking Module [#71](https://github.com/upfrontIO/editable.js/pull/71)
 
+#### API Changes
+
+- Do not include the editable host in cursor.before() and after() [#77](https://github.com/upfrontIO/editable.js/pull/77)
+- Improve editable.getContent() [#74](https://github.com/upfrontIO/editable.js/pull/74)
+
+#### Bugfixes
+
+- Remove range.detach() [#73](https://github.com/upfrontIO/editable.js/pull/73)
+
 
 # v0.3.2 (2014-06-11)
 
