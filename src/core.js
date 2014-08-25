@@ -30,8 +30,6 @@ Editable = function(userConfig) {
   }
 };
 
-window.Editable = Editable;
-
 /**
  * Adds the Editable.JS API to the given target elements.
  * Opposite of {{#crossLink "Editable/remove"}}{{/crossLink}}.
