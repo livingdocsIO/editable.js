@@ -127,19 +127,13 @@ var createDefaultBehavior = function(editable) {
       if (!(container && merger))
         return;
 
-      if (container.childNodes.length > 0)
-        cursor.moveAtTextEnd(container);
-      else
-        cursor.moveAtBeginning(container);
-      cursor.setVisibleSelection();
-
-      fragment = document.createDocumentFragment();
-      chunks = merger.childNodes;
-      for (i = 0; i < chunks.length; i++) {
-        fragment.appendChild(chunks[i].cloneNode(true));
+      if (container.childNodes.length > 0) {
+        cursor = editable.appendTo(container, merger.innerHTML);
+      } else {
+        cursor = editable.prependTo(container, merger.innerHTML);
       }
-      newChild = container.appendChild(fragment);
 
+      // remove merged node
       merger.parentNode.removeChild(merger);
 
       cursor.save();
