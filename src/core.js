@@ -208,6 +208,37 @@ Editable.prototype.getContent = function(element) {
   return content.extractContent(element);
 };
 
+
+/**
+ * @param {String | DocumentFragment} content to append.
+ * @returns {Cursor} A new Cursor object just before the inserted content.
+ */
+Editable.prototype.appendTo = function(element, contentToAppend) {
+  if (typeof contentToAppend === 'string') {
+    contentToAppend = content.createFragmentFromString(contentToAppend);
+  }
+
+  var cursor = this.createCursor(element, 'end');
+  cursor.insertAfter(contentToAppend);
+  return cursor;
+};
+
+
+/**
+ * @param {String | DocumentFragment} content to prepend
+ * @returns {Cursor} A new Cursor object just after the inserted content.
+ */
+Editable.prototype.prependTo = function(element, contentToPrepend) {
+  if (typeof contentToPrepend === 'string') {
+    contentToPrepend = content.createFragmentFromString(contentToPrepend);
+  }
+
+  var cursor = this.createCursor(element, 'beginning');
+  cursor.insertBefore(contentToPrepend);
+  return cursor;
+};
+
+
 /**
  * Get the current selection.
  * Only returns something if the selection is within an editable element.

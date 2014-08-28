@@ -49,6 +49,67 @@ describe('Editable', function() {
       });
     });
 
+    describe('appendTo()', function() {
+
+      it('appends a document fragment', function() {
+        $div.html('a');
+        var frag = document.createDocumentFragment();
+        frag.appendChild(document.createTextNode('b'));
+        editable.appendTo($div[0], frag);
+        expect($div[0].innerHTML).toEqual('ab');
+      });
+
+      it('appends text from a string', function() {
+        $div.html('a');
+        editable.appendTo($div[0], 'b');
+        expect($div[0].innerHTML).toEqual('ab');
+      });
+
+      it('appends html from a string', function() {
+        $div.html('a');
+        editable.appendTo($div[0], '<span>b</span>c');
+        expect($div[0].innerHTML).toEqual('a<span>b</span>c');
+      });
+
+      it('returns a curosr a the right position', function() {
+        $div.html('a');
+        var cursor = editable.appendTo($div[0], 'b');
+        expect(cursor.beforeHtml()).toEqual('a');
+        expect(cursor.afterHtml()).toEqual('b');
+      });
+
+    });
+
+    describe('prependTo()', function() {
+
+      it('prepends a document fragment', function() {
+        var frag = document.createDocumentFragment();
+        frag.appendChild(document.createTextNode('b'));
+        $div.html('a');
+        var content = editable.prependTo($div[0], frag);
+        expect($div[0].innerHTML).toEqual('ba');
+      });
+
+      it('prepends text from a string', function() {
+        $div.html('a');
+        var content = editable.prependTo($div[0], 'b');
+        expect($div[0].innerHTML).toEqual('ba');
+      });
+
+      it('prepends html from a string', function() {
+        $div.html('A sentence.');
+        var content = editable.prependTo($div[0], '<span>So</span> be it. ');
+        expect($div[0].innerHTML).toEqual('<span>So</span> be it. A sentence.');
+      });
+
+      it('returns a curosr a the right position', function() {
+        $div.html('a');
+        var cursor = editable.prependTo($div[0], 'b');
+        expect(cursor.beforeHtml()).toEqual('b');
+        expect(cursor.afterHtml()).toEqual('a');
+      });
+    });
+
     describe('change event', function() {
 
       it('gets triggered after format change', function(done) {
