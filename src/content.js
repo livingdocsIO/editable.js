@@ -100,6 +100,20 @@ var content = (function() {
     },
 
     /**
+     * Create a document fragment from an html string
+     * @param {String} e.g. 'some html <span>text</span>.'
+     */
+    createFragmentFromString: function(htmlString) {
+      var fragment = document.createDocumentFragment();
+      var contents = $('<div>').html(htmlString).contents();
+      for (var i = 0; i < contents.length; i++) {
+        var el = contents[i];
+        fragment.appendChild(el);
+      }
+      return fragment;
+    },
+
+    /**
      * This is a slight variation of the cloneContents method of a rangyRange.
      * It will return a fragment with the cloned contents of the range
      * without the commonAncestorElement.
