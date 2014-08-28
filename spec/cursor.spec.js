@@ -102,11 +102,25 @@ describe('Cursor', function() {
       });
     });
 
+    describe('beforeHtml()', function() {
+
+      it('gets the content before', function() {
+        expect(this.cursor.beforeHtml()).toEqual('foobar');
+      });
+    });
+
     describe('after()', function() {
 
       it('gets the content after', function() {
         var fragment = this.cursor.after();
         expect(content.getInnerHtmlOfFragment(fragment)).toEqual('');
+      });
+    });
+
+    describe('afterHtml()', function() {
+
+      it('gets the content before', function() {
+        expect(this.cursor.afterHtml()).toEqual('');
       });
     });
 

@@ -105,6 +105,13 @@ var Cursor = (function() {
       },
 
       /**
+       * Same as before() but returns a string.
+       */
+      beforeHtml: function() {
+        return content.getInnerHtmlOfFragment(this.before());
+      },
+
+      /**
        * Take the following example:
        * (The character '|' represents the cursor position)
        *
@@ -119,6 +126,13 @@ var Cursor = (function() {
         range.setEndAfter(this.host);
         fragment = content.cloneRangeContents(range);
         return fragment;
+      },
+
+      /**
+       * Same as after() but returns a string.
+       */
+      afterHtml: function() {
+        return content.getInnerHtmlOfFragment(this.after());
       },
 
       /**
