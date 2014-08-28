@@ -1,2 +1,5 @@
   window.Editable = Editable;
+  Editable.parser = parser;
+  Editable.content = content;
+
 })(window, document, window.jQuery);

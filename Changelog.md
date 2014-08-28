@@ -9,6 +9,7 @@
 
 - Do not include the editable host in cursor.before() and after() [#77](https://github.com/upfrontIO/editable.js/pull/77)
 - Improve editable.getContent() [#74](https://github.com/upfrontIO/editable.js/pull/74)
+- Add appendTo() and prependTo() [#80](https://github.com/upfrontIO/editable.js/pull/80)
 
 #### Bugfixes
 
