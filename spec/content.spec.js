@@ -512,6 +512,16 @@ describe('Content', function() {
       expect(escape(result)).toEqual('a');
     });
 
+    it('extracts the content from a document fragment', function() {
+      $host.html('a<span>b</span>c');
+      var element = $host[0];
+      var fragment = document.createDocumentFragment();
+      for (var i = 0; i < element.childNodes.length; i++) {
+        fragment.appendChild(element.childNodes[i].cloneNode(true));
+      }
+      expect(content.extractContent(fragment)).toEqual('a<span>b</span>c');
+    });
+
     it('replaces a zeroWidthSpace with a <br> tag', function() {
       $host.html('a\u200B');
       var result = content.extractContent($host[0]);

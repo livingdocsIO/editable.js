@@ -3469,8 +3469,6 @@ Editable = function(userConfig) {
   }
 };
 
-window.Editable = Editable;
-
 /**
  * Adds the Editable.JS API to the given target elements.
  * Opposite of {{#crossLink "Editable/remove"}}{{/crossLink}}.
@@ -3638,9 +3636,47 @@ Editable.prototype.createCursorAfter = function(element) {
   return this.createCursor(element, 'after');
 };
 
+/**
+ * Extract the content from an editable host or document fragment.
+ * This method will remove all internal elements and ui-elements.
+ *
+ * @param {DOM node or Document Fragment} The innerHTML of this element or fragment will be extracted.
+ * @returns {String} The cleaned innerHTML.
+ */
 Editable.prototype.getContent = function(element) {
   return content.extractContent(element);
 };
+
+
+/**
+ * @param {String | DocumentFragment} content to append.
+ * @returns {Cursor} A new Cursor object just before the inserted content.
+ */
+Editable.prototype.appendTo = function(element, contentToAppend) {
+  if (typeof contentToAppend === 'string') {
+    contentToAppend = content.createFragmentFromString(contentToAppend);
+  }
+
+  var cursor = this.createCursor(element, 'end');
+  cursor.insertAfter(contentToAppend);
+  return cursor;
+};
+
+
+/**
+ * @param {String | DocumentFragment} content to prepend
+ * @returns {Cursor} A new Cursor object just after the inserted content.
+ */
+Editable.prototype.prependTo = function(element, contentToPrepend) {
+  if (typeof contentToPrepend === 'string') {
+    contentToPrepend = content.createFragmentFromString(contentToPrepend);
+  }
+
+  var cursor = this.createCursor(element, 'beginning');
+  cursor.insertBefore(contentToPrepend);
+  return cursor;
+};
+
 
 /**
  * Get the current selection.
@@ -3854,9 +3890,19 @@ var content = (function() {
      * Extracts the content from a host element.
      * Does not touch or change the host. Just returns
      * the content and removes elements marked for removal by editable.
+     *
+     * @param {DOM node or document framgent} Element where to clean out the innerHTML. If you pass a document fragment it will be empty after this call.
+     * @param {Boolean} Flag whether to keep ui elements like spellchecking highlights.
+     * @returns {String} The cleaned innerHTML of the passed element or document fragment.
      */
     extractContent: function(element, keepUiElements) {
-      var innerHtml = element.innerHTML;
+      var innerHtml;
+      if (element.nodeType === nodeType.documentFragmentNode) {
+        innerHtml = this.getInnerHtmlOfFragment(element);
+      } else {
+        innerHtml = element.innerHTML;
+      }
+
       innerHtml = innerHtml.replace(zeroWidthNonBreakingSpace, ''); // Used for forcing inline elments to have a height
       innerHtml = innerHtml.replace(zeroWidthSpace, '<br>'); // Used for cross-browser newlines
 
@@ -3867,10 +3913,48 @@ var content = (function() {
       return clone.innerHTML;
     },
 
+    getInnerHtmlOfFragment: function(documentFragment) {
+      var div = document.createElement('div');
+      div.appendChild(documentFragment);
+      return div.innerHTML;
+    },
+
+    /**
+     * Create a document fragment from an html string
+     * @param {String} e.g. 'some html <span>text</span>.'
+     */
+    createFragmentFromString: function(htmlString) {
+      var fragment = document.createDocumentFragment();
+      var contents = $('<div>').html(htmlString).contents();
+      for (var i = 0; i < contents.length; i++) {
+        var el = contents[i];
+        fragment.appendChild(el);
+      }
+      return fragment;
+    },
+
+    /**
+     * This is a slight variation of the cloneContents method of a rangyRange.
+     * It will return a fragment with the cloned contents of the range
+     * without the commonAncestorElement.
+     *
+     * @param {rangyRange}
+     * @return {DocumentFragment}
+     */
+    cloneRangeContents: function(range) {
+      var rangeFragment = range.cloneContents();
+      var parent = rangeFragment.childNodes[0];
+      var fragment = document.createDocumentFragment();
+      while (parent.childNodes.length) {
+        fragment.appendChild(parent.childNodes[0]);
+      }
+      return fragment;
+    },
+
     /**
      * Remove elements that were inserted for internal or user interface purposes
      *
-     * @param [DOM node}
+     * @param {DOM node}
      * @param {Boolean} whether to keep ui elements like spellchecking highlights
      * Currently:
      * - Saved ranges
@@ -4093,7 +4177,6 @@ var content = (function() {
       var boundaryRange = range.cloneRange();
       boundaryRange.collapse(atStart);
       boundaryRange.insertNode(insertEl);
-      boundaryRange.detach();
 
       if (atStart) {
         range.setStartBefore(insertEl);
@@ -4250,22 +4333,52 @@ var Cursor = (function() {
         rangy.getSelection(this.win).setSingleRange(this.range);
       },
 
+      /**
+       * Take the following example:
+       * (The character '|' represents the cursor position)
+       *
+       * <div contenteditable="true">fo|o</div>
+       * before() will return a document frament containing a text node 'fo'.
+       *
+       * @returns {Document Fragment} content before the cursor or selection.
+       */
       before: function() {
         var fragment = null;
         var range = this.range.cloneRange();
         range.setStartBefore(this.host);
-        fragment = range.cloneContents();
-        range.detach();
+        fragment = content.cloneRangeContents(range);
         return fragment;
       },
 
+      /**
+       * Same as before() but returns a string.
+       */
+      beforeHtml: function() {
+        return content.getInnerHtmlOfFragment(this.before());
+      },
+
+      /**
+       * Take the following example:
+       * (The character '|' represents the cursor position)
+       *
+       * <div contenteditable="true">fo|o</div>
+       * after() will return a document frament containing a text node 'o'.
+       *
+       * @returns {Document Fragment} content after the cursor or selection.
+       */
       after: function() {
         var fragment = null;
         var range = this.range.cloneRange();
         range.setEndAfter(this.host);
-        fragment = range.cloneContents();
-        range.detach();
+        fragment = content.cloneRangeContents(range);
         return fragment;
+      },
+
+      /**
+       * Same as after() but returns a string.
+       */
+      afterHtml: function() {
+        return content.getInnerHtmlOfFragment(this.after());
       },
 
       /**
@@ -4293,10 +4406,6 @@ var Cursor = (function() {
           height: coords.height,
           width: coords.width
         };
-      },
-
-      detach: function() {
-        this.range.detach();
       },
 
       moveBefore: function(element) {
@@ -4497,13 +4606,22 @@ var createDefaultBehavior = function(editable) {
     },
 
     split: function(element, before, after, cursor) {
+      var newNode = element.cloneNode();
+      newNode.appendChild(before);
+
       var parent = element.parentNode;
-      var newStart = after.firstChild;
-      parent.insertBefore(before, element);
-      parent.replaceChild(after, element);
-      content.normalizeTags(newStart);
-      content.normalizeSpaces(newStart);
-      newStart.focus();
+      parent.insertBefore(newNode, element);
+
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+      element.appendChild(after);
+
+      content.normalizeTags(newNode);
+      content.normalizeSpaces(newNode);
+      content.normalizeTags(element);
+      content.normalizeSpaces(element);
+      element.focus();
     },
 
     merge: function(element, direction, cursor) {
@@ -4523,19 +4641,13 @@ var createDefaultBehavior = function(editable) {
       if (!(container && merger))
         return;
 
-      if (container.childNodes.length > 0)
-        cursor.moveAtTextEnd(container);
-      else
-        cursor.moveAtBeginning(container);
-      cursor.setVisibleSelection();
-
-      fragment = document.createDocumentFragment();
-      chunks = merger.childNodes;
-      for (i = 0; i < chunks.length; i++) {
-        fragment.appendChild(chunks[i].cloneNode(true));
+      if (container.childNodes.length > 0) {
+        cursor = editable.appendTo(container, merger.innerHTML);
+      } else {
+        cursor = editable.prependTo(container, merger.innerHTML);
       }
-      newChild = container.appendChild(fragment);
 
+      // remove merged node
       merger.parentNode.removeChild(merger);
 
       cursor.save();
@@ -5896,7 +6008,6 @@ var rangeSaveRestore = (function() {
       markerEl.appendChild(doc.createTextNode(markerTextChar));
 
       boundaryRange.insertNode(markerEl);
-      boundaryRange.detach();
       return markerEl;
     },
 
@@ -6529,4 +6640,7 @@ var Spellcheck = (function() {
 
 
   window.Editable = Editable;
+  Editable.parser = parser;
+  Editable.content = content;
+
 })(window, document, window.jQuery);

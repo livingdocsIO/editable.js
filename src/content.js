@@ -70,9 +70,19 @@ var content = (function() {
      * Extracts the content from a host element.
      * Does not touch or change the host. Just returns
      * the content and removes elements marked for removal by editable.
+     *
+     * @param {DOM node or document framgent} Element where to clean out the innerHTML. If you pass a document fragment it will be empty after this call.
+     * @param {Boolean} Flag whether to keep ui elements like spellchecking highlights.
+     * @returns {String} The cleaned innerHTML of the passed element or document fragment.
      */
     extractContent: function(element, keepUiElements) {
-      var innerHtml = element.innerHTML;
+      var innerHtml;
+      if (element.nodeType === nodeType.documentFragmentNode) {
+        innerHtml = this.getInnerHtmlOfFragment(element);
+      } else {
+        innerHtml = element.innerHTML;
+      }
+
       innerHtml = innerHtml.replace(zeroWidthNonBreakingSpace, ''); // Used for forcing inline elments to have a height
       innerHtml = innerHtml.replace(zeroWidthSpace, '<br>'); // Used for cross-browser newlines
 
@@ -83,10 +93,48 @@ var content = (function() {
       return clone.innerHTML;
     },
 
+    getInnerHtmlOfFragment: function(documentFragment) {
+      var div = document.createElement('div');
+      div.appendChild(documentFragment);
+      return div.innerHTML;
+    },
+
+    /**
+     * Create a document fragment from an html string
+     * @param {String} e.g. 'some html <span>text</span>.'
+     */
+    createFragmentFromString: function(htmlString) {
+      var fragment = document.createDocumentFragment();
+      var contents = $('<div>').html(htmlString).contents();
+      for (var i = 0; i < contents.length; i++) {
+        var el = contents[i];
+        fragment.appendChild(el);
+      }
+      return fragment;
+    },
+
+    /**
+     * This is a slight variation of the cloneContents method of a rangyRange.
+     * It will return a fragment with the cloned contents of the range
+     * without the commonAncestorElement.
+     *
+     * @param {rangyRange}
+     * @return {DocumentFragment}
+     */
+    cloneRangeContents: function(range) {
+      var rangeFragment = range.cloneContents();
+      var parent = rangeFragment.childNodes[0];
+      var fragment = document.createDocumentFragment();
+      while (parent.childNodes.length) {
+        fragment.appendChild(parent.childNodes[0]);
+      }
+      return fragment;
+    },
+
     /**
      * Remove elements that were inserted for internal or user interface purposes
      *
-     * @param [DOM node}
+     * @param {DOM node}
      * @param {Boolean} whether to keep ui elements like spellchecking highlights
      * Currently:
      * - Saved ranges
@@ -309,7 +357,6 @@ var content = (function() {
       var boundaryRange = range.cloneRange();
       boundaryRange.collapse(atStart);
       boundaryRange.insertNode(insertEl);
-      boundaryRange.detach();
 
       if (atStart) {
         range.setStartBefore(insertEl);

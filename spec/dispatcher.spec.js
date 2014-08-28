@@ -113,8 +113,8 @@ describe('Dispatcher', function() {
 
         var insert = on('split', function(element, before, after, cursor) {
           expect(element).toEqual($elem[0]);
-          expect(before.querySelector('*').innerHTML).toEqual('fo');
-          expect(after.querySelector('*').innerHTML).toEqual('o');
+          expect(content.getInnerHtmlOfFragment(before)).toEqual('fo');
+          expect(content.getInnerHtmlOfFragment(after)).toEqual('o');
           expect(cursor.isCursor).toEqual(true);
         });
 

@@ -92,13 +92,22 @@ var createDefaultBehavior = function(editable) {
     },
 
     split: function(element, before, after, cursor) {
+      var newNode = element.cloneNode();
+      newNode.appendChild(before);
+
       var parent = element.parentNode;
-      var newStart = after.firstChild;
-      parent.insertBefore(before, element);
-      parent.replaceChild(after, element);
-      content.normalizeTags(newStart);
-      content.normalizeSpaces(newStart);
-      newStart.focus();
+      parent.insertBefore(newNode, element);
+
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
+      }
+      element.appendChild(after);
+
+      content.normalizeTags(newNode);
+      content.normalizeSpaces(newNode);
+      content.normalizeTags(element);
+      content.normalizeSpaces(element);
+      element.focus();
     },
 
     merge: function(element, direction, cursor) {
@@ -118,19 +127,13 @@ var createDefaultBehavior = function(editable) {
       if (!(container && merger))
         return;
 
-      if (container.childNodes.length > 0)
-        cursor.moveAtTextEnd(container);
-      else
-        cursor.moveAtBeginning(container);
-      cursor.setVisibleSelection();
-
-      fragment = document.createDocumentFragment();
-      chunks = merger.childNodes;
-      for (i = 0; i < chunks.length; i++) {
-        fragment.appendChild(chunks[i].cloneNode(true));
+      if (container.childNodes.length > 0) {
+        cursor = editable.appendTo(container, merger.innerHTML);
+      } else {
+        cursor = editable.prependTo(container, merger.innerHTML);
       }
-      newChild = container.appendChild(fragment);
 
+      // remove merged node
       merger.parentNode.removeChild(merger);
 
       cursor.save();

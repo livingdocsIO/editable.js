@@ -87,22 +87,52 @@ var Cursor = (function() {
         rangy.getSelection(this.win).setSingleRange(this.range);
       },
 
+      /**
+       * Take the following example:
+       * (The character '|' represents the cursor position)
+       *
+       * <div contenteditable="true">fo|o</div>
+       * before() will return a document frament containing a text node 'fo'.
+       *
+       * @returns {Document Fragment} content before the cursor or selection.
+       */
       before: function() {
         var fragment = null;
         var range = this.range.cloneRange();
         range.setStartBefore(this.host);
-        fragment = range.cloneContents();
-        range.detach();
+        fragment = content.cloneRangeContents(range);
         return fragment;
       },
 
+      /**
+       * Same as before() but returns a string.
+       */
+      beforeHtml: function() {
+        return content.getInnerHtmlOfFragment(this.before());
+      },
+
+      /**
+       * Take the following example:
+       * (The character '|' represents the cursor position)
+       *
+       * <div contenteditable="true">fo|o</div>
+       * after() will return a document frament containing a text node 'o'.
+       *
+       * @returns {Document Fragment} content after the cursor or selection.
+       */
       after: function() {
         var fragment = null;
         var range = this.range.cloneRange();
         range.setEndAfter(this.host);
-        fragment = range.cloneContents();
-        range.detach();
+        fragment = content.cloneRangeContents(range);
         return fragment;
+      },
+
+      /**
+       * Same as after() but returns a string.
+       */
+      afterHtml: function() {
+        return content.getInnerHtmlOfFragment(this.after());
       },
 
       /**
@@ -130,10 +160,6 @@ var Cursor = (function() {
           height: coords.height,
           width: coords.width
         };
-      },
-
-      detach: function() {
-        this.range.detach();
       },
 
       moveBefore: function(element) {

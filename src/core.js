@@ -30,8 +30,6 @@ Editable = function(userConfig) {
   }
 };
 
-window.Editable = Editable;
-
 /**
  * Adds the Editable.JS API to the given target elements.
  * Opposite of {{#crossLink "Editable/remove"}}{{/crossLink}}.
@@ -199,9 +197,47 @@ Editable.prototype.createCursorAfter = function(element) {
   return this.createCursor(element, 'after');
 };
 
+/**
+ * Extract the content from an editable host or document fragment.
+ * This method will remove all internal elements and ui-elements.
+ *
+ * @param {DOM node or Document Fragment} The innerHTML of this element or fragment will be extracted.
+ * @returns {String} The cleaned innerHTML.
+ */
 Editable.prototype.getContent = function(element) {
   return content.extractContent(element);
 };
+
+
+/**
+ * @param {String | DocumentFragment} content to append.
+ * @returns {Cursor} A new Cursor object just before the inserted content.
+ */
+Editable.prototype.appendTo = function(element, contentToAppend) {
+  if (typeof contentToAppend === 'string') {
+    contentToAppend = content.createFragmentFromString(contentToAppend);
+  }
+
+  var cursor = this.createCursor(element, 'end');
+  cursor.insertAfter(contentToAppend);
+  return cursor;
+};
+
+
+/**
+ * @param {String | DocumentFragment} content to prepend
+ * @returns {Cursor} A new Cursor object just after the inserted content.
+ */
+Editable.prototype.prependTo = function(element, contentToPrepend) {
+  if (typeof contentToPrepend === 'string') {
+    contentToPrepend = content.createFragmentFromString(contentToPrepend);
+  }
+
+  var cursor = this.createCursor(element, 'beginning');
+  cursor.insertBefore(contentToPrepend);
+  return cursor;
+};
+
 
 /**
  * Get the current selection.
