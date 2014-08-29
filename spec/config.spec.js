@@ -1,25 +1,56 @@
 describe("Editable configuration", function() {
-  var editable;
 
-  afterEach(function() {
-    if (editable) {
-      editable.off();
-      editable = undefined;
-    }
-  });
+  describe('instance configuration', function() {
+    var editable;
 
-  it("should use the default as base", function() {
-    editable = new Editable();
-    expect(editable.config.log).toEqual(false);
-    expect(editable.config.editableClass).toEqual('js-editable');
-  });
-
-  it("should override the default", function() {
-    editable = new Editable({
-      log: true
+    afterEach(function() {
+      if (editable) {
+        editable.off();
+        editable = undefined;
+      }
     });
-    expect(editable.config.log).toEqual(true);
-    expect(editable.config.editableClass).toEqual('js-editable');
+
+    it('has default values', function() {
+      editable = new Editable();
+      expect(editable.config.defaultBehavior).toEqual(true);
+    });
+
+    it('does not include the global configuration', function(){
+      editable = new Editable();
+      expect(editable.config.editableClass).toEqual(undefined);
+    });
+
+    it('overrides the default values', function() {
+      editable = new Editable({
+        defaultBehavior: false
+      });
+      expect(editable.config.defaultBehavior).toEqual(false);
+    });
+  });
+
+
+  describe('globalConfig()', function() {
+    var originalConfig = $.extend({}, config);
+
+    afterEach(function() {
+      Editable.globalConfig(originalConfig);
+    });
+
+    it('has a default value for "editableClass"', function() {
+      expect(config.editableClass).toEqual('js-editable');
+    });
+
+    it('overrides "editableClass"', function() {
+      Editable.globalConfig({
+        editableClass: 'editable-instance'
+      });
+      expect(config.editableClass).toEqual('editable-instance');
+    });
+
+    // Safety check for the test setup
+    it('resets the default after each spec', function() {
+      expect(config.editableClass).toEqual('js-editable');
+    });
   });
 
 });

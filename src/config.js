@@ -11,9 +11,7 @@ var config = {
   editableClass: 'js-editable',
   editableDisabledClass: 'js-editable-disabled',
   pastingAttribute: 'data-editable-is-pasting',
-  mouseMoveSelectionChanges: false,
   boldTag: '<strong>',
-  italicTag: '<em>',
-  defaultBehavior: true
+  italicTag: '<em>'
 };
 

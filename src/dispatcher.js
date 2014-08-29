@@ -55,10 +55,10 @@ Dispatcher.prototype.unload = function() {
 Dispatcher.prototype.setupElementEvents = function() {
   var _this = this;
   this.$document.on('focus.editable', _this.editableSelector, function(event) {
-    if (this.getAttribute(_this.config.pastingAttribute)) return;
+    if (this.getAttribute(config.pastingAttribute)) return;
     _this.notify('focus', this);
   }).on('blur.editable', _this.editableSelector, function(event) {
-    if (this.getAttribute(_this.config.pastingAttribute)) return;
+    if (this.getAttribute(config.pastingAttribute)) return;
     _this.notify('blur', this);
   }).on('copy.editable', _this.editableSelector, function(event) {
     log('Copy');

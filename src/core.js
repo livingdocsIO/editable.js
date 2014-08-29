@@ -13,12 +13,23 @@
  * first in editable.prefix in order for it to be the only externally visible
  * variable.
  *
+ * @param {Object} configuration for this editable instance.
+ *   window: The window where to attach the editable events.
+ *   defaultBehavior: {Boolean} Load default-behavior.js.
+ *   mouseMoveSelectionChanges: {Boolean} Whether to get cursor and selection events on mousemove.
+ *
  * @class Editable
  */
-Editable = function(userConfig) {
-  this.config = $.extend(true, {}, config, userConfig);
-  this.win = this.config.window || window;
-  this.editableSelector = '.' + this.config.editableClass;
+Editable = function(instanceConfig) {
+  var defaultInstanceConfig = {
+    window: window,
+    defaultBehavior: true,
+    mouseMoveSelectionChanges: false
+  };
+
+  this.config = $.extend(defaultInstanceConfig, instanceConfig);
+  this.win = this.config.window;
+  this.editableSelector = '.' + config.editableClass;
 
   if (!rangy.initialized) {
     rangy.init();
@@ -30,6 +41,25 @@ Editable = function(userConfig) {
   }
 };
 
+
+/**
+ * Set configuration options that affect all editable
+ * instances.
+ *
+ * @param {Object} global configuration options (defaults are defined in config.js)
+ *   log: {Boolean}
+ *   logErrors: {Boolean}
+ *   editableClass: {String} e.g. 'js-editable'
+ *   editableDisabledClass: {String} e.g. 'js-editable-disabled'
+ *   pastingAttribute: {String} default: e.g. 'data-editable-is-pasting'
+ *   boldTag: e.g. '<strong>'
+ *   italicTag: e.g. '<em>'
+ */
+Editable.globalConfig = function(globalConfig) {
+  $.extend(config, globalConfig);
+};
+
+
 /**
  * Adds the Editable.JS API to the given target elements.
  * Opposite of {{#crossLink "Editable/remove"}}{{/crossLink}}.
@@ -39,14 +69,10 @@ Editable = function(userConfig) {
  * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
  *    array of HTMLElement or a query selector representing the target where
  *    the API should be added on.
- * @param {Object} [elementConfiguration={}] Configuration options override.
  * @chainable
  */
-Editable.prototype.add = function(target, elementConfiguration) {
-  var elemConfig = $.extend(true, {}, config, elementConfiguration);
-  // todo: store element configuration
+Editable.prototype.add = function(target) {
   this.enable($(target));
-
   // todo: check css whitespace settings
   return this;
 };
