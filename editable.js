@@ -3452,12 +3452,25 @@ var string = (function() {
  * first in editable.prefix in order for it to be the only externally visible
  * variable.
  *
+ * @param {Object} configuration for this editable instance.
+ *   window: The window where to attach the editable events.
+ *   defaultBehavior: {Boolean} Load default-behavior.js.
+ *   mouseMoveSelectionChanges: {Boolean} Whether to get cursor and selection events on mousemove.
+ *   browserSpellcheck: {Boolean} Set the spellcheck attribute on editable elements
+ *
  * @class Editable
  */
-Editable = function(userConfig) {
-  this.config = $.extend(true, {}, config, userConfig);
-  this.win = this.config.window || window;
-  this.editableSelector = '.' + this.config.editableClass;
+Editable = function(instanceConfig) {
+  var defaultInstanceConfig = {
+    window: window,
+    defaultBehavior: true,
+    mouseMoveSelectionChanges: false,
+    browserSpellcheck: true
+  };
+
+  this.config = $.extend(defaultInstanceConfig, instanceConfig);
+  this.win = this.config.window;
+  this.editableSelector = '.' + config.editableClass;
 
   if (!rangy.initialized) {
     rangy.init();
@@ -3469,6 +3482,25 @@ Editable = function(userConfig) {
   }
 };
 
+
+/**
+ * Set configuration options that affect all editable
+ * instances.
+ *
+ * @param {Object} global configuration options (defaults are defined in config.js)
+ *   log: {Boolean}
+ *   logErrors: {Boolean}
+ *   editableClass: {String} e.g. 'js-editable'
+ *   editableDisabledClass: {String} e.g. 'js-editable-disabled'
+ *   pastingAttribute: {String} default: e.g. 'data-editable-is-pasting'
+ *   boldTag: e.g. '<strong>'
+ *   italicTag: e.g. '<em>'
+ */
+Editable.globalConfig = function(globalConfig) {
+  $.extend(config, globalConfig);
+};
+
+
 /**
  * Adds the Editable.JS API to the given target elements.
  * Opposite of {{#crossLink "Editable/remove"}}{{/crossLink}}.
@@ -3478,14 +3510,10 @@ Editable = function(userConfig) {
  * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
  *    array of HTMLElement or a query selector representing the target where
  *    the API should be added on.
- * @param {Object} [elementConfiguration={}] Configuration options override.
  * @chainable
  */
-Editable.prototype.add = function(target, elementConfiguration) {
-  var elemConfig = $.extend(true, {}, config, elementConfiguration);
-  // todo: store element configuration
+Editable.prototype.add = function(target) {
   this.enable($(target));
-
   // todo: check css whitespace settings
   return this;
 };
@@ -3523,6 +3551,7 @@ Editable.prototype.disable = function($elem) {
   $elem = $elem || $('.' + config.editableClass, body);
   $elem
     .removeAttr('contenteditable')
+    .removeAttr('spellcheck')
     .removeClass(config.editableClass)
     .addClass(config.editableDisabledClass);
 
@@ -3544,6 +3573,7 @@ Editable.prototype.enable = function($elem, normalize) {
   $elem = $elem || $('.' + config.editableDisabledClass, body);
   $elem
     .attr('contenteditable', true)
+    .attr('spellcheck', this.config.browserSpellcheck)
     .removeClass(config.editableDisabledClass)
     .addClass(config.editableClass);
 
@@ -3811,10 +3841,8 @@ var config = {
   editableClass: 'js-editable',
   editableDisabledClass: 'js-editable-disabled',
   pastingAttribute: 'data-editable-is-pasting',
-  mouseMoveSelectionChanges: false,
   boldTag: '<strong>',
-  italicTag: '<em>',
-  defaultBehavior: true
+  italicTag: '<em>'
 };
 
 
@@ -4959,10 +4987,10 @@ Dispatcher.prototype.unload = function() {
 Dispatcher.prototype.setupElementEvents = function() {
   var _this = this;
   this.$document.on('focus.editable', _this.editableSelector, function(event) {
-    if (this.getAttribute(_this.config.pastingAttribute)) return;
+    if (this.getAttribute(config.pastingAttribute)) return;
     _this.notify('focus', this);
   }).on('blur.editable', _this.editableSelector, function(event) {
-    if (this.getAttribute(_this.config.pastingAttribute)) return;
+    if (this.getAttribute(config.pastingAttribute)) return;
     _this.notify('blur', this);
   }).on('copy.editable', _this.editableSelector, function(event) {
     log('Copy');
