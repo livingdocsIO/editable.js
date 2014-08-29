@@ -17,6 +17,7 @@
  *   window: The window where to attach the editable events.
  *   defaultBehavior: {Boolean} Load default-behavior.js.
  *   mouseMoveSelectionChanges: {Boolean} Whether to get cursor and selection events on mousemove.
+ *   browserSpellcheck: {Boolean} Set the spellcheck attribute on editable elements
  *
  * @class Editable
  */
@@ -24,7 +25,8 @@ Editable = function(instanceConfig) {
   var defaultInstanceConfig = {
     window: window,
     defaultBehavior: true,
-    mouseMoveSelectionChanges: false
+    mouseMoveSelectionChanges: false,
+    browserSpellcheck: true
   };
 
   this.config = $.extend(defaultInstanceConfig, instanceConfig);
@@ -110,6 +112,7 @@ Editable.prototype.disable = function($elem) {
   $elem = $elem || $('.' + config.editableClass, body);
   $elem
     .removeAttr('contenteditable')
+    .removeAttr('spellcheck')
     .removeClass(config.editableClass)
     .addClass(config.editableDisabledClass);
 
@@ -131,6 +134,7 @@ Editable.prototype.enable = function($elem, normalize) {
   $elem = $elem || $('.' + config.editableDisabledClass, body);
   $elem
     .attr('contenteditable', true)
+    .attr('spellcheck', this.config.browserSpellcheck)
     .removeClass(config.editableDisabledClass)
     .addClass(config.editableClass);
 
