@@ -17,8 +17,9 @@ var clipboard = (function() {
       setTimeout(function() {
         var pasteValue, fragment;
 
-        pasteValue = that.extractFromContenteditableContainer(pasteHolder);
+        pasteValue = that.filterContent(pasteHolder);
         fragment = content.createFragmentFromString(pasteValue);
+        $(pasteHolder).remove();
 
         cursor.restore();
         cursor.insertBefore(fragment);
@@ -26,12 +27,6 @@ var clipboard = (function() {
 
         element.removeAttribute(config.pastingAttribute);
       }, 0);
-    },
-
-    getTextAreaContainer: function(document) {
-      var pasteHolder = document.createElement('textarea');
-      pasteHolder.setAttribute('style', 'position: absolute; left: -9999px');
-      return pasteHolder;
     },
 
     getContenteditableContainer: function(document) {
@@ -51,32 +46,31 @@ var clipboard = (function() {
       return pasteHolder;
     },
 
-    extractFromContenteditableContainer: function(element) {
-      // Clean pasted values
-      // content.normalizeSpaces(pasteElement);
+    /**
+     * @param { DOM node } A container where the pasted content is located.
+     * @returns { String } A cleaned innerHTML like string built from the pasted content.
+     */
+    filterContent: function(element) {
 
-      // filter pasted content
-      var value = this.filterContent(element);
-      $(element).remove();
+      // Filter pasted content
+      var pastedString = this.filterHtmlElements(element);
 
-      console.log('Paste Value');
-      console.log(value);
-
-      // Trim Pasted Text
-      if (value) {
-        value = string.trim(value);
+      // Trim pasted Text
+      if (pastedString) {
+        pastedString = string.trim(pastedString);
       }
-      return value;
+
+      return pastedString;
     },
 
-    filterContent: function(elem, parents) {
+    filterHtmlElements: function(elem, parents) {
       if (!parents) parents = [];
 
       var child, content = '';
       for (var i = 0; i < elem.childNodes.length; i++) {
         child = elem.childNodes[i];
         if (child.nodeType === nodeType.elementNode) {
-          var childContent = this.filterContent(child, parents);
+          var childContent = this.filterHtmlElements(child, parents);
           content += this.conditionalNodeWrap(child, childContent);
         } else if (child.nodeType === nodeType.textNode) {
           content += child.nodeValue;
@@ -109,6 +103,19 @@ var clipboard = (function() {
       }
     },
 
+    // // Proposed config structure
+    // allowedHtml: {
+    //   '*': {
+    //     not: '.control'
+    //   }
+    //   'a': {
+    //     required: ['href']
+    //   }
+    //   'strong': {
+    //     transform: 'b'
+    //   }
+    // }
+
     filterAttributes: function(node) {
       var nodeName = node.nodeName.toLowerCase();
       var attributes = '';
@@ -124,6 +131,7 @@ var clipboard = (function() {
     },
 
     shouldKeepNode: function(nodeName, node) {
+      // todo: check for required attributes
       return Boolean(this.allowed[nodeName]);
     }
 
