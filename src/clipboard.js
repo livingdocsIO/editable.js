@@ -15,15 +15,13 @@ var clipboard = (function() {
 
       var that = this;
       setTimeout(function() {
-        var pasteValue, pasteElement;
+        var pasteValue, fragment;
 
         pasteValue = that.extractFromContenteditableContainer(pasteHolder);
-
-        pasteElement = document.createTextNode(pasteValue);
-        content.normalizeSpaces(pasteElement);
+        fragment = content.createFragmentFromString(pasteValue);
 
         cursor.restore();
-        cursor.insertBefore(pasteElement);
+        cursor.insertBefore(fragment);
         cursor.setVisibleSelection();
 
         element.removeAttribute(config.pastingAttribute);
@@ -47,14 +45,18 @@ var clipboard = (function() {
           width: '1px',
           height: '1px',
           overflow: 'hidden'
-        });
+        })[0];
 
-      $(document.body).append(pasteHolder[0]);
-      return pasteHolder[0];
+      $(document.body).append(pasteHolder);
+      return pasteHolder;
     },
 
     extractFromContenteditableContainer: function(element) {
-      var value = element.innerHTML;
+      // Clean pasted values
+      // content.normalizeSpaces(pasteElement);
+
+      // filter pasted content
+      var value = this.filterContent(element);
       $(element).remove();
 
       console.log('Paste Value');
@@ -65,6 +67,64 @@ var clipboard = (function() {
         value = string.trim(value);
       }
       return value;
+    },
+
+    filterContent: function(elem, parents) {
+      if (!parents) parents = [];
+
+      var child, content = '';
+      for (var i = 0; i < elem.childNodes.length; i++) {
+        child = elem.childNodes[i];
+        if (child.nodeType === nodeType.elementNode) {
+          var childContent = this.filterContent(child, parents);
+          content += this.conditionalNodeWrap(child, childContent);
+        } else if (child.nodeType === nodeType.textNode) {
+          content += child.nodeValue;
+        }
+      }
+
+      return content;
+    },
+
+    conditionalNodeWrap: function(child, content) {
+      var nodeName = child.nodeName.toLowerCase();
+      if ( this.shouldKeepNode(nodeName, child) ){
+        var attributes = this.filterAttributes(child);
+        return '<'+ nodeName + attributes +'>'+ content +'</'+ nodeName +'>';
+      } else {
+        return content;
+      }
+    },
+
+    // Tags and attributes to keep in pasted text
+    allowed: {
+      'a': {
+        'href': true
+      }
+    },
+
+    required: {
+      'a': {
+        'href': true
+      }
+    },
+
+    filterAttributes: function(node) {
+      var nodeName = node.nodeName.toLowerCase();
+      var attributes = '';
+
+      for (var i=0, len=(node.attributes || []).length; i<len; i++) {
+        var name  = node.attributes[i].name;
+        var value = node.attributes[i].value;
+        if ((this.allowed[nodeName][name]) && value) {
+          attributes += ' ' + name + '="' + value + '"';
+        }
+      }
+      return attributes;
+    },
+
+    shouldKeepNode: function(nodeName, node) {
+      return Boolean(this.allowed[nodeName]);
     }
 
   };
