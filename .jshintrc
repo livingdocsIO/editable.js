@@ -46,6 +46,7 @@
     "Spellcheck": true,
     "NodeIterator": true,
     "highlightText": true,
-    "nodeType": true
+    "nodeType": true,
+    "clipboard": true
   }
 }
