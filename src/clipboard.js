@@ -1,6 +1,41 @@
 var clipboard = (function() {
 
+  var whitespaceOnly = /^\s*$/;
+
   return {
+
+    // Elements and attributes to keep in pasted text
+    allowed: {
+      'a': {
+        'href': true
+      },
+      'strong': {},
+      'em': {}
+    },
+
+    // Elements that have required attributes.
+    // If these are not present the elements are filtered out.
+    required: {
+      'a': ['href']
+    },
+
+    // Elements that should be transformed into other elements
+    transform: {
+      'b': 'strong'
+    },
+
+    // // Proposed config structure
+    // allowedHtml: {
+    //   '*': {
+    //     not: '.control'
+    //   }
+    //   'a': {
+    //     required: ['href']
+    //   }
+    //   'strong': {
+    //     transform: 'b'
+    //   }
+    // }
 
     paste: function(element, action, cursor, document) {
       element.setAttribute(config.pastingAttribute, true);
@@ -80,44 +115,20 @@ var clipboard = (function() {
       return content;
     },
 
+    // a <b>strong</b> c
     conditionalNodeWrap: function(child, content) {
       var nodeName = child.nodeName.toLowerCase();
-      if ( this.shouldKeepNode(nodeName, child) ){
-        var attributes = this.filterAttributes(child);
+      nodeName = this.transformNodeName(nodeName);
+
+      if ( this.shouldKeepNode(nodeName, child) && !whitespaceOnly.test(content) ){
+        var attributes = this.filterAttributes(nodeName, child);
         return '<'+ nodeName + attributes +'>'+ content +'</'+ nodeName +'>';
       } else {
         return content;
       }
     },
 
-    // Tags and attributes to keep in pasted text
-    allowed: {
-      'a': {
-        'href': true
-      }
-    },
-
-    required: {
-      'a': {
-        'href': true
-      }
-    },
-
-    // // Proposed config structure
-    // allowedHtml: {
-    //   '*': {
-    //     not: '.control'
-    //   }
-    //   'a': {
-    //     required: ['href']
-    //   }
-    //   'strong': {
-    //     transform: 'b'
-    //   }
-    // }
-
-    filterAttributes: function(node) {
-      var nodeName = node.nodeName.toLowerCase();
+    filterAttributes: function(nodeName, node) {
       var attributes = '';
 
       for (var i=0, len=(node.attributes || []).length; i<len; i++) {
@@ -130,8 +141,28 @@ var clipboard = (function() {
       return attributes;
     },
 
+    transformNodeName: function(nodeName) {
+      if (this.transform[nodeName]) {
+        return this.transform[nodeName];
+      } else {
+        return nodeName;
+      }
+    },
+
+    hasRequiredAttributes: function(nodeName, node) {},
+
     shouldKeepNode: function(nodeName, node) {
-      // todo: check for required attributes
+      var attrName, attrValue;
+      var requiredAttrs = this.required[nodeName];
+      if (requiredAttrs) {
+        for (var i = 0; i < requiredAttrs.length; i++) {
+          attrName = requiredAttrs[i];
+          attrValue = node.getAttribute(attrName);
+          if (!attrValue) {
+            return false;
+          }
+        }
+      }
       return Boolean(this.allowed[nodeName]);
     }
 

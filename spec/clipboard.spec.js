@@ -16,12 +16,54 @@
       expect(extract(' a ')).toEqual('a');
     });
 
+    it('keeps a <a> element with an href attribute', function() {
+      expect(extract('<a href="http://link.com">a</a>')).toEqual('<a href="http://link.com">a</a>');
+    });
+
+    it('keeps a <strong> element', function() {
+      expect(extract('<strong>a</strong>')).toEqual('<strong>a</strong>');
+    });
+
+    it('keeps an <em> element', function() {
+      expect(extract('<em>a</em>')).toEqual('<em>a</em>');
+    });
+
+
+
+    // Remove Elements
+    // ---------------
+
     it('removes a <span> element', function() {
       expect(extract('<span>a</span>')).toEqual('a');
     });
 
-    it('keeps a <a> element with an href attribute', function() {
-      expect(extract('<a href="http://link.com">a</a>')).toEqual('<a href="http://link.com">a</a>');
+    it('removes an <a> element without an href attribute', function() {
+      expect(extract('<a>a</a>')).toEqual('a');
     });
+
+    it('removes an <a> element with an empty href attribute', function() {
+      expect(extract('<a href="">a</a>')).toEqual('a');
+    });
+
+    it('removes an empty <strong> element', function() {
+      expect(extract('<strong></strong>')).toEqual('');
+    });
+
+    it('removes a <strong> element with only whitespace', function() {
+      expect(extract('<strong> </strong>')).toEqual('');
+    });
+
+    it('removes an attribute from an <em> element', function() {
+      expect(extract('<em data-something="x">a</em>')).toEqual('<em>a</em>');
+    });
+
+
+    // Transform Elements
+    // ------------------
+
+    it('transforms a <b> into a <strong>', function() {
+      expect(extract('<b>a</b>')).toEqual('<strong>a</strong>');
+    });
+
   });
 });
