@@ -29,7 +29,6 @@
     });
 
 
-
     // Remove Elements
     // ---------------
 
@@ -63,6 +62,18 @@
 
     it('transforms a <b> into a <strong>', function() {
       expect(extract('<b>a</b>')).toEqual('<strong>a</strong>');
+    });
+
+
+    // Escape Content
+    // --------------
+
+    it('escapes the string "<b>a</b>"', function() {
+      // append the string to test as text node so the browser escapes it.
+      var div = document.createElement('div');
+      div.appendChild( document.createTextNode('<b>a</b>') );
+
+      expect(clipboard.filterContent(div)).toEqual('&lt;b&gt;a&lt;/b&gt;');
     });
 
   });

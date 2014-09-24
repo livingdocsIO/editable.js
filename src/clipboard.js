@@ -108,7 +108,8 @@ var clipboard = (function() {
           var childContent = this.filterHtmlElements(child, parents);
           content += this.conditionalNodeWrap(child, childContent);
         } else if (child.nodeType === nodeType.textNode) {
-          content += child.nodeValue;
+          // Escape HTML characters <, > and &
+          content += string.escapeHtml(child.nodeValue);
         }
       }
 
@@ -149,9 +150,7 @@ var clipboard = (function() {
       }
     },
 
-    hasRequiredAttributes: function(nodeName, node) {},
-
-    shouldKeepNode: function(nodeName, node) {
+    hasRequiredAttributes: function(nodeName, node) {
       var attrName, attrValue;
       var requiredAttrs = this.required[nodeName];
       if (requiredAttrs) {
@@ -163,7 +162,11 @@ var clipboard = (function() {
           }
         }
       }
-      return Boolean(this.allowed[nodeName]);
+      return true;
+    },
+
+    shouldKeepNode: function(nodeName, node) {
+      return this.allowed[nodeName] && this.hasRequiredAttributes(nodeName, node);
     }
 
   };
