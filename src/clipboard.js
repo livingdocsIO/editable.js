@@ -7,7 +7,7 @@ var clipboard = (function() {
     allowedElements = filter.allowedElements || {};
     requiredAttributes = filter.requiredAttributes || {};
     transformElements = filter.transformElements || {};
-  }
+  };
 
   updateConfig(config);
 
