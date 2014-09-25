@@ -1,41 +1,19 @@
 var clipboard = (function() {
-
+  var allowedElements, requiredAttributes, transformElements;
   var whitespaceOnly = /^\s*$/;
+
+  var updateConfig = function (config) {
+    var filter = config.pastedHtmlFilter;
+    allowedElements = filter.allowedElements || {};
+    requiredAttributes = filter.requiredAttributes || {};
+    transformElements = filter.transformElements || {};
+  }
+
+  updateConfig(config);
 
   return {
 
-    // Elements and attributes to keep in pasted text
-    allowed: {
-      'a': {
-        'href': true
-      },
-      'strong': {},
-      'em': {}
-    },
-
-    // Elements that have required attributes.
-    // If these are not present the elements are filtered out.
-    required: {
-      'a': ['href']
-    },
-
-    // Elements that should be transformed into other elements
-    transform: {
-      'b': 'strong'
-    },
-
-    // // Proposed config structure
-    // allowedHtml: {
-    //   '*': {
-    //     not: '.control'
-    //   }
-    //   'a': {
-    //     required: ['href']
-    //   }
-    //   'strong': {
-    //     transform: 'b'
-    //   }
-    // }
+    updateConfig: updateConfig,
 
     paste: function(element, action, cursor, document) {
       element.setAttribute(config.pastingAttribute, true);
@@ -44,10 +22,14 @@ var clipboard = (function() {
         cursor = cursor.deleteContent();
       }
 
+      // Create a placeholder and set the focus to the pasteholder
+      // to redirect the browser pasting into the pasteholder.
       cursor.save();
       var pasteHolder = this.getContenteditableContainer(document);
-      pasteHolder.focus(); // Set the focus to the pasteHolder to redirect the browser pasting
+      pasteHolder.focus();
 
+      // Use a timeout to give the browser some time to paste the content.
+      // After that grab the pasted content, filter it and restore the focus.
       var that = this;
       setTimeout(function() {
         var pasteValue, fragment;
@@ -116,7 +98,6 @@ var clipboard = (function() {
       return content;
     },
 
-    // a <b>strong</b> c
     conditionalNodeWrap: function(child, content) {
       var nodeName = child.nodeName.toLowerCase();
       nodeName = this.transformNodeName(nodeName);
@@ -135,7 +116,7 @@ var clipboard = (function() {
       for (var i=0, len=(node.attributes || []).length; i<len; i++) {
         var name  = node.attributes[i].name;
         var value = node.attributes[i].value;
-        if ((this.allowed[nodeName][name]) && value) {
+        if ((allowedElements[nodeName][name]) && value) {
           attributes += ' ' + name + '="' + value + '"';
         }
       }
@@ -143,8 +124,8 @@ var clipboard = (function() {
     },
 
     transformNodeName: function(nodeName) {
-      if (this.transform[nodeName]) {
-        return this.transform[nodeName];
+      if (transformElements[nodeName]) {
+        return transformElements[nodeName];
       } else {
         return nodeName;
       }
@@ -152,7 +133,7 @@ var clipboard = (function() {
 
     hasRequiredAttributes: function(nodeName, node) {
       var attrName, attrValue;
-      var requiredAttrs = this.required[nodeName];
+      var requiredAttrs = requiredAttributes[nodeName];
       if (requiredAttrs) {
         for (var i = 0; i < requiredAttrs.length; i++) {
           attrName = requiredAttrs[i];
@@ -166,7 +147,7 @@ var clipboard = (function() {
     },
 
     shouldKeepNode: function(nodeName, node) {
-      return this.allowed[nodeName] && this.hasRequiredAttributes(nodeName, node);
+      return allowedElements[nodeName] && this.hasRequiredAttributes(nodeName, node);
     }
 
   };

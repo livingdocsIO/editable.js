@@ -12,6 +12,33 @@ var config = {
   editableDisabledClass: 'js-editable-disabled',
   pastingAttribute: 'data-editable-is-pasting',
   boldTag: '<strong>',
-  italicTag: '<em>'
+  italicTag: '<em>',
+
+  // Rules that are applied when filtering pasted content
+  pastedHtmlFilter: {
+
+    // Elements and their attributes to keep in pasted text
+    allowedElements: {
+      'a': {
+        'href': true
+      },
+      'strong': {},
+      'em': {}
+    },
+
+    // Elements that have required attributes.
+    // If these are not present the elements are filtered out.
+    // Required attributes have to be present in the 'allowed' object
+    // as well if they should not be filtered out.
+    requiredAttributes: {
+      'a': ['href']
+    },
+
+    // Elements that should be transformed into other elements
+    transformElements: {
+      'b': 'strong',
+      'i': 'em'
+    }
+  }
 };
 

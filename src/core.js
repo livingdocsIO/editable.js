@@ -59,6 +59,7 @@ Editable = function(instanceConfig) {
  */
 Editable.globalConfig = function(globalConfig) {
   $.extend(config, globalConfig);
+  clipboard.updateConfig(config);
 };
 
 
