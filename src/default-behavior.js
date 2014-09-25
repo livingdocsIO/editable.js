@@ -102,10 +102,8 @@ var createDefaultBehavior = function(editable) {
       }
       element.appendChild(after);
 
-      content.normalizeTags(newNode);
-      content.normalizeSpaces(newNode);
-      content.normalizeTags(element);
-      content.normalizeSpaces(element);
+      content.tidyHtml(newNode);
+      content.tidyHtml(element);
       element.focus();
     },
 
@@ -136,8 +134,7 @@ var createDefaultBehavior = function(editable) {
       merger.parentNode.removeChild(merger);
 
       cursor.save();
-      content.normalizeTags(container);
-      content.normalizeSpaces(container);
+      content.tidyHtml(container);
       cursor.restore();
       cursor.setVisibleSelection();
     },
