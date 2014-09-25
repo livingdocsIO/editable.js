@@ -3408,6 +3408,15 @@ error = function() {
 };
 
 var string = (function() {
+
+  var htmlCharacters = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    '\'': '&#39;'
+  };
+
   return {
     trimRight: function(text) {
       return text.replace(/\s+$/, '');
@@ -3433,9 +3442,77 @@ var string = (function() {
       if (!flags) flags = 'g';
       var escapedStr = str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
       return new RegExp(escapedStr, flags);
+    },
+
+    /**
+     * Escape HTML characters <, > and &
+     * Usage: escapeHtml('<div>');
+     *
+     * @param { String }
+     * @param { Boolean } Optional. If true " and ' will also be escaped.
+     * @return { String } Escaped Html you can assign to innerHTML of an element.
+     */
+    escapeHtml: function(s, forAttribute) {
+      return s.replace(forAttribute ? /[&<>'"]/g : /[&<>]/g, function(c) { // "'
+        return htmlCharacters[c];
+      });
+    },
+
+    /**
+     * Escape a string the browser way.
+     */
+    browserEscapeHtml: function(str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
     }
   };
 })();
+
+
+/**
+ * Defines all supported event types by Editable.JS and provides default
+ * implementations for them defined in {{#crossLink "Behavior"}}{{/crossLink}}
+ *
+ * @type {Object}
+ */
+var config = {
+  log: false,
+  logErrors: true,
+  editableClass: 'js-editable',
+  editableDisabledClass: 'js-editable-disabled',
+  pastingAttribute: 'data-editable-is-pasting',
+  boldTag: '<strong>',
+  italicTag: '<em>',
+
+  // Rules that are applied when filtering pasted content
+  pastedHtmlFilter: {
+
+    // Elements and their attributes to keep in pasted text
+    allowedElements: {
+      'a': {
+        'href': true
+      },
+      'strong': {},
+      'em': {}
+    },
+
+    // Elements that have required attributes.
+    // If these are not present the elements are filtered out.
+    // Required attributes have to be present in the 'allowed' object
+    // as well if they should not be filtered out.
+    requiredAttributes: {
+      'a': ['href']
+    },
+
+    // Elements that should be transformed into other elements
+    transformElements: {
+      'b': 'strong',
+      'i': 'em'
+    }
+  }
+};
+
 
 /**
  * The Core module provides the Editable class that defines the Editable.JS
@@ -3498,6 +3575,7 @@ Editable = function(instanceConfig) {
  */
 Editable.globalConfig = function(globalConfig) {
   $.extend(config, globalConfig);
+  clipboard.updateConfig(config);
 };
 
 
@@ -3828,23 +3906,161 @@ var block = (function() {
   };
 })();
 
+var clipboard = (function() {
+  var allowedElements, requiredAttributes, transformElements;
+  var whitespaceOnly = /^\s*$/;
 
-/**
- * Defines all supported event types by Editable.JS and provides default
- * implementations for them defined in {{#crossLink "Behavior"}}{{/crossLink}}
- *
- * @type {Object}
- */
-var config = {
-  log: false,
-  logErrors: true,
-  editableClass: 'js-editable',
-  editableDisabledClass: 'js-editable-disabled',
-  pastingAttribute: 'data-editable-is-pasting',
-  boldTag: '<strong>',
-  italicTag: '<em>'
-};
+  var updateConfig = function (config) {
+    var filter = config.pastedHtmlFilter;
+    allowedElements = filter.allowedElements || {};
+    requiredAttributes = filter.requiredAttributes || {};
+    transformElements = filter.transformElements || {};
+  };
 
+  updateConfig(config);
+
+  return {
+
+    updateConfig: updateConfig,
+
+    paste: function(element, action, cursor, document) {
+      element.setAttribute(config.pastingAttribute, true);
+
+      if (cursor.isSelection) {
+        cursor = cursor.deleteContent();
+      }
+
+      // Create a placeholder and set the focus to the pasteholder
+      // to redirect the browser pasting into the pasteholder.
+      cursor.save();
+      var pasteHolder = this.getContenteditableContainer(document);
+      pasteHolder.focus();
+
+      // Use a timeout to give the browser some time to paste the content.
+      // After that grab the pasted content, filter it and restore the focus.
+      var that = this;
+      setTimeout(function() {
+        var pasteValue, fragment;
+
+        pasteValue = that.filterContent(pasteHolder);
+        fragment = content.createFragmentFromString(pasteValue);
+        $(pasteHolder).remove();
+
+        cursor.restore();
+        cursor.insertBefore(fragment);
+        cursor.setVisibleSelection();
+
+        element.removeAttribute(config.pastingAttribute);
+      }, 0);
+    },
+
+    getContenteditableContainer: function(document) {
+      var pasteHolder = $('<div>')
+        .attr('contenteditable', true)
+        .addClass('filteredPaste_pasteIntoArea_xxx')
+        .css({
+          position: 'fixed',
+          left: '5px',
+          top: '5px',
+          width: '1px',
+          height: '1px',
+          overflow: 'hidden'
+        })[0];
+
+      $(document.body).append(pasteHolder);
+      return pasteHolder;
+    },
+
+    /**
+     * @param { DOM node } A container where the pasted content is located.
+     * @returns { String } A cleaned innerHTML like string built from the pasted content.
+     */
+    filterContent: function(element) {
+
+      // Filter pasted content
+      var pastedString = this.filterHtmlElements(element);
+
+      // Trim pasted Text
+      if (pastedString) {
+        pastedString = string.trim(pastedString);
+      }
+
+      return pastedString;
+    },
+
+    filterHtmlElements: function(elem, parents) {
+      if (!parents) parents = [];
+
+      var child, content = '';
+      for (var i = 0; i < elem.childNodes.length; i++) {
+        child = elem.childNodes[i];
+        if (child.nodeType === nodeType.elementNode) {
+          var childContent = this.filterHtmlElements(child, parents);
+          content += this.conditionalNodeWrap(child, childContent);
+        } else if (child.nodeType === nodeType.textNode) {
+          // Escape HTML characters <, > and &
+          content += string.escapeHtml(child.nodeValue);
+        }
+      }
+
+      return content;
+    },
+
+    conditionalNodeWrap: function(child, content) {
+      var nodeName = child.nodeName.toLowerCase();
+      nodeName = this.transformNodeName(nodeName);
+
+      if ( this.shouldKeepNode(nodeName, child) && !whitespaceOnly.test(content) ){
+        var attributes = this.filterAttributes(nodeName, child);
+        return '<'+ nodeName + attributes +'>'+ content +'</'+ nodeName +'>';
+      } else {
+        return content;
+      }
+    },
+
+    filterAttributes: function(nodeName, node) {
+      var attributes = '';
+
+      for (var i=0, len=(node.attributes || []).length; i<len; i++) {
+        var name  = node.attributes[i].name;
+        var value = node.attributes[i].value;
+        if ((allowedElements[nodeName][name]) && value) {
+          attributes += ' ' + name + '="' + value + '"';
+        }
+      }
+      return attributes;
+    },
+
+    transformNodeName: function(nodeName) {
+      if (transformElements[nodeName]) {
+        return transformElements[nodeName];
+      } else {
+        return nodeName;
+      }
+    },
+
+    hasRequiredAttributes: function(nodeName, node) {
+      var attrName, attrValue;
+      var requiredAttrs = requiredAttributes[nodeName];
+      if (requiredAttrs) {
+        for (var i = 0; i < requiredAttrs.length; i++) {
+          attrName = requiredAttrs[i];
+          attrValue = node.getAttribute(attrName);
+          if (!attrValue) {
+            return false;
+          }
+        }
+      }
+      return true;
+    },
+
+    shouldKeepNode: function(nodeName, node) {
+      return allowedElements[nodeName] && this.hasRequiredAttributes(nodeName, node);
+    }
+
+  };
+
+})();
 
 var content = (function() {
 
@@ -4553,7 +4769,6 @@ var Cursor = (function() {
 
 var createDefaultBehavior = function(editable) {
   var document = editable.win.document;
-  var config = editable.config;
   var selectionWatcher = editable.dispatcher.selectionWatcher;
 
   /**
@@ -4715,37 +4930,9 @@ var createDefaultBehavior = function(editable) {
     },
 
     clipboard: function(element, action, cursor) {
-      var pasteHolder, sel;
-
-      if (action !== 'paste') return;
-
-      element.setAttribute(config.pastingAttribute, true);
-
-      if (cursor.isSelection) {
-        cursor = cursor.deleteContent();
+      if (action === 'paste') {
+        clipboard.paste(element, action, cursor, document);
       }
-
-      pasteHolder = document.createElement('textarea');
-      pasteHolder.setAttribute('style', 'position: absolute; left: -9999px');
-      cursor.insertAfter(pasteHolder);
-      sel = rangy.saveSelection();
-      pasteHolder.focus();
-
-      setTimeout(function() {
-        var pasteValue, pasteElement, cursor;
-        pasteValue = pasteHolder.value;
-        element.removeChild(pasteHolder);
-
-        rangy.restoreSelection(sel);
-        cursor = selectionWatcher.forceCursor();
-        pasteElement = document.createTextNode(pasteValue);
-        content.normalizeSpaces(pasteElement);
-        cursor.insertAfter(pasteElement);
-        cursor.moveAfter(pasteElement);
-        cursor.setVisibleSelection();
-
-        element.removeAttribute(config.pastingAttribute);
-      }, 0);
     }
   };
 };
@@ -5002,6 +5189,8 @@ Dispatcher.prototype.setupElementEvents = function() {
   }).on('paste.editable', _this.editableSelector, function(event) {
     log('Paste');
     _this.notify('clipboard', this, 'paste', _this.selectionWatcher.getFreshSelection());
+    // todo: this might be a bug since there is a timeout in the paste logic
+    // consider moving the paste code in here an not in the default behaviour
     _this.triggerChangeEvent(this);
   }).on('input.editable', _this.editableSelector, function(event) {
     log('Input');
