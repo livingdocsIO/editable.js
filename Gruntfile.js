@@ -105,15 +105,17 @@ module.exports = function(grunt) {
           '.tmp/editable.js': [
             'editable.prefix',
             'src/util/*.js',
+            'src/config.js',
             'src/core.js',
-            'src/!(core).js',
+            'src/!(core|config).js',
             'editable.suffix'
           ],
           '.tmp/editable-test.js': [
             'editable.prefix',
             'src/util/*.js',
+            'src/config.js',
             'src/core.js',
-            'src/!(core).js',
+            'src/!(core|config).js',
             'spec/**/*.js',
             'editable.suffix'
           ]
