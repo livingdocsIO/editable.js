@@ -1,12 +1,25 @@
 var clipboard = (function() {
   var allowedElements, requiredAttributes, transformElements;
+  var blockLevelElements, splitIntoBlocks;
   var whitespaceOnly = /^\s*$/;
+  var blockPlaceholder = '<!-- BLOCK -->';
 
   var updateConfig = function (config) {
-    var filter = config.pastedHtmlFilter;
-    allowedElements = filter.allowedElements || {};
-    requiredAttributes = filter.requiredAttributes || {};
-    transformElements = filter.transformElements || {};
+    var i, name, rules = config.pastedHtmlRules;
+    allowedElements = rules.allowedElements || {};
+    requiredAttributes = rules.requiredAttributes || {};
+    transformElements = rules.transformElements || {};
+
+    blockLevelElements = {};
+    for (i = 0; i < rules.blockLevelElements.length; i++) {
+      name = rules.blockLevelElements[i];
+      blockLevelElements[name] = true;
+    }
+    splitIntoBlocks = {};
+    for (i = 0; i < rules.splitIntoBlocks.length; i++) {
+      name = rules.splitIntoBlocks[i];
+      splitIntoBlocks[name] = true;
+    }
   };
 
   updateConfig(config);
@@ -49,7 +62,6 @@ var clipboard = (function() {
     getContenteditableContainer: function(document) {
       var pasteHolder = $('<div>')
         .attr('contenteditable', true)
-        .addClass('filteredPaste_pasteIntoArea_xxx')
         .css({
           position: 'fixed',
           left: '5px',
@@ -72,7 +84,19 @@ var clipboard = (function() {
       // Filter pasted content
       var pastedString = this.filterHtmlElements(element);
 
+      // Handle Blocks
+      var blocks = pastedString.split(blockPlaceholder);
+      blocks = blocks.filter(function(entry) {
+        return !whitespaceOnly.test(entry);
+      });
+      pastedString = blocks.join('<br><br>');
+
+      // Clean Whitesapce
+      // todo: make configurable
+      pastedString = this.cleanWhitespace(pastedString);
+
       // Trim pasted Text
+      // todo: make configurable
       if (pastedString) {
         pastedString = string.trim(pastedString);
       }
@@ -102,7 +126,7 @@ var clipboard = (function() {
       var nodeName = child.nodeName.toLowerCase();
       nodeName = this.transformNodeName(nodeName);
 
-      if ( this.shouldKeepNode(nodeName, child) && !whitespaceOnly.test(content) ){
+      if ( this.shouldKeepNode(nodeName, child) ) {
         var attributes = this.filterAttributes(nodeName, child);
         if (nodeName === 'br') {
           return '<'+ nodeName + attributes +'>';
@@ -112,7 +136,15 @@ var clipboard = (function() {
           return content;
         }
       } else {
-        return content;
+        if (splitIntoBlocks[nodeName]) {
+          return blockPlaceholder + content + blockPlaceholder;
+        } else if (blockLevelElements[nodeName]) {
+          // prevent missing whitespace between text when block-level
+          // elements are removed.
+          return content + ' ';
+        } else {
+          return content;
+        }
       }
     },
 
@@ -154,6 +186,17 @@ var clipboard = (function() {
 
     shouldKeepNode: function(nodeName, node) {
       return allowedElements[nodeName] && this.hasRequiredAttributes(nodeName, node);
+    },
+
+    cleanWhitespace: function(str) {
+      var cleanedStr = str.replace(/(.)(\u00A0)/g, function(match, group1, group2, offset, string) {
+        if ( /[\u0020]/.test(group1) ) {
+          return group1 + '\u00A0';
+        } else {
+          return group1 + ' ';
+        }
+      });
+      return cleanedStr;
     }
 
   };

@@ -8,6 +8,10 @@
       return clipboard.filterContent(div);
     };
 
+
+    // Copy Elements
+    // -------------
+
     it('gets a plain text', function() {
       expect(extract('a')).toEqual('a');
     });
@@ -32,6 +36,34 @@
       expect(extract('a<br>b')).toEqual('a<br>b');
     });
 
+    it('inserts double <br> after a paragraph', function() {
+      expect(extract('<p>a</p><p>b</p>')).toEqual('a<br><br>b');
+    });
+
+    it('inserts double <br> after a <h1> followed by an <h2>', function() {
+      expect(extract('<h1>a</h1><h2>b</h2>')).toEqual('a<br><br>b');
+    });
+
+
+    // Clean Whitespace
+    // ----------------
+
+    var checkWhitespace = function(a, b) {
+      expect( escape(extract(a)) ).toEqual( escape(b) );
+    };
+
+    it('replaces a single &nbsp; character', function() {
+      checkWhitespace('a&nbsp;b', 'a b');
+    });
+
+    it('replaces a series of &nbsp; with alternating whitespace and &nbsp;', function() {
+      checkWhitespace('a&nbsp;&nbsp;&nbsp;&nbsp;b', 'a \u00A0 \u00A0b');
+    });
+
+    it('replaces a single &nbsp; character before a <span>', function() {
+      checkWhitespace('a&nbsp;<span>b</span>', 'a b');
+    });
+
 
     // Remove Elements
     // ---------------
@@ -54,6 +86,10 @@
 
     it('removes a <strong> element with only whitespace', function() {
       expect(extract('<strong> </strong>')).toEqual('');
+    });
+
+    it('removes an empty <strong> element but keeps its whitespace', function() {
+      expect(extract('a<strong> </strong>b')).toEqual('a b');
     });
 
     it('removes an attribute from an <em> element', function() {
