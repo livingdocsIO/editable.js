@@ -104,7 +104,13 @@ var clipboard = (function() {
 
       if ( this.shouldKeepNode(nodeName, child) && !whitespaceOnly.test(content) ){
         var attributes = this.filterAttributes(nodeName, child);
-        return '<'+ nodeName + attributes +'>'+ content +'</'+ nodeName +'>';
+        if (nodeName === 'br') {
+          return '<'+ nodeName + attributes +'>';
+        } else if ( !whitespaceOnly.test(content) ) {
+          return '<'+ nodeName + attributes +'>'+ content +'</'+ nodeName +'>';
+        } else {
+          return content;
+        }
       } else {
         return content;
       }

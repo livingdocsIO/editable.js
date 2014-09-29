@@ -28,6 +28,10 @@
       expect(extract('<em>a</em>')).toEqual('<em>a</em>');
     });
 
+    it('keeps a <br> element', function() {
+      expect(extract('a<br>b')).toEqual('a<br>b');
+    });
+
 
     // Remove Elements
     // ---------------

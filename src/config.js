@@ -23,7 +23,8 @@ var config = {
         'href': true
       },
       'strong': {},
-      'em': {}
+      'em': {},
+      'br': {}
     },
 
     // Elements that have required attributes.
