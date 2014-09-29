@@ -3486,7 +3486,7 @@ var config = {
   italicTag: '<em>',
 
   // Rules that are applied when filtering pasted content
-  pastedHtmlFilter: {
+  pastedHtmlRules: {
 
     // Elements and their attributes to keep in pasted text
     allowedElements: {
@@ -3494,7 +3494,8 @@ var config = {
         'href': true
       },
       'strong': {},
-      'em': {}
+      'em': {},
+      'br': {}
     },
 
     // Elements that have required attributes.
@@ -3509,8 +3510,15 @@ var config = {
     transformElements: {
       'b': 'strong',
       'i': 'em'
-    }
+    },
+
+    // A list of elements which should be split into paragraphs.
+    splitIntoBlocks: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'blockquote'],
+
+    // A list of HTML block level elements.
+    blockLevelElements: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'p', 'pre', 'hr', 'blockquote', 'article', 'figure', 'header', 'footer', 'ul', 'ol', 'li', 'section', 'table', 'video']
   }
+
 };
 
 
@@ -3657,8 +3665,7 @@ Editable.prototype.enable = function($elem, normalize) {
 
   if (normalize) {
     $elem.each(function(index, el) {
-      content.normalizeTags(el);
-      content.normalizeSpaces(el);
+      content.tidyHtml(el);
     });
   }
 
@@ -3908,13 +3915,26 @@ var block = (function() {
 
 var clipboard = (function() {
   var allowedElements, requiredAttributes, transformElements;
+  var blockLevelElements, splitIntoBlocks;
   var whitespaceOnly = /^\s*$/;
+  var blockPlaceholder = '<!-- BLOCK -->';
 
   var updateConfig = function (config) {
-    var filter = config.pastedHtmlFilter;
-    allowedElements = filter.allowedElements || {};
-    requiredAttributes = filter.requiredAttributes || {};
-    transformElements = filter.transformElements || {};
+    var i, name, rules = config.pastedHtmlRules;
+    allowedElements = rules.allowedElements || {};
+    requiredAttributes = rules.requiredAttributes || {};
+    transformElements = rules.transformElements || {};
+
+    blockLevelElements = {};
+    for (i = 0; i < rules.blockLevelElements.length; i++) {
+      name = rules.blockLevelElements[i];
+      blockLevelElements[name] = true;
+    }
+    splitIntoBlocks = {};
+    for (i = 0; i < rules.splitIntoBlocks.length; i++) {
+      name = rules.splitIntoBlocks[i];
+      splitIntoBlocks[name] = true;
+    }
   };
 
   updateConfig(config);
@@ -3957,7 +3977,6 @@ var clipboard = (function() {
     getContenteditableContainer: function(document) {
       var pasteHolder = $('<div>')
         .attr('contenteditable', true)
-        .addClass('filteredPaste_pasteIntoArea_xxx')
         .css({
           position: 'fixed',
           left: '5px',
@@ -3980,7 +3999,19 @@ var clipboard = (function() {
       // Filter pasted content
       var pastedString = this.filterHtmlElements(element);
 
+      // Handle Blocks
+      var blocks = pastedString.split(blockPlaceholder);
+      blocks = blocks.filter(function(entry) {
+        return !whitespaceOnly.test(entry);
+      });
+      pastedString = blocks.join('<br><br>');
+
+      // Clean Whitesapce
+      // todo: make configurable
+      pastedString = this.cleanWhitespace(pastedString);
+
       // Trim pasted Text
+      // todo: make configurable
       if (pastedString) {
         pastedString = string.trim(pastedString);
       }
@@ -4010,11 +4041,25 @@ var clipboard = (function() {
       var nodeName = child.nodeName.toLowerCase();
       nodeName = this.transformNodeName(nodeName);
 
-      if ( this.shouldKeepNode(nodeName, child) && !whitespaceOnly.test(content) ){
+      if ( this.shouldKeepNode(nodeName, child) ) {
         var attributes = this.filterAttributes(nodeName, child);
-        return '<'+ nodeName + attributes +'>'+ content +'</'+ nodeName +'>';
+        if (nodeName === 'br') {
+          return '<'+ nodeName + attributes +'>';
+        } else if ( !whitespaceOnly.test(content) ) {
+          return '<'+ nodeName + attributes +'>'+ content +'</'+ nodeName +'>';
+        } else {
+          return content;
+        }
       } else {
-        return content;
+        if (splitIntoBlocks[nodeName]) {
+          return blockPlaceholder + content + blockPlaceholder;
+        } else if (blockLevelElements[nodeName]) {
+          // prevent missing whitespace between text when block-level
+          // elements are removed.
+          return content + ' ';
+        } else {
+          return content;
+        }
       }
     },
 
@@ -4056,6 +4101,17 @@ var clipboard = (function() {
 
     shouldKeepNode: function(nodeName, node) {
       return allowedElements[nodeName] && this.hasRequiredAttributes(nodeName, node);
+    },
+
+    cleanWhitespace: function(str) {
+      var cleanedStr = str.replace(/(.)(\u00A0)/g, function(match, group1, group2, offset, string) {
+        if ( /[\u0020]/.test(group1) ) {
+          return group1 + '\u00A0';
+        } else {
+          return group1 + ' ';
+        }
+      });
+      return cleanedStr;
     }
 
   };
@@ -4074,6 +4130,15 @@ var content = (function() {
   var zeroWidthNonBreakingSpace = /\uFEFF/g;
 
   return {
+
+    /**
+     * Clean up the Html.
+     */
+    tidyHtml: function(element) {
+      this.normalizeTags(element);
+    },
+
+
     /**
      * Remove empty tags and merge consecutive tags (they must have the same
      * attributes).
@@ -4225,27 +4290,6 @@ var content = (function() {
           }
         }
         sibling = nextSibling;
-      }
-    },
-
-    /**
-     * Convert the first and last space to a non breaking space charcter to
-     * prevent visual collapse by some browser.
-     *
-     * @method normalizeSpaces
-     * @param  {HTMLElement} element The element to process.
-     */
-    normalizeSpaces: function(element) {
-      var nonBreakingSpace = '\u00A0';
-
-      if (!element) return;
-
-      if (element.nodeType === nodeType.textNode) {
-        element.nodeValue = element.nodeValue.replace(/^(\s)/, nonBreakingSpace).replace(/(\s)$/, nonBreakingSpace);
-      }
-      else {
-        this.normalizeSpaces(element.firstChild);
-        this.normalizeSpaces(element.lastChild);
       }
     },
 
@@ -4860,10 +4904,8 @@ var createDefaultBehavior = function(editable) {
       }
       element.appendChild(after);
 
-      content.normalizeTags(newNode);
-      content.normalizeSpaces(newNode);
-      content.normalizeTags(element);
-      content.normalizeSpaces(element);
+      content.tidyHtml(newNode);
+      content.tidyHtml(element);
       element.focus();
     },
 
@@ -4894,8 +4936,7 @@ var createDefaultBehavior = function(editable) {
       merger.parentNode.removeChild(merger);
 
       cursor.save();
-      content.normalizeTags(container);
-      content.normalizeSpaces(container);
+      content.tidyHtml(container);
       cursor.restore();
       cursor.setVisibleSelection();
     },
@@ -5189,8 +5230,6 @@ Dispatcher.prototype.setupElementEvents = function() {
   }).on('paste.editable', _this.editableSelector, function(event) {
     log('Paste');
     _this.notify('clipboard', this, 'paste', _this.selectionWatcher.getFreshSelection());
-    // todo: this might be a bug since there is a timeout in the paste logic
-    // consider moving the paste code in here an not in the default behaviour
     _this.triggerChangeEvent(this);
   }).on('input.editable', _this.editableSelector, function(event) {
     log('Input');

@@ -1,6 +1,12 @@
 # v0.4.1
 
+#### Features
+
 - Filter pasted content [#84](https://github.com/upfrontIO/editable.js/pull/84)
+
+#### Bugfixes
+
+- Remove content.normalizeSpaces() [#82](https://github.com/upfrontIO/editable.js/issues/82)
 
 
 # v0.4.0
