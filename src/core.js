@@ -59,6 +59,7 @@ Editable = function(instanceConfig) {
  */
 Editable.globalConfig = function(globalConfig) {
   $.extend(config, globalConfig);
+  clipboard.updateConfig(config);
 };
 
 
@@ -140,8 +141,7 @@ Editable.prototype.enable = function($elem, normalize) {
 
   if (normalize) {
     $elem.each(function(index, el) {
-      content.normalizeTags(el);
-      content.normalizeSpaces(el);
+      content.tidyHtml(el);
     });
   }
 

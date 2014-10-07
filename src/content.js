@@ -10,6 +10,15 @@ var content = (function() {
   var zeroWidthNonBreakingSpace = /\uFEFF/g;
 
   return {
+
+    /**
+     * Clean up the Html.
+     */
+    tidyHtml: function(element) {
+      this.normalizeTags(element);
+    },
+
+
     /**
      * Remove empty tags and merge consecutive tags (they must have the same
      * attributes).
@@ -161,27 +170,6 @@ var content = (function() {
           }
         }
         sibling = nextSibling;
-      }
-    },
-
-    /**
-     * Convert the first and last space to a non breaking space charcter to
-     * prevent visual collapse by some browser.
-     *
-     * @method normalizeSpaces
-     * @param  {HTMLElement} element The element to process.
-     */
-    normalizeSpaces: function(element) {
-      var nonBreakingSpace = '\u00A0';
-
-      if (!element) return;
-
-      if (element.nodeType === nodeType.textNode) {
-        element.nodeValue = element.nodeValue.replace(/^(\s)/, nonBreakingSpace).replace(/(\s)$/, nonBreakingSpace);
-      }
-      else {
-        this.normalizeSpaces(element.firstChild);
-        this.normalizeSpaces(element.lastChild);
       }
     },
 

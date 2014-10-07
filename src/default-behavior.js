@@ -11,7 +11,6 @@
 
 var createDefaultBehavior = function(editable) {
   var document = editable.win.document;
-  var config = editable.config;
   var selectionWatcher = editable.dispatcher.selectionWatcher;
 
   /**
@@ -103,10 +102,8 @@ var createDefaultBehavior = function(editable) {
       }
       element.appendChild(after);
 
-      content.normalizeTags(newNode);
-      content.normalizeSpaces(newNode);
-      content.normalizeTags(element);
-      content.normalizeSpaces(element);
+      content.tidyHtml(newNode);
+      content.tidyHtml(element);
       element.focus();
     },
 
@@ -137,8 +134,7 @@ var createDefaultBehavior = function(editable) {
       merger.parentNode.removeChild(merger);
 
       cursor.save();
-      content.normalizeTags(container);
-      content.normalizeSpaces(container);
+      content.tidyHtml(container);
       cursor.restore();
       cursor.setVisibleSelection();
     },
@@ -173,37 +169,9 @@ var createDefaultBehavior = function(editable) {
     },
 
     clipboard: function(element, action, cursor) {
-      var pasteHolder, sel;
-
-      if (action !== 'paste') return;
-
-      element.setAttribute(config.pastingAttribute, true);
-
-      if (cursor.isSelection) {
-        cursor = cursor.deleteContent();
+      if (action === 'paste') {
+        clipboard.paste(element, action, cursor, document);
       }
-
-      pasteHolder = document.createElement('textarea');
-      pasteHolder.setAttribute('style', 'position: absolute; left: -9999px');
-      cursor.insertAfter(pasteHolder);
-      sel = rangy.saveSelection();
-      pasteHolder.focus();
-
-      setTimeout(function() {
-        var pasteValue, pasteElement, cursor;
-        pasteValue = pasteHolder.value;
-        element.removeChild(pasteHolder);
-
-        rangy.restoreSelection(sel);
-        cursor = selectionWatcher.forceCursor();
-        pasteElement = document.createTextNode(pasteValue);
-        content.normalizeSpaces(pasteElement);
-        cursor.insertAfter(pasteElement);
-        cursor.moveAfter(pasteElement);
-        cursor.setVisibleSelection();
-
-        element.removeAttribute(config.pastingAttribute);
-      }, 0);
     }
   };
 };
