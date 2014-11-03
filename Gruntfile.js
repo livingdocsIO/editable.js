@@ -137,8 +137,12 @@ module.exports = function(grunt) {
         commitFiles: ['-a'], // '-a' for all files
         pushTo: 'origin'
       }
+    },
+    shell: {
+      npm: {
+        command: 'npm publish'
+      }
     }
-
   });
 
   // livereload does not work with grunt-contrib-watch, so we use regarde instead
@@ -198,6 +202,7 @@ module.exports = function(grunt) {
   grunt.registerTask('release', function (type) {
     type = type ? type : 'patch';
     grunt.task.run('bump:' + type);
+    grunt.task.run('shell:npm');
   });
 
 };
