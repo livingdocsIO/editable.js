@@ -5637,18 +5637,29 @@ var highlightText = (function() {
         return;
       }
 
-      var textNode, length, offset, isFirstPortion, isLastPortion;
+      var next, textNode, length, offset, isFirstPortion, isLastPortion;
       var currentMatchIndex = 0;
       var currentMatch = matches[currentMatchIndex];
       var totalOffset = 0;
       var iterator = new NodeIterator(element);
       var portions = [];
-      while ( (textNode = iterator.getNextTextNode()) ) {
+      while ( (next = iterator.getNext()) ) {
+
+        // Account for <br> elements
+        if (next.nodeType === nodeType.textNode && next.data !== '') {
+          textNode = next;
+        } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
+          totalOffset = totalOffset + 1;
+          continue;
+        } else {
+          continue;
+        }
+
         var nodeText = textNode.data;
         var nodeEndOffset = totalOffset + nodeText.length;
-        if (nodeEndOffset > currentMatch.startIndex && totalOffset < currentMatch.endIndex) {
+        if (currentMatch.startIndex < nodeEndOffset && totalOffset < currentMatch.endIndex) {
 
-          // get portion position
+          // get portion position (fist, last or in the middle)
           isFirstPortion = isLastPortion = false;
           if (totalOffset <= currentMatch.startIndex) {
             isFirstPortion = true;
@@ -5667,13 +5678,13 @@ var highlightText = (function() {
           if (isLastPortion) {
             length = (currentMatch.endIndex - totalOffset) - offset;
           } else {
-            length = textNode.data.length - offset;
+            length = nodeText.length - offset;
           }
 
           // create portion object
           var portion = {
             element: textNode,
-            text: textNode.data.substring(offset, offset + length),
+            text: nodeText.substring(offset, offset + length),
             offset: offset,
             length: length,
             isLastPortion: isLastPortion
