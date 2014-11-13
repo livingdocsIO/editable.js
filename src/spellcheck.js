@@ -28,11 +28,11 @@ var Spellcheck = (function() {
    */
   var Spellcheck = function(editable, configuration) {
     var defaultConfig = {
-      checkOnFocus: false, // check on focus and blur
+      checkOnFocus: false, // check on focus
       checkOnChange: true, // check after changes
-      throttle: 1000, // todo: only apply this for changes: unbounce rate in ms before calling the spellcheck service
+      throttle: 1000, // unbounce rate in ms before calling the spellcheck service after changes
       removeOnCorrection: true, // remove highlights after a change if the cursor is inside a highlight
-      markerNode: $('<span class="spellcheck"></span>')[0],
+      markerNode: $('<span class="spellcheck"></span>'),
       spellcheckService: undefined
     };
 
@@ -67,7 +67,7 @@ var Spellcheck = (function() {
 
   Spellcheck.prototype.onChange = function(editableHost) {
     if (this.config.checkOnChange) {
-      this.editableHasChanged(editableHost);
+      this.editableHasChanged(editableHost, this.config.throttle);
     }
     if (this.config.removeOnCorrection) {
       this.removeHighlightsAtCursor(editableHost);
@@ -147,7 +147,7 @@ var Spellcheck = (function() {
     }
   };
 
-  Spellcheck.prototype.editableHasChanged = function(editableHost) {
+  Spellcheck.prototype.editableHasChanged = function(editableHost, throttle) {
     if (this.timeoutId && this.currentEditableHost === editableHost) {
       clearTimeout(this.timeoutId);
     }
@@ -157,7 +157,7 @@ var Spellcheck = (function() {
       that.checkSpelling(editableHost);
       that.currentEditableHost = undefined;
       that.timeoutId = undefined;
-    }, this.config.throttle);
+    }, throttle || 0);
 
     this.currentEditableHost = editableHost;
   };
