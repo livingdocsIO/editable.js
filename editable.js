@@ -5637,7 +5637,7 @@ var highlightText = (function() {
         return;
       }
 
-      var next, textNode, length, offset, isFirstPortion, isLastPortion;
+      var next, textNode, length, offset, isFirstPortion, isLastPortion, wordId;
       var currentMatchIndex = 0;
       var currentMatch = matches[currentMatchIndex];
       var totalOffset = 0;
@@ -5663,6 +5663,7 @@ var highlightText = (function() {
           isFirstPortion = isLastPortion = false;
           if (totalOffset <= currentMatch.startIndex) {
             isFirstPortion = true;
+            wordId = currentMatch.startIndex;
           }
           if (nodeEndOffset >= currentMatch.endIndex) {
             isLastPortion = true;
@@ -5687,7 +5688,8 @@ var highlightText = (function() {
             text: nodeText.substring(offset, offset + length),
             offset: offset,
             length: length,
-            isLastPortion: isLastPortion
+            isLastPortion: isLastPortion,
+            wordId: wordId
           };
 
           portions.push(portion);
@@ -5733,6 +5735,7 @@ var highlightText = (function() {
       range.setStart(portion.element, portion.offset);
       range.setEnd(portion.element, portion.offset + portion.length);
       var node = stencilElement.cloneNode(true);
+      node.setAttribute('data-word-id', portion.wordId);
       range.surroundContents(node);
 
       // Fix a weird behaviour where an empty text node is inserted after the range
@@ -6846,6 +6849,12 @@ var Spellcheck = (function() {
 
   Spellcheck.prototype.onChange = function(editableHost) {
     this.editableHasChanged(editableHost);
+    this.removeHighlightsAtCursor(editableHost);
+
+    // var self = this;
+    // setTimeout(function() {
+    //   self.removeHighlightsAtCursor(editableHost);
+    // }, 0);
   };
 
   Spellcheck.prototype.prepareMarkerNode = function() {
@@ -6865,6 +6874,34 @@ var Spellcheck = (function() {
     $(editableHost).find('[data-spellcheck=spellcheck]').each(function(index, elem) {
       content.unwrap(elem);
     });
+  };
+
+  Spellcheck.prototype.removeHighlightsAtCursor = function(editableHost) {
+    var wordId;
+    var selection = this.editable.getSelection(editableHost);
+    if (selection && selection.isCursor) {
+      var elementAtCursor = selection.range.startContainer;
+      if (elementAtCursor.nodeType === nodeType.textNode) {
+        elementAtCursor = elementAtCursor.parentNode;
+        if (elementAtCursor === editableHost) return;
+      }
+
+      do {
+        if (elementAtCursor === editableHost) return;
+        if ( elementAtCursor.hasAttribute('data-word-id') ) {
+          wordId = elementAtCursor.getAttribute('data-word-id');
+          break;
+        }
+      } while ( (elementAtCursor = elementAtCursor.parentNode) );
+
+      if (wordId) {
+        selection.retainVisibleSelection(function() {
+          $(editableHost).find('[data-word-id='+ wordId +']').each(function(index, elem) {
+            content.unwrap(elem);
+          });
+        });
+      }
+    }
   };
 
   Spellcheck.prototype.createRegex = function(words) {
