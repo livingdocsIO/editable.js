@@ -261,5 +261,13 @@ describe('highlightText', function() {
       expect(elem.outerHTML)
         .toEqual('<div>a, <span data-awesome="crazy">b</span> or <span data-awesome="crazy">c</span>, d</div>');
     });
+
+    it('wraps a character after a <br>', function() {
+      var elem = $('<div>a<br>b</div>')[0];
+      var regex = Spellcheck.prototype.createRegex(['b']);
+      highlight(elem, regex);
+      expect(elem.outerHTML)
+        .toEqual('<div>a<br><span data-awesome="crazy">b</span></div>');
+    });
   });
 });

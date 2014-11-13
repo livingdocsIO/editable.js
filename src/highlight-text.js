@@ -49,13 +49,22 @@ var highlightText = (function() {
         return;
       }
 
-      var textNode, length, offset, isFirstPortion, isLastPortion;
+      var next, textNode, length, offset, isFirstPortion, isLastPortion;
       var currentMatchIndex = 0;
       var currentMatch = matches[currentMatchIndex];
       var totalOffset = 0;
       var iterator = new NodeIterator(element);
       var portions = [];
-      while ( (textNode = iterator.getNextTextNode()) ) {
+      while ( (next = iterator.getNext()) ) {
+        if (next.nodeType === nodeType.textNode && next.data !== '') {
+          textNode = next;
+        } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
+          totalOffset = totalOffset + 1;
+          continue;
+        } else {
+          continue;
+        }
+
         var nodeText = textNode.data;
         var nodeEndOffset = totalOffset + nodeText.length;
         if (nodeEndOffset > currentMatch.startIndex && totalOffset < currentMatch.endIndex) {
