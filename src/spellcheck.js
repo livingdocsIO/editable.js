@@ -66,11 +66,12 @@ var Spellcheck = (function() {
 
   Spellcheck.prototype.onChange = function(editableHost) {
     this.editableHasChanged(editableHost);
+    this.removeHighlightsAtCursor(editableHost);
 
-    var that = this;
-    setTimeout(function() {
-      that.removeHighlightsAtCursor(editableHost);
-    }, 0);
+    // var self = this;
+    // setTimeout(function() {
+    //   self.removeHighlightsAtCursor(editableHost);
+    // }, 0);
   };
 
   Spellcheck.prototype.prepareMarkerNode = function() {
@@ -93,22 +94,30 @@ var Spellcheck = (function() {
   };
 
   Spellcheck.prototype.removeHighlightsAtCursor = function(editableHost) {
+    var wordId;
     var selection = this.editable.getSelection(editableHost);
     if (selection && selection.isCursor) {
-      selection.retainVisibleSelection(function() {
-        var elementAtCursor = selection.range.startContainer;
-        if (elementAtCursor.nodeType === nodeType.textNode) {
-          elementAtCursor = elementAtCursor.parentNode;
-          if (elementAtCursor === editableHost) return;
-        }
+      var elementAtCursor = selection.range.startContainer;
+      if (elementAtCursor.nodeType === nodeType.textNode) {
+        elementAtCursor = elementAtCursor.parentNode;
+        if (elementAtCursor === editableHost) return;
+      }
 
-        var $highlight = $(elementAtCursor).closest('[data-spellcheck=spellcheck]');
-        var wordId = $highlight.data('word-id');
-        console.log(wordId);
-        $(editableHost).find('[data-word-id='+ wordId +']').each(function(index, elem) {
-          content.unwrap(elem);
+      do {
+        if (elementAtCursor === editableHost) return;
+        if ( elementAtCursor.hasAttribute('data-word-id') ) {
+          wordId = elementAtCursor.getAttribute('data-word-id');
+          break;
+        }
+      } while ( (elementAtCursor = elementAtCursor.parentNode) );
+
+      if (wordId) {
+        selection.retainVisibleSelection(function() {
+          $(editableHost).find('[data-word-id='+ wordId +']').each(function(index, elem) {
+            content.unwrap(elem);
+          });
         });
-      });
+      }
     }
   };
 
