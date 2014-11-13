@@ -2,13 +2,29 @@ var highlightText = (function() {
 
   return {
     extractText: function(element) {
-      var textNode;
       var text = '';
-      var iterator = new NodeIterator(element);
-      while ( (textNode = iterator.getNextTextNode()) ) {
-        text = text + textNode.data;
-      }
+      this.getText(element, function(part) {
+        text += part;
+      });
       return text;
+    },
+
+    // Extract the text of an element.
+    // This has two notable behaviours:
+    // - It uses a NodeIterator which will skip elements
+    //   with data-editable="remove"
+    // - It returns a space for <br> elements
+    //   (The only block level element allowed inside of editables)
+    getText: function(element, callback) {
+      var iterator = new NodeIterator(element);
+      var next;
+      while ( (next = iterator.getNext()) ) {
+        if (next.nodeType === nodeType.textNode && next.data !== '') {
+          callback(next.data);
+        } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
+          callback(' ');
+        }
+      }
     },
 
     highlight: function(element, regex, stencilElement) {

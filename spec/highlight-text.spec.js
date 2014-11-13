@@ -64,6 +64,12 @@ describe('highlightText', function() {
       expect(text).toEqual('ab');
     });
 
+    it('extracts text with a <br> properly', function() {
+      this.element = $('<div>a<br>b</div>')[0];
+      var text = highlightText.extractText(this.element);
+      expect(text).toEqual('a b');
+    });
+
   });
 
   describe('minimal case', function() {
