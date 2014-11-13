@@ -131,6 +131,8 @@ var Spellcheck = (function() {
   Spellcheck.prototype.checkSpelling = function(editableHost) {
     var that = this;
     var text = highlightText.extractText(editableHost);
+    text = content.normalizeWhitespace(text);
+
     this.config.spellcheckService(text, function(misspelledWords) {
       var selection = that.editable.getSelection(editableHost);
       if (selection) {

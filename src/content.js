@@ -8,6 +8,7 @@ var content = (function() {
 
   var zeroWidthSpace = /\u200B/g;
   var zeroWidthNonBreakingSpace = /\uFEFF/g;
+  var whitespaceExceptSpace = /[^\S ]/g;
 
   return {
 
@@ -61,6 +62,10 @@ var content = (function() {
         element.removeChild(element.firstChild);
       }
       element.appendChild(fragment);
+    },
+
+    normalizeWhitespace: function(text) {
+      return text.replace(whitespaceExceptSpace, ' ');
     },
 
     /**
