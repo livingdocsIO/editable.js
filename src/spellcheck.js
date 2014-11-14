@@ -28,11 +28,12 @@ var Spellcheck = (function() {
    */
   var Spellcheck = function(editable, configuration) {
     var defaultConfig = {
-      checkOnChange: true,
-      checkOnFocus: false,
-      spellcheckService: undefined,
-      markerNode: $('<span class="spellcheck"></span>')[0],
-      throttle: 1000 // delay after changes stop before calling the spellcheck service
+      checkOnFocus: false, // check on focus
+      checkOnChange: true, // check after changes
+      throttle: 1000, // unbounce rate in ms before calling the spellcheck service after changes
+      removeOnCorrection: true, // remove highlights after a change if the cursor is inside a highlight
+      markerNode: $('<span class="spellcheck"></span>'),
+      spellcheckService: undefined
     };
 
     this.config = $.extend(defaultConfig, configuration);
@@ -46,7 +47,7 @@ var Spellcheck = (function() {
       this.editable.on('focus', $.proxy(this, 'onFocus'));
       this.editable.on('blur', $.proxy(this, 'onBlur'));
     }
-    if (this.config.checkOnChange) {
+    if (this.config.checkOnChange || this.config.removeOnCorrection) {
       this.editable.on('change', $.proxy(this, 'onChange'));
     }
   };
@@ -65,7 +66,12 @@ var Spellcheck = (function() {
   };
 
   Spellcheck.prototype.onChange = function(editableHost) {
-    this.editableHasChanged(editableHost);
+    if (this.config.checkOnChange) {
+      this.editableHasChanged(editableHost, this.config.throttle);
+    }
+    if (this.config.removeOnCorrection) {
+      this.removeHighlightsAtCursor(editableHost);
+    }
   };
 
   Spellcheck.prototype.prepareMarkerNode = function() {
@@ -85,6 +91,33 @@ var Spellcheck = (function() {
     $(editableHost).find('[data-spellcheck=spellcheck]').each(function(index, elem) {
       content.unwrap(elem);
     });
+  };
+
+  Spellcheck.prototype.removeHighlightsAtCursor = function(editableHost) {
+    var wordId;
+    var selection = this.editable.getSelection(editableHost);
+    if (selection && selection.isCursor) {
+      var elementAtCursor = selection.range.startContainer;
+      if (elementAtCursor.nodeType === nodeType.textNode) {
+        elementAtCursor = elementAtCursor.parentNode;
+      }
+
+      do {
+        if (elementAtCursor === editableHost) return;
+        if ( elementAtCursor.hasAttribute('data-word-id') ) {
+          wordId = elementAtCursor.getAttribute('data-word-id');
+          break;
+        }
+      } while ( (elementAtCursor = elementAtCursor.parentNode) );
+
+      if (wordId) {
+        selection.retainVisibleSelection(function() {
+          $(editableHost).find('[data-word-id='+ wordId +']').each(function(index, elem) {
+            content.unwrap(elem);
+          });
+        });
+      }
+    }
   };
 
   Spellcheck.prototype.createRegex = function(words) {
@@ -113,7 +146,7 @@ var Spellcheck = (function() {
     }
   };
 
-  Spellcheck.prototype.editableHasChanged = function(editableHost) {
+  Spellcheck.prototype.editableHasChanged = function(editableHost, throttle) {
     if (this.timeoutId && this.currentEditableHost === editableHost) {
       clearTimeout(this.timeoutId);
     }
@@ -123,7 +156,7 @@ var Spellcheck = (function() {
       that.checkSpelling(editableHost);
       that.currentEditableHost = undefined;
       that.timeoutId = undefined;
-    }, this.config.throttle);
+    }, throttle || 0);
 
     this.currentEditableHost = editableHost;
   };

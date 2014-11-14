@@ -1,5 +1,16 @@
 describe('Spellcheck', function() {
 
+  // Helpers
+
+  var createCursor = function(host, elem, offset) {
+    var range = rangy.createRange();
+    range.setStart(elem, offset);
+    range.setEnd(elem, offset);
+    return new Cursor(host, range);
+  };
+
+  // Specs
+
   beforeEach(function() {
     this.editable = new Editable();
   });
@@ -90,14 +101,40 @@ describe('Spellcheck', function() {
     });
 
 
-    describe('retains cursor position', function() {
+    describe('removeHighlightsAtCursor()', function() {
 
-      var createCursor = function(host, elem, offset) {
-        var range = rangy.createRange();
-        range.setStart(elem, offset);
-        range.setEnd(elem, offset);
-        return new Cursor(host, range);
-      };
+      beforeEach(function() {
+        this.spellcheck.checkSpelling(this.p);
+        this.highlight = $(this.p).find('.misspelled-word')[0];
+      });
+
+      afterEach(function() {
+        this.editable.getSelection.restore();
+      });
+
+      it('does remove the highlights if cursor is within a match', function() {
+        var self = this;
+        sinon.stub(this.editable, 'getSelection', function() {
+          return createCursor(self.p, self.highlight, 0);
+        });
+
+        this.spellcheck.removeHighlightsAtCursor(this.p);
+        expect( $(this.p).find('.misspelled-word').length ).toEqual(0);
+      });
+
+      it('does not remove the highlights if cursor is outside a match', function() {
+        var self = this;
+        sinon.stub(this.editable, 'getSelection', function() {
+          return createCursor(self.p, self.p.firstChild, 0);
+        });
+
+        this.spellcheck.removeHighlightsAtCursor(this.p);
+        expect( $(this.p).find('.misspelled-word').length ).toEqual(1);
+      });
+    });
+
+
+    describe('retains cursor position', function() {
 
       it('in the middle of a text node', function() {
         var cursor = createCursor(this.p, this.p.firstChild, 4);
