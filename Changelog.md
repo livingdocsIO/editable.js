@@ -1,8 +1,13 @@
 # v0.4.2
 
+#### Features
+
+- Remove highlights at cursor on corrections [#88](https://github.com/upfrontIO/editable.js/pull/88)
+
 #### Bugfixes
 
 - Fix spellcheck whitespace handling [#87](https://github.com/upfrontIO/editable.js/pull/87)
+
 
 # v0.4.1
 
