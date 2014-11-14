@@ -14,8 +14,7 @@
 
   editable.setupSpellcheck({
     spellcheckService: spellcheckService,
-    markerNode: $('<span class="spellcheck"></span>'),
-    throttle: 1000
+    markerNode: $('<span class="spellcheck"></span>')
   });
 
 

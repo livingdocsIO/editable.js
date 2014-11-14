@@ -52,6 +52,24 @@ describe('Content', function() {
     });
   });
 
+  describe('normalizeWhitespace()', function() {
+
+    beforeEach(function() {
+      this.element = $('<div></div>')[0];
+    });
+
+    it('replaces whitespace with spaces', function() {
+      this.element.innerHTML = '&nbsp; \ufeff';
+      var text = this.element.textContent;
+
+      // Check that textContent works as expected
+      expect(text).toEqual('\u00A0 \ufeff');
+
+      text = content.normalizeWhitespace(text);
+      expect(text).toEqual('   '); // Check for three spaces
+    });
+
+  });
 
   describe('getInnerTags()', function() {
 

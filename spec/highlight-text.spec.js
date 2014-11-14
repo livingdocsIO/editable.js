@@ -15,7 +15,7 @@ describe('highlightText', function() {
   };
 
   var highlight = function(elem, regex, stencil) {
-    if (!stencil) stencil = $('<span data-awesome="crazy">')[0];
+    if (!stencil) stencil = $('<span spellcheck="true">')[0];
     highlightText.highlight(elem, regex, stencil);
   };
 
@@ -24,6 +24,18 @@ describe('highlightText', function() {
     range.setStart(elem, offset);
     range.setEnd(elem, offset);
     return new Cursor(host, range);
+  };
+
+  // A word-id is stored on matches so that
+  // spans belonging to the same match can be identified.
+  // But this is not of interest in many tests,
+  // and this is where this helper comes in.
+  var removeWordId = function(elem) {
+    $(elem).find('[data-word-id]').removeAttr('data-word-id');
+  };
+
+  var removeSpellcheckAttr = function(elem) {
+    $(elem).find('[spellcheck]').removeAttr('spellcheck');
   };
 
   describe('extractText()', function() {
@@ -62,6 +74,12 @@ describe('highlightText', function() {
       cursor.save();
       var text = highlightText.extractText(this.element);
       expect(text).toEqual('ab');
+    });
+
+    it('extracts text with a <br> properly', function() {
+      this.element = $('<div>a<br>b</div>')[0];
+      var text = highlightText.extractText(this.element);
+      expect(text).toEqual('a b');
     });
 
   });
@@ -200,34 +218,39 @@ describe('highlightText', function() {
     it('wraps a word in a single text node', function() {
       var elem = $('<div>Some juice.</div>')[0];
       highlight(elem, /juice/g);
+      removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div>Some <span data-awesome="crazy">juice</span>.</div>')
+        .toEqual('<div>Some <span spellcheck="true">juice</span>.</div>')
     });
 
     it('wraps a word with a partial <em> element', function() {
       var elem = $('<div>Some jui<em>ce.</em></div>')[0];
       highlight(elem, /juice/g);
+      removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div>Some <span data-awesome="crazy">jui</span><em><span data-awesome="crazy">ce</span>.</em></div>')
+        .toEqual('<div>Some <span spellcheck="true">jui</span><em><span spellcheck="true">ce</span>.</em></div>')
     });
 
     it('wraps two words in the same text node', function() {
       var elem = $('<div>a or b</div>')[0];
       highlight(elem, /a|b/g);
+      removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div><span data-awesome="crazy">a</span> or <span data-awesome="crazy">b</span></div>')
+        .toEqual('<div><span spellcheck="true">a</span> or <span spellcheck="true">b</span></div>')
     });
 
     it('wraps a word in a <em> element', function() {
       var elem = $('<div><em>word</em></div>')[0];
       highlight(elem, /word/g);
+      removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div><em><span data-awesome="crazy">word</span></em></div>')
+        .toEqual('<div><em><span spellcheck="true">word</span></em></div>')
     });
 
     it('can handle a non-match', function() {
       var elem = $('<div><em>word</em></div>')[0];
       highlight(elem, /xxx/g);
+      removeWordId(elem);
       expect(elem.outerHTML)
         .toEqual('<div><em>word</em></div>')
     });
@@ -236,24 +259,63 @@ describe('highlightText', function() {
       var elem = $('<div><em>a</em> or b</div>')[0];
       var regex = Spellcheck.prototype.createRegex(['b', 'a']);
       highlight(elem, regex);
+      removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div><em><span data-awesome="crazy">a</span></em> or <span data-awesome="crazy">b</span></div>');
+        .toEqual('<div><em><span spellcheck="true">a</span></em> or <span spellcheck="true">b</span></div>');
     });
 
     it('wraps two words with a tag in between', function() {
       var elem = $('<div>A word <em>is</em> not necessary</div>')[0];
       var regex = Spellcheck.prototype.createRegex(['word', 'not']);
       highlight(elem, regex);
+      removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div>A <span data-awesome="crazy">word</span> <em>is</em> <span data-awesome="crazy">not</span> necessary</div>');
+        .toEqual('<div>A <span spellcheck="true">word</span> <em>is</em> <span spellcheck="true">not</span> necessary</div>');
     });
 
     it('wraps two characters in the same textnode, when the first match has an offset', function() {
       var elem = $('<div>a, b or c, d</div>')[0];
       var regex = Spellcheck.prototype.createRegex(['b', 'c']);
       highlight(elem, regex);
+      removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div>a, <span data-awesome="crazy">b</span> or <span data-awesome="crazy">c</span>, d</div>');
+        .toEqual('<div>a, <span spellcheck="true">b</span> or <span spellcheck="true">c</span>, d</div>');
+    });
+
+    it('wraps a character after a <br>', function() {
+      var elem = $('<div>a<br>b</div>')[0];
+      var regex = Spellcheck.prototype.createRegex(['b']);
+      highlight(elem, regex);
+      removeWordId(elem);
+      expect(elem.outerHTML)
+        .toEqual('<div>a<br><span spellcheck="true">b</span></div>');
+    });
+
+    it('stores data-word-id on a highlight', function() {
+      var elem = $('<div>a</div>')[0];
+      var regex = Spellcheck.prototype.createRegex(['a']);
+      highlight(elem, regex);
+      removeSpellcheckAttr(elem);
+      expect(elem.outerHTML)
+        .toEqual('<div><span data-word-id="0">a</span></div>');
+    });
+
+    it('stores data-word-id on different matches', function() {
+      var elem = $('<div>a b</div>')[0];
+      var regex = Spellcheck.prototype.createRegex(['a', 'b']);
+      highlight(elem, regex);
+      removeSpellcheckAttr(elem);
+      expect(elem.outerHTML)
+        .toEqual('<div><span data-word-id="0">a</span> <span data-word-id="2">b</span></div>');
+    });
+
+    it('stores same data-word-id on multiple highlights for the same match', function() {
+      var elem = $('<div>a<i>b</i></div>')[0];
+      var regex = Spellcheck.prototype.createRegex(['ab']);
+      highlight(elem, regex);
+      removeSpellcheckAttr(elem);
+      expect(elem.outerHTML)
+        .toEqual('<div><span data-word-id="0">a</span><i><span data-word-id="0">b</span></i></div>');
     });
   });
 });

@@ -2,13 +2,29 @@ var highlightText = (function() {
 
   return {
     extractText: function(element) {
-      var textNode;
       var text = '';
-      var iterator = new NodeIterator(element);
-      while ( (textNode = iterator.getNextTextNode()) ) {
-        text = text + textNode.data;
-      }
+      this.getText(element, function(part) {
+        text += part;
+      });
       return text;
+    },
+
+    // Extract the text of an element.
+    // This has two notable behaviours:
+    // - It uses a NodeIterator which will skip elements
+    //   with data-editable="remove"
+    // - It returns a space for <br> elements
+    //   (The only block level element allowed inside of editables)
+    getText: function(element, callback) {
+      var iterator = new NodeIterator(element);
+      var next;
+      while ( (next = iterator.getNext()) ) {
+        if (next.nodeType === nodeType.textNode && next.data !== '') {
+          callback(next.data);
+        } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
+          callback(' ');
+        }
+      }
     },
 
     highlight: function(element, regex, stencilElement) {
@@ -33,21 +49,33 @@ var highlightText = (function() {
         return;
       }
 
-      var textNode, length, offset, isFirstPortion, isLastPortion;
+      var next, textNode, length, offset, isFirstPortion, isLastPortion, wordId;
       var currentMatchIndex = 0;
       var currentMatch = matches[currentMatchIndex];
       var totalOffset = 0;
       var iterator = new NodeIterator(element);
       var portions = [];
-      while ( (textNode = iterator.getNextTextNode()) ) {
+      while ( (next = iterator.getNext()) ) {
+
+        // Account for <br> elements
+        if (next.nodeType === nodeType.textNode && next.data !== '') {
+          textNode = next;
+        } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
+          totalOffset = totalOffset + 1;
+          continue;
+        } else {
+          continue;
+        }
+
         var nodeText = textNode.data;
         var nodeEndOffset = totalOffset + nodeText.length;
-        if (nodeEndOffset > currentMatch.startIndex && totalOffset < currentMatch.endIndex) {
+        if (currentMatch.startIndex < nodeEndOffset && totalOffset < currentMatch.endIndex) {
 
-          // get portion position
+          // get portion position (fist, last or in the middle)
           isFirstPortion = isLastPortion = false;
           if (totalOffset <= currentMatch.startIndex) {
             isFirstPortion = true;
+            wordId = currentMatch.startIndex;
           }
           if (nodeEndOffset >= currentMatch.endIndex) {
             isLastPortion = true;
@@ -63,16 +91,17 @@ var highlightText = (function() {
           if (isLastPortion) {
             length = (currentMatch.endIndex - totalOffset) - offset;
           } else {
-            length = textNode.data.length - offset;
+            length = nodeText.length - offset;
           }
 
           // create portion object
           var portion = {
             element: textNode,
-            text: textNode.data.substring(offset, offset + length),
+            text: nodeText.substring(offset, offset + length),
             offset: offset,
             length: length,
-            isLastPortion: isLastPortion
+            isLastPortion: isLastPortion,
+            wordId: wordId
           };
 
           portions.push(portion);
@@ -118,6 +147,7 @@ var highlightText = (function() {
       range.setStart(portion.element, portion.offset);
       range.setEnd(portion.element, portion.offset + portion.length);
       var node = stencilElement.cloneNode(true);
+      node.setAttribute('data-word-id', portion.wordId);
       range.surroundContents(node);
 
       // Fix a weird behaviour where an empty text node is inserted after the range

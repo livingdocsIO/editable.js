@@ -4128,6 +4128,7 @@ var content = (function() {
 
   var zeroWidthSpace = /\u200B/g;
   var zeroWidthNonBreakingSpace = /\uFEFF/g;
+  var whitespaceExceptSpace = /[^\S ]/g;
 
   return {
 
@@ -4181,6 +4182,10 @@ var content = (function() {
         element.removeChild(element.firstChild);
       }
       element.appendChild(fragment);
+    },
+
+    normalizeWhitespace: function(text) {
+      return text.replace(whitespaceExceptSpace, ' ');
     },
 
     /**
@@ -5585,13 +5590,29 @@ var highlightText = (function() {
 
   return {
     extractText: function(element) {
-      var textNode;
       var text = '';
-      var iterator = new NodeIterator(element);
-      while ( (textNode = iterator.getNextTextNode()) ) {
-        text = text + textNode.data;
-      }
+      this.getText(element, function(part) {
+        text += part;
+      });
       return text;
+    },
+
+    // Extract the text of an element.
+    // This has two notable behaviours:
+    // - It uses a NodeIterator which will skip elements
+    //   with data-editable="remove"
+    // - It returns a space for <br> elements
+    //   (The only block level element allowed inside of editables)
+    getText: function(element, callback) {
+      var iterator = new NodeIterator(element);
+      var next;
+      while ( (next = iterator.getNext()) ) {
+        if (next.nodeType === nodeType.textNode && next.data !== '') {
+          callback(next.data);
+        } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
+          callback(' ');
+        }
+      }
     },
 
     highlight: function(element, regex, stencilElement) {
@@ -5616,21 +5637,33 @@ var highlightText = (function() {
         return;
       }
 
-      var textNode, length, offset, isFirstPortion, isLastPortion;
+      var next, textNode, length, offset, isFirstPortion, isLastPortion, wordId;
       var currentMatchIndex = 0;
       var currentMatch = matches[currentMatchIndex];
       var totalOffset = 0;
       var iterator = new NodeIterator(element);
       var portions = [];
-      while ( (textNode = iterator.getNextTextNode()) ) {
+      while ( (next = iterator.getNext()) ) {
+
+        // Account for <br> elements
+        if (next.nodeType === nodeType.textNode && next.data !== '') {
+          textNode = next;
+        } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
+          totalOffset = totalOffset + 1;
+          continue;
+        } else {
+          continue;
+        }
+
         var nodeText = textNode.data;
         var nodeEndOffset = totalOffset + nodeText.length;
-        if (nodeEndOffset > currentMatch.startIndex && totalOffset < currentMatch.endIndex) {
+        if (currentMatch.startIndex < nodeEndOffset && totalOffset < currentMatch.endIndex) {
 
-          // get portion position
+          // get portion position (fist, last or in the middle)
           isFirstPortion = isLastPortion = false;
           if (totalOffset <= currentMatch.startIndex) {
             isFirstPortion = true;
+            wordId = currentMatch.startIndex;
           }
           if (nodeEndOffset >= currentMatch.endIndex) {
             isLastPortion = true;
@@ -5646,16 +5679,17 @@ var highlightText = (function() {
           if (isLastPortion) {
             length = (currentMatch.endIndex - totalOffset) - offset;
           } else {
-            length = textNode.data.length - offset;
+            length = nodeText.length - offset;
           }
 
           // create portion object
           var portion = {
             element: textNode,
-            text: textNode.data.substring(offset, offset + length),
+            text: nodeText.substring(offset, offset + length),
             offset: offset,
             length: length,
-            isLastPortion: isLastPortion
+            isLastPortion: isLastPortion,
+            wordId: wordId
           };
 
           portions.push(portion);
@@ -5701,6 +5735,7 @@ var highlightText = (function() {
       range.setStart(portion.element, portion.offset);
       range.setEnd(portion.element, portion.offset + portion.length);
       var node = stencilElement.cloneNode(true);
+      node.setAttribute('data-word-id', portion.wordId);
       range.surroundContents(node);
 
       // Fix a weird behaviour where an empty text node is inserted after the range
@@ -6776,11 +6811,12 @@ var Spellcheck = (function() {
    */
   var Spellcheck = function(editable, configuration) {
     var defaultConfig = {
-      checkOnChange: true,
-      checkOnFocus: false,
-      spellcheckService: undefined,
-      markerNode: $('<span class="spellcheck"></span>')[0],
-      throttle: 1000 // delay after changes stop before calling the spellcheck service
+      checkOnFocus: false, // check on focus
+      checkOnChange: true, // check after changes
+      throttle: 1000, // unbounce rate in ms before calling the spellcheck service after changes
+      removeOnCorrection: true, // remove highlights after a change if the cursor is inside a highlight
+      markerNode: $('<span class="spellcheck"></span>'),
+      spellcheckService: undefined
     };
 
     this.config = $.extend(defaultConfig, configuration);
@@ -6794,7 +6830,7 @@ var Spellcheck = (function() {
       this.editable.on('focus', $.proxy(this, 'onFocus'));
       this.editable.on('blur', $.proxy(this, 'onBlur'));
     }
-    if (this.config.checkOnChange) {
+    if (this.config.checkOnChange || this.config.removeOnCorrection) {
       this.editable.on('change', $.proxy(this, 'onChange'));
     }
   };
@@ -6813,7 +6849,12 @@ var Spellcheck = (function() {
   };
 
   Spellcheck.prototype.onChange = function(editableHost) {
-    this.editableHasChanged(editableHost);
+    if (this.config.checkOnChange) {
+      this.editableHasChanged(editableHost, this.config.throttle);
+    }
+    if (this.config.removeOnCorrection) {
+      this.removeHighlightsAtCursor(editableHost);
+    }
   };
 
   Spellcheck.prototype.prepareMarkerNode = function() {
@@ -6833,6 +6874,33 @@ var Spellcheck = (function() {
     $(editableHost).find('[data-spellcheck=spellcheck]').each(function(index, elem) {
       content.unwrap(elem);
     });
+  };
+
+  Spellcheck.prototype.removeHighlightsAtCursor = function(editableHost) {
+    var wordId;
+    var selection = this.editable.getSelection(editableHost);
+    if (selection && selection.isCursor) {
+      var elementAtCursor = selection.range.startContainer;
+      if (elementAtCursor.nodeType === nodeType.textNode) {
+        elementAtCursor = elementAtCursor.parentNode;
+      }
+
+      do {
+        if (elementAtCursor === editableHost) return;
+        if ( elementAtCursor.hasAttribute('data-word-id') ) {
+          wordId = elementAtCursor.getAttribute('data-word-id');
+          break;
+        }
+      } while ( (elementAtCursor = elementAtCursor.parentNode) );
+
+      if (wordId) {
+        selection.retainVisibleSelection(function() {
+          $(editableHost).find('[data-word-id='+ wordId +']').each(function(index, elem) {
+            content.unwrap(elem);
+          });
+        });
+      }
+    }
   };
 
   Spellcheck.prototype.createRegex = function(words) {
@@ -6861,7 +6929,7 @@ var Spellcheck = (function() {
     }
   };
 
-  Spellcheck.prototype.editableHasChanged = function(editableHost) {
+  Spellcheck.prototype.editableHasChanged = function(editableHost, throttle) {
     if (this.timeoutId && this.currentEditableHost === editableHost) {
       clearTimeout(this.timeoutId);
     }
@@ -6871,7 +6939,7 @@ var Spellcheck = (function() {
       that.checkSpelling(editableHost);
       that.currentEditableHost = undefined;
       that.timeoutId = undefined;
-    }, this.config.throttle);
+    }, throttle || 0);
 
     this.currentEditableHost = editableHost;
   };
@@ -6879,6 +6947,8 @@ var Spellcheck = (function() {
   Spellcheck.prototype.checkSpelling = function(editableHost) {
     var that = this;
     var text = highlightText.extractText(editableHost);
+    text = content.normalizeWhitespace(text);
+
     this.config.spellcheckService(text, function(misspelledWords) {
       var selection = that.editable.getSelection(editableHost);
       if (selection) {
