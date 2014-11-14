@@ -100,7 +100,6 @@ var Spellcheck = (function() {
       var elementAtCursor = selection.range.startContainer;
       if (elementAtCursor.nodeType === nodeType.textNode) {
         elementAtCursor = elementAtCursor.parentNode;
-        if (elementAtCursor === editableHost) return;
       }
 
       do {
