@@ -1,3 +1,10 @@
+# v0.4.3
+
+#### Improvements
+
+- Remove vendor files from repo, update dependencies [#90](https://github.com/upfrontIO/editable.js/pull/90)
+
+
 # v0.4.2
 
 #### Features
