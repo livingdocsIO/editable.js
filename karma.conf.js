@@ -15,12 +15,12 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       // test helpers
-      'vendor/sinon-*.js',
+      'bower_components/sinon/index.js',
 
       // vendor files
-      'vendor/jquery-*.js',
-      'vendor/rangy-1.2.3/rangy-core.js',
-      'vendor/bowser.js',
+      'bower_components/jquery/jquery.js',
+      'bower_components/rangy/rangy-core.js',
+      'bower_components/bowser/bowser.js',
 
       // source files
       '.tmp/editable-test.js',

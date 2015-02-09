@@ -94,8 +94,8 @@ module.exports = function(grunt) {
       dist: {
         files: {
           'editable.js': [
-            'vendor/rangy-1.2.3/rangy-core.js',
-            'vendor/bowser.js',
+            'bower_components/rangy/rangy-core.js',
+            'bower_components/bowser/bowser.js',
             '.tmp/editable.js'
           ]
         }
