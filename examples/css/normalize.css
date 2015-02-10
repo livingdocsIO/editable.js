@@ -206,9 +206,12 @@ mark {
  * Address margins set differently in IE 6/7.
  */
 
-p,
-pre {
+p {
     margin: 1em 0;
+}
+
+pre {
+    margin: 0;
 }
 
 /**

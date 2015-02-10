@@ -70,32 +70,113 @@ fieldset {
     padding: 0;
 }
 
-/*
- * Allow only vertical resizing of textareas.
- */
+/* ==========================================================================
+   Typo
+   ========================================================================== */
 
-textarea {
-    resize: vertical;
+html {
+    background-color: #f4f7f9;
+}
+
+.logo-section {
+    padding: 4em 0;
+    /*background-color: #2b414d;*/
+}
+
+.logo {
+    max-width: 800px;
+    margin: 0 auto;
+
+    text-align: center;
+    /* text on yellow*/
+    /*color: #fffce1;*/
+    color: #fff;
+}
+
+.square {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+
+    /* yellow */
+    background: #efc75e;
+}
+
+.logo h1 {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: .2em .5em;
+}
+
+.logo h2 {
+    margin-top: .5em;
+    font-weight: 400;
+    color: rgba(255, 255, 255, .5);
+    color: rgba(0, 0, 0, 0.6);
+}
+
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+
+section {
+    padding: 2em 0;
+}
+
+.section-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.section-dark {
+    background-color: #2b414d;
 }
 
 /* ==========================================================================
-   Chrome Frame prompt
+   Example Blocks
    ========================================================================== */
 
-.chromeframe {
-    margin: 0.2em 0;
-    background: #ccc;
-    color: #000;
-    padding: 0.2em 0;
+
+
+.example-title {
+    font-size: 2rem;
+    color: rgba(0, 0, 0, 0.9);
 }
 
-/* ==========================================================================
-   Author's custom styles
-   ========================================================================== */
+.example-sheet {
+    padding: 1em 2em;
 
+    font-size: 1.5rem;
+    border: 1px solid #eee;
+    background-color: #fff;
+}
+
+.block-outline {
+
+}
+
+.code-example {
+    margin: 1rem 0;
+    font-size: 1.3rem;
+}
+
+.code-example pre {
+    border: 1px solid #eee;
+}
+
+.code-example h3 {
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 0.75);
+    margin: 0;
+}
+
+/* old stuff */
 
 article {
-    width: 660px;
+    max-width: 660px;
     margin: 0 auto;
 }
 
@@ -108,6 +189,11 @@ article {
     height: 500px;
 }
 
+
+/* ==========================================================================
+   Tooltip
+   ========================================================================== */
+
 .selection-tip {
     position: absolute;
     color: #eee;
@@ -116,114 +202,103 @@ article {
     border-radius: 5px;
 }
 
+.selection-tip button {
+    background: none;
+    border: none;
+    padding: 11px 18px 8px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
 
-    .selection-tip:after /* triangle decoration */
-    {
-        width: 0;
-        height: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        border-top: 8px solid #333;
-        content: '';
-        position: absolute;
-        left: 50%;
-        bottom: -8px;
-        margin-left: -8px;
-    }
+.selection-tip button:last-child {
+    border-right: none;
+}
 
-        .selection-tip.top:after
-        {
-            border-top-color: transparent;
-            border-bottom: 8px solid #111;
-            top: -20px;
-            bottom: auto;
-        }
+.selection-tip button:hover {
+    color: #efc75e;
+}
 
-        .selection-tip.left:after
-        {
-            left: 8px;
-            margin: 0;
-        }
 
-        .selection-tip.right:after
-        {
-            right: 8px;
-            left: auto;
-            margin: 0;
-        }
+.selection-tip:after /* triangle decoration */
+{
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #333;
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -8px;
+    margin-left: -8px;
+}
+
+.selection-tip.top:after
+{
+    border-top-color: transparent;
+    border-bottom: 8px solid #111;
+    top: -20px;
+    bottom: auto;
+}
+
+.selection-tip.left:after
+{
+    left: 8px;
+    margin: 0;
+}
+
+.selection-tip.right:after
+{
+    right: 8px;
+    left: auto;
+    margin: 0;
+}
+
+
+
+/* ==========================================================================
+   Spellcheck & Highlight
+   ========================================================================== */
 
 .spellcheck {
-    border-bottom: 2px dotted orange;
+    border-bottom: 2px solid orange;
+}
+
+.highlight {
+    background: #ecbc3f;
+    color: #fff;
+    border-radius: 10px;
+    padding: 1px 5px;
 }
 
 /* ==========================================================================
-   Helper classes
+   iFrame
    ========================================================================== */
 
-/*
- * Image replacement
- */
-
-.ir {
-    background-color: transparent;
-    border: 0;
-    overflow: hidden;
-    /* IE 6/7 fallback */
-    *text-indent: -9999px;
+.iframe-sheet {
+    padding: 1em;
+    border: 1px solid #eee;
+    background-color: #fff;
 }
 
-.ir:before {
-    content: "";
-    display: block;
-    width: 0;
-    height: 150%;
+.iframe-example {
+    width: 100%;
+    min-height: 500px;
+
+    border: 1px solid #ccc;
+    border-top: 1px solid #666;
+    border-left: 1px solid #666;
+    box-sizing: border-box;
+
 }
 
-/*
- * Hide from both screenreaders and browsers: h5bp.com/u
- */
 
-.hidden {
-    display: none !important;
-    visibility: hidden;
-}
+/* ==========================================================================
+   Helpers
+   ========================================================================== */
 
-/*
- * Hide only visually, but have it available for screenreaders: h5bp.com/v
- */
-
-.visuallyhidden {
-    border: 0;
-    clip: rect(0 0 0 0);
-    height: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-    width: 1px;
-}
-
-/*
- * Extends the .visuallyhidden class to allow the element to be focusable
- * when navigated to via the keyboard: h5bp.com/p
- */
-
-.visuallyhidden.focusable:active,
-.visuallyhidden.focusable:focus {
-    clip: auto;
-    height: auto;
-    margin: 0;
-    overflow: visible;
-    position: static;
-    width: auto;
-}
-
-/*
- * Hide visually and from screenreaders, but maintain layout
- */
-
-.invisible {
-    visibility: hidden;
+.space-after {
+    margin-bottom: 5em;
 }
 
 /*
@@ -274,74 +349,3 @@ article {
     /* Style adjustments for high resolution devices */
 }
 
-/* ==========================================================================
-   Print styles.
-   Inlined to avoid required HTTP connection: h5bp.com/r
-   ========================================================================== */
-
-@media print {
-    * {
-        background: transparent !important;
-        color: #000 !important; /* Black prints faster: h5bp.com/s */
-        box-shadow: none !important;
-        text-shadow: none !important;
-    }
-
-    a,
-    a:visited {
-        text-decoration: underline;
-    }
-
-    a[href]:after {
-        content: " (" attr(href) ")";
-    }
-
-    abbr[title]:after {
-        content: " (" attr(title) ")";
-    }
-
-    /*
-     * Don't show links for images, or javascript/internal links
-     */
-
-    .ir a:after,
-    a[href^="javascript:"]:after,
-    a[href^="#"]:after {
-        content: "";
-    }
-
-    pre,
-    blockquote {
-        border: 1px solid #999;
-        page-break-inside: avoid;
-    }
-
-    thead {
-        display: table-header-group; /* h5bp.com/t */
-    }
-
-    tr,
-    img {
-        page-break-inside: avoid;
-    }
-
-    img {
-        max-width: 100% !important;
-    }
-
-    @page {
-        margin: 0.5cm;
-    }
-
-    p,
-    h2,
-    h3 {
-        orphans: 3;
-        widows: 3;
-    }
-
-    h2,
-    h3 {
-        page-break-after: avoid;
-    }
-}

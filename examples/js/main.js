@@ -1,20 +1,14 @@
-;(function($) {
+// Paragraph Example
+;(function() {
 
   var editable = new Editable({});
 
 
-  // Spellcheck
-  // ----------
+  // Paragraph
+  // ---------
 
-  var spellcheckService = function(text, callback) {
-    var words = [];
-    words = ['test', 'xxx', 'Lorem', 'dolor', 'ante', 'nunc.'];
-    callback(words);
-  };
-
-  editable.setupSpellcheck({
-    spellcheckService: spellcheckService,
-    markerNode: $('<span class="spellcheck"></span>')
+  $(document).ready(function() {
+    editable.add('.paragraph-example p');
   });
 
 
@@ -24,13 +18,14 @@
   var lastSelection;
   var setupTooltip = function() {
     var tooltip = $('<div class="selection-tip" style="display:none;">' +
-      '<button class="js-format js-format-bold">b</button>' +
-      '<button class="js-format js-format-italic">i</button>' +
-      '<button class="js-format js-format-link">a</button>' +
-      '<button class="js-format js-format-quote">«</button>' +
-      '<button class="js-format js-format-clear">x</button>' +
+      '<button class="js-format js-format-bold"><i class="fa fa-bold"></i></button>' +
+      '<button class="js-format js-format-italic"><i class="fa fa-italic"></i></button>' +
+      '<button class="js-format js-format-link"><i class="fa fa-link"></i></button>' +
+      '<button class="js-format js-format-quote"><i class="fa fa-quote-left"></i></button>' +
+      '<button class="js-format js-format-clear"><i class="fa fa-eraser"></i></button>' +
     '</div>');
     $(document.body).append(tooltip);
+    // tooltip.show().css('top', 100).css('left', 100);
 
     editable.selection(function(el, selection) {
       lastSelection = selection;
@@ -45,7 +40,6 @@
         tooltip.hide();
       }
     }).blur(function(el) {
-      // todo: this should not be necessary here
       tooltip.hide();
     });
 
@@ -53,16 +47,10 @@
   };
 
   var setupTooltipListeners = function() {
+
     // prevent editable from loosing focus
     $(document).on('mousedown', '.js-format', function(event) {
       event.preventDefault();
-    });
-
-    $(document).on('click', '.js-format', function(event) {
-      event.preventDefault();
-      if (!lastSelection.isSelection) {
-        console.log('main.js: got no selection');
-      }
     });
 
     $(document).on('click', '.js-format-bold', function(event) {
@@ -102,25 +90,49 @@
   };
 
   $(document).ready(function() {
-    editable.add('.is-editable');
+    editable.add('.formatting-example p');
     setupTooltip();
   });
 
 
-  // IFrame Setup
+  // Highlighting
   // ------------
 
+  editable.add('.highlighting-example p');
+
+  var highlightService = function(text, callback) {
+    var words = ['happy'];
+    callback(words);
+  };
+
+  editable.setupSpellcheck({
+    spellcheckService: highlightService,
+    markerNode: $('<span class="highlight"></span>')
+  });
+
+
+  // Pasting
+  // -------
+
+  editable.add('.pasting-example p');
+
+
+  // IFrame
+  // ------
+
   $(document).ready(function(){
-    var $iframe = $('.iframe-container iframe');
+    var $iframe = $('.iframe-example');
 
     $iframe.on('load', function() {
       var iframeWindow = $iframe[0].contentWindow;
       var iframeEditable = new Editable({
         window: iframeWindow
       });
-      iframeEditable.add($('.is-editable', $iframe[0].contentDocument.body));
-    });
 
+      var iframeBody = $iframe[0].contentDocument.body;
+      iframeEditable.add( $('.is-editable', iframeBody) );
+    });
   });
 
-})(jQuery);
+})();
+
