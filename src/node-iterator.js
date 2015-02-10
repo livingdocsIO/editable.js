@@ -16,7 +16,7 @@ var NodeIterator = (function() {
         return next;
       }
     }
-  },
+  };
 
   NodeIterator.prototype.getNext = function() {
     var child, n;
