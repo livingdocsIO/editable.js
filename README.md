@@ -114,11 +114,9 @@ Grunt tasks:
 
 ```bash
 # watch and update editable.js and editable-test.js in .tmp/
-# (required for grunt server and running tests)
+# and hands-on browser testing with livereload 
+# (required for running tests)
 grunt dev
-
-# hands-on browser testing with livereload
-grunt server
 
 # run tests with PhantomJS
 grunt test
