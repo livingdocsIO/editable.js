@@ -15,7 +15,7 @@
   // Text Formatting
   // ---------------
 
-  var lastSelection;
+  var currentSelection;
   var setupTooltip = function() {
     var tooltip = $('<div class="selection-tip" style="display:none;">' +
       '<button class="js-format js-format-bold"><i class="fa fa-bold"></i></button>' +
@@ -25,10 +25,9 @@
       '<button class="js-format js-format-clear"><i class="fa fa-eraser"></i></button>' +
     '</div>');
     $(document.body).append(tooltip);
-    // tooltip.show().css('top', 100).css('left', 100);
 
     editable.selection(function(el, selection) {
-      lastSelection = selection;
+      currentSelection = selection;
       if (selection) {
         coords = selection.getCoordinates();
 
@@ -54,39 +53,40 @@
     });
 
     $(document).on('click', '.js-format-bold', function(event) {
-      if (lastSelection.isSelection) {
-        lastSelection.toggleBold();
-        lastSelection.triggerChange();
+      if (currentSelection.isSelection) {
+        currentSelection.toggleBold();
+        currentSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-italic', function(event) {
-      if (lastSelection.isSelection) {
-        lastSelection.toggleEmphasis();
-        lastSelection.triggerChange();
+      if (currentSelection.isSelection) {
+        currentSelection.toggleEmphasis();
+        currentSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-link', function(event) {
-      if (lastSelection.isSelection) {
-        lastSelection.toggleLink('www.upfront.io');
-        lastSelection.triggerChange();
+      if (currentSelection.isSelection) {
+        currentSelection.toggleLink('www.upfront.io');
+        currentSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-quote', function(event) {
-      if (lastSelection.isSelection) {
-        lastSelection.toggleSurround('«', '»');
-        lastSelection.triggerChange();
+      if (currentSelection.isSelection) {
+        currentSelection.toggleSurround('«', '»');
+        currentSelection.triggerChange();
       }
     });
 
     $(document).on('click', '.js-format-clear', function(event) {
-      if (lastSelection.isSelection) {
-        lastSelection.removeFormatting();
-        lastSelection.triggerChange();
+      if (currentSelection.isSelection) {
+        currentSelection.removeFormatting();
+        currentSelection.triggerChange();
       }
     });
+
   };
 
   $(document).ready(function() {
