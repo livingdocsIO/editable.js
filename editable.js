@@ -3522,6 +3522,7 @@ error = function() {
 
 var string = (function() {
 
+  var toString = Object.prototype.toString;
   var htmlCharacters = {
     '&': '&amp;',
     '<': '&lt;',
@@ -5996,7 +5997,7 @@ var NodeIterator = (function() {
         return next;
       }
     }
-  },
+  };
 
   NodeIterator.prototype.getNext = function() {
     var child, n;
@@ -7081,5 +7082,6 @@ var Spellcheck = (function() {
   window.Editable = Editable;
   Editable.parser = parser;
   Editable.content = content;
+  Editable.bowser = bowser;
 
 })(window, document, window.jQuery);

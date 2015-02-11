@@ -1,5 +1,6 @@
 var string = (function() {
 
+  var toString = Object.prototype.toString;
   var htmlCharacters = {
     '&': '&amp;',
     '<': '&lt;',

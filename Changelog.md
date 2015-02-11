@@ -1,3 +1,10 @@
+# v0.4.4
+
+#### Bugfixes
+
+- Fix missing global variable toString in IE [#95](https://github.com/upfrontIO/editable.js/pull/95)
+
+
 # v0.4.3
 
 #### Improvements
