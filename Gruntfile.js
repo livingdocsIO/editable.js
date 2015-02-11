@@ -115,7 +115,7 @@ module.exports = function(grunt) {
     },
     bump: {
       options: {
-        files: ['package.json', 'bower.json'],
+        files: ['package.json', 'bower.json', 'version.json'],
         commitFiles: ['-a'], // '-a' for all files
         pushTo: 'origin'
       }
@@ -123,6 +123,28 @@ module.exports = function(grunt) {
     shell: {
       npm: {
         command: 'npm publish'
+      }
+    },
+    revision: {
+      options: {
+        property: 'git.revision',
+        ref: 'HEAD',
+        short: true
+      }
+    },
+    replace: {
+      revision: {
+        options: {
+          patterns: [
+            {
+              match: /\"revision\": ?\"[a-z0-9]+\"/,
+              replacement: '"revision": "<%= git.revision %>"'
+            }
+          ]
+        },
+        files: {
+          'version.json': ['version.json']
+        }
       }
     }
   });
@@ -147,6 +169,7 @@ module.exports = function(grunt) {
   grunt.registerTask('build', [
     'jshint',
     'clean:server',
+    'add-revision',
     'concat:editable',
     'karma:build',
     'concat:dist',
@@ -159,6 +182,8 @@ module.exports = function(grunt) {
     'concat:dist',
     'uglify'
   ]);
+
+  grunt.registerTask('add-revision', ['revision', 'replace:revision']);
 
   grunt.registerTask('default', ['dev']);
 
