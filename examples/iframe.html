@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
-        <link rel="stylesheet" href="test/css/normalize.css">
-        <link rel="stylesheet" href="test/css/main.css">
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
     </head>
     <body>
-
-        <!-- Content -->
         <article>
 
             <header>
-                <h1>Lorem ipsum</h1>
+                <h1>Inside the IFrame</h1>
                 <p>
                   Posted by <span>John Smith</span> on
                   <time datetime="2012-06-09T20:00+00:00" pubdate>June 9th, 2012</time>
@@ -23,14 +21,8 @@
             </header>
 
             <div>
-                <div style="background-color: #eee;">
-                    <span class="is-editable">inline element</span>
-                </div>
-
-                <p class="is-editable">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. <a href="http://www.upfront.io">Sed <strong>ante</strong> dapibus</a> diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc.</p>
-
                 <p class="is-editable">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. <a href="http://www.upfront.io">Sed <strong>ante</strong> dapibus</a> diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur sodales ligula in libero. Sed dignissim lacinia nunc.
                 </p>
 
                 <h2 class="is-editable">
@@ -55,18 +47,5 @@
                 </ol>
             </div>
         </article>
-
-        <!-- IFrame -->
-        <article class="iframe-container">
-            <iframe src='iframe.html'></iframe>
-        </article>
-
-        <script src="bower_components/jquery/jquery.js"></script>
-        <script src="bower_components/rangy/rangy-core.js"></script>
-        <script src="bower_components/bowser/bowser.js"></script>
-
-        <script src=".tmp/editable.js"></script>
-        <script src="test/js/main.js"></script>
-
     </body>
 </html>
