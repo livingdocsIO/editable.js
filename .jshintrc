@@ -41,7 +41,6 @@
     "Selection": true,
     "SelectionWatcher": true,
     "string": true,
-    "toString": true,
     "Spellcheck": true,
     "NodeIterator": true,
     "highlightText": true,
