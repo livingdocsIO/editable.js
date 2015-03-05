@@ -61,14 +61,11 @@ Dispatcher.prototype.setupElementEvents = function() {
     if (this.getAttribute(config.pastingAttribute)) return;
     _this.notify('blur', this);
   }).on('copy.editable', _this.editableSelector, function(event) {
-    log('Copy');
     _this.notify('clipboard', this, 'copy', _this.selectionWatcher.getFreshSelection());
   }).on('cut.editable', _this.editableSelector, function(event) {
-    log('Cut');
     _this.notify('clipboard', this, 'cut', _this.selectionWatcher.getFreshSelection());
     _this.triggerChangeEvent(this);
   }).on('paste.editable', _this.editableSelector, function(event) {
-    log('Paste');
     var element = this;
     var afterPaste = function (blocks, cursor) {
       _this.notify('paste', element, blocks, cursor);
@@ -82,7 +79,6 @@ Dispatcher.prototype.setupElementEvents = function() {
     _this.notify('change', this);
 
   }).on('input.editable', _this.editableSelector, function(event) {
-    log('Input');
     if (isInputEventSupported) {
       _this.notify('change', this);
     } else {
