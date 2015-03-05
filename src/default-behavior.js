@@ -168,6 +168,38 @@ var createDefaultBehavior = function(editable) {
       log('Default move behavior');
     },
 
+    paste: function(element, blocks, cursor) {
+      console.log('default behavior: paste!')
+
+      var fragment;
+      cursor.restore();
+
+      if (blocks.length) {
+        var firstBlock = blocks[0];
+        fragment = content.createFragmentFromString(firstBlock);
+        cursor.insertBefore(fragment);
+      }
+
+      if (blocks.length > 1) {
+        console.log('multiple blocks', blocks)
+        for (var i = 1; i < blocks.length; i++) {
+          var parent = element.parentNode;
+          var newElement = element.cloneNode(false);
+          if (newElement.id) newElement.removeAttribute('id');
+          fragment = content.createFragmentFromString(blocks[i]);
+          $(newElement).append(fragment);
+
+          parent.insertBefore(newElement, element.nextSibling);
+          // newElement.focus();
+        }
+      }
+
+      if (blocks.length <= 1) {
+        cursor.setVisibleSelection();
+      }
+
+    },
+
     clipboard: function(element, action, cursor) {
       log('Default clipboard behavior');
     }
