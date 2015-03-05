@@ -169,9 +169,7 @@ var createDefaultBehavior = function(editable) {
     },
 
     clipboard: function(element, action, cursor) {
-      if (action === 'paste') {
-        clipboard.paste(element, action, cursor, document);
-      }
+      log('Default clipboard behavior');
     }
   };
 };
