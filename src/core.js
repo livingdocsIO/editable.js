@@ -365,8 +365,9 @@ var createEventSubscriber = function(name) {
 /**
  * Set up callback functions for several events.
  */
-var events = ['focus', 'blur', 'flow', 'selection', 'cursor', 'newline', 'insert',
-              'split', 'merge', 'empty', 'change', 'switch', 'move', 'clipboard'];
+var events = ['focus', 'blur', 'flow', 'selection', 'cursor', 'newline',
+              'insert', 'split', 'merge', 'empty', 'change', 'switch', 'move',
+              'clipboard', 'paste'];
 
 for (var i = 0; i < events.length; ++i) {
   var eventName = events[i];

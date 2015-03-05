@@ -163,17 +163,28 @@ var createDefaultEvents = function (editable) {
     },
 
     /**
-     * The clipboard event is triggered when the user copies, pastes or cuts
+     * The clipboard event is triggered when the user copies or cuts
      * a selection within a block.
-     * The default behavior is to... TODO
      *
      * @event clipboard
      * @param {HTMLElement} element The element triggering the event.
-     * @param {String} action The clipboard action: "copy", "paste", "cut".
+     * @param {String} action The clipboard action: "copy" or "cut".
      * @param {Cursor} cursor The actual cursor object.
      */
     clipboard: function(element, action, cursor) {
       behavior.clipboard(element, action, cursor);
+    },
+
+    /**
+     * The paste event is triggered when the user pastes text
+     *
+     * @event paste
+     * @param {HTMLElement} The element triggering the event.
+     * @param {Array of String} The pasted blocks
+     * @param {Cursor} The cursor object.
+     */
+    paste: function(element, blocks, cursor) {
+      behavior.paste(element, blocks, cursor);
     }
   };
 };
