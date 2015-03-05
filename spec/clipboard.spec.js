@@ -1,47 +1,59 @@
  describe('Clipboard', function() {
 
-  describe('filterContent()', function() {
+  describe('parseContent()', function() {
 
     var extract = function(str) {
       var div = document.createElement('div');
       div.innerHTML = str;
-      return clipboard.filterContent(div);
+      return clipboard.parseContent(div);
     };
+
+    var extractSingleBlock = function(str) {
+      return extract(str)[0]
+    }
 
 
     // Copy Elements
     // -------------
 
     it('gets a plain text', function() {
-      expect(extract('a')).toEqual('a');
+      expect(extractSingleBlock('a')).toEqual('a');
     });
 
     it('trims text', function() {
-      expect(extract(' a ')).toEqual('a');
+      expect(extractSingleBlock(' a ')).toEqual('a');
     });
 
     it('keeps a <a> element with an href attribute', function() {
-      expect(extract('<a href="http://link.com">a</a>')).toEqual('<a href="http://link.com">a</a>');
+      expect(extractSingleBlock('<a href="http://link.com">a</a>')).toEqual('<a href="http://link.com">a</a>');
     });
 
     it('keeps a <strong> element', function() {
-      expect(extract('<strong>a</strong>')).toEqual('<strong>a</strong>');
+      expect(extractSingleBlock('<strong>a</strong>')).toEqual('<strong>a</strong>');
     });
 
     it('keeps an <em> element', function() {
-      expect(extract('<em>a</em>')).toEqual('<em>a</em>');
+      expect(extractSingleBlock('<em>a</em>')).toEqual('<em>a</em>');
     });
 
     it('keeps a <br> element', function() {
-      expect(extract('a<br>b')).toEqual('a<br>b');
+      expect(extractSingleBlock('a<br>b')).toEqual('a<br>b');
     });
 
-    it('inserts double <br> after a paragraph', function() {
-      expect(extract('<p>a</p><p>b</p>')).toEqual('a<br><br>b');
+
+    // Split Blocks
+    // ------------
+
+    it('creates two blocks from two paragraphs', function() {
+      var blocks = extract('<p>a</p><p>b</p>');
+      expect(blocks[0]).toEqual('a');
+      expect(blocks[1]).toEqual('b');
     });
 
-    it('inserts double <br> after a <h1> followed by an <h2>', function() {
-      expect(extract('<h1>a</h1><h2>b</h2>')).toEqual('a<br><br>b');
+    it('creates two blocks from an <h1> followed by an <h2>', function() {
+      var blocks = extract('<h1>a</h1><h2>b</h2>')
+      expect(blocks[0]).toEqual('a');
+      expect(blocks[1]).toEqual('b');
     });
 
 
@@ -49,7 +61,7 @@
     // ----------------
 
     var checkWhitespace = function(a, b) {
-      expect( escape(extract(a)) ).toEqual( escape(b) );
+      expect( escape(extractSingleBlock(a)) ).toEqual( escape(b) );
     };
 
     it('replaces a single &nbsp; character', function() {
@@ -69,31 +81,31 @@
     // ---------------
 
     it('removes a <span> element', function() {
-      expect(extract('<span>a</span>')).toEqual('a');
+      expect(extractSingleBlock('<span>a</span>')).toEqual('a');
     });
 
     it('removes an <a> element without an href attribute', function() {
-      expect(extract('<a>a</a>')).toEqual('a');
+      expect(extractSingleBlock('<a>a</a>')).toEqual('a');
     });
 
     it('removes an <a> element with an empty href attribute', function() {
-      expect(extract('<a href="">a</a>')).toEqual('a');
+      expect(extractSingleBlock('<a href="">a</a>')).toEqual('a');
     });
 
     it('removes an empty <strong> element', function() {
-      expect(extract('<strong></strong>')).toEqual('');
+      expect(extractSingleBlock('<strong></strong>')).toEqual(undefined);
     });
 
     it('removes a <strong> element with only whitespace', function() {
-      expect(extract('<strong> </strong>')).toEqual('');
+      expect(extractSingleBlock('<strong> </strong>')).toEqual(undefined);
     });
 
     it('removes an empty <strong> element but keeps its whitespace', function() {
-      expect(extract('a<strong> </strong>b')).toEqual('a b');
+      expect(extractSingleBlock('a<strong> </strong>b')).toEqual('a b');
     });
 
     it('removes an attribute from an <em> element', function() {
-      expect(extract('<em data-something="x">a</em>')).toEqual('<em>a</em>');
+      expect(extractSingleBlock('<em data-something="x">a</em>')).toEqual('<em>a</em>');
     });
 
 
@@ -101,7 +113,7 @@
     // ------------------
 
     it('transforms a <b> into a <strong>', function() {
-      expect(extract('<b>a</b>')).toEqual('<strong>a</strong>');
+      expect(extractSingleBlock('<b>a</b>')).toEqual('<strong>a</strong>');
     });
 
 
@@ -113,7 +125,7 @@
       var div = document.createElement('div');
       div.appendChild( document.createTextNode('<b>a</b>') );
 
-      expect(clipboard.filterContent(div)).toEqual('&lt;b&gt;a&lt;/b&gt;');
+      expect(clipboard.parseContent(div)[0]).toEqual('&lt;b&gt;a&lt;/b&gt;');
     });
 
   });

@@ -69,12 +69,18 @@ Dispatcher.prototype.setupElementEvents = function() {
     _this.triggerChangeEvent(this);
   }).on('paste.editable', _this.editableSelector, function(event) {
     log('Paste');
-    _this.notify('clipboard', this, 'paste', _this.selectionWatcher.getFreshSelection());
-    clipboard.paste(element, action, cursor, document);
+    var element = this;
+    var afterPaste = function (blocks, cursor) {
+      _this.notify('paste', element, blocks, cursor);
+    };
+
+    var cursor = _this.selectionWatcher.getFreshSelection();
+    clipboard.paste(this, cursor, afterPaste);
 
     // The input event does not fire when we process the content manually
     // and insert it via script
     _this.notify('change', this);
+
   }).on('input.editable', _this.editableSelector, function(event) {
     log('Input');
     if (isInputEventSupported) {

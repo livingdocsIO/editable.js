@@ -28,7 +28,8 @@ var clipboard = (function() {
 
     updateConfig: updateConfig,
 
-    paste: function(element, action, cursor, document) {
+    paste: function(element, cursor, callback) {
+      document = element.ownerDocument;
       element.setAttribute(config.pastingAttribute, true);
 
       if (cursor.isSelection) {
@@ -38,28 +39,25 @@ var clipboard = (function() {
       // Create a placeholder and set the focus to the pasteholder
       // to redirect the browser pasting into the pasteholder.
       cursor.save();
-      var pasteHolder = this.getContenteditableContainer(document);
+      var pasteHolder = this.injectPasteholder(document);
       pasteHolder.focus();
 
       // Use a timeout to give the browser some time to paste the content.
       // After that grab the pasted content, filter it and restore the focus.
-      var that = this;
+      var _this = this;
       setTimeout(function() {
-        var pasteValue, fragment;
+        var blocks;
 
-        pasteValue = that.filterContent(pasteHolder);
-        fragment = content.createFragmentFromString(pasteValue);
+        blocks = _this.parseContent(pasteHolder);
         $(pasteHolder).remove();
-
-        cursor.restore();
-        cursor.insertBefore(fragment);
-        cursor.setVisibleSelection();
-
         element.removeAttribute(config.pastingAttribute);
+
+        callback(blocks, cursor);
+
       }, 0);
     },
 
-    getContenteditableContainer: function(document) {
+    injectPasteholder: function(document) {
       var pasteHolder = $('<div>')
         .attr('contenteditable', true)
         .css({
@@ -76,32 +74,37 @@ var clipboard = (function() {
     },
 
     /**
-     * @param { DOM node } A container where the pasted content is located.
-     * @returns { String } A cleaned innerHTML like string built from the pasted content.
+     * - Parse pasted content
+     * - Split it up into blocks
+     * - clean and normalize every block
+     *
+     * @param {DOM node} A container where the pasted content is located.
+     * @returns {Array of Strings} An array of cleaned innerHTML like strings.
      */
-    filterContent: function(element) {
+    parseContent: function(element) {
 
       // Filter pasted content
       var pastedString = this.filterHtmlElements(element);
 
       // Handle Blocks
       var blocks = pastedString.split(blockPlaceholder);
+      for (var i = 0; i < blocks.length; i++) {
+        var entry = blocks[i];
+
+        // Clean Whitesapce
+        entry = this.cleanWhitespace(entry);
+
+        // Trim pasted Text
+        entry = string.trim(entry);
+
+        blocks[i] = entry;
+      }
+
       blocks = blocks.filter(function(entry) {
         return !whitespaceOnly.test(entry);
       });
-      pastedString = blocks.join('<br><br>');
 
-      // Clean Whitesapce
-      // todo: make configurable
-      pastedString = this.cleanWhitespace(pastedString);
-
-      // Trim pasted Text
-      // todo: make configurable
-      if (pastedString) {
-        pastedString = string.trim(pastedString);
-      }
-
-      return pastedString;
+      return blocks;
     },
 
     filterHtmlElements: function(elem, parents) {
