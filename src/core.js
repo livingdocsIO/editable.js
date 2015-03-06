@@ -244,7 +244,10 @@ Editable.prototype.getContent = function(element) {
  * @returns {Cursor} A new Cursor object just before the inserted content.
  */
 Editable.prototype.appendTo = function(element, contentToAppend) {
+  element = content.adoptElement(element, this.win.document);
+
   if (typeof contentToAppend === 'string') {
+    // todo: create content in the right window
     contentToAppend = content.createFragmentFromString(contentToAppend);
   }
 
@@ -254,12 +257,16 @@ Editable.prototype.appendTo = function(element, contentToAppend) {
 };
 
 
+
 /**
  * @param {String | DocumentFragment} content to prepend
  * @returns {Cursor} A new Cursor object just after the inserted content.
  */
 Editable.prototype.prependTo = function(element, contentToPrepend) {
+  element = content.adoptElement(element, this.win.document);
+
   if (typeof contentToPrepend === 'string') {
+    // todo: create content in the right window
     contentToPrepend = content.createFragmentFromString(contentToPrepend);
   }
 
