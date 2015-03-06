@@ -59,7 +59,7 @@ var clipboard = (function() {
     },
 
     injectPasteholder: function(document) {
-      var pasteHolder = $('<div>')
+      var pasteHolder = $(document.createElement('div'))
         .attr('contenteditable', true)
         .css({
           position: 'fixed',

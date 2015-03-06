@@ -259,6 +259,12 @@ var Cursor = (function() {
         return true;
       },
 
+      // Create an element with the correct ownerWindow
+      // (see: http://www.w3.org/DOM/faq.html#ownerdoc)
+      createElement: function(tagName) {
+        return this.win.document.createElement(tagName);
+      },
+
       // Currently we call triggerChange manually after format changes.
       // This is to prevent excessive triggering of the change event during
       // merge or split operations or other manipulations by scripts.
