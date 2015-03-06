@@ -127,6 +127,14 @@ var content = (function() {
       return fragment;
     },
 
+    adoptElement: function(node, doc) {
+      if (node.ownerDocument != doc) {
+        return doc.adoptNode(node);
+      } else {
+        return node;
+      }
+    },
+
     /**
      * This is a slight variation of the cloneContents method of a rangyRange.
      * It will return a fragment with the cloned contents of the range

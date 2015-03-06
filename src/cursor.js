@@ -52,6 +52,7 @@ var Cursor = (function() {
           element = content.createFragmentFromString(element);
         }
         if (parser.isDocumentFragmentWithoutChildren(element)) return;
+        element = this.adoptElement(element);
 
         var preceedingElement = element;
         if (element.nodeType === nodeType.documentFragmentNode) {
@@ -74,6 +75,7 @@ var Cursor = (function() {
           element = content.createFragmentFromString(element);
         }
         if (parser.isDocumentFragmentWithoutChildren(element)) return;
+        element = this.adoptElement(element);
         this.range.insertNode(element);
       },
 
@@ -263,6 +265,12 @@ var Cursor = (function() {
       // (see: http://www.w3.org/DOM/faq.html#ownerdoc)
       createElement: function(tagName) {
         return this.win.document.createElement(tagName);
+      },
+
+      // Make sure a node has the correct ownerWindow
+      // (see: https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode)
+      adoptElement: function(node) {
+        return content.adoptElement(node, this.win.document);
       },
 
       // Currently we call triggerChange manually after format changes.

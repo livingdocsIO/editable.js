@@ -103,6 +103,7 @@ var Selection = (function() {
     },
 
     toggle: function(elem) {
+      elem = this.adoptElement(elem);
       this.range = content.toggleTag(this.host, this.range, elem);
       this.setSelection();
     },
@@ -224,6 +225,7 @@ var Selection = (function() {
      * @method forceWrap
      */
     forceWrap: function(elem) {
+      elem = this.adoptElement(elem);
       this.range = content.forceWrap(this.host, this.range, elem);
       this.setSelection();
     },
