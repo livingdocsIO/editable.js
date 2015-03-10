@@ -181,7 +181,6 @@ var createDefaultBehavior = function(editable) {
       }
 
       if (blocks.length > 1) {
-        console.log('multiple blocks', blocks)
         for (var i = 1; i < blocks.length; i++) {
           var parent = element.parentNode;
           var newElement = element.cloneNode(false);

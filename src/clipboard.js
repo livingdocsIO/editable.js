@@ -29,7 +29,7 @@ var clipboard = (function() {
     updateConfig: updateConfig,
 
     paste: function(element, cursor, callback) {
-      document = element.ownerDocument;
+      var document = element.ownerDocument;
       element.setAttribute(config.pastingAttribute, true);
 
       if (cursor.isSelection) {
