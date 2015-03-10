@@ -52,6 +52,7 @@ var clipboard = (function() {
         $(pasteHolder).remove();
         element.removeAttribute(config.pastingAttribute);
 
+        cursor.restore();
         callback(blocks, cursor);
 
       }, 0);

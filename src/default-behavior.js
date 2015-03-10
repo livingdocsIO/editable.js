@@ -169,10 +169,7 @@ var createDefaultBehavior = function(editable) {
     },
 
     paste: function(element, blocks, cursor) {
-      console.log('default behavior: paste!')
-
       var fragment;
-      cursor.restore();
 
       if (blocks.length) {
         var firstBlock = blocks[0];
