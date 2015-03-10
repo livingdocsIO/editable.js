@@ -68,15 +68,20 @@ Dispatcher.prototype.setupElementEvents = function() {
   }).on('paste.editable', _this.editableSelector, function(event) {
     var element = this;
     var afterPaste = function (blocks, cursor) {
-      _this.notify('paste', element, blocks, cursor);
+      if (blocks.length) {
+        _this.notify('paste', element, blocks, cursor);
+
+        // The input event does not fire when we process the content manually
+        // and insert it via script
+        _this.notify('change', element);
+      } else {
+        cursor.setVisibleSelection();
+      }
     };
 
     var cursor = _this.selectionWatcher.getFreshSelection();
     clipboard.paste(this, cursor, afterPaste);
 
-    // The input event does not fire when we process the content manually
-    // and insert it via script
-    _this.notify('change', this);
 
   }).on('input.editable', _this.editableSelector, function(event) {
     if (isInputEventSupported) {
