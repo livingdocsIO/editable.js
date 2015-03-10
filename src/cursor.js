@@ -45,9 +45,12 @@ var Cursor = (function() {
       /**
        * Insert content before the cursor
        *
-       * @param DOM node or document fragment
+       * @param {String, DOM node or document fragment}
        */
       insertBefore: function(element) {
+        if ( string.isString(element) ) {
+          element = content.createFragmentFromString(element);
+        }
         if (parser.isDocumentFragmentWithoutChildren(element)) return;
 
         var preceedingElement = element;
@@ -64,9 +67,12 @@ var Cursor = (function() {
       /**
        * Insert content after the cursor
        *
-       * @param DOM node or document fragment
+       * @param {String, DOM node or document fragment}
        */
       insertAfter: function(element) {
+        if ( string.isString(element) ) {
+          element = content.createFragmentFromString(element);
+        }
         if (parser.isDocumentFragmentWithoutChildren(element)) return;
         this.range.insertNode(element);
       },
