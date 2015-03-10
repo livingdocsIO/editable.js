@@ -62,11 +62,12 @@ var clipboard = (function() {
         .attr('contenteditable', true)
         .css({
           position: 'fixed',
-          left: '5px',
-          top: '5px',
+          right: '5px',
+          top: '50%',
           width: '1px',
           height: '1px',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          outline: 'none'
         })[0];
 
       $(document.body).append(pasteHolder);
