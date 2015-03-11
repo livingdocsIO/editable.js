@@ -171,29 +171,28 @@ var createDefaultBehavior = function(editable) {
     paste: function(element, blocks, cursor) {
       var fragment;
 
-      if (blocks.length) {
-        var firstBlock = blocks[0];
-        fragment = content.createFragmentFromString(firstBlock);
-        cursor.insertBefore(fragment);
-      }
+      var firstBlock = blocks[0];
+      cursor.insertBefore(firstBlock);
 
-      if (blocks.length > 1) {
+      if (blocks.length <= 1) {
+        cursor.setVisibleSelection();
+      } else {
+        var parent = element.parentNode;
+        var currentElement = element;
+
         for (var i = 1; i < blocks.length; i++) {
-          var parent = element.parentNode;
           var newElement = element.cloneNode(false);
           if (newElement.id) newElement.removeAttribute('id');
           fragment = content.createFragmentFromString(blocks[i]);
           $(newElement).append(fragment);
-
-          parent.insertBefore(newElement, element.nextSibling);
-          // newElement.focus();
+          parent.insertBefore(newElement, currentElement.nextSibling);
+          currentElement = newElement;
         }
-      }
 
-      if (blocks.length <= 1) {
+        // focus last element
+        cursor = editable.createCursorAtEnd(currentElement);
         cursor.setVisibleSelection();
       }
-
     },
 
     clipboard: function(element, action, cursor) {
