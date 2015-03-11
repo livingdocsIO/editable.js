@@ -1,3 +1,9 @@
+
+# v0.5.0
+
+- Split pasted content into blocks [#97](https://github.com/upfrontIO/editable.js/pull/97)
+
+
 # v0.4.4
 
 #### Bugfixes
