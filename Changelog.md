@@ -1,3 +1,6 @@
+# v0.5.1
+
+(v0.5.0 was accidentally pushed to npm so this patch is just to be able to push the new version to npm)
 
 # v0.5.0
 
