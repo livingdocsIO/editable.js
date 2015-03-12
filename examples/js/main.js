@@ -98,7 +98,8 @@
   // Highlighting
   // ------------
 
-  editable.add('.highlighting-example p');
+  var $highlightExample = $('.highlighting-example p');
+  editable.add($highlightExample);
 
   var highlightService = function(text, callback) {
     var words = ['happy'];
@@ -107,8 +108,11 @@
 
   editable.setupSpellcheck({
     spellcheckService: highlightService,
-    markerNode: $('<span class="highlight"></span>')
+    markerNode: $('<span class="highlight"></span>'),
+    throttle: 0
   });
+
+  editable.spellcheck.checkSpelling($highlightExample[0]);
 
 
   // Pasting
