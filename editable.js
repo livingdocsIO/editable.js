@@ -3596,8 +3596,8 @@ var config = {
   editableClass: 'js-editable',
   editableDisabledClass: 'js-editable-disabled',
   pastingAttribute: 'data-editable-is-pasting',
-  boldTag: '<strong>',
-  italicTag: '<em>',
+  boldTag: 'strong',
+  italicTag: 'em',
 
   // Rules that are applied when filtering pasted content
   pastedHtmlRules: {
@@ -3882,7 +3882,10 @@ Editable.prototype.getContent = function(element) {
  * @returns {Cursor} A new Cursor object just before the inserted content.
  */
 Editable.prototype.appendTo = function(element, contentToAppend) {
+  element = content.adoptElement(element, this.win.document);
+
   if (typeof contentToAppend === 'string') {
+    // todo: create content in the right window
     contentToAppend = content.createFragmentFromString(contentToAppend);
   }
 
@@ -3892,12 +3895,16 @@ Editable.prototype.appendTo = function(element, contentToAppend) {
 };
 
 
+
 /**
  * @param {String | DocumentFragment} content to prepend
  * @returns {Cursor} A new Cursor object just after the inserted content.
  */
 Editable.prototype.prependTo = function(element, contentToPrepend) {
+  element = content.adoptElement(element, this.win.document);
+
   if (typeof contentToPrepend === 'string') {
+    // todo: create content in the right window
     contentToPrepend = content.createFragmentFromString(contentToPrepend);
   }
 
@@ -4089,7 +4096,7 @@ var clipboard = (function() {
     },
 
     injectPasteholder: function(document) {
-      var pasteHolder = $('<div>')
+      var pasteHolder = $(document.createElement('div'))
         .attr('contenteditable', true)
         .css({
           position: 'fixed',
@@ -4365,6 +4372,14 @@ var content = (function() {
         fragment.appendChild(el);
       }
       return fragment;
+    },
+
+    adoptElement: function(node, doc) {
+      if (node.ownerDocument !== doc) {
+        return doc.adoptNode(node);
+      } else {
+        return node;
+      }
     },
 
     /**
@@ -4711,6 +4726,7 @@ var Cursor = (function() {
           element = content.createFragmentFromString(element);
         }
         if (parser.isDocumentFragmentWithoutChildren(element)) return;
+        element = this.adoptElement(element);
 
         var preceedingElement = element;
         if (element.nodeType === nodeType.documentFragmentNode) {
@@ -4733,6 +4749,7 @@ var Cursor = (function() {
           element = content.createFragmentFromString(element);
         }
         if (parser.isDocumentFragmentWithoutChildren(element)) return;
+        element = this.adoptElement(element);
         this.range.insertNode(element);
       },
 
@@ -4916,6 +4933,18 @@ var Cursor = (function() {
         if (!cursor.range.equals(this.range)) return false;
 
         return true;
+      },
+
+      // Create an element with the correct ownerWindow
+      // (see: http://www.w3.org/DOM/faq.html#ownerdoc)
+      createElement: function(tagName) {
+        return this.win.document.createElement(tagName);
+      },
+
+      // Make sure a node has the correct ownerWindow
+      // (see: https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode)
+      adoptElement: function(node) {
+        return content.adoptElement(node, this.win.document);
       },
 
       // Currently we call triggerChange manually after format changes.
@@ -6738,7 +6767,7 @@ var Selection = (function() {
      * @method link
      */
     link: function(href, attrs) {
-      var $link = $('<a>');
+      var $link = $(this.createElement('a'));
       if (href) $link.attr('href', href);
       for (var name in attrs) {
         $link.attr(name, attrs[name]);
@@ -6766,6 +6795,7 @@ var Selection = (function() {
     },
 
     toggle: function(elem) {
+      elem = this.adoptElement(elem);
       this.range = content.toggleTag(this.host, this.range, elem);
       this.setSelection();
     },
@@ -6775,13 +6805,13 @@ var Selection = (function() {
      * @method makeBold
      */
     makeBold: function() {
-      var $bold = $(config.boldTag);
-      this.forceWrap($bold[0]);
+      var bold = this.createElement(config.boldTag);
+      this.forceWrap(bold);
     },
 
     toggleBold: function() {
-      var $bold = $(config.boldTag);
-      this.toggle($bold[0]);
+      var bold = this.createElement(config.boldTag);
+      this.toggle(bold);
     },
 
     /**
@@ -6789,13 +6819,13 @@ var Selection = (function() {
      * @method giveEmphasis
      */
     giveEmphasis: function() {
-      var $em = $(config.italicTag);
-      this.forceWrap($em[0]);
+      var em = this.createElement(config.italicTag);
+      this.forceWrap(em);
     },
 
     toggleEmphasis: function() {
-      var $italic = $(config.italicTag);
-      this.toggle($italic[0]);
+      var em = this.createElement(config.italicTag);
+      this.toggle(em);
     },
 
     /**
@@ -6887,6 +6917,7 @@ var Selection = (function() {
      * @method forceWrap
      */
     forceWrap: function(elem) {
+      elem = this.adoptElement(elem);
       this.range = content.forceWrap(this.host, this.range, elem);
       this.setSelection();
     },
@@ -6992,9 +7023,10 @@ var Spellcheck = (function() {
       spellcheckService: undefined
     };
 
+    this.editable = editable;
+    this.win = editable.win;
     this.config = $.extend(defaultConfig, configuration);
     this.prepareMarkerNode();
-    this.editable = editable;
     this.setup();
   };
 
@@ -7033,8 +7065,11 @@ var Spellcheck = (function() {
   Spellcheck.prototype.prepareMarkerNode = function() {
     var marker = this.config.markerNode;
     if (marker.jquery) {
-      this.config.markerNode = marker = marker[0];
+      marker = marker[0];
     }
+    marker = content.adoptElement(marker, this.win.document);
+    this.config.markerNode = marker;
+
     marker.setAttribute('data-editable', 'ui-unwrap');
     marker.setAttribute('data-spellcheck', 'spellcheck');
   };
