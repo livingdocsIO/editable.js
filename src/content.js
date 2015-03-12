@@ -186,6 +186,19 @@ var content = (function() {
       }
     },
 
+    getParentsAndSelf: function(node, tagName) {
+      var parents = [];
+      while (node) {
+        if (node.nodeType === nodeType.elementNode) {
+          if (!tagName || node.nodeName === tagName.toUpperCase()) {
+            parents.push(node);
+          }
+        }
+        node = node.parentNode;
+      }
+      return parents;
+    },
+
     /**
      * Get all tags that start or end inside the range
      */
