@@ -61,18 +61,29 @@ Dispatcher.prototype.setupElementEvents = function() {
     if (this.getAttribute(config.pastingAttribute)) return;
     _this.notify('blur', this);
   }).on('copy.editable', _this.editableSelector, function(event) {
-    log('Copy');
     _this.notify('clipboard', this, 'copy', _this.selectionWatcher.getFreshSelection());
   }).on('cut.editable', _this.editableSelector, function(event) {
-    log('Cut');
     _this.notify('clipboard', this, 'cut', _this.selectionWatcher.getFreshSelection());
     _this.triggerChangeEvent(this);
   }).on('paste.editable', _this.editableSelector, function(event) {
-    log('Paste');
-    _this.notify('clipboard', this, 'paste', _this.selectionWatcher.getFreshSelection());
-    _this.triggerChangeEvent(this);
+    var element = this;
+    var afterPaste = function (blocks, cursor) {
+      if (blocks.length) {
+        _this.notify('paste', element, blocks, cursor);
+
+        // The input event does not fire when we process the content manually
+        // and insert it via script
+        _this.notify('change', element);
+      } else {
+        cursor.setVisibleSelection();
+      }
+    };
+
+    var cursor = _this.selectionWatcher.getFreshSelection();
+    clipboard.paste(this, cursor, afterPaste);
+
+
   }).on('input.editable', _this.editableSelector, function(event) {
-    log('Input');
     if (isInputEventSupported) {
       _this.notify('change', this);
     } else {

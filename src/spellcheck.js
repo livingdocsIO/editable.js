@@ -36,9 +36,10 @@ var Spellcheck = (function() {
       spellcheckService: undefined
     };
 
+    this.editable = editable;
+    this.win = editable.win;
     this.config = $.extend(defaultConfig, configuration);
     this.prepareMarkerNode();
-    this.editable = editable;
     this.setup();
   };
 
@@ -77,8 +78,11 @@ var Spellcheck = (function() {
   Spellcheck.prototype.prepareMarkerNode = function() {
     var marker = this.config.markerNode;
     if (marker.jquery) {
-      this.config.markerNode = marker = marker[0];
+      marker = marker[0];
     }
+    marker = content.adoptElement(marker, this.win.document);
+    this.config.markerNode = marker;
+
     marker.setAttribute('data-editable', 'ui-unwrap');
     marker.setAttribute('data-spellcheck', 'spellcheck');
   };

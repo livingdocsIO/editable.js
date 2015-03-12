@@ -11,8 +11,8 @@ var config = {
   editableClass: 'js-editable',
   editableDisabledClass: 'js-editable-disabled',
   pastingAttribute: 'data-editable-is-pasting',
-  boldTag: '<strong>',
-  italicTag: '<em>',
+  boldTag: 'strong',
+  italicTag: 'em',
 
   // Rules that are applied when filtering pasted content
   pastedHtmlRules: {

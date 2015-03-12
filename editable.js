@@ -3596,8 +3596,8 @@ var config = {
   editableClass: 'js-editable',
   editableDisabledClass: 'js-editable-disabled',
   pastingAttribute: 'data-editable-is-pasting',
-  boldTag: '<strong>',
-  italicTag: '<em>',
+  boldTag: 'strong',
+  italicTag: 'em',
 
   // Rules that are applied when filtering pasted content
   pastedHtmlRules: {
@@ -3882,7 +3882,10 @@ Editable.prototype.getContent = function(element) {
  * @returns {Cursor} A new Cursor object just before the inserted content.
  */
 Editable.prototype.appendTo = function(element, contentToAppend) {
+  element = content.adoptElement(element, this.win.document);
+
   if (typeof contentToAppend === 'string') {
+    // todo: create content in the right window
     contentToAppend = content.createFragmentFromString(contentToAppend);
   }
 
@@ -3892,12 +3895,16 @@ Editable.prototype.appendTo = function(element, contentToAppend) {
 };
 
 
+
 /**
  * @param {String | DocumentFragment} content to prepend
  * @returns {Cursor} A new Cursor object just after the inserted content.
  */
 Editable.prototype.prependTo = function(element, contentToPrepend) {
+  element = content.adoptElement(element, this.win.document);
+
   if (typeof contentToPrepend === 'string') {
+    // todo: create content in the right window
     contentToPrepend = content.createFragmentFromString(contentToPrepend);
   }
 
@@ -4003,8 +4010,9 @@ var createEventSubscriber = function(name) {
 /**
  * Set up callback functions for several events.
  */
-var events = ['focus', 'blur', 'flow', 'selection', 'cursor', 'newline', 'insert',
-              'split', 'merge', 'empty', 'change', 'switch', 'move', 'clipboard'];
+var events = ['focus', 'blur', 'flow', 'selection', 'cursor', 'newline',
+              'insert', 'split', 'merge', 'empty', 'change', 'switch', 'move',
+              'clipboard', 'paste'];
 
 for (var i = 0; i < events.length; ++i) {
   var eventName = events[i];
@@ -4057,7 +4065,8 @@ var clipboard = (function() {
 
     updateConfig: updateConfig,
 
-    paste: function(element, action, cursor, document) {
+    paste: function(element, cursor, callback) {
+      var document = element.ownerDocument;
       element.setAttribute(config.pastingAttribute, true);
 
       if (cursor.isSelection) {
@@ -4067,37 +4076,36 @@ var clipboard = (function() {
       // Create a placeholder and set the focus to the pasteholder
       // to redirect the browser pasting into the pasteholder.
       cursor.save();
-      var pasteHolder = this.getContenteditableContainer(document);
+      var pasteHolder = this.injectPasteholder(document);
       pasteHolder.focus();
 
       // Use a timeout to give the browser some time to paste the content.
       // After that grab the pasted content, filter it and restore the focus.
-      var that = this;
+      var _this = this;
       setTimeout(function() {
-        var pasteValue, fragment;
+        var blocks;
 
-        pasteValue = that.filterContent(pasteHolder);
-        fragment = content.createFragmentFromString(pasteValue);
+        blocks = _this.parseContent(pasteHolder);
         $(pasteHolder).remove();
+        element.removeAttribute(config.pastingAttribute);
 
         cursor.restore();
-        cursor.insertBefore(fragment);
-        cursor.setVisibleSelection();
+        callback(blocks, cursor);
 
-        element.removeAttribute(config.pastingAttribute);
       }, 0);
     },
 
-    getContenteditableContainer: function(document) {
-      var pasteHolder = $('<div>')
+    injectPasteholder: function(document) {
+      var pasteHolder = $(document.createElement('div'))
         .attr('contenteditable', true)
         .css({
           position: 'fixed',
-          left: '5px',
-          top: '5px',
+          right: '5px',
+          top: '50%',
           width: '1px',
           height: '1px',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          outline: 'none'
         })[0];
 
       $(document.body).append(pasteHolder);
@@ -4105,32 +4113,37 @@ var clipboard = (function() {
     },
 
     /**
-     * @param { DOM node } A container where the pasted content is located.
-     * @returns { String } A cleaned innerHTML like string built from the pasted content.
+     * - Parse pasted content
+     * - Split it up into blocks
+     * - clean and normalize every block
+     *
+     * @param {DOM node} A container where the pasted content is located.
+     * @returns {Array of Strings} An array of cleaned innerHTML like strings.
      */
-    filterContent: function(element) {
+    parseContent: function(element) {
 
       // Filter pasted content
       var pastedString = this.filterHtmlElements(element);
 
       // Handle Blocks
       var blocks = pastedString.split(blockPlaceholder);
+      for (var i = 0; i < blocks.length; i++) {
+        var entry = blocks[i];
+
+        // Clean Whitesapce
+        entry = this.cleanWhitespace(entry);
+
+        // Trim pasted Text
+        entry = string.trim(entry);
+
+        blocks[i] = entry;
+      }
+
       blocks = blocks.filter(function(entry) {
         return !whitespaceOnly.test(entry);
       });
-      pastedString = blocks.join('<br><br>');
 
-      // Clean Whitesapce
-      // todo: make configurable
-      pastedString = this.cleanWhitespace(pastedString);
-
-      // Trim pasted Text
-      // todo: make configurable
-      if (pastedString) {
-        pastedString = string.trim(pastedString);
-      }
-
-      return pastedString;
+      return blocks;
     },
 
     filterHtmlElements: function(elem, parents) {
@@ -4359,6 +4372,14 @@ var content = (function() {
         fragment.appendChild(el);
       }
       return fragment;
+    },
+
+    adoptElement: function(node, doc) {
+      if (node.ownerDocument !== doc) {
+        return doc.adoptNode(node);
+      } else {
+        return node;
+      }
     },
 
     /**
@@ -4698,10 +4719,14 @@ var Cursor = (function() {
       /**
        * Insert content before the cursor
        *
-       * @param DOM node or document fragment
+       * @param {String, DOM node or document fragment}
        */
       insertBefore: function(element) {
+        if ( string.isString(element) ) {
+          element = content.createFragmentFromString(element);
+        }
         if (parser.isDocumentFragmentWithoutChildren(element)) return;
+        element = this.adoptElement(element);
 
         var preceedingElement = element;
         if (element.nodeType === nodeType.documentFragmentNode) {
@@ -4717,10 +4742,14 @@ var Cursor = (function() {
       /**
        * Insert content after the cursor
        *
-       * @param DOM node or document fragment
+       * @param {String, DOM node or document fragment}
        */
       insertAfter: function(element) {
+        if ( string.isString(element) ) {
+          element = content.createFragmentFromString(element);
+        }
         if (parser.isDocumentFragmentWithoutChildren(element)) return;
+        element = this.adoptElement(element);
         this.range.insertNode(element);
       },
 
@@ -4906,6 +4935,18 @@ var Cursor = (function() {
         return true;
       },
 
+      // Create an element with the correct ownerWindow
+      // (see: http://www.w3.org/DOM/faq.html#ownerdoc)
+      createElement: function(tagName) {
+        return this.win.document.createElement(tagName);
+      },
+
+      // Make sure a node has the correct ownerWindow
+      // (see: https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode)
+      adoptElement: function(node) {
+        return content.adoptElement(node, this.win.document);
+      },
+
       // Currently we call triggerChange manually after format changes.
       // This is to prevent excessive triggering of the change event during
       // merge or split operations or other manipulations by scripts.
@@ -5089,10 +5130,35 @@ var createDefaultBehavior = function(editable) {
       log('Default move behavior');
     },
 
-    clipboard: function(element, action, cursor) {
-      if (action === 'paste') {
-        clipboard.paste(element, action, cursor, document);
+    paste: function(element, blocks, cursor) {
+      var fragment;
+
+      var firstBlock = blocks[0];
+      cursor.insertBefore(firstBlock);
+
+      if (blocks.length <= 1) {
+        cursor.setVisibleSelection();
+      } else {
+        var parent = element.parentNode;
+        var currentElement = element;
+
+        for (var i = 1; i < blocks.length; i++) {
+          var newElement = element.cloneNode(false);
+          if (newElement.id) newElement.removeAttribute('id');
+          fragment = content.createFragmentFromString(blocks[i]);
+          $(newElement).append(fragment);
+          parent.insertBefore(newElement, currentElement.nextSibling);
+          currentElement = newElement;
+        }
+
+        // focus last element
+        cursor = editable.createCursorAtEnd(currentElement);
+        cursor.setVisibleSelection();
       }
+    },
+
+    clipboard: function(element, action, cursor) {
+      log('Default clipboard behavior');
     }
   };
 };
@@ -5262,17 +5328,28 @@ var createDefaultEvents = function (editable) {
     },
 
     /**
-     * The clipboard event is triggered when the user copies, pastes or cuts
+     * The clipboard event is triggered when the user copies or cuts
      * a selection within a block.
-     * The default behavior is to... TODO
      *
      * @event clipboard
      * @param {HTMLElement} element The element triggering the event.
-     * @param {String} action The clipboard action: "copy", "paste", "cut".
+     * @param {String} action The clipboard action: "copy" or "cut".
      * @param {Cursor} cursor The actual cursor object.
      */
     clipboard: function(element, action, cursor) {
       behavior.clipboard(element, action, cursor);
+    },
+
+    /**
+     * The paste event is triggered when the user pastes text
+     *
+     * @event paste
+     * @param {HTMLElement} The element triggering the event.
+     * @param {Array of String} The pasted blocks
+     * @param {Cursor} The cursor object.
+     */
+    paste: function(element, blocks, cursor) {
+      behavior.paste(element, blocks, cursor);
     }
   };
 };
@@ -5340,18 +5417,29 @@ Dispatcher.prototype.setupElementEvents = function() {
     if (this.getAttribute(config.pastingAttribute)) return;
     _this.notify('blur', this);
   }).on('copy.editable', _this.editableSelector, function(event) {
-    log('Copy');
     _this.notify('clipboard', this, 'copy', _this.selectionWatcher.getFreshSelection());
   }).on('cut.editable', _this.editableSelector, function(event) {
-    log('Cut');
     _this.notify('clipboard', this, 'cut', _this.selectionWatcher.getFreshSelection());
     _this.triggerChangeEvent(this);
   }).on('paste.editable', _this.editableSelector, function(event) {
-    log('Paste');
-    _this.notify('clipboard', this, 'paste', _this.selectionWatcher.getFreshSelection());
-    _this.triggerChangeEvent(this);
+    var element = this;
+    var afterPaste = function (blocks, cursor) {
+      if (blocks.length) {
+        _this.notify('paste', element, blocks, cursor);
+
+        // The input event does not fire when we process the content manually
+        // and insert it via script
+        _this.notify('change', element);
+      } else {
+        cursor.setVisibleSelection();
+      }
+    };
+
+    var cursor = _this.selectionWatcher.getFreshSelection();
+    clipboard.paste(this, cursor, afterPaste);
+
+
   }).on('input.editable', _this.editableSelector, function(event) {
-    log('Input');
     if (isInputEventSupported) {
       _this.notify('change', this);
     } else {
@@ -6679,7 +6767,7 @@ var Selection = (function() {
      * @method link
      */
     link: function(href, attrs) {
-      var $link = $('<a>');
+      var $link = $(this.createElement('a'));
       if (href) $link.attr('href', href);
       for (var name in attrs) {
         $link.attr(name, attrs[name]);
@@ -6707,6 +6795,7 @@ var Selection = (function() {
     },
 
     toggle: function(elem) {
+      elem = this.adoptElement(elem);
       this.range = content.toggleTag(this.host, this.range, elem);
       this.setSelection();
     },
@@ -6716,13 +6805,13 @@ var Selection = (function() {
      * @method makeBold
      */
     makeBold: function() {
-      var $bold = $(config.boldTag);
-      this.forceWrap($bold[0]);
+      var bold = this.createElement(config.boldTag);
+      this.forceWrap(bold);
     },
 
     toggleBold: function() {
-      var $bold = $(config.boldTag);
-      this.toggle($bold[0]);
+      var bold = this.createElement(config.boldTag);
+      this.toggle(bold);
     },
 
     /**
@@ -6730,13 +6819,13 @@ var Selection = (function() {
      * @method giveEmphasis
      */
     giveEmphasis: function() {
-      var $em = $(config.italicTag);
-      this.forceWrap($em[0]);
+      var em = this.createElement(config.italicTag);
+      this.forceWrap(em);
     },
 
     toggleEmphasis: function() {
-      var $italic = $(config.italicTag);
-      this.toggle($italic[0]);
+      var em = this.createElement(config.italicTag);
+      this.toggle(em);
     },
 
     /**
@@ -6828,6 +6917,7 @@ var Selection = (function() {
      * @method forceWrap
      */
     forceWrap: function(elem) {
+      elem = this.adoptElement(elem);
       this.range = content.forceWrap(this.host, this.range, elem);
       this.setSelection();
     },
@@ -6933,9 +7023,10 @@ var Spellcheck = (function() {
       spellcheckService: undefined
     };
 
+    this.editable = editable;
+    this.win = editable.win;
     this.config = $.extend(defaultConfig, configuration);
     this.prepareMarkerNode();
-    this.editable = editable;
     this.setup();
   };
 
@@ -6974,8 +7065,11 @@ var Spellcheck = (function() {
   Spellcheck.prototype.prepareMarkerNode = function() {
     var marker = this.config.markerNode;
     if (marker.jquery) {
-      this.config.markerNode = marker = marker[0];
+      marker = marker[0];
     }
+    marker = content.adoptElement(marker, this.win.document);
+    this.config.markerNode = marker;
+
     marker.setAttribute('data-editable', 'ui-unwrap');
     marker.setAttribute('data-spellcheck', 'spellcheck');
   };
