@@ -128,7 +128,7 @@ var content = (function() {
     },
 
     adoptElement: function(node, doc) {
-      if (node.ownerDocument != doc) {
+      if (node.ownerDocument !== doc) {
         return doc.adoptNode(node);
       } else {
         return node;
