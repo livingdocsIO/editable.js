@@ -2,8 +2,9 @@
  * The Keyboard module defines an event API for key events.
  */
 
-var Keyboard = function() {
+var Keyboard = function(selectionWatcher) {
   eventable(this);
+  this.selectionWatcher = selectionWatcher;
 };
 
 Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEvent) {
@@ -63,6 +64,29 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEve
   case 93: // Chrome/Safari: 93 (Right)
     break;
   default:
+    if (browserFeatures.contenteditableSpanBug) {
+      var range = this.selectionWatcher.getFreshRange();
+      if (range.isSelection) {
+        var nodeToCheck, rangyRange = range.range;
+
+        // Webkits contenteditable inserts spans when there is a
+        // styled node that starts just outside of the selection and
+        // is contained in the selection and followed by other textNodes.
+        // So first we check if we have a node just at the beginning of the
+        // selection. And if so we delete it before Chrome can do its magic.
+        if (rangyRange.startOffset === 0) {
+          if (rangyRange.startContainer.nodeType === nodeType.textNode) {
+            nodeToCheck = rangyRange.startContainer.parentNode;
+          } else if (rangyRange.startContainer.nodeType === nodeType.elementNode) {
+            nodeToCheck = rangyRange.startContainer;
+          }
+        }
+
+        if (nodeToCheck && nodeToCheck !== target && rangyRange.containsNode(nodeToCheck, true)) {
+          nodeToCheck.remove();
+        }
+      }
+    }
     if (notifyCharacterEvent) {
       this.notify(target, 'character', event);
     }

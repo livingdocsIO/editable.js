@@ -13,8 +13,8 @@ var Dispatcher = function(editable) {
   this.config = editable.config;
   this.editable = editable;
   this.editableSelector = editable.editableSelector;
-  this.keyboard = new Keyboard();
   this.selectionWatcher = new SelectionWatcher(this, win);
+  this.keyboard = new Keyboard(this.selectionWatcher);
   this.setup();
 };
 
