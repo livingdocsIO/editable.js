@@ -39,10 +39,12 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEve
     break;
 
   case this.key.backspace:
+    this.preventContenteditableBug(target);
     this.notify(target, 'backspace', event);
     break;
 
   case this.key['delete']:
+    this.preventContenteditableBug(target);
     this.notify(target, 'delete', event);
     break;
 
@@ -64,31 +66,35 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEve
   case 93: // Chrome/Safari: 93 (Right)
     break;
   default:
-    if (browserFeatures.contenteditableSpanBug) {
-      var range = this.selectionWatcher.getFreshRange();
-      if (range.isSelection) {
-        var nodeToCheck, rangyRange = range.range;
-
-        // Webkits contenteditable inserts spans when there is a
-        // styled node that starts just outside of the selection and
-        // is contained in the selection and followed by other textNodes.
-        // So first we check if we have a node just at the beginning of the
-        // selection. And if so we delete it before Chrome can do its magic.
-        if (rangyRange.startOffset === 0) {
-          if (rangyRange.startContainer.nodeType === nodeType.textNode) {
-            nodeToCheck = rangyRange.startContainer.parentNode;
-          } else if (rangyRange.startContainer.nodeType === nodeType.elementNode) {
-            nodeToCheck = rangyRange.startContainer;
-          }
-        }
-
-        if (nodeToCheck && nodeToCheck !== target && rangyRange.containsNode(nodeToCheck, true)) {
-          nodeToCheck.remove();
-        }
-      }
-    }
+    this.preventContenteditableBug(target);
     if (notifyCharacterEvent) {
       this.notify(target, 'character', event);
+    }
+  }
+};
+
+Keyboard.prototype.preventContenteditableBug = function(target) {
+  if (browserFeatures.contenteditableSpanBug) {
+    var range = this.selectionWatcher.getFreshRange();
+    if (range.isSelection) {
+      var nodeToCheck, rangyRange = range.range;
+
+      // Webkits contenteditable inserts spans when there is a
+      // styled node that starts just outside of the selection and
+      // is contained in the selection and followed by other textNodes.
+      // So first we check if we have a node just at the beginning of the
+      // selection. And if so we delete it before Chrome can do its magic.
+      if (rangyRange.startOffset === 0) {
+        if (rangyRange.startContainer.nodeType === nodeType.textNode) {
+          nodeToCheck = rangyRange.startContainer.parentNode;
+        } else if (rangyRange.startContainer.nodeType === nodeType.elementNode) {
+          nodeToCheck = rangyRange.startContainer;
+        }
+      }
+
+      if (nodeToCheck && nodeToCheck !== target && rangyRange.containsNode(nodeToCheck, true)) {
+        nodeToCheck.remove();
+      }
     }
   }
 };
