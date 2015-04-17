@@ -2,7 +2,10 @@ describe('Keyboard', function() {
   var keyboard, event, called;
 
   beforeEach(function() {
-    keyboard = new Keyboard();
+    var mockedSelectionWatcher = {
+      getFreshRange: function() { return {}; }
+    };
+    keyboard = new Keyboard(mockedSelectionWatcher);
     event = jQuery.Event("keydown");
     called = 0;
   });
