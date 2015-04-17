@@ -4263,6 +4263,7 @@ var content = (function() {
      * Clean up the Html.
      */
     tidyHtml: function(element) {
+      // if (element.normalize) element.normalize();
       this.normalizeTags(element);
     },
 
@@ -5369,8 +5370,8 @@ var Dispatcher = function(editable) {
   this.config = editable.config;
   this.editable = editable;
   this.editableSelector = editable.editableSelector;
-  this.keyboard = new Keyboard();
   this.selectionWatcher = new SelectionWatcher(this, win);
+  this.keyboard = new Keyboard(this.selectionWatcher);
   this.setup();
 };
 
@@ -5781,9 +5782,27 @@ var browserFeatures = (function() {
   })();
 
 
+  // Chrome contenteditable bug when inserting a character with a selection that:
+  //  - starts at the beginning of the contenteditable
+  //  - contains a styled span
+  //  - and some unstyled text
+  //
+  // Example:
+  // <p>|<span class="highlight">a</span>b|</p>
+  //
+  // For more details:
+  // https://code.google.com/p/chromium/issues/detail?id=335955
+  //
+  // It seems it is a webkit bug as I could reproduce on Safari (LP).
+  var contenteditableSpanBug = (function() {
+    return !!bowser.webkit;
+  })();
+
+
   return {
     contenteditable: contenteditable,
-    selectionchange: selectionchange
+    selectionchange: selectionchange,
+    contenteditableSpanBug: contenteditableSpanBug
   };
 
 })();
@@ -5983,8 +6002,9 @@ var highlightText = (function() {
  * The Keyboard module defines an event API for key events.
  */
 
-var Keyboard = function() {
+var Keyboard = function(selectionWatcher) {
   eventable(this);
+  this.selectionWatcher = selectionWatcher;
 };
 
 Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEvent) {
@@ -6019,10 +6039,12 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEve
     break;
 
   case this.key.backspace:
+    this.preventContenteditableBug(target);
     this.notify(target, 'backspace', event);
     break;
 
   case this.key['delete']:
+    this.preventContenteditableBug(target);
     this.notify(target, 'delete', event);
     break;
 
@@ -6044,8 +6066,35 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEve
   case 93: // Chrome/Safari: 93 (Right)
     break;
   default:
+    this.preventContenteditableBug(target);
     if (notifyCharacterEvent) {
       this.notify(target, 'character', event);
+    }
+  }
+};
+
+Keyboard.prototype.preventContenteditableBug = function(target) {
+  if (browserFeatures.contenteditableSpanBug) {
+    var range = this.selectionWatcher.getFreshRange();
+    if (range.isSelection) {
+      var nodeToCheck, rangyRange = range.range;
+
+      // Webkits contenteditable inserts spans when there is a
+      // styled node that starts just outside of the selection and
+      // is contained in the selection and followed by other textNodes.
+      // So first we check if we have a node just at the beginning of the
+      // selection. And if so we delete it before Chrome can do its magic.
+      if (rangyRange.startOffset === 0) {
+        if (rangyRange.startContainer.nodeType === nodeType.textNode) {
+          nodeToCheck = rangyRange.startContainer.parentNode;
+        } else if (rangyRange.startContainer.nodeType === nodeType.elementNode) {
+          nodeToCheck = rangyRange.startContainer;
+        }
+      }
+
+      if (nodeToCheck && nodeToCheck !== target && rangyRange.containsNode(nodeToCheck, true)) {
+        nodeToCheck.remove();
+      }
     }
   }
 };

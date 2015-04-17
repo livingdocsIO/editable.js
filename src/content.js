@@ -16,6 +16,7 @@ var content = (function() {
      * Clean up the Html.
      */
     tidyHtml: function(element) {
+      // if (element.normalize) element.normalize();
       this.normalizeTags(element);
     },
 
