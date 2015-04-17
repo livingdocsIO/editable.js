@@ -1,6 +1,12 @@
+# v0.5.2
+
+- Fix webkit contenteditable span insertion bug [#101](https://github.com/upfrontIO/editable.js/pull/101)
+
+
 # v0.5.1
 
 (v0.5.0 was accidentally pushed to npm so this patch is just to be able to push the new version to npm)
+
 
 # v0.5.0
 
