@@ -38,6 +38,25 @@ var NodeIterator = (function() {
     return this.current;
   };
 
+
+  NodeIterator.prototype.outerLookahead = function(node) {
+    var next, n = node;
+    if (node) {
+      while ((n !== this.root) && !(next = n.nextSibling)) {
+        n = n.parentNode;
+      }
+    }
+    return next;
+  };
+
+
+  // todo LP: maybe rename replaceCurrent
+  NodeIterator.prototype.setCurrent = function(node) {
+    this.next = node;
+    this.getNext();
+  };
+
+
   NodeIterator.prototype.replaceCurrent = function(replacement) {
     this.current = replacement;
     this.next = undefined;
