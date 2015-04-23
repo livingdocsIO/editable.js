@@ -18,7 +18,7 @@ module.exports = function(config) {
       'bower_components/sinon/index.js',
 
       // vendor files
-      'bower_components/jquery/jquery.js',
+      'bower_components/jquery/dist/jquery.js',
       'bower_components/rangy/rangy-core.js',
       'bower_components/bowser/bowser.js',
 
