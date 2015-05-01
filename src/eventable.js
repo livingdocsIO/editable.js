@@ -73,13 +73,13 @@ var getEventableModule = function(notifyContext) {
     },
 
     notify: function(context, event) {
-      var args;
+      var args = Array.prototype.slice.call(arguments);
       if (notifyContext) {
-        args = Array.prototype.slice.call(arguments).splice(1);
         event = context;
         context = notifyContext;
+        args = args.splice(1);
       } else {
-        args = Array.prototype.slice.call(arguments).splice(2);
+        args = args.splice(2);
       }
       var eventListeners = listeners[event];
       if (eventListeners === undefined) return;
