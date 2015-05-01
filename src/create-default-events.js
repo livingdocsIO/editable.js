@@ -1,4 +1,6 @@
-var createDefaultEvents = function (editable) {
+var createDefaultBehavior = require('./create-default-behavior');
+
+module.exports = function (editable) {
   var behavior = createDefaultBehavior(editable);
 
   return {

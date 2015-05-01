@@ -1,3 +1,6 @@
+var Cursor = require('./cursor');
+var Selection = require('./selection');
+
 /** RangeContainer
  *
  * primarily used to compare ranges
@@ -5,7 +8,8 @@
  * so we can easily compare them without checking for undefined
  * all the time
  */
-var RangeContainer = function(editableHost, rangyRange) {
+var RangeContainer;
+module.exports = RangeContainer = function(editableHost, rangyRange) {
   this.host = editableHost && editableHost.jquery ?
     editableHost[0] :
     editableHost;

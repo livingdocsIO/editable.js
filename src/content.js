@@ -1,4 +1,10 @@
-var content = (function() {
+var nodeType = require('./node-type');
+var rangeSaveRestore = require('./range-save-restore');
+var parser = require('./parser');
+var string = require('./util/string');
+
+var content;
+module.exports = content = (function() {
 
   var restoreRange = function(host, range, func) {
     range = rangeSaveRestore.save(range);

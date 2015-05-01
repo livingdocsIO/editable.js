@@ -1,8 +1,11 @@
+var nodeType = require('./node-type');
+
 // A DOM node iterator.
 //
 // Has the ability to replace nodes on the fly and continue
 // the iteration.
-var NodeIterator = (function() {
+var NodeIterator;
+module.exports = NodeIterator = (function() {
 
   var NodeIterator = function(root) {
     this.root = root;

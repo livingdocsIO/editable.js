@@ -1,3 +1,7 @@
+var string = require('./util/string');
+var nodeType = require('./node-type');
+var config = require('./config');
+
 /**
  * The parser module provides helper methods to parse html-chunks
  * manipulations and helpers for common tasks.
@@ -6,7 +10,7 @@
  * @submodule parser
  */
 
-var parser = (function() {
+module.exports = (function() {
   /**
    * Singleton that provides DOM lookup helpers.
    * @static

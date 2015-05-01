@@ -75,19 +75,19 @@ var getEventableModule = function(notifyContext) {
     notify: function(context, event) {
       var args;
       if (notifyContext) {
+        args = Array.prototype.slice.call(arguments).splice(1);
         event = context;
         context = notifyContext;
-        args = Array.prototype.slice.call(arguments).splice(1);
       } else {
         args = Array.prototype.slice.call(arguments).splice(2);
       }
       var eventListeners = listeners[event];
       if (eventListeners === undefined) return;
 
-
       // Traverse backwards and execute the newest listeners first.
       // Stop if a listener returns false.
       for (var i = eventListeners.length - 1; i >= 0; i--) {
+        // debugger
         if (eventListeners[i].apply(context, args) === false)
           break;
       }
@@ -96,7 +96,7 @@ var getEventableModule = function(notifyContext) {
 
 };
 
-var eventable = function(obj, notifyContext) {
+module.exports = function(obj, notifyContext) {
   var module = getEventableModule(notifyContext);
   for (var prop in module) {
     obj[prop] = module[prop];

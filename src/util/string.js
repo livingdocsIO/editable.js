@@ -1,4 +1,4 @@
-var string = (function() {
+module.exports = (function() {
 
   var toString = Object.prototype.toString;
   var htmlCharacters = {

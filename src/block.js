@@ -1,4 +1,4 @@
-var block = (function() {
+module.exports = (function() {
 
   var getSibling = function(type) {
     return function(element) {

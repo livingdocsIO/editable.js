@@ -1,3 +1,10 @@
+var content = require('./content');
+var parser = require('./parser');
+var string = require('./util/string');
+var nodeType = require('./node-type');
+var error = require('./util/error');
+var rangeSaveRestore = require('./range-save-restore');
+
 /**
  * The Cursor module provides a cross-browser abstraction layer for cursor.
  *
@@ -5,7 +12,8 @@
  * @submodule cursor
  */
 
-var Cursor = (function() {
+var Cursor;
+module.exports = Cursor = (function() {
 
   /**
    * Class for the Cursor module.

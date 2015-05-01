@@ -1,3 +1,12 @@
+var config = require('./config');
+var error = require('./util/error');
+var content = require('./content');
+var clipboard = require('./clipboard');
+var Dispatcher = require('./dispatcher');
+var Cursor = require('./cursor');
+var Spellcheck = require('./spellcheck');
+var createDefaultEvents = require('./create-default-events');
+
 /**
  * The Core module provides the Editable class that defines the Editable.JS
  * API and is the main entry point for Editable.JS.
@@ -21,7 +30,7 @@
  *
  * @class Editable
  */
-Editable = function(instanceConfig) {
+var Editable = function(instanceConfig) {
   var defaultInstanceConfig = {
     window: window,
     defaultBehavior: true,
@@ -43,6 +52,8 @@ Editable = function(instanceConfig) {
   }
 };
 
+module.exports = Editable;
+window.Editable = Editable;
 
 /**
  * Set configuration options that affect all editable

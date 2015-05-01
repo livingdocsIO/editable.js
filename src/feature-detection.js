@@ -1,4 +1,4 @@
-var browserFeatures = (function() {
+module.exports = (function() {
   /**
    * Check for contenteditable support
    *

@@ -1,4 +1,7 @@
-var highlightText = (function() {
+var NodeIterator = require('./node-iterator');
+var nodeType = require('./node-type');
+
+module.exports = (function() {
 
   return {
     extractText: function(element) {

@@ -5,7 +5,7 @@
  *
  * @type {Object}
  */
-var config = {
+module.exports = {
   log: false,
   logErrors: true,
   editableClass: 'js-editable',
