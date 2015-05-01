@@ -106,6 +106,20 @@ module.exports = function(grunt) {
         }
       }
     },
+
+    browserify: {
+      options: {
+        debug: true
+      },
+      tmp: {
+        files: {
+          '.tmp/editable.js' : [
+            'src/core.js'
+          ]
+        }
+      }
+    },
+
     uglify: {
       dist: {
         files: {
@@ -115,6 +129,7 @@ module.exports = function(grunt) {
         }
       }
     },
+
     bump: {
       options: {
         files: ['package.json', 'bower.json', 'version.json'],
