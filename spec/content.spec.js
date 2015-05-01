@@ -1,3 +1,6 @@
+var content = require('../src/content');
+var rangeSaveRestore = require('../src/range-save-restore');
+
 describe('Content', function() {
 
   describe('normalizeTags()', function() {
@@ -182,7 +185,7 @@ describe('Content', function() {
       range.setStart(host[0], 0);
       range.setEnd(host[0], 1);
 
-      content.wrap(range, '<em>')
+      content.wrap(range, '<em>');
       expect(host.html()).toEqual('<em>b</em>');
     });
   });
@@ -284,10 +287,10 @@ describe('Content', function() {
       range.setStart(host.find('b')[0], 0);
       range.setEnd(host.find('b')[0], 1);
 
-      range = content.toggleTag(host[0], range, $('<b>')[0])
+      range = content.toggleTag(host[0], range, $('<b>')[0]);
       expect(host.html()).toEqual('a');
 
-      content.toggleTag(host[0], range, $('<b>')[0])
+      content.toggleTag(host[0], range, $('<b>')[0]);
       expect(host.html()).toEqual('<b>a</b>');
     });
   });
@@ -604,7 +607,7 @@ describe('Content', function() {
         expect(result).toEqual('a<span data-editable="ui-remove">b</span>c');
       });
 
-    })
+    });
 
 
     describe('with ranges', function() {
@@ -625,7 +628,7 @@ describe('Content', function() {
         range.setEnd($host[0], 0);
         var savedRange = rangeSaveRestore.save(range);
         var result = content.extractContent($host[0]);
-        expect(result).toEqual('a')
+        expect(result).toEqual('a');
       });
 
       it('leaves the saved ranges in the host', function() {

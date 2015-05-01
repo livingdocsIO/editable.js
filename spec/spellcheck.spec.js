@@ -1,3 +1,7 @@
+var Editable = require('../src/core');
+var Spellcheck = require('../src/spellcheck');
+var Cursor = require('../src/cursor');
+
 describe('Spellcheck', function() {
 
   // Helpers

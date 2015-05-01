@@ -1,3 +1,5 @@
+var Keyboard = require('../src/keyboard');
+
 describe('Keyboard', function() {
   var keyboard, event, called;
 
@@ -6,7 +8,7 @@ describe('Keyboard', function() {
       getFreshRange: function() { return {}; }
     };
     keyboard = new Keyboard(mockedSelectionWatcher);
-    event = jQuery.Event("keydown");
+    event = jQuery.Event('keydown');
     called = 0;
   });
 
@@ -14,10 +16,10 @@ describe('Keyboard', function() {
 
     it('notifies a left event', function() {
       keyboard.on('left', function(event) {
-        called += 1
+        called += 1;
       });
 
-      event.keyCode = Keyboard.key['left'];
+      event.keyCode = Keyboard.key.left;
       keyboard.dispatchKeyEvent(event, {});
       expect(called).toEqual(1);
     });
@@ -26,27 +28,27 @@ describe('Keyboard', function() {
 
       it('does not fire the event for a "left" key', function() {
         keyboard.on('character', function(event) {
-          called += 1
+          called += 1;
         });
 
-        event.keyCode = Keyboard.key['left'];
+        event.keyCode = Keyboard.key.left;
         keyboard.dispatchKeyEvent(event, {}, true);
         expect(called).toEqual(0);
       });
 
       it('does not fire the event for a "ctrl" key', function() {
         keyboard.on('character', function(event) {
-          called += 1
+          called += 1;
         });
 
-        event.keyCode = Keyboard.key['ctrl'];
+        event.keyCode = Keyboard.key.ctrl;
         keyboard.dispatchKeyEvent(event, {}, true);
         expect(called).toEqual(0);
       });
 
       it('does fire the event for a "e" key', function() {
         keyboard.on('character', function(event) {
-          called += 1
+          called += 1;
         });
 
         event.keyCode = 'e'.charCodeAt(0);
@@ -56,7 +58,7 @@ describe('Keyboard', function() {
 
       it('does not fire the event for a "e" key without the notifyCharacterEvent param', function() {
         keyboard.on('character', function(event) {
-          called += 1
+          called += 1;
         });
 
         event.keyCode = 'e'.charCodeAt(0);

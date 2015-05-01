@@ -1,3 +1,6 @@
+var parser = require('../src/parser');
+var config = require('../src/config');
+
 describe('Parser', function() {
 
   // helper methods
@@ -13,7 +16,7 @@ describe('Parser', function() {
     range.selectNodeContents(node);
     range.collapse(false);
     return range;
-  }
+  };
 
   // test elements
   var empty = $('<div></div>')[0];
@@ -56,7 +59,7 @@ describe('Parser', function() {
   describe('getNodeIndex()', function() {
 
     it('gets element index of link in text', function() {
-      var linkNode = $(textWithLink).find('a').first()[0]
+      var linkNode = $(textWithLink).find('a').first()[0];
       expect( parser.getNodeIndex(linkNode) ).toBe( 1 );
     });
   });
@@ -79,7 +82,7 @@ describe('Parser', function() {
   describe('isWhitespaceOnly()', function() {
 
     it('works with void element', function() {
-      var textNode = document.createTextNode('')
+      var textNode = document.createTextNode('');
       expect(parser.isWhitespaceOnly(textNode)).toEqual(true);
     });
 
@@ -147,13 +150,13 @@ describe('Parser', function() {
     it('works for single child node', function() {
       // <div>foobar|</div>
       var range = createRangyCursorAfter(oneWord.firstChild);
-      expect(range.endOffset).toEqual(1)
+      expect(range.endOffset).toEqual(1);
       expect(parser.isEndOffset(oneWord, 1)).toEqual(true);
     });
 
     it('works for empty node', function() {
       // <div>|</div>
-      var range = createRangyCursorAtEnd(empty)
+      var range = createRangyCursorAtEnd(empty);
       expect(parser.isEndOffset(empty, range.endOffset)).toEqual(true);
     });
 
@@ -175,12 +178,12 @@ describe('Parser', function() {
     it('works with text and element nodes', function() {
       // <div>foo <a href='#'>bar</a>.|</div>
       var range = createRangyCursorAfter(textWithLink.childNodes[2]);
-      expect(range.endOffset).toEqual(3)
+      expect(range.endOffset).toEqual(3);
       expect(parser.isEndOffset(textWithLink, 3)).toEqual(true);
 
       // <div>foo <a href='#'>bar</a>|.</div>
-      var range = createRangyCursorAfter(textWithLink.childNodes[1]);
-      expect(range.endOffset).toEqual(2)
+      range = createRangyCursorAfter(textWithLink.childNodes[1]);
+      expect(range.endOffset).toEqual(2);
       expect(parser.isEndOffset(textWithLink, 2)).toEqual(false);
     });
   });
@@ -291,7 +294,7 @@ describe('Parser', function() {
       // <div><a href='#'>foo <span class='important'>bar</span>|</a></div>
       var endContainer = $(linkWithSpan).find('a')[0];
       var range = createRangyCursorAtEnd(endContainer);
-      expect(range.endOffset).toEqual(2)
+      expect(range.endOffset).toEqual(2);
       expect(parser.isEndOfHost(linkWithSpan, endContainer, 2)).toEqual(true);
 
       // <div><a href='#'>foo |<span class='important'>bar</span></a></div>
@@ -399,21 +402,21 @@ describe('isDocumentFragmentWithoutChildren()', function() {
   });
 
   it('returns truthy for a fragment with no children', function() {
-    expect(parser.isDocumentFragmentWithoutChildren(this.frag)).toBeTruthy()
+    expect(parser.isDocumentFragmentWithoutChildren(this.frag)).toBeTruthy();
   });
 
   it('returns falsy for a documentFragment with an empty text node as child', function() {
     this.frag.appendChild(window.document.createTextNode(''));
-    expect(parser.isDocumentFragmentWithoutChildren(this.frag)).toBeFalsy()
+    expect(parser.isDocumentFragmentWithoutChildren(this.frag)).toBeFalsy();
   });
 
   it('returns falsy for undefined', function() {
-    expect(parser.isDocumentFragmentWithoutChildren(undefined)).toBeFalsy()
+    expect(parser.isDocumentFragmentWithoutChildren(undefined)).toBeFalsy();
   });
 
   it('returns falsy for an element node', function() {
     var node = $('<div>')[0];
-    expect(parser.isDocumentFragmentWithoutChildren(node)).toBeFalsy()
+    expect(parser.isDocumentFragmentWithoutChildren(node)).toBeFalsy();
   });
 
 });

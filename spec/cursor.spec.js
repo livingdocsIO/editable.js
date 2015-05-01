@@ -1,3 +1,7 @@
+var content = require('../src/content');
+var Cursor = require('../src/cursor');
+var config = require('../src/config');
+
 describe('Cursor', function() {
 
   it('is defined', function() {
@@ -78,7 +82,7 @@ describe('Cursor', function() {
         var test = function() {
           var frag = window.document.createDocumentFragment();
           this.cursor.insertAfter(frag);
-        }
+        };
         expect($.proxy(test, this)).not.toThrow();
       });
     });
@@ -89,7 +93,7 @@ describe('Cursor', function() {
         var test = function() {
           var frag = window.document.createDocumentFragment();
           this.cursor.insertBefore(frag);
-        }
+        };
         expect($.proxy(test, this)).not.toThrow();
       });
     });

@@ -22,5 +22,12 @@
     "jQuery": true,
     "rangy": true,
     "bowser": true,
+    "escape": true,
+    "describe": true,
+    "it": true,
+    "expect": true,
+    "beforeEach": true,
+    "afterEach": true,
+    "sinon": true
   }
 }

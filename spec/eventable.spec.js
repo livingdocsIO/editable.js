@@ -1,3 +1,5 @@
+var eventable = require('../src/eventable');
+
 describe('eventable', function() {
   var obj;
 
@@ -24,7 +26,7 @@ describe('eventable', function() {
       var called = 0;
       obj.on('publish', function(arg) {
         called += 1;
-        expect(this.test).toEqual('A')
+        expect(this.test).toEqual('A');
       });
       obj.notify({ test: 'A' }, 'publish');
       expect(called).toEqual(1);
@@ -55,8 +57,8 @@ describe('eventable', function() {
       var called = 0;
       obj.on('publish', function(argA, argB) {
         called += 1;
-        expect(argA).toEqual('A')
-        expect(argB).toEqual('B')
+        expect(argA).toEqual('A');
+        expect(argB).toEqual('B');
       });
       obj.notify('publish', 'A', 'B');
       expect(called).toEqual(1);

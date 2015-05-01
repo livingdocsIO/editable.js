@@ -1,3 +1,6 @@
+var NodeIterator = require('../src/node-iterator');
+var highlightText = require('../src/highlight-text');
+
 describe('NodeIterator', function() {
 
   // Helper methods
@@ -6,7 +9,7 @@ describe('NodeIterator', function() {
   var callnTimes = function(object, methodName, count) {
     var returnValue;
     while (count--) {
-      returnValue = object[methodName]()
+      returnValue = object[methodName]();
     }
     return returnValue;
   };
