@@ -24,7 +24,7 @@ module.exports = function(grunt) {
           'src/{,*/}*.js',
           'spec/**/*.spec.js'
         ],
-        tasks: ['concat:editable']
+        tasks: ['browserify']
       }
     },
 
@@ -50,15 +50,18 @@ module.exports = function(grunt) {
     clean: {
       server: '.tmp'
     },
+
     jshint: {
       options: {
         jshintrc: '.jshintrc'
       },
       all: [
         'Gruntfile.js',
-        'src/{,*/}*.js'
+        'src/{,*/}*.js',
+        'spec/{,*/}*.js'
       ]
     },
+
     karma: {
       unit: {
         configFile: 'karma.conf.js',
@@ -74,6 +77,7 @@ module.exports = function(grunt) {
         singleRun: true
       }
     },
+
     concat: {
       dist: {
         files: {
@@ -83,27 +87,6 @@ module.exports = function(grunt) {
             '.tmp/editable.js'
           ]
         }
-      },
-      editable: {
-        files: {
-          '.tmp/editable.js': [
-            'editable.prefix',
-            'src/util/*.js',
-            'src/config.js',
-            'src/core.js',
-            'src/!(core|config).js',
-            'editable.suffix'
-          ],
-          '.tmp/editable-test.js': [
-            'editable.prefix',
-            'src/util/*.js',
-            'src/config.js',
-            'src/core.js',
-            'src/!(core|config).js',
-            'spec/**/*.js',
-            'editable.suffix'
-          ]
-        }
       }
     },
 
@@ -111,10 +94,17 @@ module.exports = function(grunt) {
       options: {
         debug: true
       },
-      tmp: {
+      src: {
         files: {
-          '.tmp/editable.js' : [
+          '.tmp/editable.js': [
             'src/core.js'
+          ]
+        }
+      },
+      test: {
+        files: {
+          '.tmp/editable-test.js': [
+            'spec/*.spec.js'
           ]
         }
       }
@@ -137,11 +127,13 @@ module.exports = function(grunt) {
         pushTo: 'origin'
       }
     },
+
     shell: {
       npm: {
         command: 'npm publish'
       }
     },
+
     revision: {
       options: {
         property: 'git.revision',
@@ -149,6 +141,7 @@ module.exports = function(grunt) {
         short: true
       }
     },
+
     replace: {
       revision: {
         options: {
@@ -168,7 +161,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', [
     'clean:server',
-    'concat:editable',
+    'browserify:test',
     'karma:unit'
   ]);
 
@@ -178,7 +171,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('dev', [
     'clean:server',
-    'concat:editable',
+    'browserify:src',
     'connect',
     'watch'
   ]);
@@ -187,7 +180,7 @@ module.exports = function(grunt) {
     'jshint',
     'clean:server',
     'add-revision',
-    'concat:editable',
+    'browserify',
     'karma:build',
     'concat:dist',
     'uglify'
@@ -195,7 +188,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('devbuild', [
     'clean:server',
-    'concat:editable',
+    'browserify:src',
     'concat:dist',
     'uglify'
   ]);
