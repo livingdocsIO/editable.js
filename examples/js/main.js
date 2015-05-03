@@ -89,9 +89,25 @@
 
   };
 
+  var updateCode = function(elem) {
+    var content = editable.getContent(elem);
+    var $codeBlock = $('.formatting-code-js');
+    $codeBlock.text(content.trim());
+    Prism.highlightElement($codeBlock[0]);
+  };
+
   $(document).ready(function() {
     editable.add('.formatting-example p');
     setupTooltip();
+
+    var secondExample = document.querySelector('.formatting-example p');
+    updateCode(secondExample);
+
+    editable.on('change', function(elem) {
+      if (elem === secondExample) {
+        updateCode(elem);
+      }
+    });
   });
 
 
