@@ -56,7 +56,7 @@ module.exports = function(grunt) {
     react: {
       examples: {
         files: {
-          'examples/js/react.js': 'examples/js/react.jsx'
+          '.tmp/js/react.js': 'examples/js/react.jsx'
         }
       }
     },
@@ -186,6 +186,7 @@ module.exports = function(grunt) {
   grunt.registerTask('dev', [
     'clean:server',
     'browserify:src',
+    'react',
     'connect',
     'watch'
   ]);
