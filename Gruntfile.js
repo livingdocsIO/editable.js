@@ -25,6 +25,12 @@ module.exports = function(grunt) {
           'spec/**/*.spec.js'
         ],
         tasks: ['browserify']
+      },
+      examples: {
+        files: [
+          'examples/js/*.jsx'
+        ],
+        tasks: ['react']
       }
     },
 
@@ -43,6 +49,14 @@ module.exports = function(grunt) {
             'examples',
             'bower_components'
           ]
+        }
+      }
+    },
+
+    react: {
+      examples: {
+        files: {
+          'examples/js/react.js': 'examples/js/react.jsx'
         }
       }
     },

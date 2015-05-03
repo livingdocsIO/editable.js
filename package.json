@@ -28,6 +28,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-git-revision": "0.0.1",
     "grunt-karma": "^0.10.1",
+    "grunt-react": "^0.12.2",
     "grunt-replace": "^0.8.0",
     "grunt-shell": "^1.1.1",
     "jasmine-core": "^2.2.0",
