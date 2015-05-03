@@ -9,6 +9,7 @@
 
   $(document).ready(function() {
     editable.add('.paragraph-example p');
+    examples.setup(editable);
   });
 
 

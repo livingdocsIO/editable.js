@@ -271,6 +271,64 @@ article {
     padding: 1px 5px;
 }
 
+
+/* ==========================================================================
+   Events List
+   ========================================================================== */
+
+.events-list {
+  margin: 0;
+  padding: 0;
+}
+
+.events-list li {
+  list-style: none;
+  margin-bottom: 2px;
+}
+
+.events-list li:last-child {
+  margin-bottom: 0;
+}
+
+.event-name {
+  display: inline-block;
+  padding: 0 10px;
+  margin-right: 5px;
+
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #eab730;
+  color: #fff;
+  font-weight: 400;
+}
+
+.selection {
+  display: inline-block;
+  background: #b3d4fc;
+}
+
+.cursor-position {
+  color: #49a345;
+}
+
+.cursor-position i {
+  display: inline-block;
+  width: 1px;
+  height: 100%;
+  position: relative;
+  top: -3px;
+  border-right: 2px solid #0c86b1;
+  margin-right: 1px;
+}
+
+.clipboard-action {
+  color: #666;
+}
+
+.clipboard-content {
+  color: #49a345;
+}
+
 /* ==========================================================================
    iFrame
    ========================================================================== */
@@ -331,7 +389,7 @@ article {
     height: 100%;
     position: relative;
     top: -3px;
-    border-right: 2px solid blue;
+    border-right: 2px solid #0c86b1;
     margin-right: 1px;
 
 }
