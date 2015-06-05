@@ -48,7 +48,8 @@ module.exports = function(grunt) {
     },
 
     clean: {
-      server: '.tmp'
+      server: '.tmp',
+      test: '.tmp/editable-test.js'
     },
 
     jshint: {
@@ -159,7 +160,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('test', [
-    'clean:server',
+    'clean:test',
     'browserify:test',
     'karma:unit'
   ]);
