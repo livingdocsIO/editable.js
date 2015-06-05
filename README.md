@@ -91,12 +91,6 @@ To find out what you can do with the the editable.js `cursor` and `selection` ob
 
 ## Development
 
-Organization:
-All files of editable.js share the same closure. This is in order to allow all classes inside the editable.js API to use global objects, but only expose the Editable singleton as the only externally visible variable of editable.js. To get a shared closure the files editable.prefix and editable.suffix wrap all code.
-
-**JSHint** does not know this, so all variables defined directly in this editable.js scope have to be added to the globals in .jshintrc
-
-
 Setup:
 
 - [PhantomJS](http://phantomjs.org/)
