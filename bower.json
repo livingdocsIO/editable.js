@@ -19,7 +19,6 @@
   ],
   "devDependencies": {
     "sinon": "http://sinonjs.org/releases/sinon-1.10.3.js",
-    "bowser": "0.7.2",
     "rangy": "1.2.3"
   },
   "dependencies": {

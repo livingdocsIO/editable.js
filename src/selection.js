@@ -1,3 +1,8 @@
+var Cursor = require('./cursor');
+var content = require('./content');
+var parser = require('./parser');
+var config = require('./config');
+
 /**
  * The Selection module provides a cross-browser abstraction layer for range
  * and selection.
@@ -6,7 +11,7 @@
  * @submodule selection
  */
 
-var Selection = (function() {
+module.exports = (function() {
 
   /**
    * Class that represents a selection and provides functionality to access or

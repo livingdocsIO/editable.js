@@ -1,3 +1,5 @@
+var Editable = require('../src/core');
+
 describe('Editable', function() {
   var editable, $div;
 
@@ -45,7 +47,7 @@ describe('Editable', function() {
         var content = editable.getContent($div[0]);
 
         // escape to show invisible characters
-        expect(escape(content)).toEqual('a')
+        expect(escape(content)).toEqual('a');
       });
     });
 

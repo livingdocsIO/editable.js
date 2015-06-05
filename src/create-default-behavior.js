@@ -1,3 +1,8 @@
+var parser = require('./parser');
+var content = require('./content');
+var log = require('./util/log');
+var block = require('./block');
+
 /**
  * The Behavior module defines the behavior triggered in response to the Editable.JS
  * events (see {{#crossLink "Editable"}}{{/crossLink}}).
@@ -9,7 +14,7 @@
  */
 
 
-var createDefaultBehavior = function(editable) {
+module.exports = function(editable) {
   var document = editable.win.document;
   var selectionWatcher = editable.dispatcher.selectionWatcher;
 

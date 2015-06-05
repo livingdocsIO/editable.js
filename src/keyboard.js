@@ -1,11 +1,16 @@
+var browserFeatures = require('./feature-detection');
+var nodeType = require('./node-type');
+var eventable = require('./eventable');
+
 /**
  * The Keyboard module defines an event API for key events.
  */
-
 var Keyboard = function(selectionWatcher) {
   eventable(this);
   this.selectionWatcher = selectionWatcher;
 };
+
+module.exports = Keyboard;
 
 Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEvent) {
   switch (event.keyCode) {

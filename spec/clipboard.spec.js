@@ -1,4 +1,6 @@
- describe('Clipboard', function() {
+var clipboard = require('../src/clipboard');
+
+describe('Clipboard', function() {
 
   describe('parseContent()', function() {
 
@@ -9,8 +11,8 @@
     };
 
     var extractSingleBlock = function(str) {
-      return extract(str)[0]
-    }
+      return extract(str)[0];
+    };
 
 
     // Copy Elements
@@ -51,7 +53,7 @@
     });
 
     it('creates two blocks from an <h1> followed by an <h2>', function() {
-      var blocks = extract('<h1>a</h1><h2>b</h2>')
+      var blocks = extract('<h1>a</h1><h2>b</h2>');
       expect(blocks[0]).toEqual('a');
       expect(blocks[1]).toEqual('b');
     });

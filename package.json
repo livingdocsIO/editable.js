@@ -11,9 +11,12 @@
   ],
   "description": "Friendly contenteditable API",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "bowser": "0.7.3"
+  },
   "devDependencies": {
     "grunt": "^0.4.5",
+    "grunt-browserify": "^3.7.0",
     "grunt-bump": "^0.1.0",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-coffee": "^0.12.0",

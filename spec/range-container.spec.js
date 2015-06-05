@@ -1,3 +1,5 @@
+var RangeContainer = require('../src/range-container');
+
 describe('RangeContainer', function() {
 
   describe('with no params', function() {

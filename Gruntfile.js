@@ -24,7 +24,7 @@ module.exports = function(grunt) {
           'src/{,*/}*.js',
           'spec/**/*.spec.js'
         ],
-        tasks: ['concat:editable']
+        tasks: ['browserify']
       }
     },
 
@@ -48,17 +48,21 @@ module.exports = function(grunt) {
     },
 
     clean: {
-      server: '.tmp'
+      server: '.tmp',
+      test: '.tmp/editable-test.js'
     },
+
     jshint: {
       options: {
         jshintrc: '.jshintrc'
       },
       all: [
         'Gruntfile.js',
-        'src/{,*/}*.js'
+        'src/{,*/}*.js',
+        'spec/{,*/}*.js'
       ]
     },
+
     karma: {
       unit: {
         configFile: 'karma.conf.js',
@@ -74,38 +78,38 @@ module.exports = function(grunt) {
         singleRun: true
       }
     },
+
     concat: {
       dist: {
         files: {
           'editable.js': [
             'bower_components/rangy/rangy-core.js',
-            'bower_components/bowser/bowser.js',
             '.tmp/editable.js'
-          ]
-        }
-      },
-      editable: {
-        files: {
-          '.tmp/editable.js': [
-            'editable.prefix',
-            'src/util/*.js',
-            'src/config.js',
-            'src/core.js',
-            'src/!(core|config).js',
-            'editable.suffix'
-          ],
-          '.tmp/editable-test.js': [
-            'editable.prefix',
-            'src/util/*.js',
-            'src/config.js',
-            'src/core.js',
-            'src/!(core|config).js',
-            'spec/**/*.js',
-            'editable.suffix'
           ]
         }
       }
     },
+
+    browserify: {
+      options: {
+        debug: true
+      },
+      src: {
+        files: {
+          '.tmp/editable.js': [
+            'src/core.js'
+          ]
+        }
+      },
+      test: {
+        files: {
+          '.tmp/editable-test.js': [
+            'spec/*.spec.js'
+          ]
+        }
+      }
+    },
+
     uglify: {
       dist: {
         files: {
@@ -115,6 +119,7 @@ module.exports = function(grunt) {
         }
       }
     },
+
     bump: {
       options: {
         files: ['package.json', 'bower.json', 'version.json'],
@@ -122,11 +127,13 @@ module.exports = function(grunt) {
         pushTo: 'origin'
       }
     },
+
     shell: {
       npm: {
         command: 'npm publish'
       }
     },
+
     revision: {
       options: {
         property: 'git.revision',
@@ -134,6 +141,7 @@ module.exports = function(grunt) {
         short: true
       }
     },
+
     replace: {
       revision: {
         options: {
@@ -152,8 +160,8 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('test', [
-    'clean:server',
-    'concat:editable',
+    'clean:test',
+    'browserify:test',
     'karma:unit'
   ]);
 
@@ -163,7 +171,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('dev', [
     'clean:server',
-    'concat:editable',
+    'browserify:src',
     'connect',
     'watch'
   ]);
@@ -172,7 +180,7 @@ module.exports = function(grunt) {
     'jshint',
     'clean:server',
     'add-revision',
-    'concat:editable',
+    'browserify',
     'karma:build',
     'concat:dist',
     'uglify'
@@ -180,7 +188,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('devbuild', [
     'clean:server',
-    'concat:editable',
+    'browserify:src',
     'concat:dist',
     'uglify'
   ]);

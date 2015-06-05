@@ -1,3 +1,14 @@
+var config = require('./config');
+var error = require('./util/error');
+var parser = require('./parser');
+var content = require('./content');
+var clipboard = require('./clipboard');
+var Dispatcher = require('./dispatcher');
+var Cursor = require('./cursor');
+var Spellcheck = require('./spellcheck');
+var createDefaultEvents = require('./create-default-events');
+var browser = require('bowser').browser;
+
 /**
  * The Core module provides the Editable class that defines the Editable.JS
  * API and is the main entry point for Editable.JS.
@@ -9,9 +20,6 @@
 
 /**
  * Constructor for the Editable.JS API that is externally visible.
- * Note that the Editable literal is defined
- * first in editable.prefix in order for it to be the only externally visible
- * variable.
  *
  * @param {Object} configuration for this editable instance.
  *   window: The window where to attach the editable events.
@@ -21,7 +29,7 @@
  *
  * @class Editable
  */
-Editable = function(instanceConfig) {
+var Editable = function(instanceConfig) {
   var defaultInstanceConfig = {
     window: window,
     defaultBehavior: true,
@@ -43,6 +51,13 @@ Editable = function(instanceConfig) {
   }
 };
 
+// Expose modules and editable
+Editable.parser = parser;
+Editable.content = content;
+Editable.browser = browser;
+window.Editable = Editable;
+
+module.exports = Editable;
 
 /**
  * Set configuration options that affect all editable

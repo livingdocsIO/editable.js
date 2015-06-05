@@ -1,4 +1,8 @@
-var clipboard = (function() {
+var config = require('./config');
+var string = require('./util/string');
+var nodeType = require('./node-type');
+
+module.exports = (function() {
   var allowedElements, requiredAttributes, transformElements;
   var blockLevelElements, splitIntoBlocks;
   var whitespaceOnly = /^\s*$/;

@@ -1,3 +1,10 @@
+var browserFeatures = require('./feature-detection');
+var clipboard = require('./clipboard');
+var eventable = require('./eventable');
+var SelectionWatcher = require('./selection-watcher');
+var config = require('./config');
+var Keyboard = require('./keyboard');
+
 /**
  * The Dispatcher module is responsible for dealing with events and their handlers.
  *
@@ -17,6 +24,8 @@ var Dispatcher = function(editable) {
   this.keyboard = new Keyboard(this.selectionWatcher);
   this.setup();
 };
+
+module.exports = Dispatcher;
 
 // This will be set to true once we detect the input event is working.
 // Input event description on MDN:

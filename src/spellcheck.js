@@ -1,4 +1,8 @@
-var Spellcheck = (function() {
+var content = require('./content');
+var highlightText = require('./highlight-text');
+var nodeType = require('./node-type');
+
+module.exports = (function() {
 
   // Unicode character blocks for letters.
   // See: http://jrgraphix.net/research/unicode_blocks.php

@@ -20,7 +20,6 @@ module.exports = function(config) {
       // vendor files
       'bower_components/jquery/dist/jquery.js',
       'bower_components/rangy/rangy-core.js',
-      'bower_components/bowser/bowser.js',
 
       // source files
       '.tmp/editable-test.js',
