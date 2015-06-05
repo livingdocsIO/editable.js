@@ -1,3 +1,5 @@
+var browser = require('bowser').browser;
+
 module.exports = (function() {
   /**
    * Check for contenteditable support
@@ -18,7 +20,7 @@ module.exports = (function() {
   var selectionchange = (function() {
 
     // not exactly feature detection... is it?
-    return !(bowser.gecko || bowser.opera);
+    return !(browser.gecko || browser.opera);
   })();
 
 
@@ -35,7 +37,7 @@ module.exports = (function() {
   //
   // It seems it is a webkit bug as I could reproduce on Safari (LP).
   var contenteditableSpanBug = (function() {
-    return !!bowser.webkit;
+    return !!browser.webkit;
   })();
 
 
