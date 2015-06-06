@@ -38,13 +38,11 @@
           </p>
         </div>
 
-        <div class="code-example">
-          <h3>HTML</h3>
-<pre><code class="language-markup">&lt;p&gt;
-  Lorem ipsum dolor sit amet...
-&lt;/p&gt;</code></pre>
-
+        <div>
+          <h3>Fired Events:</h3>
+          <div class="paragraph-example-events"></div>
         </div>
+
       </div>
     </section>
 
@@ -57,9 +55,18 @@
 
         <div class="formatting-example example-sheet">
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero.
           </p>
         </div>
+
+        <div class="code-example">
+          <h3>HTML</h3>
+<pre><code class="formatting-code-js language-markup">&lt;p&gt;
+  Lorem ipsum dolor sit amet...
+&lt;/p&gt;</code></pre>
+
+        </div>
+
       </div>
     </section>
 
@@ -117,7 +124,21 @@
           <h4>
             <span>focus</span> <span>blur</span>
           </h4>
-          <p>Fired when when editable element gets focus and after it is blurred. </p>
+          <p>Fired when when editable block gets focus and after it is blurred. </p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('focus', function(elem) {
+  // your code...
+});
+
+editable.on('blur', function(elem) {
+  // your code...
+});
+</code></pre>
+          </div>
+
         </div>
 
         <!-- selection -->
@@ -125,12 +146,13 @@
           <h4>
             <span>selection</span>
           </h4>
-          <p>Fired when the user selects some text inside an editable element.</p>
+
+          <p>Fired when the user selects some text inside an editable block.</p>
 
           <div class="code-example">
-          <h3>JS</h3>
+            <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.selection(function(elem, selection) {
+editable.on('selection', function(elem, selection) {
   if (selection) {
     var coords = selection.getCoordinates();
     var text = selection.text();
@@ -150,13 +172,18 @@ editable.selection(function(elem, selection) {
           <h4>
             <span>cursor</span>
           </h4>
-          <p>Fired when the user selects some text inside an editable element.</p>
+          <p>Fired when the user selects some text inside an editable block.</p>
 
           <div class="code-example">
-          <h3>JS</h3>
+          <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.cursor(function(elem, cursor) {
-  // todo...
+editable.on('cursor', function(elem, cursor) {
+  if (cursor) {
+    // example if you wanted to insert an element right before the cursor
+    cursor.insertBefore($('<span>')[0]);
+  } else {
+    // no cursor anymore in that editable block
+  }
 });
 </code></pre>
           </div>
@@ -167,7 +194,16 @@ editable.cursor(function(elem, cursor) {
           <h4>
             <span>change</span>
           </h4>
-          <p>Fired when the user selects some text inside an editable element.</p>
+          <p>Fired when the user selects some text inside an editable block.</p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('change', function(elem) {
+  var currentContent = editable.getContent(elem);
+});
+</code></pre>
+          </div>
 
         </div>
 
@@ -175,7 +211,19 @@ editable.cursor(function(elem, cursor) {
           <h4>
             <span>clipboard</span>
           </h4>
+
           <p>Fired for `copy`, `cut` and `paste` events.</p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('clipboard', function(elem, action, selection) {
+  if (action === 'cut') {
+    var cutOutText = selection.text();
+  }
+});
+</code></pre>
+          </div>
 
         </div>
 
@@ -190,6 +238,19 @@ editable.cursor(function(elem, cursor) {
             The end<span class="cursor">&nbsp;</span>
           <p>
 
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('insert', function(elem, direction, cursor) {
+  if (direction === 'after') {
+    // your code...
+  } else if (direction === 'before') {
+    // your code...
+  }
+});
+</code></pre>
+          </div>
+
         </div>
 
         <!-- split -->
@@ -202,6 +263,17 @@ editable.cursor(function(elem, cursor) {
           <p class="edit-example">
             a<span class="cursor">&nbsp;</span>b
           <p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('split', function(elem, before, after, cursor) {
+  // before and after are document fragments with the content
+  // from before and after the cursor in it.
+});
+</code></pre>
+          </div>
+
         </div>
 
         <!-- merge -->
@@ -214,6 +286,20 @@ editable.cursor(function(elem, cursor) {
           <p class="edit-example">
             <span class="cursor">&nbsp;</span>ab
           <p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('merge', function(elem, direction, cursor) {
+  if (direction === 'after') {
+    // your code...
+  } else if (direction === 'before') {
+    // your code...
+  }
+});
+</code></pre>
+          </div>
+
         </div>
 
         <!-- switch -->
@@ -221,7 +307,21 @@ editable.cursor(function(elem, cursor) {
           <h4>
             <span>switch</span>
           </h4>
+
           <p>Fired when the user pressed an arrow key at the top or bottom so that you may want to set the cursor into the preceding or following editale element.</p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('switch', function(elem, direction, cursor) {
+  if (direction === 'after') {
+    // your code...
+  } else if (direction === 'before') {
+    // your code...
+  }
+});
+</code></pre>
+          </div>
 
         </div>
 
@@ -232,19 +332,32 @@ editable.cursor(function(elem, cursor) {
           </h4>
           <p>Fired when the user presses shift and enter (&#x21E7; + &#x23ce;) to insert a newline.</p>
 
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('newline', function(elem, cursor) {
+  // your code...
+});
+</code></pre>
+          </div>
+
         </div>
       </div>
     </section>
 
 
-    <!-- Scripts -->
-
+    <!-- load editable -->
     <script src="jquery/dist/jquery.js"></script>
     <script src="rangy/rangy-core.js"></script>
-
     <script src="editable.js"></script>
+
+    <!-- dependencies of this demo site -->
+    <script src="js/prism.js"></script>
+    <script src="https://fb.me/react-with-addons-0.13.3.js"></script>
+
+    <!-- code for this demo site -->
+    <script src="js/react.js"></script>
     <script src="js/main.js"></script>
 
-    <script src="js/prism.js"></script>
   </body>
 </html>

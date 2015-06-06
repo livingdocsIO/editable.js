@@ -25,6 +25,12 @@ module.exports = function(grunt) {
           'spec/**/*.spec.js'
         ],
         tasks: ['browserify']
+      },
+      examples: {
+        files: [
+          'examples/js/*.jsx'
+        ],
+        tasks: ['react']
       }
     },
 
@@ -43,6 +49,14 @@ module.exports = function(grunt) {
             'examples',
             'bower_components'
           ]
+        }
+      }
+    },
+
+    react: {
+      examples: {
+        files: {
+          '.tmp/js/react.js': 'examples/js/react.jsx'
         }
       }
     },
@@ -172,6 +186,7 @@ module.exports = function(grunt) {
   grunt.registerTask('dev', [
     'clean:server',
     'browserify:src',
+    'react',
     'connect',
     'watch'
   ]);
