@@ -18,10 +18,10 @@
     "!editable.min.js"
   ],
   "devDependencies": {
-    "sinon": "http://sinonjs.org/releases/sinon-1.10.3.js",
-    "rangy": "1.2.3"
+    "sinon": "http://sinonjs.org/releases/sinon-1.10.3.js"
   },
   "dependencies": {
+    "rangy": "1.2.3",
     "jquery": "2.1.3"
   }
 }
