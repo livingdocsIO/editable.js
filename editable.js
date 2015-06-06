@@ -5004,10 +5004,10 @@ module.exports = function (editable) {
      * @event clipboard
      * @param {HTMLElement} element The element triggering the event.
      * @param {String} action The clipboard action: "copy" or "cut".
-     * @param {Cursor} cursor The actual cursor object.
+     * @param {Selection} selection A selection object around the copied content.
      */
-    clipboard: function(element, action, cursor) {
-      behavior.clipboard(element, action, cursor);
+    clipboard: function(element, action, selection) {
+      behavior.clipboard(element, action, selection);
     },
 
     /**
@@ -5394,10 +5394,16 @@ Dispatcher.prototype.setupElementEvents = function() {
     if (this.getAttribute(config.pastingAttribute)) return;
     _this.notify('blur', this);
   }).on('copy.editable', _this.editableSelector, function(event) {
-    _this.notify('clipboard', this, 'copy', _this.selectionWatcher.getFreshSelection());
+    var selection = _this.selectionWatcher.getFreshSelection();
+    if (selection.isSelection) {
+      _this.notify('clipboard', this, 'copy', selection);
+    }
   }).on('cut.editable', _this.editableSelector, function(event) {
-    _this.notify('clipboard', this, 'cut', _this.selectionWatcher.getFreshSelection());
-    _this.triggerChangeEvent(this);
+    var selection = _this.selectionWatcher.getFreshSelection();
+    if (selection.isSelection) {
+      _this.notify('clipboard', this, 'cut', selection);
+      _this.triggerChangeEvent(this);
+    }
   }).on('paste.editable', _this.editableSelector, function(event) {
     var element = this;
     var afterPaste = function (blocks, cursor) {

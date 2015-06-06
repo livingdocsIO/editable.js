@@ -171,10 +171,10 @@ module.exports = function (editable) {
      * @event clipboard
      * @param {HTMLElement} element The element triggering the event.
      * @param {String} action The clipboard action: "copy" or "cut".
-     * @param {Cursor} cursor The actual cursor object.
+     * @param {Selection} selection A selection object around the copied content.
      */
-    clipboard: function(element, action, cursor) {
-      behavior.clipboard(element, action, cursor);
+    clipboard: function(element, action, selection) {
+      behavior.clipboard(element, action, selection);
     },
 
     /**
