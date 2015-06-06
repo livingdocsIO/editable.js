@@ -1,6 +1,0 @@
-  window.Editable = Editable;
-  Editable.parser = parser;
-  Editable.content = content;
-  Editable.bowser = bowser;
-
-})(window, document, window.jQuery);

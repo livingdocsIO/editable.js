@@ -5,14 +5,14 @@
  *
  * @type {Object}
  */
-var config = {
+module.exports = {
   log: false,
   logErrors: true,
   editableClass: 'js-editable',
   editableDisabledClass: 'js-editable-disabled',
   pastingAttribute: 'data-editable-is-pasting',
-  boldTag: '<strong>',
-  italicTag: '<em>',
+  boldTag: 'strong',
+  italicTag: 'em',
 
   // Rules that are applied when filtering pasted content
   pastedHtmlRules: {

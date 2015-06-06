@@ -1,3 +1,6 @@
+var Selection = require('../src/selection');
+var Cursor = require('../src/cursor');
+
 describe('Selection', function() {
 
   it('should be defined', function() {
@@ -40,7 +43,7 @@ describe('Selection', function() {
         range = rangy.createRange();
         range.setStartBefore(textNode);
         range.setEnd(textNode, 5);
-        var selection = new Selection(this.oneWord, range);
+        selection = new Selection(this.oneWord, range);
         expect(selection.isAllSelected()).toEqual(false);
       });
     });

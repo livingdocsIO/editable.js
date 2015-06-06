@@ -1,4 +1,6 @@
-var browserFeatures = (function() {
+var browser = require('bowser').browser;
+
+module.exports = (function() {
   /**
    * Check for contenteditable support
    *
@@ -18,13 +20,31 @@ var browserFeatures = (function() {
   var selectionchange = (function() {
 
     // not exactly feature detection... is it?
-    return !(bowser.gecko || bowser.opera);
+    return !(browser.gecko || browser.opera);
+  })();
+
+
+  // Chrome contenteditable bug when inserting a character with a selection that:
+  //  - starts at the beginning of the contenteditable
+  //  - contains a styled span
+  //  - and some unstyled text
+  //
+  // Example:
+  // <p>|<span class="highlight">a</span>b|</p>
+  //
+  // For more details:
+  // https://code.google.com/p/chromium/issues/detail?id=335955
+  //
+  // It seems it is a webkit bug as I could reproduce on Safari (LP).
+  var contenteditableSpanBug = (function() {
+    return !!browser.webkit;
   })();
 
 
   return {
     contenteditable: contenteditable,
-    selectionchange: selectionchange
+    selectionchange: selectionchange,
+    contenteditableSpanBug: contenteditableSpanBug
   };
 
 })();

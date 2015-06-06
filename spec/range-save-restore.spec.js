@@ -1,3 +1,5 @@
+var rangeSaveRestore = require('../src/range-save-restore');
+
 describe('RangeSaveRestore', function() {
 
   var range, host;
@@ -11,10 +13,10 @@ describe('RangeSaveRestore', function() {
     range.setStart(host[0], 0);
     range.setEnd(host[0], 1);
     rangeSaveRestore.save(range);
-    expect(range.toHtml()).toEqual('a')
-    expect(host[0].childNodes[0].nodeName).toEqual('SPAN')
-    expect(host[0].childNodes[1].nodeValue).toEqual('a')
-    expect(host[0].childNodes[2].nodeName).toEqual('SPAN')
+    expect(range.toHtml()).toEqual('a');
+    expect(host[0].childNodes[0].nodeName).toEqual('SPAN');
+    expect(host[0].childNodes[1].nodeValue).toEqual('a');
+    expect(host[0].childNodes[2].nodeName).toEqual('SPAN');
   });
 
   it('restores a range', function(){

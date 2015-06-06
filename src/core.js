@@ -1,3 +1,14 @@
+var config = require('./config');
+var error = require('./util/error');
+var parser = require('./parser');
+var content = require('./content');
+var clipboard = require('./clipboard');
+var Dispatcher = require('./dispatcher');
+var Cursor = require('./cursor');
+var Spellcheck = require('./spellcheck');
+var createDefaultEvents = require('./create-default-events');
+var browser = require('bowser').browser;
+
 /**
  * The Core module provides the Editable class that defines the Editable.JS
  * API and is the main entry point for Editable.JS.
@@ -9,9 +20,6 @@
 
 /**
  * Constructor for the Editable.JS API that is externally visible.
- * Note that the Editable literal is defined
- * first in editable.prefix in order for it to be the only externally visible
- * variable.
  *
  * @param {Object} configuration for this editable instance.
  *   window: The window where to attach the editable events.
@@ -21,7 +29,7 @@
  *
  * @class Editable
  */
-Editable = function(instanceConfig) {
+var Editable = function(instanceConfig) {
   var defaultInstanceConfig = {
     window: window,
     defaultBehavior: true,
@@ -43,6 +51,13 @@ Editable = function(instanceConfig) {
   }
 };
 
+// Expose modules and editable
+Editable.parser = parser;
+Editable.content = content;
+Editable.browser = browser;
+window.Editable = Editable;
+
+module.exports = Editable;
 
 /**
  * Set configuration options that affect all editable
@@ -244,7 +259,10 @@ Editable.prototype.getContent = function(element) {
  * @returns {Cursor} A new Cursor object just before the inserted content.
  */
 Editable.prototype.appendTo = function(element, contentToAppend) {
+  element = content.adoptElement(element, this.win.document);
+
   if (typeof contentToAppend === 'string') {
+    // todo: create content in the right window
     contentToAppend = content.createFragmentFromString(contentToAppend);
   }
 
@@ -254,12 +272,16 @@ Editable.prototype.appendTo = function(element, contentToAppend) {
 };
 
 
+
 /**
  * @param {String | DocumentFragment} content to prepend
  * @returns {Cursor} A new Cursor object just after the inserted content.
  */
 Editable.prototype.prependTo = function(element, contentToPrepend) {
+  element = content.adoptElement(element, this.win.document);
+
   if (typeof contentToPrepend === 'string') {
+    // todo: create content in the right window
     contentToPrepend = content.createFragmentFromString(contentToPrepend);
   }
 
@@ -365,8 +387,9 @@ var createEventSubscriber = function(name) {
 /**
  * Set up callback functions for several events.
  */
-var events = ['focus', 'blur', 'flow', 'selection', 'cursor', 'newline', 'insert',
-              'split', 'merge', 'empty', 'change', 'switch', 'move', 'clipboard'];
+var events = ['focus', 'blur', 'flow', 'selection', 'cursor', 'newline',
+              'insert', 'split', 'merge', 'empty', 'change', 'switch', 'move',
+              'clipboard', 'paste'];
 
 for (var i = 0; i < events.length; ++i) {
   var eventName = events[i];

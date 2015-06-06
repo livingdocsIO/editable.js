@@ -1,3 +1,8 @@
+var parser = require('./parser');
+var content = require('./content');
+var log = require('./util/log');
+var block = require('./block');
+
 /**
  * The Behavior module defines the behavior triggered in response to the Editable.JS
  * events (see {{#crossLink "Editable"}}{{/crossLink}}).
@@ -9,7 +14,7 @@
  */
 
 
-var createDefaultBehavior = function(editable) {
+module.exports = function(editable) {
   var document = editable.win.document;
   var selectionWatcher = editable.dispatcher.selectionWatcher;
 
@@ -168,10 +173,35 @@ var createDefaultBehavior = function(editable) {
       log('Default move behavior');
     },
 
-    clipboard: function(element, action, cursor) {
-      if (action === 'paste') {
-        clipboard.paste(element, action, cursor, document);
+    paste: function(element, blocks, cursor) {
+      var fragment;
+
+      var firstBlock = blocks[0];
+      cursor.insertBefore(firstBlock);
+
+      if (blocks.length <= 1) {
+        cursor.setVisibleSelection();
+      } else {
+        var parent = element.parentNode;
+        var currentElement = element;
+
+        for (var i = 1; i < blocks.length; i++) {
+          var newElement = element.cloneNode(false);
+          if (newElement.id) newElement.removeAttribute('id');
+          fragment = content.createFragmentFromString(blocks[i]);
+          $(newElement).append(fragment);
+          parent.insertBefore(newElement, currentElement.nextSibling);
+          currentElement = newElement;
+        }
+
+        // focus last element
+        cursor = editable.createCursorAtEnd(currentElement);
+        cursor.setVisibleSelection();
       }
+    },
+
+    clipboard: function(element, action, cursor) {
+      log('Default clipboard behavior');
     }
   };
 };

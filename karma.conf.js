@@ -18,9 +18,8 @@ module.exports = function(config) {
       'bower_components/sinon/index.js',
 
       // vendor files
-      'bower_components/jquery/jquery.js',
+      'bower_components/jquery/dist/jquery.js',
       'bower_components/rangy/rangy-core.js',
-      'bower_components/bowser/bowser.js',
 
       // source files
       '.tmp/editable-test.js',
@@ -64,7 +63,7 @@ module.exports = function(config) {
 
     // If browser does not capture in given timeout [ms], kill it
     // CLI --capture-timeout 5000
-    captureTimeout: 5000,
+    captureTimeout: 8000,
 
     // Auto run tests on start (when browsers are captured) and exit
     // CLI --single-run --no-single-run

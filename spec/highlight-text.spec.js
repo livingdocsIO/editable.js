@@ -1,3 +1,7 @@
+var Cursor = require('../src/cursor');
+var highlightText = require('../src/highlight-text');
+var Spellcheck = require('../src/spellcheck');
+
 describe('highlightText', function() {
 
   // Helper Methods
@@ -45,7 +49,7 @@ describe('highlightText', function() {
     });
 
     it('extracts the text', function() {
-      this.element.innerHTML = 'a'
+      this.element.innerHTML = 'a';
       var text = highlightText.extractText(this.element);
       expect(text).toEqual('a');
     });
@@ -220,7 +224,7 @@ describe('highlightText', function() {
       highlight(elem, /juice/g);
       removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div>Some <span spellcheck="true">juice</span>.</div>')
+        .toEqual('<div>Some <span spellcheck="true">juice</span>.</div>');
     });
 
     it('wraps a word with a partial <em> element', function() {
@@ -228,7 +232,7 @@ describe('highlightText', function() {
       highlight(elem, /juice/g);
       removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div>Some <span spellcheck="true">jui</span><em><span spellcheck="true">ce</span>.</em></div>')
+        .toEqual('<div>Some <span spellcheck="true">jui</span><em><span spellcheck="true">ce</span>.</em></div>');
     });
 
     it('wraps two words in the same text node', function() {
@@ -236,7 +240,7 @@ describe('highlightText', function() {
       highlight(elem, /a|b/g);
       removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div><span spellcheck="true">a</span> or <span spellcheck="true">b</span></div>')
+        .toEqual('<div><span spellcheck="true">a</span> or <span spellcheck="true">b</span></div>');
     });
 
     it('wraps a word in a <em> element', function() {
@@ -244,7 +248,7 @@ describe('highlightText', function() {
       highlight(elem, /word/g);
       removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div><em><span spellcheck="true">word</span></em></div>')
+        .toEqual('<div><em><span spellcheck="true">word</span></em></div>');
     });
 
     it('can handle a non-match', function() {
@@ -252,7 +256,7 @@ describe('highlightText', function() {
       highlight(elem, /xxx/g);
       removeWordId(elem);
       expect(elem.outerHTML)
-        .toEqual('<div><em>word</em></div>')
+        .toEqual('<div><em>word</em></div>');
     });
 
     it('works with a more complex regex', function() {

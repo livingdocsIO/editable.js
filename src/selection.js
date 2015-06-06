@@ -1,3 +1,8 @@
+var Cursor = require('./cursor');
+var content = require('./content');
+var parser = require('./parser');
+var config = require('./config');
+
 /**
  * The Selection module provides a cross-browser abstraction layer for range
  * and selection.
@@ -6,7 +11,7 @@
  * @submodule selection
  */
 
-var Selection = (function() {
+module.exports = (function() {
 
   /**
    * Class that represents a selection and provides functionality to access or
@@ -75,7 +80,7 @@ var Selection = (function() {
      * @method link
      */
     link: function(href, attrs) {
-      var $link = $('<a>');
+      var $link = $(this.createElement('a'));
       if (href) $link.attr('href', href);
       for (var name in attrs) {
         $link.attr(name, attrs[name]);
@@ -103,6 +108,7 @@ var Selection = (function() {
     },
 
     toggle: function(elem) {
+      elem = this.adoptElement(elem);
       this.range = content.toggleTag(this.host, this.range, elem);
       this.setSelection();
     },
@@ -112,13 +118,13 @@ var Selection = (function() {
      * @method makeBold
      */
     makeBold: function() {
-      var $bold = $(config.boldTag);
-      this.forceWrap($bold[0]);
+      var bold = this.createElement(config.boldTag);
+      this.forceWrap(bold);
     },
 
     toggleBold: function() {
-      var $bold = $(config.boldTag);
-      this.toggle($bold[0]);
+      var bold = this.createElement(config.boldTag);
+      this.toggle(bold);
     },
 
     /**
@@ -126,13 +132,13 @@ var Selection = (function() {
      * @method giveEmphasis
      */
     giveEmphasis: function() {
-      var $em = $(config.italicTag);
-      this.forceWrap($em[0]);
+      var em = this.createElement(config.italicTag);
+      this.forceWrap(em);
     },
 
     toggleEmphasis: function() {
-      var $italic = $(config.italicTag);
-      this.toggle($italic[0]);
+      var em = this.createElement(config.italicTag);
+      this.toggle(em);
     },
 
     /**
@@ -224,6 +230,7 @@ var Selection = (function() {
      * @method forceWrap
      */
     forceWrap: function(elem) {
+      elem = this.adoptElement(elem);
       this.range = content.forceWrap(this.host, this.range, elem);
       this.setSelection();
     },

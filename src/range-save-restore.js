@@ -1,8 +1,11 @@
+var error = require('./util/error');
+var nodeType = require('./node-type');
+
 /**
  * Inspired by the Selection save and restore module for Rangy by Tim Down
  * Saves and restores ranges using invisible marker elements in the DOM.
  */
-var rangeSaveRestore = (function() {
+module.exports = (function() {
   var boundaryMarkerId = 0;
 
   // (U+FEFF) zero width no-break space

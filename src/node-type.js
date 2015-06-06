@@ -1,7 +1,6 @@
 // DOM node types
 // https://developer.mozilla.org/en-US/docs/Web/API/Node.nodeType
-
-var nodeType = {
+module.exports = {
   elementNode: 1,
   attributeNode: 2,
   textNode: 3,

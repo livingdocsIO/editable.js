@@ -1,4 +1,7 @@
-describe("Editable configuration", function() {
+var config = require('../src/config');
+var Editable = require('../src/core');
+
+describe('Editable configuration', function() {
 
   describe('instance configuration', function() {
     var editable;

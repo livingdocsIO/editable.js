@@ -9,6 +9,7 @@
 
   $(document).ready(function() {
     editable.add('.paragraph-example p');
+    examples.setup(editable);
   });
 
 
@@ -89,16 +90,33 @@
 
   };
 
+  var updateCode = function(elem) {
+    var content = editable.getContent(elem);
+    var $codeBlock = $('.formatting-code-js');
+    $codeBlock.text(content.trim());
+    Prism.highlightElement($codeBlock[0]);
+  };
+
   $(document).ready(function() {
     editable.add('.formatting-example p');
     setupTooltip();
+
+    var secondExample = document.querySelector('.formatting-example p');
+    updateCode(secondExample);
+
+    editable.on('change', function(elem) {
+      if (elem === secondExample) {
+        updateCode(elem);
+      }
+    });
   });
 
 
   // Highlighting
   // ------------
 
-  editable.add('.highlighting-example p');
+  var $highlightExample = $('.highlighting-example p');
+  editable.add($highlightExample);
 
   var highlightService = function(text, callback) {
     var words = ['happy'];
@@ -107,8 +125,11 @@
 
   editable.setupSpellcheck({
     spellcheckService: highlightService,
-    markerNode: $('<span class="highlight"></span>')
+    markerNode: $('<span class="highlight"></span>'),
+    throttle: 0
   });
+
+  editable.spellcheck.checkSpelling($highlightExample[0]);
 
 
   // Pasting

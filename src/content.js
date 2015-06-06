@@ -1,4 +1,10 @@
-var content = (function() {
+var nodeType = require('./node-type');
+var rangeSaveRestore = require('./range-save-restore');
+var parser = require('./parser');
+var string = require('./util/string');
+
+var content;
+module.exports = content = (function() {
 
   var restoreRange = function(host, range, func) {
     range = rangeSaveRestore.save(range);
@@ -16,6 +22,7 @@ var content = (function() {
      * Clean up the Html.
      */
     tidyHtml: function(element) {
+      // if (element.normalize) element.normalize();
       this.normalizeTags(element);
     },
 
@@ -125,6 +132,14 @@ var content = (function() {
         fragment.appendChild(el);
       }
       return fragment;
+    },
+
+    adoptElement: function(node, doc) {
+      if (node.ownerDocument !== doc) {
+        return doc.adoptNode(node);
+      } else {
+        return node;
+      }
     },
 
     /**

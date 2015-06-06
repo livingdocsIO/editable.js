@@ -1,3 +1,5 @@
+var string = require('../src/util/string');
+
 describe('string util', function() {
 
   describe('escapeHtml()', function() {

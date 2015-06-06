@@ -1,3 +1,8 @@
+var parser = require('./parser');
+var RangeContainer = require('./range-container');
+var Cursor = require('./cursor');
+var Selection = require('./selection');
+
 /**
  * The SelectionWatcher module watches for selection changes inside
  * of editable blocks.
@@ -5,7 +10,9 @@
  * @module core
  * @submodule selectionWatcher
  */
-var SelectionWatcher = function(dispatcher, win) {
+
+var SelectionWatcher;
+module.exports = SelectionWatcher = function(dispatcher, win) {
   this.dispatcher = dispatcher;
   this.win = win || window;
   this.rangySelection = undefined;

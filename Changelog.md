@@ -1,3 +1,19 @@
+# v0.5.2
+
+- Fix webkit contenteditable span insertion bug [#101](https://github.com/upfrontIO/editable.js/pull/101)
+
+
+# v0.5.1
+
+(v0.5.0 was accidentally pushed to npm so this patch is just to be able to push the new version to npm)
+
+
+# v0.5.0
+
+- Split pasted content into blocks [#97](https://github.com/upfrontIO/editable.js/pull/97)
+- Adopt elements to iframe (set correct ownerDocument) [#98](https://github.com/upfrontIO/editable.js/pull/98)
+
+
 # v0.4.4
 
 #### Bugfixes

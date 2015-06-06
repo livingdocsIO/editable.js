@@ -1,3 +1,8 @@
+var content = require('../src/content');
+var Cursor = require('../src/cursor');
+var Keyboard = require('../src/keyboard');
+var Editable = require('../src/core');
+
 describe('Dispatcher', function() {
 
   var key = Keyboard.key;
@@ -28,13 +33,13 @@ describe('Dispatcher', function() {
   // register one listener per test
   var on = function(eventName, func) {
     // off(); // make sure the last listener is unregistered
-    var obj = { calls: 0 }
+    var obj = { calls: 0 };
     var proxy = function() {
       obj.calls += 1;
       func.apply(this, arguments);
     };
     onListener = { event: eventName, listener: proxy };
-    editable.on(eventName, proxy)
+    editable.on(eventName, proxy);
     return obj;
   };
 
@@ -44,7 +49,7 @@ describe('Dispatcher', function() {
       editable.unload();
       onListener = undefined;
     }
-  }
+  };
 
   describe('for editable', function() {
 
@@ -128,7 +133,7 @@ describe('Dispatcher', function() {
 
       beforeEach(function(){
         event = jQuery.Event('keydown');
-        event.keyCode = key['backspace'];
+        event.keyCode = key.backspace;
       });
 
       it('fires "merge" if cursor is at the beginning', function(done) {
@@ -137,7 +142,7 @@ describe('Dispatcher', function() {
 
         on('merge', function(element) {
           expect(element).toEqual($elem[0]);
-          done()
+          done();
         });
 
         $elem.trigger(event);
@@ -149,7 +154,7 @@ describe('Dispatcher', function() {
 
         on('change', function(element) {
           expect(element).toEqual($elem[0]);
-          done()
+          done();
         });
 
         $elem.trigger(event);
@@ -168,7 +173,7 @@ describe('Dispatcher', function() {
 
         on('merge', function(element) {
           expect(element).toEqual($elem[0]);
-          done()
+          done();
         });
 
         $elem.trigger(event);
