@@ -44,12 +44,12 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEve
     break;
 
   case this.key.backspace:
-    this.preventContenteditableBug(target);
+    this.preventContenteditableBug(target, event);
     this.notify(target, 'backspace', event);
     break;
 
   case this.key['delete']:
-    this.preventContenteditableBug(target);
+    this.preventContenteditableBug(target, event);
     this.notify(target, 'delete', event);
     break;
 
@@ -71,15 +71,17 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEve
   case 93: // Chrome/Safari: 93 (Right)
     break;
   default:
-    this.preventContenteditableBug(target);
+    this.preventContenteditableBug(target, event);
     if (notifyCharacterEvent) {
       this.notify(target, 'character', event);
     }
   }
 };
 
-Keyboard.prototype.preventContenteditableBug = function(target) {
+Keyboard.prototype.preventContenteditableBug = function(target, event) {
   if (browserFeatures.contenteditableSpanBug) {
+    if (event.ctrlKey || event.metaKey) return;
+
     var range = this.selectionWatcher.getFreshRange();
     if (range.isSelection) {
       var nodeToCheck, rangyRange = range.range;
