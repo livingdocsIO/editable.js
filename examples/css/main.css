@@ -281,14 +281,39 @@ article {
   padding: 0;
 }
 
-.events-list li {
+.events-list .events-list-entry {
   list-style: none;
   margin-bottom: 2px;
+  opacity: .6;
+  transition: opacity 1s ease-in;
 }
 
-.events-list li:last-child {
+.events-list .events-list-entry:last-child {
   margin-bottom: 0;
 }
+
+
+/* Event List Animations */
+
+.events-list .events-enter {
+  opacity: 1;
+}
+
+.events-list .events-enter.events-enter-active {
+  opacity: .99;
+}
+
+.events-list .events-leave {
+  opacity: .6;
+  transition: opacity .4s ease-in;
+}
+
+.events-list .events-leave.events-leave-active {
+  opacity: .01;
+}
+
+
+/* Event styles */
 
 .event-name {
   display: inline-block;

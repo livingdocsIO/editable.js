@@ -1,17 +1,23 @@
+var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
+var guid = 0;
+
 var Events = React.createClass({
   render: function() {
     var content, list = this.props.list;
     if (list.length) {
       content = list.map(function(entry) {
-        return <Events.Entry { ...entry } />
+        return <Events.Entry key={ entry.id } { ...entry } />
       });
     } else {
-      content = 'Nothing to see yet.';
+      content = <div key="empty-entry">Nothing to see yet.</div>;
     }
+
     return (
-      <ul className="events-list">
-        { content }
-      </ul>
+      <div className="events-list">
+        <ReactCSSTransitionGroup transitionName="events" transitionLeave={false}>
+          { content }
+        </ReactCSSTransitionGroup>
+      </div>
     )
   }
 });
@@ -19,10 +25,10 @@ var Events = React.createClass({
 Events.Entry = React.createClass({
   render: function() {
     return (
-      <li>
+      <div className="events-list-entry">
         <span className="event-name">{ this.props.name }</span>
         { this.props.content }
-      </li>
+      </div>
     );
   }
 });
@@ -68,6 +74,8 @@ var removeFromList = function() {
 }
 
 var showEvent = function(event) {
+  guid += 1;
+  event.id = guid;
   addToList(event);
   draw();
 };
@@ -210,4 +218,3 @@ window.examples = {
     draw();
   }
 };
-
