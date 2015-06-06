@@ -43,11 +43,11 @@ module.exports = function(grunt) {
       },
       livereload: {
         options: {
-          open: true,
+          open: 'http://localhost:9050/',
           base: [
             '.tmp',
             'examples',
-            'bower_components'
+            './'
           ]
         }
       }
