@@ -3,7 +3,4 @@ node_modules
 bower_components
 npm-debug.log
 
-.grunt
-dist
 .tmp
-coverage
