@@ -1,3 +1,16 @@
+# v0.6.0
+
+#### Bugfixes
+
+- Fix Ctrl copy bug introduced by #101 [#105](https://github.com/upfrontIO/editable.js/pull/105)
+- Only fire clipboard cut and copy events when there is a selection [#106](https://github.com/upfrontIO/editable.js/pull/106)
+
+#### Improvements
+
+- Use Browserify [#102](https://github.com/upfrontIO/editable.js/pull/102)
+- Improve the examples page [#104](https://github.com/upfrontIO/editable.js/pull/104)
+
+
 # v0.5.2
 
 - Fix webkit contenteditable span insertion bug [#101](https://github.com/upfrontIO/editable.js/pull/101)
