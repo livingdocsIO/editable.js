@@ -1,3 +1,4 @@
+var $ = require('jquery');
 var browserFeatures = require('./feature-detection');
 var clipboard = require('./clipboard');
 var eventable = require('./eventable');
