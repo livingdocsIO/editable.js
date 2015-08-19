@@ -1,4 +1,4 @@
-var browser = require('bowser').browser;
+var browser = require('bowser');
 
 module.exports = (function() {
   /**
