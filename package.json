@@ -66,5 +66,12 @@
   },
   "engines": {
     "node": ">=0.10.0"
-  }
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE",
+    "editable.js",
+    "editable.min.js"
+  ]
 }
