@@ -107,7 +107,11 @@ module.exports = function(grunt) {
     browserify: {
       options: {
         browserifyOptions: {
-          debug: true
+          debug: true,
+          alias: [
+              './src/modules/jquery.js:jquery',
+              './src/modules/rangy.js:rangy'
+          ]
         }
       },
       src: {
