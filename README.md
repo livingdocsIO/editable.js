@@ -17,6 +17,12 @@ Via bower:
 bower install editable
 ```
 
+Via npm:
+
+```shell
+npm install upfront-editable
+```
+
 Otherwise you can just grab the [editable.js](editable.js) or [editable.min.js](editable.min.js) files from this repo.
 
 
@@ -108,7 +114,7 @@ Grunt tasks:
 
 ```bash
 # watch and update editable.js and editable-test.js in .tmp/
-# and hands-on browser testing with livereload 
+# and hands-on browser testing with livereload
 # (required for running tests)
 grunt dev
 
