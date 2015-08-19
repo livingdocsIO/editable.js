@@ -106,7 +106,9 @@ module.exports = function(grunt) {
 
     browserify: {
       options: {
-        debug: true
+        browserifyOptions: {
+          debug: true
+        }
       },
       src: {
         files: {
