@@ -21,25 +21,10 @@
     "jquery": "^2.1.4",
     "rangy": "^1.3.0"
   },
-  "scripts": {
-    "build": "browserify src/core.js ---standalone Editable -d > editable.js",
-    "release": "browserify src/core.js ---standalone Editable | uglifyjs -m -c > editable.min.js",
-  },
-  "browserify": {
-    "transform": [
-      "browserify-shim"
-    ]
-  },
-  "browserify-shim": {
-    "rangy": "global:rangy",
-    "jquery": "global:jQuery"
-  },
   "devDependencies": {
-    "browserify": "^11.0.1",
     "grunt": "^0.4.5",
     "grunt-browserify": "^3.7.0",
     "grunt-bump": "^0.1.0",
-    "grunt-cli": "^0.1.13",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-coffee": "^0.12.0",
     "grunt-contrib-concat": "^0.5.0",
@@ -61,8 +46,7 @@
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-safari-launcher": "^0.1.1",
     "load-grunt-tasks": "^1.0.0",
-    "matchdep": "~0.1.1",
-    "uglify-js": "^2.4.24"
+    "matchdep": "~0.1.1"
   },
   "engines": {
     "node": ">=0.10.0"
