@@ -131,6 +131,10 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      options: {
+         mangle: true,
+         compress: true
+      },
       dist: {
         files: {
           'editable.min.js': [
