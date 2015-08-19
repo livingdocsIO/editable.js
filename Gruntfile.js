@@ -106,12 +106,12 @@ module.exports = function(grunt) {
 
     browserify: {
       options: {
+        alias: {
+           'jquery': './src/modules/jquery.js',
+           'rangy': './src/modules/rangy.js'
+        },
         browserifyOptions: {
           debug: true,
-          alias: [
-              './src/modules/jquery.js:jquery',
-              './src/modules/rangy.js:rangy'
-          ]
         }
       },
       src: {
