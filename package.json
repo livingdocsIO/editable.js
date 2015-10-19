@@ -31,7 +31,7 @@
     "grunt-react": "^0.12.2",
     "grunt-replace": "^0.8.0",
     "grunt-shell": "^1.1.1",
-    "jasmine-core": "^2.2.0",
+    "jasmine-core": "^2.3.4",
     "karma": "^0.12.31",
     "karma-chrome-launcher": "^0.1.7",
     "karma-firefox-launcher": "^0.1.4",
