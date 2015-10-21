@@ -12,7 +12,7 @@
   "description": "Friendly contenteditable API",
   "license": "MIT",
   "dependencies": {
-    "bowser": "0.7.3"
+    "bowser": "1.0.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
