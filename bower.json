@@ -21,7 +21,7 @@
     "sinon": "http://sinonjs.org/releases/sinon-1.10.3.js"
   },
   "dependencies": {
-    "rangy": "1.2.3",
+    "rangy": "1.3.0",
     "jquery": "2.1.3"
   }
 }

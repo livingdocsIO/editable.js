@@ -1,3 +1,4 @@
+var rangy = require('rangy');
 var parser = require('./parser');
 var RangeContainer = require('./range-container');
 var Cursor = require('./cursor');

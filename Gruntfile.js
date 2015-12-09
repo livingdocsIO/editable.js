@@ -106,7 +106,13 @@ module.exports = function(grunt) {
 
     browserify: {
       options: {
-        debug: true
+        alias: {
+           'jquery': './src/modules/jquery.js',
+           'rangy': './src/modules/rangy.js'
+        },
+        browserifyOptions: {
+          debug: true,
+        }
       },
       src: {
         files: {
@@ -125,6 +131,10 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      options: {
+         mangle: true,
+         compress: true
+      },
       dist: {
         files: {
           'editable.min.js': [

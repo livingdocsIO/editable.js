@@ -1,3 +1,4 @@
+var rangy = require('rangy');
 var error = require('./util/error');
 var nodeType = require('./node-type');
 

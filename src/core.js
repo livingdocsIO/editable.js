@@ -1,3 +1,5 @@
+var rangy = require('rangy');
+var $ = require('jquery');
 var config = require('./config');
 var error = require('./util/error');
 var parser = require('./parser');
@@ -7,7 +9,7 @@ var Dispatcher = require('./dispatcher');
 var Cursor = require('./cursor');
 var Spellcheck = require('./spellcheck');
 var createDefaultEvents = require('./create-default-events');
-var browser = require('bowser').browser;
+var browser = require('bowser');
 
 /**
  * The Core module provides the Editable class that defines the Editable.JS
