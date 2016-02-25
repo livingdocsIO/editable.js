@@ -63,23 +63,28 @@ Dispatcher.prototype.unload = function() {
  */
 Dispatcher.prototype.setupElementEvents = function() {
   var _this = this;
+
   this.$document.on('focus.editable', _this.editableSelector, function(event) {
     if (this.getAttribute(config.pastingAttribute)) return;
     _this.notify('focus', this);
+
   }).on('blur.editable', _this.editableSelector, function(event) {
     if (this.getAttribute(config.pastingAttribute)) return;
     _this.notify('blur', this);
+
   }).on('copy.editable', _this.editableSelector, function(event) {
     var selection = _this.selectionWatcher.getFreshSelection();
     if (selection.isSelection) {
       _this.notify('clipboard', this, 'copy', selection);
     }
+
   }).on('cut.editable', _this.editableSelector, function(event) {
     var selection = _this.selectionWatcher.getFreshSelection();
     if (selection.isSelection) {
       _this.notify('clipboard', this, 'cut', selection);
       _this.triggerChangeEvent(this);
     }
+
   }).on('paste.editable', _this.editableSelector, function(event) {
     var element = this;
     var afterPaste = function (blocks, cursor) {
@@ -97,7 +102,6 @@ Dispatcher.prototype.setupElementEvents = function() {
     var cursor = _this.selectionWatcher.getFreshSelection();
     clipboard.paste(this, cursor, afterPaste);
 
-
   }).on('input.editable', _this.editableSelector, function(event) {
     if (isInputEventSupported) {
       _this.notify('change', this);
@@ -107,6 +111,7 @@ Dispatcher.prototype.setupElementEvents = function() {
       // isInputEventSupported flag without notifiying the change event.
       isInputEventSupported = true;
     }
+
   }).on('formatEditable.editable', _this.editableSelector, function(event) {
     _this.notify('change', this);
   });
@@ -220,7 +225,6 @@ Dispatcher.prototype.setupKeyboardEvents = function() {
     } else {
       _this.notify('split', this, cursor.before(), cursor.after(), cursor);
     }
-
   }).on('shiftEnter', function(event) {
     event.preventDefault();
     event.stopPropagation();

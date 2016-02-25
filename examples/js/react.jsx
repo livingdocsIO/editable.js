@@ -155,6 +155,22 @@ window.examples = {
       showEvent(event);
     });
 
+    editable.on('paste', function(elem, blocks, cursor) {
+      if (!isFromFirstExample(elem)) return;
+
+      console.log(blocks);
+      text = blocks.join(' ');
+      if (text.length > 40) {
+        text = text.substring(0, 38) + '...';
+      }
+
+      var event = {
+        name: 'paste',
+        content: <Clipboard content={ text } />
+      };
+      showEvent(event);
+    });
+
     editable.on('insert', function(elem, direction, cursor) {
       if (!isFromFirstExample(elem)) return;
       var content;

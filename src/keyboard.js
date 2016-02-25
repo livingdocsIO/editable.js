@@ -73,7 +73,13 @@ Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEve
   default:
     this.preventContenteditableBug(target, event);
     if (notifyCharacterEvent) {
-      this.notify(target, 'character', event);
+
+      // Don't notify character events as long as either the ctrl or
+      // meta key are pressed.
+      // see: https://github.com/upfrontIO/editable.js/pull/125
+      if (!event.ctrlKey && !event.metaKey) {
+        this.notify(target, 'character', event);
+      }
     }
   }
 };
