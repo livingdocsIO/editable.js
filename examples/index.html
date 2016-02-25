@@ -207,12 +207,13 @@ editable.on('change', function(elem) {
 
         </div>
 
+        <!-- clipboard -->
         <div class="documentation">
           <h4>
             <span>clipboard</span>
           </h4>
 
-          <p>Fired for `copy`, `cut` and `paste` events.</p>
+          <p>Fired for `copy` and `cut` events.</p>
 
           <div class="code-example">
             <h3>Example:</h3>
@@ -221,6 +222,28 @@ editable.on('clipboard', function(elem, action, selection) {
   if (action === 'cut') {
     var cutOutText = selection.text();
   }
+});
+</code></pre>
+          </div>
+
+        </div>
+
+        <!-- paste -->
+        <div class="documentation">
+          <h4>
+            <span>paste</span>
+          </h4>
+
+          <p>Fired for a `paste` event.</p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('paste', function(elem, blocks, cursor) {
+  // blocks is an array of strings preprocessed by editable.js.
+  // If the pasted content contains HTML it is split up by block
+  // level elements and cleaned and normalized.
+  var text = blocks.join(' ');
 });
 </code></pre>
           </div>
