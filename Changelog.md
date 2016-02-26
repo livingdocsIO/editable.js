@@ -1,3 +1,9 @@
+# v0.6.1
+
+#### Bugfixes
+
+- Do not fire change event before paste event when pasting [#125](https://github.com/upfrontIO/editable.js/pull/125)
+
 # v0.6.0
 
 #### Bugfixes
