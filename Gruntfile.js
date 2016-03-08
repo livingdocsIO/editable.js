@@ -90,6 +90,11 @@ module.exports = function(grunt) {
         configFile: 'karma.conf.js',
         browsers: ['Chrome', 'Firefox', 'Safari'],
         singleRun: true
+      },
+      ci: {
+        configFile: 'karma.conf.js',
+        browsers: ['PhantomJS'],
+        singleRun: true
       }
     },
 
@@ -197,6 +202,16 @@ module.exports = function(grunt) {
     'add-revision',
     'browserify',
     'karma:build',
+    'concat:dist',
+    'uglify'
+  ]);
+
+  grunt.registerTask('cibuild', [
+    'jshint',
+    'clean:server',
+    'add-revision',
+    'browserify',
+    'karma:ci',
     'concat:dist',
     'uglify'
   ]);
