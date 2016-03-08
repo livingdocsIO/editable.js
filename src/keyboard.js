@@ -125,11 +125,11 @@ Keyboard.prototype.preventContenteditableBug = function(target, event) {
     // We insert a &nbsp; in front of the node and select it before the
     // key-pressed event is applied by the editor.
     var range = this.selectionWatcher.getFreshRange();
+
     if (range.isSelection) {
       var startNode, endNode, rangyRange = range.range;
 
-      // First, let's make sure we are in the edge-case, in which the bug
-      // happens.
+      // Let's make sure we are in the edge-case, in which the bug happens.
       if (rangyRange.startOffset !== 0) {
         // The selection does not start at the beginning of a node. We have
         // nothing to do.
@@ -153,6 +153,9 @@ Keyboard.prototype.preventContenteditableBug = function(target, event) {
         endNode = rangyRange.endContainer.parentNode;
       } else if (rangyRange.endContainer.nodeType === nodeType.elementNode) {
         endNode = rangyRange.endContainer;
+      } else {
+        // This should not happen.
+        return;
       }
 
       if (endNode && endNode === startNode) {
@@ -160,20 +163,17 @@ Keyboard.prototype.preventContenteditableBug = function(target, event) {
         return;
       }
 
+      // Let's see if the endNode is within the startNode
+      var endNodeContainer = $(endNode).closest([target, startNode]);
+      if (endNodeContainer[0] === startNode) {
+        // The endNode is within the startNode, we have nothing to do.
+        return;
+      }
+
       // Now we are sure, we are in the edge case, in which Webkit behaves
-      // strangely. Let's apply the workaround:
-      // We start by inserting a &nbsp; in front of the node.
-      var textNode = document.createTextNode('\u00A0');
-      startNode.parentNode.insertBefore(textNode, startNode);
-
-      // We extend the selection to include the newly added &nbsp;
-      rangyRange.setStartBefore(textNode);
-      var selction = rangy.getSelection();
-      selction.removeAllRanges();
-      selction.addRange(rangyRange);
-
-      // We make sure the &nbsp; is within a preceding textnode.
-      textNode.parentNode.normalize();
+      // strangely. We can simply remove the startNode.
+      var parentNode = startNode.parentNode;
+      startNode.remove();
 
       // We recursively call the bugfix in case our &nbsp; now is the first
       // character of a styled element, e.g.
