@@ -88,26 +88,99 @@ Keyboard.prototype.preventContenteditableBug = function(target, event) {
   if (browserFeatures.contenteditableSpanBug) {
     if (event.ctrlKey || event.metaKey) return;
 
+    // This fixes a strange webkit bug that can be reproduced as follows:
+    //
+    // 1. A node used within a contenteditable has some style, e.g through the
+    //    following CSS:
+    //
+    //      strong {
+    //        color: red;
+    //      }
+    //
+    // 2. A selection starts with the first character of a styled node and ends
+    //    outside of that node, e.g: "big beautiful" is selected in the folloing
+    //    html:
+    //
+    //      <p contenteditable="true">
+    //        Hello <strong>big</strong> beautiful world
+    //      </p>
+    //
+    // 3. The user types a letter character to replace "big beautiful", e.g. "x"
+    //
+    // Result: Webkits adds <font> and <b> tags:
+    //
+    //    <p contenteditable="true">
+    //      Hello
+    //      <font color="#ff0000">
+    //        <b>f</b>
+    //      </font>
+    //      world
+    //    </p>
+    //
+    // This bug ONLY happens, if the first character of the node is selected and
+    // the selection goes further than the node.
+    //
+    // Solution:
+    //
+    // We insert a &nbsp; in front of the node and select it before the
+    // key-pressed event is applied by the editor.
     var range = this.selectionWatcher.getFreshRange();
     if (range.isSelection) {
-      var nodeToCheck, rangyRange = range.range;
+      var startNode, endNode, rangyRange = range.range;
 
-      // Webkits contenteditable inserts spans when there is a
-      // styled node that starts just outside of the selection and
-      // is contained in the selection and followed by other textNodes.
-      // So first we check if we have a node just at the beginning of the
-      // selection. And if so we delete it before Chrome can do its magic.
-      if (rangyRange.startOffset === 0) {
-        if (rangyRange.startContainer.nodeType === nodeType.textNode) {
-          nodeToCheck = rangyRange.startContainer.parentNode;
-        } else if (rangyRange.startContainer.nodeType === nodeType.elementNode) {
-          nodeToCheck = rangyRange.startContainer;
-        }
+      // First, let's make sure we are in the edge-case, in which the bug
+      // happens.
+      if (rangyRange.startOffset !== 0) {
+        // The selection does not start at the beginning of a node. We have
+        // nothing to do.
+        return;
       }
 
-      if (nodeToCheck && nodeToCheck !== target && rangyRange.containsNode(nodeToCheck, true)) {
-        nodeToCheck.remove();
+      // Lets get the node in which the selection starts.
+      if (rangyRange.startContainer.nodeType === nodeType.textNode) {
+        startNode = rangyRange.startContainer.parentNode;
+      } else if (rangyRange.startContainer.nodeType === nodeType.elementNode) {
+        startNode = rangyRange.startContainer;
       }
+
+      if (!startNode || startNode === target) {
+        // The node is the contenteditable node. We have nothing to do.
+        return;
+      }
+
+      // Lets get the node in which the selection ends.
+      if (rangyRange.endContainer.nodeType === nodeType.textNode) {
+        endNode = rangyRange.endContainer.parentNode;
+      } else if (rangyRange.endContainer.nodeType === nodeType.elementNode) {
+        endNode = rangyRange.endContainer;
+      }
+
+      if (endNode && endNode === startNode) {
+        // The selection ends within the node it started, we have nothing to do.
+        return;
+      }
+
+      // Now we are sure, we are in the edge case, in which Webkit behaves
+      // strangely. Let's apply the workaround:
+      // We start by inserting a &nbsp; in front of the node.
+      var textNode = document.createTextNode('\u00A0');
+      startNode.parentNode.insertBefore(textNode, startNode);
+
+      // We extend the selection to include the newly added &nbsp;
+      rangyRange.setStartBefore(textNode);
+      var selction = rangy.getSelection();
+      selction.removeAllRanges();
+      selction.addRange(rangyRange);
+
+      // We make sure the &nbsp; is within a preceding textnode.
+      textNode.parentNode.normalize();
+
+      // We recursively call the bugfix in case our &nbsp; now is the first
+      // character of a styled element, e.g.
+      //    <p contenteditable="true">
+      //      Hello <em>&nbsp;<strong>very</strong>big</em> beautiful world
+      //    </p>
+      this.preventContenteditableBug(target, event);
     }
   }
 };

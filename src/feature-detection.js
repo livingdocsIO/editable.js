@@ -24,19 +24,8 @@ module.exports = (function() {
   })();
 
 
-  // Chrome contenteditable bug when inserting a character with a selection that:
-  //  - starts at the beginning of the contenteditable
-  //  - contains a styled span
-  //  - and some unstyled text
-  //
-  // Example:
-  // <p>|<span class="highlight">a</span>b|</p>
-  //
-  // For more details:
-  // https://code.google.com/p/chromium/issues/detail?id=335955
-  //
-  // It seems it is a webkit bug as I could reproduce on Safari (LP).
   var contenteditableSpanBug = (function() {
+    // See Keyboard.prototype.preventContenteditableBug for more information.
     return !!browser.webkit;
   })();
 
