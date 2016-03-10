@@ -1,3 +1,9 @@
+# v0.6.2
+
+#### Bugfixes
+
+- Fix a bug related to an edge-case behavior of contenteditable in webkit based browsers [#127](https://github.com/upfrontIO/editable.js/pull/127)
+
 # v0.6.1
 
 #### Bugfixes
