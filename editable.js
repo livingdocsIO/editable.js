@@ -6106,65 +6106,17 @@ Keyboard.prototype.preventContenteditableBug = function(target, event) {
     //
     // Solution:
     //
-    // We insert a &nbsp; in front of the node and select it before the
-    // key-pressed event is applied by the editor.
-    var range = this.selectionWatcher.getFreshRange();
+    // Manually remove the element that would be removed anyway before inserting
+    // the new letter.
+    var rangyInstance = this.selectionWatcher.getFreshRange();
+    if (!rangyInstance.isSelection) {
+      return;
+    }
 
-    if (range.isSelection) {
-      var startNode, endNode, rangyRange = range.range;
+    var nodeToRemove = Keyboard.getNodeToRemove(rangyInstance.range, target);
 
-      // Let's make sure we are in the edge-case, in which the bug happens.
-      if (rangyRange.startOffset !== 0) {
-        // The selection does not start at the beginning of a node. We have
-        // nothing to do.
-        return;
-      }
-
-      // Lets get the node in which the selection starts.
-      if (rangyRange.startContainer.nodeType === nodeType.textNode) {
-        startNode = rangyRange.startContainer.parentNode;
-      } else if (rangyRange.startContainer.nodeType === nodeType.elementNode) {
-        startNode = rangyRange.startContainer;
-      }
-
-      if (!startNode || startNode === target) {
-        // The node is the contenteditable node. We have nothing to do.
-        return;
-      }
-
-      // Lets get the node in which the selection ends.
-      if (rangyRange.endContainer.nodeType === nodeType.textNode) {
-        endNode = rangyRange.endContainer.parentNode;
-      } else if (rangyRange.endContainer.nodeType === nodeType.elementNode) {
-        endNode = rangyRange.endContainer;
-      } else {
-        // This should not happen.
-        return;
-      }
-
-      if (endNode && endNode === startNode) {
-        // The selection ends within the node it started, we have nothing to do.
-        return;
-      }
-
-      // Let's see if the endNode is within the startNode
-      var endNodeContainer = $(endNode).closest([target, startNode]);
-      if (endNodeContainer[0] === startNode) {
-        // The endNode is within the startNode, we have nothing to do.
-        return;
-      }
-
-      // Now we are sure, we are in the edge case, in which Webkit behaves
-      // strangely. We can simply remove the startNode.
-      var parentNode = startNode.parentNode;
-      startNode.remove();
-
-      // We recursively call the bugfix in case our &nbsp; now is the first
-      // character of a styled element, e.g.
-      //    <p contenteditable="true">
-      //      Hello <em>&nbsp;<strong>very</strong>big</em> beautiful world
-      //    </p>
-      this.preventContenteditableBug(target, event);
+    if (nodeToRemove) {
+      nodeToRemove.remove();
     }
   }
 };
@@ -6185,6 +6137,70 @@ Keyboard.prototype.key = {
 };
 
 Keyboard.key = Keyboard.prototype.key;
+
+Keyboard.getNodeToRemove = function (selectionRange, target) {
+  // This function is only used by preventContenteditableBug. It is exposed on
+  // the Keyboard constructor for testing purpose only.
+
+  // Let's make sure we are in the edge-case, in which the bug happens.
+  if (selectionRange.startOffset !== 0) {
+    // The selection does not start at the beginning of a node. We have
+    // nothing to do.
+    return;
+  }
+
+  var startNodeElement = selectionRange.startContainer;
+
+  // If the node is a textNode, we select its parent.
+  if (startNodeElement.nodeType === nodeType.textNode) {
+    startNodeElement = startNodeElement.parentNode;
+  }
+
+  // The target is the contenteditable element, which we do not want to replace
+  if (startNodeElement === target) {
+    return;
+  }
+
+  // We get a range that contains everything within the sartNodeElement to test
+  // if the selectionRange is within the startNode, we have nothing to do.
+  var startNodeRange = rangy.createRange();
+  startNodeRange.setStartBefore(startNodeElement.firstChild);
+  startNodeRange.setEndAfter(startNodeElement.lastChild);
+  if (startNodeRange.containsRange(selectionRange)) {
+    return;
+  }
+
+  // If the selectionRange.startContainer was a textNode, we have to make sure
+  // that its parent's content starts with this node. Content is either a
+  // text node or an element. This is done to avoid false positives like the
+  // following one:
+  // <strong>foo<em>bar</em>|baz</strong>quux|
+  if (selectionRange.startContainer.nodeType === nodeType.textNode) {
+    var contentNodeTypes = [nodeType.textNode, nodeType.elementNode];
+    var firstContentNode = startNodeElement.firstChild;
+    do {
+      if (contentNodeTypes.indexOf(firstContentNode.nodeType) !== -1) {
+        break;
+      }
+    } while ((firstContentNode = firstContentNode.nextSibling));
+
+    if (firstContentNode !== selectionRange.startContainer) {
+      return;
+    }
+  }
+
+  // Now we know, that we have to return at lease the startNodeElement for
+  // removal. But it could be, that we also need to remove its parent, e.g.
+  // we need to remove <strong> in the following example:
+  // <strong><em>|foo</em>bar</strong>baz|
+  var rangeStatingBeforeCurrentElement = selectionRange.cloneRange();
+  rangeStatingBeforeCurrentElement.setStartBefore(startNodeElement);
+
+  return Keyboard.getNodeToRemove(
+    rangeStatingBeforeCurrentElement,
+    target
+  ) || startNodeElement;
+};
 
 },{"./eventable":11,"./feature-detection":12,"./node-type":16}],15:[function(require,module,exports){
 var nodeType = require('./node-type');
