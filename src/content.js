@@ -1,3 +1,6 @@
+var $ = require('jquery');
+var rangy = require('rangy');
+
 var nodeType = require('./node-type');
 var rangeSaveRestore = require('./range-save-restore');
 var parser = require('./parser');

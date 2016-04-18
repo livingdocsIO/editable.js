@@ -1,3 +1,6 @@
+var $ = require('jquery');
+var rangy = require('rangy');
+
 var Selection = require('../src/selection');
 var Cursor = require('../src/cursor');
 

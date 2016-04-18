@@ -1,3 +1,6 @@
+var $ = require('jquery');
+var rangy = require('rangy');
+
 var content = require('./content');
 var parser = require('./parser');
 var string = require('./util/string');
@@ -292,4 +295,3 @@ module.exports = Cursor = (function() {
 
   return Cursor;
 })();
-

@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 var parser = require('./parser');
 var content = require('./content');
 var log = require('./util/log');

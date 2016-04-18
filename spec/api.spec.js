@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 var Editable = require('../src/core');
 
 describe('Editable', function() {

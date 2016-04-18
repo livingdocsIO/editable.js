@@ -1,3 +1,6 @@
+var $ = require('jquery');
+var rangy = require('rangy');
+
 var content = require('../src/content');
 var rangeSaveRestore = require('../src/range-save-restore');
 

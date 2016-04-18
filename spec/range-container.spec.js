@@ -1,3 +1,6 @@
+var $ = require('jquery');
+var rangy = require('rangy');
+
 var RangeContainer = require('../src/range-container');
 
 describe('RangeContainer', function() {

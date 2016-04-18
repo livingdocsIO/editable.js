@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 var NodeIterator = require('../src/node-iterator');
 var highlightText = require('../src/highlight-text');
 

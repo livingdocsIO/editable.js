@@ -1,3 +1,5 @@
+var rangy = require('rangy');
+
 var NodeIterator = require('./node-iterator');
 var nodeType = require('./node-type');
 

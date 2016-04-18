@@ -14,15 +14,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      // test helpers
-      'bower_components/sinon/index.js',
-
-      // vendor files
-      'bower_components/jquery/dist/jquery.js',
-      'bower_components/rangy/rangy-core.js',
-
       // source files
-      '.tmp/editable-test.js',
+      '.tmp/editable-test.js'
     ],
 
     // list of files to exclude

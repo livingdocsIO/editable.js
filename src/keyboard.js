@@ -1,3 +1,5 @@
+var rangy = require('rangy')
+
 var browserFeatures = require('./feature-detection');
 var nodeType = require('./node-type');
 var eventable = require('./eventable');

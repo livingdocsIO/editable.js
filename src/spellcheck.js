@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 var content = require('./content');
 var highlightText = require('./highlight-text');
 var nodeType = require('./node-type');
@@ -188,4 +190,3 @@ module.exports = (function() {
 
   return Spellcheck;
 })();
-

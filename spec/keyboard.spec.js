@@ -1,3 +1,6 @@
+var $ = require('jquery');
+var rangy = require('rangy');
+
 var destructureNodes,
   Keyboard = require('../src/keyboard'),
   nodeType = require('../src/node-type');
@@ -14,7 +17,7 @@ describe('Keyboard', function() {
         getFreshRange: function() { return {}; }
       };
       keyboard = new Keyboard(mockedSelectionWatcher);
-      event = jQuery.Event('keydown');
+      event = $.Event('keydown');
       called = 0;
     });
 

@@ -1,3 +1,6 @@
+var $ = require('jquery');
+var rangy = require('rangy');
+
 var content = require('../src/content');
 var Cursor = require('../src/cursor');
 var Keyboard = require('../src/keyboard');
@@ -71,7 +74,7 @@ describe('Dispatcher', function() {
     describe('on Enter', function() {
 
       beforeEach(function(){
-        event = jQuery.Event('keydown');
+        event = $.Event('keydown');
         event.keyCode = key.enter;
       });
 
@@ -132,7 +135,7 @@ describe('Dispatcher', function() {
     describe('on backspace', function() {
 
       beforeEach(function(){
-        event = jQuery.Event('keydown');
+        event = $.Event('keydown');
         event.keyCode = key.backspace;
       });
 
@@ -163,7 +166,7 @@ describe('Dispatcher', function() {
 
     describe('on delete', function() {
       beforeEach(function(){
-        event = jQuery.Event('keydown');
+        event = $.Event('keydown');
         event.keyCode = key['delete'];
       });
 
@@ -189,7 +192,7 @@ describe('Dispatcher', function() {
 
     describe('on keydown', function() {
       beforeEach(function(){
-        event = jQuery.Event('keydown');
+        event = $.Event('keydown');
       });
 
       it('fires change when a character is pressed', function(done) {

@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 var config = require('../src/config');
 var Editable = require('../src/core');
 

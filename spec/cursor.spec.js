@@ -1,3 +1,6 @@
+var $ = require('jquery');
+var rangy = require('rangy');
+
 var content = require('../src/content');
 var Cursor = require('../src/cursor');
 var config = require('../src/config');

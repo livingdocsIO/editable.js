@@ -1,3 +1,7 @@
+var $ = require('jquery');
+var rangy = require('rangy');
+var sinon = require('sinon');
+
 var Cursor = require('../src/cursor');
 var highlightText = require('../src/highlight-text');
 var Spellcheck = require('../src/spellcheck');

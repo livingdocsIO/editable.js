@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 var Cursor = require('./cursor');
 var content = require('./content');
 var parser = require('./parser');

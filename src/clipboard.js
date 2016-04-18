@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 var config = require('./config');
 var string = require('./util/string');
 var nodeType = require('./node-type');

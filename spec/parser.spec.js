@@ -1,3 +1,6 @@
+var $ = require('jquery');
+var rangy = require('rangy');
+
 var parser = require('../src/parser');
 var config = require('../src/config');
 
