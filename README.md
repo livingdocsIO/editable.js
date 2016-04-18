@@ -1,5 +1,5 @@
-editable.js
-===========
+# editable.js
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com)
 
 ## What is it about?
 
@@ -108,7 +108,7 @@ Grunt tasks:
 
 ```bash
 # watch and update editable.js and editable-test.js in .tmp/
-# and hands-on browser testing with livereload 
+# and hands-on browser testing with livereload
 # (required for running tests)
 grunt dev
 

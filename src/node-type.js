@@ -13,4 +13,4 @@ module.exports = {
   documentTypeNode: 10,
   documentFragmentNode: 11,
   notationNode: 12
-};
+}

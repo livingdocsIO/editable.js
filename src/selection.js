@@ -1,9 +1,9 @@
-var $ = require('jquery');
+var $ = require('jquery')
 
-var Cursor = require('./cursor');
-var content = require('./content');
-var parser = require('./parser');
-var config = require('./config');
+var Cursor = require('./cursor')
+var content = require('./content')
+var parser = require('./parser')
+var config = require('./config')
 
 /**
  * The Selection module provides a cross-browser abstraction layer for range
@@ -13,8 +13,7 @@ var config = require('./config');
  * @submodule selection
  */
 
-module.exports = (function() {
-
+module.exports = (function () {
   /**
    * Class that represents a selection and provides functionality to access or
    * modify the selection.
@@ -22,23 +21,23 @@ module.exports = (function() {
    * @class Selection
    * @constructor
    */
-  var Selection = function(editableHost, rangyRange) {
-    this.setHost(editableHost);
-    this.range = rangyRange;
-    this.isSelection = true;
-  };
+  var Selection = function (editableHost, rangyRange) {
+    this.setHost(editableHost)
+    this.range = rangyRange
+    this.isSelection = true
+  }
 
   // add Cursor prototpye to Selection prototype chain
-  var Base = function() {};
-  Base.prototype = Cursor.prototype;
+  var Base = function () {}
+  Base.prototype = Cursor.prototype
   Selection.prototype = $.extend(new Base(), {
     /**
      * Get the text inside the selection.
      *
      * @method text
      */
-    text: function() {
-      return this.range.toString();
+    text: function () {
+      return this.range.toString()
     },
 
     /**
@@ -46,15 +45,15 @@ module.exports = (function() {
      *
      * @method html
      */
-    html: function() {
-      return this.range.toHtml();
+    html: function () {
+      return this.range.toHtml()
     },
 
     /**
      *
      * @method isAllSelected
      */
-    isAllSelected: function() {
+    isAllSelected: function () {
       return parser.isBeginningOfHost(
         this.host,
         this.range.startContainer,
@@ -62,85 +61,85 @@ module.exports = (function() {
       parser.isTextEndOfHost(
         this.host,
         this.range.endContainer,
-        this.range.endOffset);
+        this.range.endOffset)
     },
 
     /**
      * Get the ClientRects of this selection.
      * Use this if you want more precision than getBoundingClientRect can give.
      */
-    getRects: function() {
-      var coords = this.range.nativeRange.getClientRects();
+    getRects: function () {
+      var coords = this.range.nativeRange.getClientRects()
 
       // todo: translate into absolute positions
       // just like Cursor#getCoordinates()
-      return coords;
+      return coords
     },
 
     /**
      *
      * @method link
      */
-    link: function(href, attrs) {
-      var $link = $(this.createElement('a'));
-      if (href) $link.attr('href', href);
+    link: function (href, attrs) {
+      var $link = $(this.createElement('a'))
+      if (href) $link.attr('href', href)
       for (var name in attrs) {
-        $link.attr(name, attrs[name]);
+        $link.attr(name, attrs[name])
       }
 
-      this.forceWrap($link[0]);
+      this.forceWrap($link[0])
     },
 
-    unlink: function() {
-      this.removeFormatting('a');
+    unlink: function () {
+      this.removeFormatting('a')
     },
 
-    toggleLink: function(href, attrs) {
-      var links = this.getTagsByName('a');
+    toggleLink: function (href, attrs) {
+      var links = this.getTagsByName('a')
       if (links.length >= 1) {
-        var firstLink = links[0];
+        var firstLink = links[0]
         if (this.isExactSelection(firstLink, 'visible')) {
-          this.unlink();
+          this.unlink()
         } else {
-          this.expandTo(firstLink);
+          this.expandTo(firstLink)
         }
       } else {
-        this.link(href, attrs);
+        this.link(href, attrs)
       }
     },
 
-    toggle: function(elem) {
-      elem = this.adoptElement(elem);
-      this.range = content.toggleTag(this.host, this.range, elem);
-      this.setSelection();
+    toggle: function (elem) {
+      elem = this.adoptElement(elem)
+      this.range = content.toggleTag(this.host, this.range, elem)
+      this.setSelection()
     },
 
     /**
      *
      * @method makeBold
      */
-    makeBold: function() {
-      var bold = this.createElement(config.boldTag);
-      this.forceWrap(bold);
+    makeBold: function () {
+      var bold = this.createElement(config.boldTag)
+      this.forceWrap(bold)
     },
 
-    toggleBold: function() {
-      var bold = this.createElement(config.boldTag);
-      this.toggle(bold);
+    toggleBold: function () {
+      var bold = this.createElement(config.boldTag)
+      this.toggle(bold)
     },
 
     /**
      *
      * @method giveEmphasis
      */
-    giveEmphasis: function() {
-      var em = this.createElement(config.italicTag);
-      this.forceWrap(em);
+    giveEmphasis: function () {
+      var em = this.createElement(config.italicTag)
+      this.forceWrap(em)
     },
 
-    toggleEmphasis: function() {
-      var em = this.createElement(config.italicTag);
-      this.toggle(em);
+    toggleEmphasis: function () {
+      var em = this.createElement(config.italicTag)
+      this.toggle(em)
     },
 
     /**
@@ -150,23 +149,23 @@ module.exports = (function() {
      * @param {String} E.g. '«'
      * @param {String} E.g. '»'
      */
-    surround: function(startCharacter, endCharacter) {
-      this.range = content.surround(this.host, this.range, startCharacter, endCharacter);
-      this.setSelection();
+    surround: function (startCharacter, endCharacter) {
+      this.range = content.surround(this.host, this.range, startCharacter, endCharacter)
+      this.setSelection()
     },
 
-    removeSurround: function(startCharacter, endCharacter) {
-      this.range = content.deleteCharacter(this.host, this.range, startCharacter);
-      this.range = content.deleteCharacter(this.host, this.range, endCharacter);
-      this.setSelection();
+    removeSurround: function (startCharacter, endCharacter) {
+      this.range = content.deleteCharacter(this.host, this.range, startCharacter)
+      this.range = content.deleteCharacter(this.host, this.range, endCharacter)
+      this.setSelection()
     },
 
-    toggleSurround: function(startCharacter, endCharacter) {
+    toggleSurround: function (startCharacter, endCharacter) {
       if (this.containsString(startCharacter) &&
         this.containsString(endCharacter)) {
-        this.removeSurround(startCharacter, endCharacter);
+        this.removeSurround(startCharacter, endCharacter)
       } else {
-        this.surround(startCharacter, endCharacter);
+        this.surround(startCharacter, endCharacter)
       }
     },
 
@@ -174,9 +173,9 @@ module.exports = (function() {
      * @method removeFormatting
      * @param {String} tagName. E.g. 'a' to remove all links.
      */
-    removeFormatting: function(tagName) {
-      this.range = content.removeFormatting(this.host, this.range, tagName);
-      this.setSelection();
+    removeFormatting: function (tagName) {
+      this.range = content.removeFormatting(this.host, this.range, tagName)
+      this.setSelection()
     },
 
     /**
@@ -186,9 +185,9 @@ module.exports = (function() {
      * @method deleteContent
      * @return Cursor instance
      */
-    deleteContent: function() {
-      this.range.deleteContents();
-      return new Cursor(this.host, this.range);
+    deleteContent: function () {
+      this.range.deleteContents()
+      return new Cursor(this.host, this.range)
     },
 
     /**
@@ -197,9 +196,9 @@ module.exports = (function() {
      * @method expandTo
      * @param {DOM Node}
      */
-    expandTo: function(elem) {
-      this.range = content.expandTo(this.host, this.range, elem);
-      this.setSelection();
+    expandTo: function (elem) {
+      this.range = content.expandTo(this.host, this.range, elem)
+      this.setSelection()
     },
 
     /**
@@ -207,10 +206,10 @@ module.exports = (function() {
      *
      *  @return Cursor instance
      */
-    collapseAtBeginning: function(elem) {
-      this.range.collapse(true);
-      this.setSelection();
-      return new Cursor(this.host, this.range);
+    collapseAtBeginning: function (elem) {
+      this.range.collapse(true)
+      this.setSelection()
+      return new Cursor(this.host, this.range)
     },
 
     /**
@@ -218,10 +217,10 @@ module.exports = (function() {
      *
      *  @return Cursor instance
      */
-    collapseAtEnd: function(elem) {
-      this.range.collapse(false);
-      this.setSelection();
-      return new Cursor(this.host, this.range);
+    collapseAtEnd: function (elem) {
+      this.range.collapse(false)
+      this.setSelection()
+      return new Cursor(this.host, this.range)
     },
 
     /**
@@ -231,10 +230,10 @@ module.exports = (function() {
      *
      * @method forceWrap
      */
-    forceWrap: function(elem) {
-      elem = this.adoptElement(elem);
-      this.range = content.forceWrap(this.host, this.range, elem);
-      this.setSelection();
+    forceWrap: function (elem) {
+      elem = this.adoptElement(elem)
+      this.range = content.forceWrap(this.host, this.range, elem)
+      this.setSelection()
     },
 
     /**
@@ -246,8 +245,8 @@ module.exports = (function() {
      *   DOM Nodes.
      * @return {Array of DOM Nodes}
      */
-    getTags: function(filterFunc) {
-      return content.getTags(this.host, this.range, filterFunc);
+    getTags: function (filterFunc) {
+      return content.getTags(this.host, this.range, filterFunc)
     },
 
     /**
@@ -257,8 +256,8 @@ module.exports = (function() {
      * @param {String} tagName. E.g. 'a' to get all links.
      * @return {Array of DOM Nodes}
      */
-    getTagsByName: function(tagName) {
-      return content.getTagsByName(this.host, this.range, tagName);
+    getTagsByName: function (tagName) {
+      return content.getTagsByName(this.host, this.range, tagName)
     },
 
     /**
@@ -271,8 +270,8 @@ module.exports = (function() {
      *   be ignored.
      * @return {Boolean}
      */
-    isExactSelection: function(elem, onlyVisible) {
-      return content.isExactSelection(this.range, elem, onlyVisible);
+    isExactSelection: function (elem, onlyVisible) {
+      return content.isExactSelection(this.range, elem, onlyVisible)
     },
 
     /**
@@ -281,8 +280,8 @@ module.exports = (function() {
      * @method containsString
      * @return {Boolean}
      */
-    containsString: function(str) {
-      return content.containsString(this.range, str);
+    containsString: function (str) {
+      return content.containsString(this.range, str)
     },
 
     /**
@@ -291,11 +290,11 @@ module.exports = (function() {
      *
      * @method deleteCharacter
      */
-    deleteCharacter: function(character) {
-      this.range = content.deleteCharacter(this.host, this.range, character);
-      this.setSelection();
+    deleteCharacter: function (character) {
+      this.range = content.deleteCharacter(this.host, this.range, character)
+      this.setSelection()
     }
-  });
+  })
 
-  return Selection;
-})();
+  return Selection
+})()

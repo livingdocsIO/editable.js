@@ -4,9 +4,8 @@
 //
 // For all available config options and default values, see:
 // https://github.com/karma-runner/karma/blob/stable/lib/config.js#L54
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
-
     // base path, that will be used to resolve files and exclude
     basePath: './',
 
@@ -66,5 +65,5 @@ module.exports = function(config) {
     // CLI --report-slower-than 500
     reportSlowerThan: 500
 
-  });
-};
+  })
+}

@@ -1,96 +1,88 @@
-var $ = require('jquery');
-var rangy = require('rangy');
+var $ = require('jquery')
+var rangy = require('rangy')
 
-var RangeContainer = require('../src/range-container');
+var RangeContainer = require('../src/range-container')
 
-describe('RangeContainer', function() {
+describe('RangeContainer', function () {
+  describe('with no params', function () {
+    beforeEach(function () {
+      this.range = new RangeContainer()
+    })
 
-  describe('with no params', function() {
+    it('has nothing selected', function () {
+      expect(this.range.isAnythingSelected).toBe(false)
+    })
 
-    beforeEach(function(){
-      this.range = new RangeContainer();
-    });
+    it('is no Cursor', function () {
+      expect(this.range.isCursor).toBe(false)
+    })
 
-    it('has nothing selected', function(){
-      expect(this.range.isAnythingSelected).toBe(false);
-    });
+    it('is no Selection', function () {
+      expect(this.range.isSelection).toBe(false)
+    })
 
-    it('is no Cursor', function(){
-      expect(this.range.isCursor).toBe(false);
-    });
+    describe('getCursor()', function () {
+      it('returns undefined', function () {
+        expect(this.range.getCursor()).toBe(undefined)
+      })
+    })
 
-    it('is no Selection', function(){
-      expect(this.range.isSelection).toBe(false);
-    });
+    describe('getSelection()', function () {
+      it('returns undefined', function () {
+        expect(this.range.getSelection()).toBe(undefined)
+      })
+    })
+  })
 
-    describe('getCursor()', function(){
+  describe('with a selection', function () {
+    beforeEach(function () {
+      var elem = $('<div>Text</div>')
+      var range = rangy.createRange()
+      range.selectNodeContents(elem[0])
+      this.range = new RangeContainer(elem[0], range)
+    })
 
-      it('returns undefined', function(){
-        expect(this.range.getCursor()).toBe(undefined);
-      });
-    });
+    it('has something selected', function () {
+      expect(this.range.isAnythingSelected).toBe(true)
+    })
 
-    describe('getSelection()', function(){
+    it('is no Cursor', function () {
+      expect(this.range.isCursor).toBe(false)
+    })
 
-      it('returns undefined', function(){
-        expect(this.range.getSelection()).toBe(undefined);
-      });
-    });
+    it('is a Selection', function () {
+      expect(this.range.isSelection).toBe(true)
+    })
 
-  });
+    it('can force a cursor', function () {
+      expect(this.range.host.innerHTML).toEqual('Text')
 
-  describe('with a selection', function() {
+      var cursor = this.range.forceCursor()
 
-    beforeEach(function(){
-      var elem = $('<div>Text</div>');
-      var range = rangy.createRange();
-      range.selectNodeContents(elem[0]);
-      this.range = new RangeContainer(elem[0], range);
-    });
+      expect(cursor.isCursor).toBe(true)
+      expect(this.range.host.innerHTML).toEqual('')
+    })
+  })
 
-    it('has something selected', function(){
-      expect(this.range.isAnythingSelected).toBe(true);
-    });
+  describe('with a cursor', function () {
+    beforeEach(function () {
+      var elem = $('<div>Text</div>')
+      var range = rangy.createRange()
+      range.selectNodeContents(elem[0])
+      range.collapse(true)
+      this.range = new RangeContainer(elem, range)
+    })
 
-    it('is no Cursor', function(){
-      expect(this.range.isCursor).toBe(false);
-    });
+    it('has something selected', function () {
+      expect(this.range.isAnythingSelected).toBe(true)
+    })
 
-    it('is a Selection', function(){
-      expect(this.range.isSelection).toBe(true);
-    });
+    it('is a Cursor', function () {
+      expect(this.range.isCursor).toBe(true)
+    })
 
-    it('can force a cursor', function(){
-      expect(this.range.host.innerHTML).toEqual('Text');
-
-      var cursor = this.range.forceCursor();
-
-      expect(cursor.isCursor).toBe(true);
-      expect(this.range.host.innerHTML).toEqual('');
-    });
-  });
-
-  describe('with a cursor', function() {
-
-    beforeEach(function(){
-      var elem = $('<div>Text</div>');
-      var range = rangy.createRange();
-      range.selectNodeContents(elem[0]);
-      range.collapse(true);
-      this.range = new RangeContainer(elem, range);
-    });
-
-    it('has something selected', function(){
-      expect(this.range.isAnythingSelected).toBe(true);
-    });
-
-    it('is a Cursor', function(){
-      expect(this.range.isCursor).toBe(true);
-    });
-
-    it('is no Selection', function(){
-      expect(this.range.isSelection).toBe(false);
-    });
-  });
-
-});
+    it('is no Selection', function () {
+      expect(this.range.isSelection).toBe(false)
+    })
+  })
+})

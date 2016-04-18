@@ -1,8 +1,8 @@
-var $ = require('jquery');
+var $ = require('jquery')
 
-var string = require('./util/string');
-var nodeType = require('./node-type');
-var config = require('./config');
+var string = require('./util/string')
+var nodeType = require('./node-type')
+var config = require('./config')
 
 /**
  * The parser module provides helper methods to parse html-chunks
@@ -12,13 +12,12 @@ var config = require('./config');
  * @submodule parser
  */
 
-module.exports = (function() {
+module.exports = (function () {
   /**
    * Singleton that provides DOM lookup helpers.
    * @static
    */
   return {
-
     /**
      * Get the editableJS host block of a node.
      *
@@ -26,10 +25,10 @@ module.exports = (function() {
      * @param {DOM Node}
      * @return {DOM Node}
      */
-    getHost: function(node) {
-      var editableSelector = '.' + config.editableClass;
-      var hostNode = $(node).closest(editableSelector);
-      return hostNode.length ? hostNode[0] : undefined;
+    getHost: function (node) {
+      var editableSelector = '.' + config.editableClass
+      var hostNode = $(node).closest(editableSelector)
+      return hostNode.length ? hostNode[0] : undefined
     },
 
     /**
@@ -39,12 +38,12 @@ module.exports = (function() {
      * @method getNodeIndex
      * @param {HTMLElement}
      */
-    getNodeIndex: function(node) {
-      var index = 0;
+    getNodeIndex: function (node) {
+      var index = 0
       while ((node = node.previousSibling) !== null) {
-        index += 1;
+        index += 1
       }
-      return index;
+      return index
     },
 
     /**
@@ -54,20 +53,20 @@ module.exports = (function() {
      * @method isVoid
      * @param {HTMLElement}
      */
-    isVoid: function(node) {
-      var child, i, len;
-      var childNodes = node.childNodes;
+    isVoid: function (node) {
+      var child, i, len
+      var childNodes = node.childNodes
 
       for (i = 0, len = childNodes.length; i < len; i++) {
-        child = childNodes[i];
+        child = childNodes[i]
 
         if (child.nodeType === nodeType.textNode && !this.isVoidTextNode(child)) {
-          return false;
+          return false
         } else if (child.nodeType === nodeType.elementNode) {
-          return false;
+          return false
         }
       }
-      return true;
+      return true
     },
 
     /**
@@ -76,8 +75,8 @@ module.exports = (function() {
      * @method isVoidTextNode
      * @param {HTMLElement}
      */
-    isVoidTextNode: function(node) {
-      return node.nodeType === nodeType.textNode && !node.nodeValue;
+    isVoidTextNode: function (node) {
+      return node.nodeType === nodeType.textNode && !node.nodeValue
     },
 
     /**
@@ -86,12 +85,12 @@ module.exports = (function() {
      * @method isWhitespaceOnly
      * @param {HTMLElement}
      */
-    isWhitespaceOnly: function(node) {
-      return node.nodeType === nodeType.textNode && this.lastOffsetWithContent(node) === 0;
+    isWhitespaceOnly: function (node) {
+      return node.nodeType === nodeType.textNode && this.lastOffsetWithContent(node) === 0
     },
 
-    isLinebreak: function(node) {
-      return node.nodeType === nodeType.elementNode && node.tagName === 'BR';
+    isLinebreak: function (node) {
+      return node.nodeType === nodeType.elementNode && node.tagName === 'BR'
     },
 
     /**
@@ -102,130 +101,120 @@ module.exports = (function() {
      * @method isWhitespaceOnly
      * @param {HTMLElement}
      */
-    lastOffsetWithContent: function(node) {
+    lastOffsetWithContent: function (node) {
       if (node.nodeType === nodeType.textNode) {
-        return string.trimRight(node.nodeValue).length;
+        return string.trimRight(node.nodeValue).length
       } else {
-        var i,
-            childNodes = node.childNodes;
+        var childNodes = node.childNodes
 
-        for (i = childNodes.length - 1; i >= 0; i--) {
-          node = childNodes[i];
+        for (var i = childNodes.length - 1; i >= 0; i--) {
+          node = childNodes[i]
           if (this.isWhitespaceOnly(node) || this.isLinebreak(node)) {
-            continue;
+            continue
           } else {
             // The offset starts at 0 before the first element
             // and ends with the length after the last element.
-            return i + 1;
+            return i + 1
           }
         }
-        return 0;
+        return 0
       }
     },
 
-    isBeginningOfHost: function(host, container, offset) {
+    isBeginningOfHost: function (host, container, offset) {
       if (container === host) {
-        return this.isStartOffset(container, offset);
+        return this.isStartOffset(container, offset)
       }
 
       if (this.isStartOffset(container, offset)) {
-        var parentContainer = container.parentNode;
+        var parentContainer = container.parentNode
 
         // The index of the element simulates a range offset
         // right before the element.
-        var offsetInParent = this.getNodeIndex(container);
-        return this.isBeginningOfHost(host, parentContainer, offsetInParent);
+        var offsetInParent = this.getNodeIndex(container)
+        return this.isBeginningOfHost(host, parentContainer, offsetInParent)
       } else {
-        return false;
+        return false
       }
     },
 
-    isEndOfHost: function(host, container, offset) {
+    isEndOfHost: function (host, container, offset) {
       if (container === host) {
-        return this.isEndOffset(container, offset);
+        return this.isEndOffset(container, offset)
       }
 
       if (this.isEndOffset(container, offset)) {
-        var parentContainer = container.parentNode;
+        var parentContainer = container.parentNode
 
         // The index of the element plus one simulates a range offset
         // right after the element.
-        var offsetInParent = this.getNodeIndex(container) + 1;
-        return this.isEndOfHost(host, parentContainer, offsetInParent);
+        var offsetInParent = this.getNodeIndex(container) + 1
+        return this.isEndOfHost(host, parentContainer, offsetInParent)
       } else {
-        return false;
+        return false
       }
     },
 
-    isStartOffset: function(container, offset) {
-      if (container.nodeType === nodeType.textNode) {
-        return offset === 0;
-      } else {
-        if (container.childNodes.length === 0)
-          return true;
-        else
-          return container.childNodes[offset] === container.firstChild;
-      }
+    isStartOffset: function (container, offset) {
+      if (container.nodeType === nodeType.textNode) return offset === 0
+
+      if (container.childNodes.length === 0) return true
+
+      return container.childNodes[offset] === container.firstChild
     },
 
-    isEndOffset: function(container, offset) {
-      if (container.nodeType === nodeType.textNode) {
-        return offset === container.length;
-      } else {
-        if (container.childNodes.length === 0)
-          return true;
-        else if (offset > 0)
-          return container.childNodes[offset - 1] === container.lastChild;
-        else
-          return false;
-      }
+    isEndOffset: function (container, offset) {
+      if (container.nodeType === nodeType.textNode) return offset === container.length
+
+      if (container.childNodes.length === 0) return true
+
+      if (offset > 0) return container.childNodes[offset - 1] === container.lastChild
+
+      return false
     },
 
-    isTextEndOfHost: function(host, container, offset) {
+    isTextEndOfHost: function (host, container, offset) {
       if (container === host) {
-        return this.isTextEndOffset(container, offset);
+        return this.isTextEndOffset(container, offset)
       }
 
       if (this.isTextEndOffset(container, offset)) {
-        var parentContainer = container.parentNode;
+        var parentContainer = container.parentNode
 
         // The index of the element plus one simulates a range offset
         // right after the element.
-        var offsetInParent = this.getNodeIndex(container) + 1;
-        return this.isTextEndOfHost(host, parentContainer, offsetInParent);
+        var offsetInParent = this.getNodeIndex(container) + 1
+        return this.isTextEndOfHost(host, parentContainer, offsetInParent)
       } else {
-        return false;
+        return false
       }
     },
 
-    isTextEndOffset: function(container, offset) {
+    isTextEndOffset: function (container, offset) {
       if (container.nodeType === nodeType.textNode) {
-        var text = string.trimRight(container.nodeValue);
-        return offset >= text.length;
+        var text = string.trimRight(container.nodeValue)
+        return offset >= text.length
       } else if (container.childNodes.length === 0) {
-        return true;
+        return true
       } else {
-        var lastOffset = this.lastOffsetWithContent(container);
-        return offset >= lastOffset;
+        var lastOffset = this.lastOffsetWithContent(container)
+        return offset >= lastOffset
       }
     },
 
-    isSameNode: function(target, source) {
-      var i, len, attr;
+    isSameNode: function (target, source) {
+      var i, len, attr
 
-      if (target.nodeType !== source.nodeType)
-        return false;
+      if (target.nodeType !== source.nodeType) return false
 
-      if (target.nodeName !== source.nodeName)
-        return false;
+      if (target.nodeName !== source.nodeName) return false
 
-      for (i = 0, len = target.attributes.length; i < len; i++) {
-        attr = target.attributes[i];
-        if (source.getAttribute(attr.name) !== attr.value)
-          return false;
+      for (i = 0, len = target.attributes.length; i < len; i++) {
+        attr = target.attributes[i]
+        if (source.getAttribute(attr.name) !== attr.value) return false
       }
 
-      return true;
+      return true
     },
 
     /**
@@ -235,11 +224,10 @@ module.exports = (function() {
      * @param  {HTMLElement} container The container to iterate on.
      * @return {HTMLElement}           THe deepest last child in the container.
      */
-    latestChild: function(container) {
-      if (container.lastChild)
-        return this.latestChild(container.lastChild);
-      else
-        return container;
+    latestChild: function (container) {
+      if (container.lastChild) return this.latestChild(container.lastChild)
+
+      return container
     },
 
     /**
@@ -250,28 +238,28 @@ module.exports = (function() {
      * @param  {HTMLElement} DOM node.
      * @return {Boolean}
      */
-    isDocumentFragmentWithoutChildren: function(fragment) {
+    isDocumentFragmentWithoutChildren: function (fragment) {
       if (fragment &&
-          fragment.nodeType === nodeType.documentFragmentNode &&
-          fragment.childNodes.length === 0) {
-        return true;
+        fragment.nodeType === nodeType.documentFragmentNode &&
+        fragment.childNodes.length === 0) {
+        return true
       }
-      return false;
+      return false
     },
 
     /**
      * Determine if an element behaves like an inline element.
      */
-    isInlineElement: function(window, element) {
-      var styles = element.currentStyle || window.getComputedStyle(element, '');
-      var display = styles.display;
+    isInlineElement: function (window, element) {
+      var styles = element.currentStyle || window.getComputedStyle(element, '')
+      var display = styles.display
       switch (display) {
-      case 'inline':
-      case 'inline-block':
-        return true;
-      default:
-        return false;
+        case 'inline':
+        case 'inline-block':
+          return true
+        default:
+          return false
       }
     }
-  };
-})();
+  }
+})()

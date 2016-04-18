@@ -1,4 +1,3 @@
-
 /**
  * Defines all supported event types by Editable.JS and provides default
  * implementations for them defined in {{#crossLink "Behavior"}}{{/crossLink}}
@@ -16,7 +15,6 @@ module.exports = {
 
   // Rules that are applied when filtering pasted content
   pastedHtmlRules: {
-
     // Elements and their attributes to keep in pasted text
     allowedElements: {
       'a': {
@@ -48,5 +46,4 @@ module.exports = {
     blockLevelElements: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'p', 'pre', 'hr', 'blockquote', 'article', 'figure', 'header', 'footer', 'ul', 'ol', 'li', 'section', 'table', 'video']
   }
 
-};
-
+}

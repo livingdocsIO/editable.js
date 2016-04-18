@@ -1,5 +1,5 @@
-var Cursor = require('./cursor');
-var Selection = require('./selection');
+var Cursor = require('./cursor')
+var Selection = require('./selection')
 
 /** RangeContainer
  *
@@ -8,48 +8,47 @@ var Selection = require('./selection');
  * so we can easily compare them without checking for undefined
  * all the time
  */
-var RangeContainer;
-module.exports = RangeContainer = function(editableHost, rangyRange) {
-  this.host = editableHost && editableHost.jquery ?
-    editableHost[0] :
-    editableHost;
-  this.range = rangyRange;
-  this.isAnythingSelected = (rangyRange !== undefined);
-  this.isCursor = (this.isAnythingSelected && rangyRange.collapsed);
-  this.isSelection = (this.isAnythingSelected && !this.isCursor);
-};
+var RangeContainer
+module.exports = RangeContainer = function (editableHost, rangyRange) {
+  this.host = editableHost && editableHost.jquery
+    ? editableHost[0]
+    : editableHost
+  this.range = rangyRange
+  this.isAnythingSelected = (rangyRange !== undefined)
+  this.isCursor = (this.isAnythingSelected && rangyRange.collapsed)
+  this.isSelection = (this.isAnythingSelected && !this.isCursor)
+}
 
-RangeContainer.prototype.getCursor = function() {
+RangeContainer.prototype.getCursor = function () {
   if (this.isCursor) {
-    return new Cursor(this.host, this.range);
+    return new Cursor(this.host, this.range)
   }
-};
+}
 
-RangeContainer.prototype.getSelection = function() {
+RangeContainer.prototype.getSelection = function () {
   if (this.isSelection) {
-    return new Selection(this.host, this.range);
+    return new Selection(this.host, this.range)
   }
-};
+}
 
-RangeContainer.prototype.forceCursor = function() {
+RangeContainer.prototype.forceCursor = function () {
   if (this.isSelection) {
-    var selection = this.getSelection();
-    return selection.deleteContent();
+    var selection = this.getSelection()
+    return selection.deleteContent()
   } else {
-    return this.getCursor();
+    return this.getCursor()
   }
-};
+}
 
-RangeContainer.prototype.isDifferentFrom = function(otherRangeContainer) {
-  otherRangeContainer = otherRangeContainer || new RangeContainer();
-  var self = this.range;
-  var other = otherRangeContainer.range;
+RangeContainer.prototype.isDifferentFrom = function (otherRangeContainer) {
+  otherRangeContainer = otherRangeContainer || new RangeContainer()
+  var self = this.range
+  var other = otherRangeContainer.range
   if (self && other) {
-    return !self.equals(other);
+    return !self.equals(other)
   } else if (!self && !other) {
-    return false;
+    return false
   } else {
-    return true;
+    return true
   }
-};
-
+}

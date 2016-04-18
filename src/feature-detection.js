@@ -1,6 +1,6 @@
-var browser = require('bowser').browser;
+var browser = require('bowser').browser
 
-module.exports = (function() {
+module.exports = (function () {
   /**
    * Check for contenteditable support
    *
@@ -9,7 +9,7 @@ module.exports = (function() {
    * here is a whitelist of verified working browsers:
    * https://github.com/NielsLeenheer/html5test/blob/549f6eac866aa861d9649a0707ff2c0157895706/scripts/engine.js#L2083
    */
-  var contenteditable = typeof document.documentElement.contentEditable !== 'undefined';
+  var contenteditable = typeof document.documentElement.contentEditable !== 'undefined'
 
   /**
    * Check selectionchange event (currently supported in IE, Chrome and Safari)
@@ -17,23 +17,19 @@ module.exports = (function() {
    * To handle selectionchange in firefox see CKEditor selection object
    * https://github.com/ckeditor/ckeditor-dev/blob/master/core/selection.js#L388
    */
-  var selectionchange = (function() {
-
+  var selectionchange = (function () {
     // not exactly feature detection... is it?
-    return !(browser.gecko || browser.opera);
-  })();
+    return !(browser.gecko || browser.opera)
+  })()
 
-
-  var contenteditableSpanBug = (function() {
+  var contenteditableSpanBug = (function () {
     // See Keyboard.prototype.preventContenteditableBug for more information.
-    return !!browser.webkit;
-  })();
-
+    return !!browser.webkit
+  })()
 
   return {
     contenteditable: contenteditable,
     selectionchange: selectionchange,
     contenteditableSpanBug: contenteditableSpanBug
-  };
-
-})();
+  }
+})()

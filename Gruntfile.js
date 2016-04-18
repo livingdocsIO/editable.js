@@ -1,12 +1,10 @@
-'use strict';
+'use strict'
 
-module.exports = function(grunt) {
-
+module.exports = function (grunt) {
   // load all grunt tasks
-  require('load-grunt-tasks')(grunt);
+  require('load-grunt-tasks')(grunt)
 
   grunt.initConfig({
-
     watch: {
       livereload: {
         options: {
@@ -17,7 +15,7 @@ module.exports = function(grunt) {
           '.tmp/{,*/}*.js',
           'test/js/{,*/}*.js',
           'test/css/{,*/}*.css'
-        ],
+        ]
       },
       src: {
         files: [
@@ -64,17 +62,6 @@ module.exports = function(grunt) {
     clean: {
       server: '.tmp',
       test: '.tmp/editable-test.js'
-    },
-
-    jshint: {
-      options: {
-        jshintrc: '.jshintrc'
-      },
-      all: [
-        'Gruntfile.js',
-        'src/{,*/}*.js',
-        'spec/{,*/}*.js'
-      ]
     },
 
     karma: {
@@ -133,7 +120,7 @@ module.exports = function(grunt) {
         files: {
           'editable.min.js': [
             'editable.js'
-          ],
+          ]
         }
       }
     },
@@ -175,17 +162,13 @@ module.exports = function(grunt) {
         }
       }
     }
-  });
+  })
 
   grunt.registerTask('test', [
     'clean:test',
     'browserify:test',
     'karma:unit'
-  ]);
-
-  grunt.registerTask('lint', [
-    'jshint'
-  ]);
+  ])
 
   grunt.registerTask('dev', [
     'clean:server',
@@ -193,39 +176,36 @@ module.exports = function(grunt) {
     'react',
     'connect',
     'watch'
-  ]);
+  ])
 
   grunt.registerTask('build', [
-    'jshint',
     'clean:server',
     'add-revision',
     'browserify',
     'karma:build',
     'concat:dist',
     'uglify'
-  ]);
+  ])
 
   grunt.registerTask('cibuild', [
-    'jshint',
     'clean:server',
     'add-revision',
     'browserify',
     'karma:ci',
     'concat:dist',
     'uglify'
-  ]);
+  ])
 
   grunt.registerTask('devbuild', [
     'clean:server',
     'browserify:src',
     'concat:dist',
     'uglify'
-  ]);
+  ])
 
-  grunt.registerTask('add-revision', ['revision', 'replace:revision']);
+  grunt.registerTask('add-revision', ['revision', 'replace:revision'])
 
-  grunt.registerTask('default', ['dev']);
-
+  grunt.registerTask('default', ['dev'])
 
   // Release a new version
   // Only do this on the `master` branch.
@@ -235,9 +215,8 @@ module.exports = function(grunt) {
   // release:minor
   // release:major
   grunt.registerTask('release', function (type) {
-    type = type ? type : 'patch';
-    grunt.task.run('bump:' + type);
-    grunt.task.run('shell:npm');
-  });
-
-};
+    type = type || 'patch'
+    grunt.task.run('bump:' + type)
+    grunt.task.run('shell:npm')
+  })
+}

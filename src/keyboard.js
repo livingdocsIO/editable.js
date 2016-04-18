@@ -1,94 +1,92 @@
 var rangy = require('rangy')
 
-var browserFeatures = require('./feature-detection');
-var nodeType = require('./node-type');
-var eventable = require('./eventable');
+var browserFeatures = require('./feature-detection')
+var nodeType = require('./node-type')
+var eventable = require('./eventable')
 
 /**
  * The Keyboard module defines an event API for key events.
  */
-var Keyboard = function(selectionWatcher) {
-  eventable(this);
-  this.selectionWatcher = selectionWatcher;
-};
+var Keyboard = function (selectionWatcher) {
+  eventable(this)
+  this.selectionWatcher = selectionWatcher
+}
 
-module.exports = Keyboard;
+module.exports = Keyboard
 
-Keyboard.prototype.dispatchKeyEvent = function(event, target, notifyCharacterEvent) {
+Keyboard.prototype.dispatchKeyEvent = function (event, target, notifyCharacterEvent) {
   switch (event.keyCode) {
+    case this.key.left:
+      this.notify(target, 'left', event)
+      break
 
-  case this.key.left:
-    this.notify(target, 'left', event);
-    break;
+    case this.key.right:
+      this.notify(target, 'right', event)
+      break
 
-  case this.key.right:
-    this.notify(target, 'right', event);
-    break;
+    case this.key.up:
+      this.notify(target, 'up', event)
+      break
 
-  case this.key.up:
-    this.notify(target, 'up', event);
-    break;
+    case this.key.down:
+      this.notify(target, 'down', event)
+      break
 
-  case this.key.down:
-    this.notify(target, 'down', event);
-    break;
-
-  case this.key.tab:
-    if (event.shiftKey) {
-      this.notify(target, 'shiftTab', event);
-    } else {
-      this.notify(target, 'tab', event);
-    }
-    break;
-
-  case this.key.esc:
-    this.notify(target, 'esc', event);
-    break;
-
-  case this.key.backspace:
-    this.preventContenteditableBug(target, event);
-    this.notify(target, 'backspace', event);
-    break;
-
-  case this.key['delete']:
-    this.preventContenteditableBug(target, event);
-    this.notify(target, 'delete', event);
-    break;
-
-  case this.key.enter:
-    if (event.shiftKey) {
-      this.notify(target, 'shiftEnter', event);
-    } else {
-      this.notify(target, 'enter', event);
-    }
-    break;
-  case this.key.ctrl:
-  case this.key.shift:
-  case this.key.alt:
-    break;
-  // Metakey
-  case 224: // Firefox: 224
-  case 17: // Opera: 17
-  case 91: // Chrome/Safari: 91 (Left)
-  case 93: // Chrome/Safari: 93 (Right)
-    break;
-  default:
-    this.preventContenteditableBug(target, event);
-    if (notifyCharacterEvent) {
-
-      // Don't notify character events as long as either the ctrl or
-      // meta key are pressed.
-      // see: https://github.com/upfrontIO/editable.js/pull/125
-      if (!event.ctrlKey && !event.metaKey) {
-        this.notify(target, 'character', event);
+    case this.key.tab:
+      if (event.shiftKey) {
+        this.notify(target, 'shiftTab', event)
+      } else {
+        this.notify(target, 'tab', event)
       }
-    }
-  }
-};
+      break
 
-Keyboard.prototype.preventContenteditableBug = function(target, event) {
+    case this.key.esc:
+      this.notify(target, 'esc', event)
+      break
+
+    case this.key.backspace:
+      this.preventContenteditableBug(target, event)
+      this.notify(target, 'backspace', event)
+      break
+
+    case this.key['delete']:
+      this.preventContenteditableBug(target, event)
+      this.notify(target, 'delete', event)
+      break
+
+    case this.key.enter:
+      if (event.shiftKey) {
+        this.notify(target, 'shiftEnter', event)
+      } else {
+        this.notify(target, 'enter', event)
+      }
+      break
+    case this.key.ctrl:
+    case this.key.shift:
+    case this.key.alt:
+      break
+    // Metakey
+    case 224: // Firefox: 224
+    case 17: // Opera: 17
+    case 91: // Chrome/Safari: 91 (Left)
+    case 93: // Chrome/Safari: 93 (Right)
+      break
+    default:
+      this.preventContenteditableBug(target, event)
+      if (notifyCharacterEvent) {
+        // Don't notify character events as long as either the ctrl or
+        // meta key are pressed.
+        // see: https://github.com/upfrontIO/editable.js/pull/125
+        if (!event.ctrlKey && !event.metaKey) {
+          this.notify(target, 'character', event)
+        }
+      }
+  }
+}
+
+Keyboard.prototype.preventContenteditableBug = function (target, event) {
   if (browserFeatures.contenteditableSpanBug) {
-    if (event.ctrlKey || event.metaKey) return;
+    if (event.ctrlKey || event.metaKey) return
 
     // This fixes a strange webkit bug that can be reproduced as follows:
     //
@@ -96,7 +94,7 @@ Keyboard.prototype.preventContenteditableBug = function(target, event) {
     //    following CSS:
     //
     //      strong {
-    //        color: red;
+    //        color: red
     //      }
     //
     // 2. A selection starts with the first character of a styled node and ends
@@ -126,18 +124,18 @@ Keyboard.prototype.preventContenteditableBug = function(target, event) {
     //
     // Manually remove the element that would be removed anyway before inserting
     // the new letter.
-    var rangyInstance = this.selectionWatcher.getFreshRange();
+    var rangyInstance = this.selectionWatcher.getFreshRange()
     if (!rangyInstance.isSelection) {
-      return;
+      return
     }
 
-    var nodeToRemove = Keyboard.getNodeToRemove(rangyInstance.range, target);
+    var nodeToRemove = Keyboard.getNodeToRemove(rangyInstance.range, target)
 
     if (nodeToRemove) {
-      nodeToRemove.remove();
+      nodeToRemove.remove()
     }
   }
-};
+}
 
 Keyboard.prototype.key = {
   left: 37,
@@ -152,9 +150,9 @@ Keyboard.prototype.key = {
   shift: 16,
   ctrl: 17,
   alt: 18
-};
+}
 
-Keyboard.key = Keyboard.prototype.key;
+Keyboard.key = Keyboard.prototype.key
 
 Keyboard.getNodeToRemove = function (selectionRange, target) {
   // This function is only used by preventContenteditableBug. It is exposed on
@@ -164,28 +162,28 @@ Keyboard.getNodeToRemove = function (selectionRange, target) {
   if (selectionRange.startOffset !== 0) {
     // The selection does not start at the beginning of a node. We have
     // nothing to do.
-    return;
+    return
   }
 
-  var startNodeElement = selectionRange.startContainer;
+  var startNodeElement = selectionRange.startContainer
 
   // If the node is a textNode, we select its parent.
   if (startNodeElement.nodeType === nodeType.textNode) {
-    startNodeElement = startNodeElement.parentNode;
+    startNodeElement = startNodeElement.parentNode
   }
 
   // The target is the contenteditable element, which we do not want to replace
   if (startNodeElement === target) {
-    return;
+    return
   }
 
   // We get a range that contains everything within the sartNodeElement to test
   // if the selectionRange is within the startNode, we have nothing to do.
-  var startNodeRange = rangy.createRange();
-  startNodeRange.setStartBefore(startNodeElement.firstChild);
-  startNodeRange.setEndAfter(startNodeElement.lastChild);
+  var startNodeRange = rangy.createRange()
+  startNodeRange.setStartBefore(startNodeElement.firstChild)
+  startNodeRange.setEndAfter(startNodeElement.lastChild)
   if (startNodeRange.containsRange(selectionRange)) {
-    return;
+    return
   }
 
   // If the selectionRange.startContainer was a textNode, we have to make sure
@@ -194,16 +192,16 @@ Keyboard.getNodeToRemove = function (selectionRange, target) {
   // following one:
   // <strong>foo<em>bar</em>|baz</strong>quux|
   if (selectionRange.startContainer.nodeType === nodeType.textNode) {
-    var contentNodeTypes = [nodeType.textNode, nodeType.elementNode];
-    var firstContentNode = startNodeElement.firstChild;
+    var contentNodeTypes = [nodeType.textNode, nodeType.elementNode]
+    var firstContentNode = startNodeElement.firstChild
     do {
       if (contentNodeTypes.indexOf(firstContentNode.nodeType) !== -1) {
-        break;
+        break
       }
-    } while ((firstContentNode = firstContentNode.nextSibling));
+    } while ((firstContentNode = firstContentNode.nextSibling))
 
     if (firstContentNode !== selectionRange.startContainer) {
-      return;
+      return
     }
   }
 
@@ -211,11 +209,11 @@ Keyboard.getNodeToRemove = function (selectionRange, target) {
   // removal. But it could be, that we also need to remove its parent, e.g.
   // we need to remove <strong> in the following example:
   // <strong><em>|foo</em>bar</strong>baz|
-  var rangeStatingBeforeCurrentElement = selectionRange.cloneRange();
-  rangeStatingBeforeCurrentElement.setStartBefore(startNodeElement);
+  var rangeStatingBeforeCurrentElement = selectionRange.cloneRange()
+  rangeStatingBeforeCurrentElement.setStartBefore(startNodeElement)
 
   return Keyboard.getNodeToRemove(
     rangeStatingBeforeCurrentElement,
     target
-  ) || startNodeElement;
-};
+  ) || startNodeElement
+}

@@ -1,7 +1,7 @@
-var createDefaultBehavior = require('./create-default-behavior');
+var createDefaultBehavior = require('./create-default-behavior')
 
 module.exports = function (editable) {
-  var behavior = createDefaultBehavior(editable);
+  var behavior = createDefaultBehavior(editable)
 
   return {
     /**
@@ -11,8 +11,8 @@ module.exports = function (editable) {
      * @event focus
      * @param {HTMLElement} element The element triggering the event.
      */
-    focus: function(element) {
-      behavior.focus(element);
+    focus: function (element) {
+      behavior.focus(element)
     },
 
     /**
@@ -22,8 +22,8 @@ module.exports = function (editable) {
      * @event blur
      * @param {HTMLElement} element The element triggering the event.
      */
-    blur: function(element) {
-      behavior.blur(element);
+    blur: function (element) {
+      behavior.blur(element)
     },
 
     /**
@@ -34,8 +34,8 @@ module.exports = function (editable) {
      * @param {HTMLElement} element The element triggering the event.
      * @param {String} action The flow action: "start" or "pause".
      */
-    flow: function(element, action) {
-      behavior.flow(element, action);
+    flow: function (element, action) {
+      behavior.flow(element, action)
     },
 
     /**
@@ -47,8 +47,8 @@ module.exports = function (editable) {
      * @param {HTMLElement} element The element triggering the event.
      * @param {Selection} selection The actual Selection object.
      */
-    selection: function(element, selection) {
-      behavior.selection(element, selection);
+    selection: function (element, selection) {
+      behavior.selection(element, selection)
     },
 
     /**
@@ -59,8 +59,8 @@ module.exports = function (editable) {
      * @param {HTMLElement} element The element triggering the event.
      * @param {Cursor} cursor The actual Cursor object.
      */
-    cursor: function(element, cursor) {
-      behavior.cursor(element, cursor);
+    cursor: function (element, cursor) {
+      behavior.cursor(element, cursor)
     },
 
     /**
@@ -72,8 +72,8 @@ module.exports = function (editable) {
      * @param {HTMLElement} element The element triggering the event.
      * @param {Cursor} cursor The actual cursor object.
      */
-    newline: function(element, cursor) {
-      behavior.newline(element, cursor);
+    newline: function (element, cursor) {
+      behavior.newline(element, cursor)
     },
 
     /**
@@ -87,10 +87,9 @@ module.exports = function (editable) {
      * @param {String} after The HTML string after the split.
      * @param {Cursor} cursor The actual cursor object.
      */
-    split: function(element, before, after, cursor) {
-      behavior.split(element, before, after, cursor);
+    split: function (element, before, after, cursor) {
+      behavior.split(element, before, after, cursor)
     },
-
 
     /**
      * The insert event is triggered when a new block should be inserted. This
@@ -103,10 +102,9 @@ module.exports = function (editable) {
      * @param {String} direction The insert direction: "before" or "after".
      * @param {Cursor} cursor The actual cursor object.
      */
-    insert: function(element, direction, cursor) {
-      behavior.insert(element, direction, cursor);
+    insert: function (element, direction, cursor) {
+      behavior.insert(element, direction, cursor)
     },
-
 
     /**
      * The merge event is triggered when two needs to be merged. This happens
@@ -120,8 +118,8 @@ module.exports = function (editable) {
      * @param {String} direction The merge direction: "before" or "after".
      * @param {Cursor} cursor The actual cursor object.
      */
-    merge: function(element, direction, cursor) {
-      behavior.merge(element, direction, cursor);
+    merge: function (element, direction, cursor) {
+      behavior.merge(element, direction, cursor)
     },
 
     /**
@@ -131,8 +129,8 @@ module.exports = function (editable) {
      * @event empty
      * @param {HTMLElement} element The element triggering the event.
      */
-    empty: function(element) {
-      behavior.empty(element);
+    empty: function (element) {
+      behavior.empty(element)
     },
 
     /**
@@ -145,8 +143,8 @@ module.exports = function (editable) {
      * @param {String} direction The switch direction: "before" or "after".
      * @param {Cursor} cursor The actual cursor object.*
      */
-    'switch': function(element, direction, cursor) {
-      behavior.switch(element, direction, cursor);
+    'switch': function (element, direction, cursor) {
+      behavior.switch(element, direction, cursor)
     },
 
     /**
@@ -160,8 +158,8 @@ module.exports = function (editable) {
      * @param {Selection} selection The actual Selection object.
      * @param {String} direction The move direction: "before" or "after".
      */
-    move: function(element, selection, direction) {
-      behavior.move(element, selection, direction);
+    move: function (element, selection, direction) {
+      behavior.move(element, selection, direction)
     },
 
     /**
@@ -173,8 +171,8 @@ module.exports = function (editable) {
      * @param {String} action The clipboard action: "copy" or "cut".
      * @param {Selection} selection A selection object around the copied content.
      */
-    clipboard: function(element, action, selection) {
-      behavior.clipboard(element, action, selection);
+    clipboard: function (element, action, selection) {
+      behavior.clipboard(element, action, selection)
     },
 
     /**
@@ -185,8 +183,8 @@ module.exports = function (editable) {
      * @param {Array of String} The pasted blocks
      * @param {Cursor} The cursor object.
      */
-    paste: function(element, blocks, cursor) {
-      behavior.paste(element, blocks, cursor);
+    paste: function (element, blocks, cursor) {
+      behavior.paste(element, blocks, cursor)
     }
-  };
-};
+  }
+}
