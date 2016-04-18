@@ -76,6 +76,16 @@ module.exports = (function() {
     },
 
     /**
+     * Check if a link can be added.
+     * If the editableHost or a parent is a link element linking
+     * should not be possible.
+     */
+    canLinkBeSet: function() {
+      var linkParents = content.getParentsAndSelf(this.host, 'a');
+      return linkParents.length ? false : true;
+    },
+
+    /**
      *
      * @method link
      */
