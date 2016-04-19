@@ -1,5 +1,8 @@
 # editable.js
+[![Build Status](https://travis-ci.org/upfrontIO/editable.js.svg?branch=master)](https://travis-ci.org/upfrontIO/editable.js)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com)
+[![Dependency Status](https://david-dm.org/upfrontIO/editable.js/master.svg)](https://david-dm.org/upfrontIO/editable.js/master)
+[![devDependency Status](https://david-dm.org/upfrontIO/editable.js/master/dev-status.svg)](https://david-dm.org/upfrontIO/editable.js/master#info=devDependencies)
 
 ## What is it about?
 
