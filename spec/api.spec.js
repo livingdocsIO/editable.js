@@ -13,8 +13,8 @@ describe('Editable', function () {
   })
 
   describe('global variable', function () {
-    it('is defined', function () {
-      expect(window.Editable).toBeDefined()
+    it('is not defined', function () {
+      expect(window.Editable).toBeUndefined()
     })
 
     it('creates a new Editable instance', function () {

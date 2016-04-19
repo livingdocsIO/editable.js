@@ -3,6 +3,7 @@ var webpack = require('webpack')
 
 var dist = process.env.BUILD_DIST === 'true'
 var docs = process.env.BUILD_DOCS === 'true'
+var test = process.env.BUILD_TEST === 'true'
 
 module.exports = {
   devtool: dist || docs ? 'sourcemap' : 'eval',
@@ -20,7 +21,7 @@ module.exports = {
   externals: dist && {
     jquery: 'jQuery'
   },
-  module: dist ? {} : {
+  module: dist || test ? {} : {
     loaders: [{
       test: /\.css$/,
       loaders: ['style', 'css']
@@ -44,7 +45,7 @@ module.exports = {
     'process.env': {
       'NODE_ENV': '"production"'
     }
-  }) : []) : [
+  }) : []) : test ? [] : [
     new webpack.optimize.CommonsChunkPlugin({
       filename: 'hmr.js',
       name: 'hmr'
