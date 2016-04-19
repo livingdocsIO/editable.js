@@ -5,7 +5,12 @@ cache:
     - node_modules
 notifications:
   email: false
+node_js:
+  - '4'
 before_script:
   - npm prune
-node_js:
-  - 4
+after_success:
+  - npm run semantic-release
+branches:
+  except:
+    - "/^v\\d+\\.\\d+\\.\\d+$/"

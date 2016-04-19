@@ -1,22 +1,10 @@
 {
   "name": "upfront-editable",
-  "version": "0.6.2",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/upfrontIO/editable.js.git"
-  },
-  "keywords": [
-    "contenteditable",
-    "editable"
-  ],
   "description": "Friendly contenteditable API",
-  "license": "MIT",
+  "version": "0.0.0-development",
   "dependencies": {
     "bowser": "0.7.3",
     "rangy": "^1.3.0"
-  },
-  "peerDependencies": {
-    "jquery": "^2.2.3"
   },
   "devDependencies": {
     "babel-core": "^6.7.6",
@@ -44,6 +32,7 @@
     "open-browser-webpack-plugin": "0.0.2",
     "prismjs": "^1.4.1",
     "react": "^0.13.3",
+    "semantic-release": "^4.3.5",
     "sinon": "^2.0.0-pre",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
@@ -53,17 +42,35 @@
   "engines": {
     "node": ">=0.10.0"
   },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "keywords": [
+    "contenteditable",
+    "editable"
+  ],
+  "license": "MIT",
+  "main": "src/core.js",
+  "peerDependencies": {
+    "jquery": "^2.2.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/upfrontIO/editable.js.git"
+  },
   "scripts": {
-    "lint": "eslint .",
-    "build": "npm run build:lib -s && npm run build:docs -s",
+    "start": "webpack-dev-server --inline --hot",
     "prebuild:lib": "rimraf ./dist",
     "build:lib": "BUILD_DIST=true webpack",
     "prebuild:docs": "rimraf ./examples/dist",
     "build:docs": "BUILD_DOCS=true webpack",
-    "start": "webpack-dev-server --inline --hot",
-    "test": "karma start",
-    "test:all": "npm run test -s -- --browsers Chrome,Firefox,Safari",
-    "test:watch": "npm run test -s -- --single-run false"
-  },
-  "main": "src/core.js"
+    "build": "npm run build:lib -s && npm run build:docs -s",
+    "test": "npm run build -s && npm run test:karma -s",
+    "test:all": "npm run test:karma -s -- --browsers Chrome,Firefox,Safari",
+    "test:karma": "karma start",
+    "test:watch": "npm run test:karma -s -- --single-run false",
+    "lint": "eslint .",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+  }
 }
