@@ -1,3 +1,9 @@
+var $ = require('jquery')
+var Prism = require('prismjs')
+
+var Editable = require('../')
+var examples = require('./events.js')
+
 // Paragraph Example
 ;(function () {
   var editable = new Editable({})
@@ -27,7 +33,7 @@
     editable.selection(function (el, selection) {
       currentSelection = selection
       if (selection) {
-        coords = selection.getCoordinates()
+        var coords = selection.getCoordinates()
 
         // position tooltip
         var top = coords.top - tooltip.outerHeight() - 15

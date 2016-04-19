@@ -4,5 +4,14 @@
     "browser": true,
     "node": true,
     "jasmine": true
-  }
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "rules": {
+    "react/jsx-uses-vars": 1
+  },
+  "plugins": ["react"]
 }

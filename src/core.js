@@ -58,7 +58,6 @@ var Editable = function (instanceConfig) {
 Editable.parser = parser
 Editable.content = content
 Editable.browser = browser
-window.Editable = Editable
 
 module.exports = Editable
 

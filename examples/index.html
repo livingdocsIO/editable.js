@@ -7,12 +7,8 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
 
-    <link rel="stylesheet" href="css/prism.css">
-    <link rel="stylesheet" href="css/font-awesome.css">
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/main.css">
+    <script src="/hmr.js"></script>
+    <script src="dist/styles.js"></script>
   </head>
   <body>
 
@@ -368,18 +364,6 @@ editable.on('newline', function(elem, cursor) {
       </div>
     </section>
 
-
-    <!-- load editable -->
-    <script src="../node_modules/jquery/dist/jquery.js"></script>
-    <script src="editable.js"></script>
-
-    <!-- dependencies of this demo site -->
-    <script src="js/prism.js"></script>
-    <script src="https://fb.me/react-with-addons-0.13.3.js"></script>
-
-    <!-- code for this demo site -->
-    <script src="js/react.js"></script>
-    <script src="js/main.js"></script>
-
+    <script src="dist/bundle.js"></script>
   </body>
 </html>

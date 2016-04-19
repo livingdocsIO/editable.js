@@ -1,22 +1,26 @@
+var $ = require('jquery')
+var React = require('react/dist/react-with-addons')
+
 var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
 var guid = 0
 
 var Events = React.createClass({
   render: function () {
-    var content, list = this.props.list
+    var content
+    var list = this.props.list
     if (list.length) {
       content = list.map(function (entry) {
         return <Events.Entry key={entry.id} { ...entry } />
       })
     } else {
-      content = <div key="empty-entry">
+      content = <div key='empty-entry'>
                   Nothing to see yet.
                 </div>
     }
 
     return (
-    <div className="events-list">
-      <ReactCSSTransitionGroup transitionName="events" transitionLeave={false}>
+    <div className='events-list'>
+      <ReactCSSTransitionGroup transitionName='events' transitionLeave={false}>
         {content}
       </ReactCSSTransitionGroup>
     </div>
@@ -27,8 +31,8 @@ var Events = React.createClass({
 Events.Entry = React.createClass({
   render: function () {
     return (
-    <div className="events-list-entry">
-      <span className="event-name">{this.props.name}</span>
+    <div className='events-list-entry'>
+      <span className='event-name'>{this.props.name}</span>
       {this.props.content}
     </div>
     )
@@ -38,7 +42,7 @@ Events.Entry = React.createClass({
 var CursorPosition = React.createClass({
   render: function () {
     return (
-    <span className="cursor-position">"{this.props.before}<i>&nbsp;</i>{this.props.after}"</span>
+    <span className='cursor-position'>'{this.props.before}<i>&nbsp;</i>{this.props.after}'</span>
     )
   }
 })
@@ -46,7 +50,7 @@ var CursorPosition = React.createClass({
 var Selection = React.createClass({
   render: function () {
     return (
-    <span className="selection">{this.props.content}</span>
+    <span className='selection'>{this.props.content}</span>
     )
   }
 })
@@ -54,7 +58,7 @@ var Selection = React.createClass({
 var Clipboard = React.createClass({
   render: function () {
     return (
-    <span><span className="clipboard-action">{this.props.action}</span> <span className="clipboard-content">"{this.props.content}"</span></span>
+    <span><span className='clipboard-action'>{this.props.action}</span> <span className='clipboard-content'>'{this.props.content}'</span></span>
     )
   }
 })
@@ -69,7 +73,7 @@ var addToList = function (event) {
 }
 
 var removeFromList = function () {
-  var event = events.pop()
+  events.pop()
   draw()
 }
 
@@ -91,7 +95,7 @@ var isFromFirstExample = function (elem) {
   if ($(elem).closest('.paragraph-example').length) return true
 }
 
-window.examples = {
+module.exports = {
   setup: function (editable) {
     editable.on('focus', function (elem) {
       if (!isFromFirstExample(elem)) return
@@ -158,7 +162,7 @@ window.examples = {
       if (!isFromFirstExample(elem)) return
 
       console.log(blocks)
-      text = blocks.join(' ')
+      var text = blocks.join(' ')
       if (text.length > 40) {
         text = text.substring(0, 38) + '...'
       }
@@ -172,12 +176,10 @@ window.examples = {
 
     editable.on('insert', function (elem, direction, cursor) {
       if (!isFromFirstExample(elem)) return
-      var content
-      if (direction == 'after') {
-        content = 'Insert a new block after the current one'
-      } else {
-        content = 'Insert a new block before the current one'
-      }
+      var content = direction === 'after'
+        ? 'Insert a new block after the current one'
+        : 'Insert a new block before the current one'
+
       var event = {
         name: 'insert',
         content: content
@@ -196,11 +198,10 @@ window.examples = {
 
     editable.on('merge', function (elem, direction) {
       if (!isFromFirstExample(elem)) return
-      if (direction == 'after') {
-        content = 'Merge this block with the following block'
-      } else {
-        content = 'Merge this block with the previous block'
-      }
+      var content = direction === 'after'
+        ? 'Merge this block with the following block'
+        : 'Merge this block with the previous block'
+
       var event = {
         name: 'merge',
         content: content
@@ -210,11 +211,10 @@ window.examples = {
 
     editable.on('switch', function (elem, direction, cursor) {
       if (!isFromFirstExample(elem)) return
-      if (direction == 'after') {
-        content = 'Set the focus to the following block'
-      } else {
-        content = 'Set the focus to the previous block'
-      }
+      var content = direction === 'after'
+        ? 'Set the focus to the following block'
+        : 'Set the focus to the previous block'
+
       var event = {
         name: 'switch',
         content: content
