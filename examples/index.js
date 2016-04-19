@@ -1,7 +1,7 @@
 var $ = require('jquery')
 var Prism = require('prismjs')
 
-var Editable = require('../')
+var Editable = require('../src/core')
 var examples = require('./events.js')
 
 // Paragraph Example

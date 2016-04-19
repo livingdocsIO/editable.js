@@ -14,13 +14,15 @@ module.exports = function (config) {
       watched: false
     }],
 
-    preprocessors: {'spec/*.spec.js': ['webpack']},
+    preprocessors: {
+      'spec/*.spec.js': ['webpack', 'sourcemap']
+    },
 
     webpack: webpackConfig,
 
     webpackMiddleware: {noInfo: true},
 
-    reporters: ['dots'],
+    reporters: ['progress'],
 
     port: 9876,
 

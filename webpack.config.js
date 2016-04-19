@@ -6,9 +6,9 @@ var docs = process.env.BUILD_DOCS === 'true'
 var test = process.env.BUILD_TEST === 'true'
 
 module.exports = {
-  devtool: dist || docs ? 'sourcemap' : 'eval',
+  devtool: dist || docs || test ? 'sourcemap' : 'eval',
   entry: dist ? {
-    'dist/editable': './'
+    'dist/editable': './src/core.js'
   } : {
     'examples/dist/bundle': './examples/index.js',
     'examples/dist/styles': './examples/index.css'
@@ -21,21 +21,21 @@ module.exports = {
   externals: dist && {
     jquery: 'jQuery'
   },
-  module: dist || test ? {} : {
+  module: {
     loaders: [{
+      test: /\.js$/,
+      exclude: /(node_modules)/,
+      loader: 'babel',
+      query: {
+        presets: ['react', 'es2015']
+      }
+    }].concat(dist || test ? [] : [{
       test: /\.css$/,
       loaders: ['style', 'css']
     }, {
       test: /\.(png|jpe?g|svg|gif|eot|ttf|woff2?)/,
       loader: 'url'
-    }, {
-      test: /\.js$/,
-      exclude: /(node_modules)/,
-      loader: 'babel',
-      query: {
-        presets: ['react']
-      }
-    }]
+    }])
   },
   plugins: dist || docs ? [
     new webpack.optimize.DedupePlugin(),
