@@ -72,7 +72,7 @@
     "test:all": "npm run test:karma -s -- --browsers Chrome,Firefox,Safari",
     "test:karma": "karma start",
     "test:watch": "npm run test:karma -s -- --single-run false",
-    "lint": "eslint .",
+    "lint": "eslint --ignore-path .gitignore .",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "postsemantic-release": "node ./bin/deploy-example.js"
   }
