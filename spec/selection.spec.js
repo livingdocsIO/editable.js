@@ -1,8 +1,8 @@
-var $ = require('jquery')
-var rangy = require('rangy')
+import $ from 'jquery'
+import rangy from 'rangy'
 
-var Selection = require('../src/selection')
-var Cursor = require('../src/cursor')
+import Selection from '../src/selection'
+import Cursor from '../src/cursor'
 
 describe('Selection', function () {
   it('should be defined', function () {

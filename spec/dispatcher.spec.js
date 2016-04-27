@@ -1,10 +1,10 @@
-var $ = require('jquery')
-var rangy = require('rangy')
+import $ from 'jquery'
+import rangy from 'rangy'
 
-var content = require('../src/content')
-var Cursor = require('../src/cursor')
-var Keyboard = require('../src/keyboard')
-var Editable = require('../src/core')
+import * as content from '../src/content'
+import Cursor from '../src/cursor'
+import Keyboard from '../src/keyboard'
+import Editable from '../src/core'
 
 describe('Dispatcher', function () {
   var key = Keyboard.key

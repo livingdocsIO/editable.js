@@ -1,38 +1,38 @@
-var $ = require('jquery')
+import $ from 'jquery'
 
-var content = require('./content')
-var highlightText = require('./highlight-text')
-var nodeType = require('./node-type')
+import * as content from './content'
+import highlightText from './highlight-text'
+import * as nodeType from './node-type'
 
-module.exports = (function () {
-  // Unicode character blocks for letters.
-  // See: http://jrgraphix.net/research/unicode_blocks.php
-  //
-  // \\u0041-\\u005A    A-Z (Basic Latin)
-  // \\u0061-\\u007A    a-z (Basic Latin)
-  // \\u0030-\\u0039    0-9 (Basic Latin)
-  // \\u00AA            ª   (Latin-1 Supplement)
-  // \\u00B5            µ   (Latin-1 Supplement)
-  // \\u00BA            º   (Latin-1 Supplement)
-  // \\u00C0-\\u00D6    À-Ö (Latin-1 Supplement)
-  // \\u00D8-\\u00F6    Ø-ö (Latin-1 Supplement)
-  // \\u00F8-\\u00FF    ø-ÿ (Latin-1 Supplement)
-  // \\u0100-\\u017F    Ā-ſ (Latin Extended-A)
-  // \\u0180-\\u024F    ƀ-ɏ (Latin Extended-B)
-  var letterChars = '\\u0041-\\u005A\\u0061-\\u007A\\u0030-\\u0039\\u00AA\\u00B5\\u00BA\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u00FF\\u0100-\\u017F\\u0180-\\u024F'
+// Unicode character blocks for letters.
+// See: http://jrgraphix.net/research/unicode_blocks.php
+//
+// \\u0041-\\u005A    A-Z (Basic Latin)
+// \\u0061-\\u007A    a-z (Basic Latin)
+// \\u0030-\\u0039    0-9 (Basic Latin)
+// \\u00AA            ª   (Latin-1 Supplement)
+// \\u00B5            µ   (Latin-1 Supplement)
+// \\u00BA            º   (Latin-1 Supplement)
+// \\u00C0-\\u00D6    À-Ö (Latin-1 Supplement)
+// \\u00D8-\\u00F6    Ø-ö (Latin-1 Supplement)
+// \\u00F8-\\u00FF    ø-ÿ (Latin-1 Supplement)
+// \\u0100-\\u017F    Ā-ſ (Latin Extended-A)
+// \\u0180-\\u024F    ƀ-ɏ (Latin Extended-B)
+const letterChars = '\\u0041-\\u005A\\u0061-\\u007A\\u0030-\\u0039\\u00AA\\u00B5\\u00BA\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u00FF\\u0100-\\u017F\\u0180-\\u024F'
 
-  var escapeRegEx = function (s) {
-    return String(s).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1')
-  }
+function escapeRegEx (s) {
+  return String(s).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1')
+}
 
-  /**
-   * Spellcheck class.
-   *
-   * @class Spellcheck
-   * @constructor
-   */
-  var Spellcheck = function (editable, configuration) {
-    var defaultConfig = {
+/**
+* Spellcheck class.
+*
+* @class Spellcheck
+* @constructor
+*/
+export default class Spellcheck {
+  constructor (editable, configuration) {
+    const defaultConfig = {
       checkOnFocus: false, // check on focus
       checkOnChange: true, // check after changes
       throttle: 1000, // unbounce rate in ms before calling the spellcheck service after changes
@@ -48,7 +48,7 @@ module.exports = (function () {
     this.setup()
   }
 
-  Spellcheck.prototype.setup = function (editable) {
+  setup (editable) {
     if (this.config.checkOnFocus) {
       this.editable.on('focus', $.proxy(this, 'onFocus'))
       this.editable.on('blur', $.proxy(this, 'onBlur'))
@@ -58,20 +58,20 @@ module.exports = (function () {
     }
   }
 
-  Spellcheck.prototype.onFocus = function (editableHost) {
+  onFocus (editableHost) {
     if (this.focusedEditable !== editableHost) {
       this.focusedEditable = editableHost
       this.editableHasChanged(editableHost)
     }
   }
 
-  Spellcheck.prototype.onBlur = function (editableHost) {
+  onBlur (editableHost) {
     if (this.focusedEditable === editableHost) {
       this.focusedEditable = undefined
     }
   }
 
-  Spellcheck.prototype.onChange = function (editableHost) {
+  onChange (editableHost) {
     if (this.config.checkOnChange) {
       this.editableHasChanged(editableHost, this.config.throttle)
     }
@@ -80,8 +80,8 @@ module.exports = (function () {
     }
   }
 
-  Spellcheck.prototype.prepareMarkerNode = function () {
-    var marker = this.config.markerNode
+  prepareMarkerNode () {
+    let marker = this.config.markerNode
     if (marker.jquery) {
       marker = marker[0]
     }
@@ -92,25 +92,26 @@ module.exports = (function () {
     marker.setAttribute('data-spellcheck', 'spellcheck')
   }
 
-  Spellcheck.prototype.createMarkerNode = function () {
+  createMarkerNode () {
     return this.config.markerNode.cloneNode()
   }
 
-  Spellcheck.prototype.removeHighlights = function (editableHost) {
-    $(editableHost).find('[data-spellcheck=spellcheck]').each(function (index, elem) {
+  removeHighlights (editableHost) {
+    $(editableHost).find('[data-spellcheck=spellcheck]')
+    .each((index, elem) => {
       content.unwrap(elem)
     })
   }
 
-  Spellcheck.prototype.removeHighlightsAtCursor = function (editableHost) {
-    var wordId
-    var selection = this.editable.getSelection(editableHost)
+  removeHighlightsAtCursor (editableHost) {
+    const selection = this.editable.getSelection(editableHost)
     if (selection && selection.isCursor) {
-      var elementAtCursor = selection.range.startContainer
+      let elementAtCursor = selection.range.startContainer
       if (elementAtCursor.nodeType === nodeType.textNode) {
         elementAtCursor = elementAtCursor.parentNode
       }
 
+      let wordId
       do {
         if (elementAtCursor === editableHost) return
         if (elementAtCursor.hasAttribute('data-word-id')) {
@@ -120,8 +121,8 @@ module.exports = (function () {
       } while ((elementAtCursor = elementAtCursor.parentNode))
 
       if (wordId) {
-        selection.retainVisibleSelection(function () {
-          $(editableHost).find('[data-word-id=' + wordId + ']').each(function (index, elem) {
+        selection.retainVisibleSelection(() => {
+          $(editableHost).find('[data-word-id=' + wordId + ']').each((index, elem) => {
             content.unwrap(elem)
           })
         })
@@ -129,62 +130,52 @@ module.exports = (function () {
     }
   }
 
-  Spellcheck.prototype.createRegex = function (words) {
-    var escapedWords = $.map(words, function (word) {
-      return escapeRegEx(word)
-    })
+  createRegex (words) {
+    const escapedWords = $.map(words, (word) => escapeRegEx(word))
 
-    var regex = ''
-    regex += '([^' + letterChars + ']|^)'
-    regex += '(' + escapedWords.join('|') + ')'
-    regex += '(?=[^' + letterChars + ']|$)'
+    const regex = `([^${letterChars}]|^)` +
+      `(${escapedWords.join('|')})` +
+      `(?=[^${letterChars}]|$)`
 
     return new RegExp(regex, 'g')
   }
 
-  Spellcheck.prototype.highlight = function (editableHost, misspelledWords) {
+  highlight (editableHost, misspelledWords) {
     // Remove old highlights
     this.removeHighlights(editableHost)
 
     // Create new highlights
     if (misspelledWords && misspelledWords.length > 0) {
-      var regex = this.createRegex(misspelledWords)
-      var span = this.createMarkerNode()
+      const regex = this.createRegex(misspelledWords)
+      const span = this.createMarkerNode()
       highlightText.highlight(editableHost, regex, span)
     }
   }
 
-  Spellcheck.prototype.editableHasChanged = function (editableHost, throttle) {
+  editableHasChanged (editableHost, throttle) {
     if (this.timeoutId && this.currentEditableHost === editableHost) {
       clearTimeout(this.timeoutId)
     }
 
-    var that = this
-    this.timeoutId = setTimeout(function () {
-      that.checkSpelling(editableHost)
-      that.currentEditableHost = undefined
-      that.timeoutId = undefined
+    this.timeoutId = setTimeout(() => {
+      this.checkSpelling(editableHost)
+      this.currentEditableHost = undefined
+      this.timeoutId = undefined
     }, throttle || 0)
 
     this.currentEditableHost = editableHost
   }
 
-  Spellcheck.prototype.checkSpelling = function (editableHost) {
-    var that = this
-    var text = highlightText.extractText(editableHost)
+  checkSpelling (editableHost) {
+    let text = highlightText.extractText(editableHost)
     text = content.normalizeWhitespace(text)
 
-    this.config.spellcheckService(text, function (misspelledWords) {
-      var selection = that.editable.getSelection(editableHost)
-      if (selection) {
-        selection.retainVisibleSelection(function () {
-          that.highlight(editableHost, misspelledWords)
-        })
-      } else {
-        that.highlight(editableHost, misspelledWords)
-      }
+    this.config.spellcheckService(text, (misspelledWords) => {
+      const selection = this.editable.getSelection(editableHost)
+      if (!selection) return this.highlight(editableHost, misspelledWords)
+      selection.retainVisibleSelection(() => {
+        this.highlight(editableHost, misspelledWords)
+      })
     })
   }
-
-  return Spellcheck
-})()
+}

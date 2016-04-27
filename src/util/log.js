@@ -1,27 +1,19 @@
-var config = require('../config')
+import * as config from '../config'
 
 // Allows for safe console logging
 // If the last param is the string "trace" console.trace will be called
 // configuration: disable with config.log = false
-module.exports = function () {
+export default function log () {
   if (config.log === false) return
 
-  var args, _ref
-  args = Array.prototype.slice.call(arguments)
-  if (args.length) {
-    if (args[args.length - 1] === 'trace') {
-      args.pop()
-      if ((_ref = window.console) ? _ref.trace : void 0) {
-        console.trace()
-      }
-    }
+  if (!global.console) return
+
+  const args = arguments.length === 1 ? arguments[0] : Array.from(arguments)
+
+  if (arguments.length !== 1 && args[args.length - 1] === 'trace') {
+    args.pop()
+    if (console.trace) console.trace()
   }
 
-  if (args.length === 1) {
-    args = args[0]
-  }
-
-  if (window.console) {
-    return console.log(args)
-  }
+  return console.log(args)
 }

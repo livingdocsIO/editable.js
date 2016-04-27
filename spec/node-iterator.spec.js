@@ -1,7 +1,7 @@
-var $ = require('jquery')
+import $ from 'jquery'
 
-var NodeIterator = require('../src/node-iterator')
-var highlightText = require('../src/highlight-text')
+import NodeIterator from '../src/node-iterator'
+import highlightText from '../src/highlight-text'
 
 describe('NodeIterator', function () {
   // Helper methods

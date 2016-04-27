@@ -1,10 +1,13 @@
-var $ = require('jquery')
-var rangy = require('rangy')
+import $ from 'jquery'
+import rangy from 'rangy'
 
-var content = require('../src/content')
-var rangeSaveRestore = require('../src/range-save-restore')
+import * as content from '../src/content'
+import * as rangeSaveRestore from '../src/range-save-restore'
+
+rangy.init()
 
 describe('Content', function () {
+
   describe('normalizeTags()', function () {
     var plain = $('<div>Plain <strong>text</strong><strong>block</strong> example snippet</div>')[0]
     var plainWithSpace = $('<div>Plain <strong>text</strong> <strong>block</strong> example snippet</div>')[0]

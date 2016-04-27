@@ -1,8 +1,8 @@
-var $ = require('jquery')
-var rangy = require('rangy')
+import $ from 'jquery'
+import rangy from 'rangy'
 
-var parser = require('../src/parser')
-var config = require('../src/config')
+import * as parser from '../src/parser'
+import * as config from '../src/config'
 
 describe('Parser', function () {
   // helper methods

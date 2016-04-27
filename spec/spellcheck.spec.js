@@ -1,10 +1,10 @@
-var $ = require('jquery')
-var rangy = require('rangy')
-var sinon = require('sinon')
+import $ from 'jquery'
+import rangy from 'rangy'
+import sinon from 'sinon'
 
-var Editable = require('../src/core')
-var Spellcheck = require('../src/spellcheck')
-var Cursor = require('../src/cursor')
+import Editable from '../src/core'
+import Spellcheck from '../src/spellcheck'
+import Cursor from '../src/cursor'
 
 describe('Spellcheck', function () {
   // Helpers

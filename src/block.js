@@ -1,14 +1,11 @@
-module.exports = (function () {
-  var getSibling = function (type) {
-    return function (element) {
-      var sibling = element[type]
-      if (sibling && sibling.getAttribute('contenteditable')) return sibling
-      return null
-    }
-  }
+export const next = getSibling('nextElementSibling')
+export const previous = getSibling('previousElementSibling')
 
-  return {
-    next: getSibling('nextElementSibling'),
-    previous: getSibling('previousElementSibling')
+function getSibling (type) {
+  return function (element) {
+    const sibling = element[type]
+    return sibling && sibling.getAttribute('contenteditable')
+      ? sibling
+      : null
   }
-})()
+}

@@ -1,7 +1,7 @@
-var $ = require('jquery')
+import $ from 'jquery'
 
-var config = require('../src/config')
-var Editable = require('../src/core')
+import * as config from '../src/config'
+import Editable from '../src/core'
 
 describe('Editable configuration', function () {
   describe('instance configuration', function () {

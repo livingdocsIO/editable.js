@@ -1,11 +1,11 @@
-var clipboard = require('../src/clipboard')
+import { parseContent } from '../src/clipboard'
 
 describe('Clipboard', function () {
   describe('parseContent()', function () {
     var extract = function (str) {
       var div = document.createElement('div')
       div.innerHTML = str
-      return clipboard.parseContent(div)
+      return parseContent(div)
     }
 
     var extractSingleBlock = function (str) {
@@ -119,7 +119,7 @@ describe('Clipboard', function () {
       var div = document.createElement('div')
       div.appendChild(document.createTextNode('<b>a</b>'))
 
-      expect(clipboard.parseContent(div)[0]).toEqual('&lt;b&gt;a&lt;/b&gt;')
+      expect(parseContent(div)[0]).toEqual('&lt;b&gt;a&lt;/b&gt;')
     })
   })
 })

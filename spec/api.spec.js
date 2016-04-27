@@ -1,6 +1,6 @@
-var $ = require('jquery')
+import $ from 'jquery'
 
-var Editable = require('../src/core')
+import Editable from '../src/core'
 
 describe('Editable', function () {
   var editable, $div

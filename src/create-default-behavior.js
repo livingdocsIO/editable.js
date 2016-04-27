@@ -1,9 +1,9 @@
-var $ = require('jquery')
+import $ from 'jquery'
 
-var parser = require('./parser')
-var content = require('./content')
-var log = require('./util/log')
-var block = require('./block')
+import * as parser from './parser'
+import * as content from './content'
+import log from './util/log'
+import * as block from './block'
 
 /**
  * The Behavior module defines the behavior triggered in response to the Editable.JS
@@ -15,56 +15,45 @@ var block = require('./block')
  * @submodule behavior
  */
 
-module.exports = function (editable) {
-  var document = editable.win.document
-
+export default function createDefaultBehavior (editable) {
+  const document = editable.win.document
   /**
-    * Factory for the default behavior.
-    * Provides default behavior of the Editable.JS API.
-    *
-    * @static
-    */
+  * Factory for the default behavior.
+  * Provides default behavior of the Editable.JS API.
+  *
+  * @static
+  */
+
   return {
-    focus: function (element) {
+    focus (element) {
       // Add a <br> element if the editable is empty to force it to have height
       // E.g. Firefox does not render empty block elements and most browsers do
       // not render  empty inline elements.
-      if (parser.isVoid(element)) {
-        var br = document.createElement('br')
-        br.setAttribute('data-editable', 'remove')
-        element.appendChild(br)
-      }
+      if (!parser.isVoid(element)) return
+      const br = document.createElement('br')
+      br.setAttribute('data-editable', 'remove')
+      element.appendChild(br)
     },
 
-    blur: function (element) {
+    blur (element) {
       content.cleanInternals(element)
     },
 
-    selection: function (element, selection) {
-      if (selection) {
-        log('Default selection behavior')
-      } else {
-        log('Default selection empty behavior')
-      }
+    selection (element, selection) {
+      log(selection ? 'Default selection behavior' : 'Default selection empty behavior')
     },
 
-    cursor: function (element, cursor) {
-      if (cursor) {
-        log('Default cursor behavior')
-      } else {
-        log('Default cursor empty behavior')
-      }
+    cursor (element, cursor) {
+      log(cursor ? 'Default cursor behavior' : 'Default cursor empty behavior')
     },
 
-    newline: function (element, cursor) {
-      var atEnd = cursor.isAtEnd()
-      var br = document.createElement('br')
-      cursor.insertBefore(br)
+    newline (element, cursor) {
+      cursor.insertBefore(document.createElement('br'))
 
-      if (atEnd) {
+      if (cursor.isAtEnd()) {
         log('at the end')
 
-        var noWidthSpace = document.createTextNode('\u200B')
+        const noWidthSpace = document.createTextNode('\u200B')
         cursor.insertAfter(noWidthSpace)
 
         // var trailingBr = document.createElement('br')
@@ -77,9 +66,9 @@ module.exports = function (editable) {
       cursor.setVisibleSelection()
     },
 
-    insert: function (element, direction, cursor) {
-      var parent = element.parentNode
-      var newElement = element.cloneNode(false)
+    insert (element, direction, cursor) {
+      const parent = element.parentNode
+      const newElement = element.cloneNode(false)
       if (newElement.id) newElement.removeAttribute('id')
 
       switch (direction) {
@@ -94,25 +83,23 @@ module.exports = function (editable) {
       }
     },
 
-    split: function (element, before, after, cursor) {
-      var newNode = element.cloneNode()
+    split (element, before, after, cursor) {
+      const newNode = element.cloneNode()
       newNode.appendChild(before)
 
-      var parent = element.parentNode
+      const parent = element.parentNode
       parent.insertBefore(newNode, element)
 
-      while (element.firstChild) {
-        element.removeChild(element.firstChild)
-      }
-      element.appendChild(after)
+      while (element.firstChild) element.removeChild(element.firstChild)
 
+      element.appendChild(after)
       content.tidyHtml(newNode)
       content.tidyHtml(element)
       element.focus()
     },
 
-    merge: function (element, direction, cursor) {
-      var container, merger
+    merge (element, direction, cursor) {
+      let container, merger
 
       switch (direction) {
         case 'before':
@@ -127,11 +114,9 @@ module.exports = function (editable) {
 
       if (!(container && merger)) return
 
-      if (container.childNodes.length > 0) {
-        cursor = editable.appendTo(container, merger.innerHTML)
-      } else {
-        cursor = editable.prependTo(container, merger.innerHTML)
-      }
+      cursor = container.childNodes.length > 0
+        ? editable.appendTo(container, merger.innerHTML)
+        : editable.prependTo(container, merger.innerHTML)
 
       // remove merged node
       merger.parentNode.removeChild(merger)
@@ -142,23 +127,21 @@ module.exports = function (editable) {
       cursor.setVisibleSelection()
     },
 
-    empty: function (element) {
+    empty (element) {
       log('Default empty behavior')
     },
 
-    'switch': function (element, direction, cursor) {
-      var next, previous
-
+    switch (element, direction, cursor) {
       switch (direction) {
         case 'before':
-          previous = block.previous(element)
+          const previous = block.previous(element)
           if (previous) {
             cursor.moveAtTextEnd(previous)
             cursor.setVisibleSelection()
           }
           break
         case 'after':
-          next = block.next(element)
+          const next = block.next(element)
           if (next) {
             cursor.moveAtBeginning(next)
             cursor.setVisibleSelection()
@@ -167,38 +150,33 @@ module.exports = function (editable) {
       }
     },
 
-    move: function (element, selection, direction) {
+    move (element, selection, direction) {
       log('Default move behavior')
     },
 
-    paste: function (element, blocks, cursor) {
-      var fragment
+    paste (element, blocks, cursor) {
+      cursor.insertBefore(blocks[0])
 
-      var firstBlock = blocks[0]
-      cursor.insertBefore(firstBlock)
+      if (blocks.length <= 1) return cursor.setVisibleSelection()
 
-      if (blocks.length <= 1) {
-        cursor.setVisibleSelection()
-      } else {
-        var parent = element.parentNode
-        var currentElement = element
+      var parent = element.parentNode
+      var currentElement = element
 
-        for (var i = 1; i < blocks.length; i++) {
-          var newElement = element.cloneNode(false)
-          if (newElement.id) newElement.removeAttribute('id')
-          fragment = content.createFragmentFromString(blocks[i])
-          $(newElement).append(fragment)
-          parent.insertBefore(newElement, currentElement.nextSibling)
-          currentElement = newElement
-        }
+      blocks.forEach((block) => {
+        const newElement = element.cloneNode(false)
+        if (newElement.id) newElement.removeAttribute('id')
+        const fragment = content.createFragmentFromString(block)
+        $(newElement).append(fragment)
+        parent.insertBefore(newElement, currentElement.nextSibling)
+        currentElement = newElement
+      })
 
-        // focus last element
-        cursor = editable.createCursorAtEnd(currentElement)
-        cursor.setVisibleSelection()
-      }
+      // focus last element
+      editable.createCursorAtEnd(currentElement)
+      .setVisibleSelection()
     },
 
-    clipboard: function (element, action, cursor) {
+    clipboard (element, action, cursor) {
       log('Default clipboard behavior')
     }
   }

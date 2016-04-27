@@ -1,4 +1,4 @@
-var string = require('../src/util/string')
+import * as string from '../src/util/string'
 
 describe('string util', function () {
   describe('escapeHtml()', function () {

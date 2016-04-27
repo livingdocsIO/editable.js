@@ -1,7 +1,7 @@
-var $ = require('jquery')
-var rangy = require('rangy')
+import $ from 'jquery'
+import rangy from 'rangy'
 
-var rangeSaveRestore = require('../src/range-save-restore')
+import * as rangeSaveRestore from '../src/range-save-restore'
 
 describe('RangeSaveRestore', function () {
   var range, host

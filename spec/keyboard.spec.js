@@ -1,9 +1,9 @@
-var $ = require('jquery')
-var rangy = require('rangy')
+import $ from 'jquery'
+import rangy from 'rangy'
 
+import Keyboard from '../src/keyboard'
+import * as nodeType from '../src/node-type'
 var destructureNodes
-var Keyboard = require('../src/keyboard')
-var nodeType = require('../src/node-type')
 
 describe('Keyboard', function () {
   describe('dispatchKeyEvent()', function () {

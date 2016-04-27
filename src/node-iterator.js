@@ -1,28 +1,24 @@
-var nodeType = require('./node-type')
+import * as nodeType from './node-type'
 
 // A DOM node iterator.
 //
 // Has the ability to replace nodes on the fly and continue
 // the iteration.
-module.exports = (function () {
-  var NodeIterator = function (root) {
-    this.root = root
-    this.current = this.next = this.root
+export default class NodeIterator {
+  constructor (root) {
+    this.current = this.next = this.root = root
   }
 
-  NodeIterator.prototype.getNextTextNode = function () {
-    var next
+  getNextTextNode () {
+    let next
     while ((next = this.getNext())) {
-      if (next.nodeType === nodeType.textNode && next.data !== '') {
-        return next
-      }
+      if (next.nodeType === nodeType.textNode && next.data !== '') return next
     }
   }
 
-  NodeIterator.prototype.getNext = function () {
-    var child, n
-    n = this.current = this.next
-    child = this.next = undefined
+  getNext () {
+    let n = this.current = this.next
+    let child = this.next = undefined
     if (this.current) {
       child = n.firstChild
 
@@ -39,14 +35,12 @@ module.exports = (function () {
     return this.current
   }
 
-  NodeIterator.prototype.replaceCurrent = function (replacement) {
+  replaceCurrent (replacement) {
     this.current = replacement
     this.next = undefined
-    var n = this.current
+    let n = this.current
     while ((n !== this.root) && !(this.next = n.nextSibling)) {
       n = n.parentNode
     }
   }
-
-  return NodeIterator
-})()
+}

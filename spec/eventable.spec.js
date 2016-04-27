@@ -1,4 +1,4 @@
-var eventable = require('../src/eventable')
+import eventable from '../src/eventable'
 
 describe('eventable', function () {
   var obj

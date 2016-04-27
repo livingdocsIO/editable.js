@@ -1,7 +1,7 @@
-var $ = require('jquery')
-var rangy = require('rangy')
+import $ from 'jquery'
+import rangy from 'rangy'
 
-var RangeContainer = require('../src/range-container')
+import RangeContainer from '../src/range-container'
 
 describe('RangeContainer', function () {
   describe('with no params', function () {
