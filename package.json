@@ -77,6 +77,7 @@
     "prebuild:lib": "rimraf ./lib",
     "build": "npm run build:dist -s && npm run build:lib -s && npm run build:docs -s",
     "test": "npm run build -s && npm run test:karma -s",
+    "posttest": "npm run lint -s",
     "test:all": "npm run test:karma -s -- --browsers Chrome,Firefox,Safari",
     "test:karma": "karma start",
     "test:watch": "npm run test:karma -s -- --single-run false",
