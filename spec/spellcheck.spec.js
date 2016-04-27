@@ -9,8 +9,8 @@ import Cursor from '../src/cursor'
 describe('Spellcheck', function () {
   // Helpers
 
-  var createCursor = function (host, elem, offset) {
-    var range = rangy.createRange()
+  function createCursor (host, elem, offset) {
+    const range = rangy.createRange()
     range.setStart(elem, offset)
     range.setEnd(elem, offset)
     return new Cursor(host, range)
@@ -18,45 +18,44 @@ describe('Spellcheck', function () {
 
   // Specs
 
-  beforeEach(function () {
+  beforeEach(() => {
     this.editable = new Editable()
   })
 
-  describe('new instance', function () {
-    it('is created and has a reference to editable', function () {
-      var spellcheck = new Spellcheck(this.editable)
+  describe('new instance', () => {
+    it('is created and has a reference to editable', () => {
+      const spellcheck = new Spellcheck(this.editable)
       expect(spellcheck.editable).toEqual(this.editable)
     })
   })
 
-  describe('with a simple sentence', function () {
-    beforeEach(function () {
-      var that = this
+  describe('with a simple sentence', () => {
+    beforeEach(() => {
       this.p = $('<p>A simple sentence.</p>')[0]
       this.errors = ['simple']
       this.spellcheck = new Spellcheck(this.editable, {
         markerNode: $('<span class="misspelled-word"></span>')[0],
-        spellcheckService: function (text, callback) {
-          callback(that.errors)
+        spellcheckService: (text, callback) => {
+          callback(this.errors)
         }
       })
     })
 
-    describe('checkSpelling()', function () {
-      it('calls highlight()', function () {
-        var highlight = sinon.spy(this.spellcheck, 'highlight')
+    describe('checkSpelling()', () => {
+      it('calls highlight()', () => {
+        const highlight = sinon.spy(this.spellcheck, 'highlight')
         this.spellcheck.checkSpelling(this.p)
         expect(highlight.called).toEqual(true)
       })
 
-      it('highlights a match with the given marker node', function () {
+      it('highlights a match with the given marker node', () => {
         this.spellcheck.checkSpelling(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
       })
 
-      it('removes a corrected highlighted match.', function () {
+      it('removes a corrected highlighted match.', () => {
         this.spellcheck.checkSpelling(this.p)
-        var $misspelledWord = $(this.p).find('.misspelled-word')
+        let $misspelledWord = $(this.p).find('.misspelled-word')
         expect($misspelledWord.length).toEqual(1)
 
         // correct the error
@@ -68,15 +67,15 @@ describe('Spellcheck', function () {
         expect($misspelledWord.length).toEqual(0)
       })
 
-      it('match highlights are marked with "ui-unwrap"', function () {
+      it('match highlights are marked with "ui-unwrap"', () => {
         this.spellcheck.checkSpelling(this.p)
-        var $spellcheck = $(this.p).find('.misspelled-word').first()
-        var dataEditable = $spellcheck.attr('data-editable')
+        const $spellcheck = $(this.p).find('.misspelled-word').first()
+        const dataEditable = $spellcheck.attr('data-editable')
         expect(dataEditable).toEqual('ui-unwrap')
       })
 
-      it('calls highlight() for an empty wordlist', function () {
-        var highlight = sinon.spy(this.spellcheck, 'highlight')
+      it('calls highlight() for an empty wordlist', () => {
+        const highlight = sinon.spy(this.spellcheck, 'highlight')
         this.spellcheck.config.spellcheckService = function (text, callback) {
           callback([])
         }
@@ -84,8 +83,8 @@ describe('Spellcheck', function () {
         expect(highlight.called).toEqual(true)
       })
 
-      it('calls highlight() for an undefined wordlist', function () {
-        var highlight = sinon.spy(this.spellcheck, 'highlight')
+      it('calls highlight() for an undefined wordlist', () => {
+        const highlight = sinon.spy(this.spellcheck, 'highlight')
         this.spellcheck.config.spellcheckService = function (text, callback) {
           callback()
         }
@@ -94,8 +93,8 @@ describe('Spellcheck', function () {
       })
     })
 
-    describe('removeHighlights()', function () {
-      it('removes the highlights', function () {
+    describe('removeHighlights()', () => {
+      it('removes the highlights', () => {
         this.spellcheck.checkSpelling(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
         this.spellcheck.removeHighlights(this.p)
@@ -103,40 +102,34 @@ describe('Spellcheck', function () {
       })
     })
 
-    describe('removeHighlightsAtCursor()', function () {
-      beforeEach(function () {
+    describe('removeHighlightsAtCursor()', () => {
+      beforeEach(() => {
         this.spellcheck.checkSpelling(this.p)
         this.highlight = $(this.p).find('.misspelled-word')[0]
       })
 
-      afterEach(function () {
+      afterEach(() => {
         this.editable.getSelection.restore()
       })
 
-      it('does remove the highlights if cursor is within a match', function () {
-        var self = this
-        sinon.stub(this.editable, 'getSelection', function () {
-          return createCursor(self.p, self.highlight, 0)
-        })
+      it('does remove the highlights if cursor is within a match', () => {
+        sinon.stub(this.editable, 'getSelection', () => createCursor(this.p, this.highlight, 0))
 
         this.spellcheck.removeHighlightsAtCursor(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(0)
       })
 
-      it('does not remove the highlights if cursor is outside a match', function () {
-        var self = this
-        sinon.stub(this.editable, 'getSelection', function () {
-          return createCursor(self.p, self.p.firstChild, 0)
-        })
+      it('does not remove the highlights if cursor is outside a match', () => {
+        sinon.stub(this.editable, 'getSelection', () => createCursor(this.p, this.p.firstChild, 0))
 
         this.spellcheck.removeHighlightsAtCursor(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
       })
     })
 
-    describe('retains cursor position', function () {
-      it('in the middle of a text node', function () {
-        var cursor = createCursor(this.p, this.p.firstChild, 4)
+    describe('retains cursor position', () => {
+      it('in the middle of a text node', () => {
+        const cursor = createCursor(this.p, this.p.firstChild, 4)
         cursor.save()
         this.spellcheck.checkSpelling(this.p)
         cursor.restore()

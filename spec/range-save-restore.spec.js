@@ -3,15 +3,15 @@ import rangy from 'rangy'
 
 import * as rangeSaveRestore from '../src/range-save-restore'
 
-describe('RangeSaveRestore', function () {
-  var range, host
-  beforeEach(function () {
+describe('RangeSaveRestore', () => {
+  let range
+  beforeEach(() => {
     range = rangy.createRange()
   })
 
-  it('saves a range', function () {
+  it('saves a range', () => {
     // <div>|a|</div>
-    host = $('<div><div>a</div></div>')
+    const host = $('<div><div>a</div></div>')
     range.setStart(host[0].firstChild, 0)
     range.setEnd(host[0].firstChild, 1)
     rangeSaveRestore.save(range)
@@ -21,13 +21,13 @@ describe('RangeSaveRestore', function () {
     expect(host[0].firstChild.childNodes[2].nodeName).toEqual('SPAN')
   })
 
-  it('restores a range', function () {
+  it('restores a range', () => {
     // <div>|a|</div>
-    host = $('<div><div>a</div></div>')
+    const host = $('<div><div>a</div></div>')
     range.setStart(host[0].firstChild, 0)
     range.setEnd(host[0].firstChild, 1)
-    var savedRange = rangeSaveRestore.save(range)
-    var recoveredRange = rangeSaveRestore.restore(host[0].firstChild, savedRange)
+    const savedRange = rangeSaveRestore.save(range)
+    const recoveredRange = rangeSaveRestore.restore(host[0].firstChild, savedRange)
     expect($(host[0].firstChild).html()).toEqual('a')
     expect(recoveredRange.toHtml()).toEqual('a')
   })

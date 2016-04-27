@@ -1,18 +1,18 @@
 import eventable from '../src/eventable'
 
-describe('eventable', function () {
-  var obj
+describe('eventable', () => {
+  let obj
 
-  describe('with individual contexts', function () {
-    beforeEach(function () {
+  describe('with individual contexts', () => {
+    beforeEach(() => {
       obj = {}
       eventable(obj)
     })
 
-    it('passes the arguments right', function () {
-      var called = 0
+    it('passes the arguments right', () => {
+      let called = 0
       obj.on('publish', function (argA, argB) {
-        called += 1
+        called++
         expect(argA).toEqual('A')
         expect(argB).toEqual('B')
       })
@@ -21,10 +21,10 @@ describe('eventable', function () {
       expect(called).toEqual(1)
     })
 
-    it('sets the proper context', function () {
-      var called = 0
+    it('sets the proper context', () => {
+      let called = 0
       obj.on('publish', function (arg) {
-        called += 1
+        called++
         expect(this.test).toEqual('A')
       })
       obj.notify({ test: 'A' }, 'publish')
@@ -32,28 +32,28 @@ describe('eventable', function () {
     })
   })
 
-  describe('with a predefined context', function () {
-    beforeEach(function () {
+  describe('with a predefined context', () => {
+    beforeEach(() => {
       obj = {}
       eventable(obj, { test: 'context' })
     })
 
-    it('attaches an "on" method', function () {
+    it('attaches an "on" method', () => {
       expect(obj.on).toBeDefined()
     })
 
-    it('attaches an "off" method', function () {
+    it('attaches an "off" method', () => {
       expect(obj.off).toBeDefined()
     })
 
-    it('attaches a "notify" method', function () {
+    it('attaches a "notify" method', () => {
       expect(obj.notify).toBeDefined()
     })
 
-    it('passes the arguments right', function () {
-      var called = 0
-      obj.on('publish', function (argA, argB) {
-        called += 1
+    it('passes the arguments right', () => {
+      let called = 0
+      obj.on('publish', (argA, argB) => {
+        called++
         expect(argA).toEqual('A')
         expect(argB).toEqual('B')
       })
@@ -61,21 +61,21 @@ describe('eventable', function () {
       expect(called).toEqual(1)
     })
 
-    it('sets the context', function () {
-      var called = 0
+    it('sets the context', () => {
+      let called = 0
       obj.on('publish', function () {
-        called += 1
+        called++
         expect(this.test).toEqual('context')
       })
       obj.notify('publish')
       expect(called).toEqual(1)
     })
 
-    describe('on()', function () {
-      it('notifies a listener', function () {
-        var called = 0
-        obj.on('publish', function () {
-          called += 1
+    describe('on()', () => {
+      it('notifies a listener', () => {
+        let called = 0
+        obj.on('publish', () => {
+          called++
         })
 
         obj.notify('publish', 'success')
@@ -83,27 +83,20 @@ describe('eventable', function () {
       })
     })
 
-    describe('off()', function () {
-      var calledA, calledB, calledC
-      var listenerA, listenerB, listenerC
+    describe('off()', () => {
+      let calledA, calledB, calledC
+      function listenerA () {
+        calledA++
+      }
 
-      beforeEach(function () {
+      beforeEach(() => {
         calledA = calledB = calledC = 0
-        listenerA = function () {
-          calledA += 1
-        }
-        listenerB = function () {
-          calledB += 1
-        }
-        listenerC = function () {
-          calledC += 1
-        }
         obj.on('publish', listenerA)
-        obj.on('publish', listenerB)
-        obj.on('awesome', listenerC)
+        obj.on('publish', () => calledB++)
+        obj.on('awesome', () => calledC++)
       })
 
-      it('can cope with undefined', function () {
+      it('can cope with undefined', () => {
         obj.off('publish', undefined)
         obj.notify('publish', 'success')
         expect(calledA).toEqual(1)
@@ -111,7 +104,7 @@ describe('eventable', function () {
         expect(calledC).toEqual(0)
       })
 
-      it('removes a single listener', function () {
+      it('removes a single listener', () => {
         obj.off('publish', listenerA)
         obj.notify('publish', 'success')
         expect(calledA).toEqual(0)
@@ -119,7 +112,7 @@ describe('eventable', function () {
         expect(calledC).toEqual(0)
       })
 
-      it('removes all listeners for one event type', function () {
+      it('removes all listeners for one event type', () => {
         obj.off('publish')
         obj.notify('publish', 'success')
         obj.notify('awesome', 'success')
@@ -128,7 +121,7 @@ describe('eventable', function () {
         expect(calledC).toEqual(1)
       })
 
-      it('removes all listeners', function () {
+      it('removes all listeners', () => {
         obj.off()
         obj.notify('publish', 'success')
         obj.notify('awesome', 'success')
