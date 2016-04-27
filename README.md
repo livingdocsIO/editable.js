@@ -73,19 +73,16 @@ In a `selection` event you get the editable element that triggered the event as 
 In the following example we are going to show a toolbar on top of the selection whenever the user has selected something inside of an editable element.
 
 ```javascript
-editable.selection(function(editableElement, selection) {
+editable.selection((editableElement, selection) => {
   if (!selection) return toolbar.hide()
 
   // get coordinates relative to the document (suited for absolutely positioned elements)
-  coords = selection.getCoordinates()
+  const coords = selection.getCoordinates()
 
   // position toolbar
-  var top = coords.top - toolbar.outerHeight()
-  var left = coords.left + (coords.width / 2) - (toolbar.outerWidth() / 2)
-  toolbar.css({
-    top: top,
-    left: left
-  }).show()
+  const top = coords.top - toolbar.outerHeight()
+  const left = coords.left + (coords.width / 2) - (toolbar.outerWidth() / 2)
+  toolbar.css({top, left}).show()
 })
 ```
 

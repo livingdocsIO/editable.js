@@ -1,235 +1,221 @@
-var $ = require('jquery')
-var React = require('react/addons')
+import $ from 'jquery'
+import React, { Component, PropTypes } from 'react/addons'
+const ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
 
-var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
-var guid = 0
+class Events extends Component {
+  render () {
+    const content = this.props.list.map(function (entry) {
+      return <Events.Entry key={entry.id} { ...entry } />
+    })
 
-var Events = React.createClass({
-  render: function () {
-    var content
-    var list = this.props.list
-    if (list.length) {
-      content = list.map(function (entry) {
-        return <Events.Entry key={entry.id} { ...entry } />
-      })
-    } else {
-      content = <div key='empty-entry'>
-                  Nothing to see yet.
-                </div>
-    }
-
-    return (
-    <div className='events-list'>
+    return (<div className='events-list'>
       <ReactCSSTransitionGroup transitionName='events' transitionLeave={false}>
-        {content}
+        {content.length ? content : (<div key='empty-entry'>
+          Nothing to see yet.
+        </div>)}
       </ReactCSSTransitionGroup>
-    </div>
-    )
-  }
-})
-
-Events.Entry = React.createClass({
-  render: function () {
-    return (
-    <div className='events-list-entry'>
-      <span className='event-name'>{this.props.name}</span>
-      {this.props.content}
-    </div>
-    )
-  }
-})
-
-var CursorPosition = React.createClass({
-  render: function () {
-    return (
-    <span className='cursor-position'>'{this.props.before}<i>&nbsp;</i>{this.props.after}'</span>
-    )
-  }
-})
-
-var Selection = React.createClass({
-  render: function () {
-    return (
-    <span className='selection'>{this.props.content}</span>
-    )
-  }
-})
-
-var Clipboard = React.createClass({
-  render: function () {
-    return (
-    <span><span className='clipboard-action'>{this.props.action}</span> <span className='clipboard-content'>'{this.props.content}'</span></span>
-    )
-  }
-})
-
-var listLength = 7
-var events = []
-var addToList = function (event) {
-  events.unshift(event)
-  if (events.length > listLength) {
-    removeFromList()
+    </div>)
   }
 }
+Events.propTypes = {
+  list: PropTypes.array
+}
 
-var removeFromList = function () {
+Events.Entry = class Entry extends Component {
+  render () {
+    return (<div className='events-list-entry'>
+      <span className='event-name'>{this.props.name}</span>
+      {this.props.content}
+    </div>)
+  }
+}
+Events.Entry.propTypes = {
+  name: PropTypes.string,
+  content: PropTypes.object
+}
+
+class CursorPosition extends Component {
+  render () {
+    return (<span className='cursor-position'>
+      {this.props.before}
+      <i>&nbsp;</i>
+      {this.props.after}
+    </span>)
+  }
+}
+CursorPosition.propTypes = {
+  before: PropTypes.string,
+  after: PropTypes.string
+}
+
+class Selection extends Component {
+  render () {
+    return <span className='selection'>{this.props.content}</span>
+  }
+}
+Selection.propTypes = {
+  content: PropTypes.string
+}
+
+class Clipboard extends Component {
+  render () {
+    return (<span>
+      <span className='clipboard-action'>{this.props.action}</span> <span className='clipboard-content'>{this.props.content}</span>
+    </span>)
+  }
+}
+Clipboard.propTypes = {
+  action: PropTypes.string,
+  content: PropTypes.string
+}
+
+let guid = 0
+const listLength = 7
+const events = []
+
+function addToList (event) {
+  events.unshift(event)
+  if (events.length > listLength) removeFromList()
+}
+
+function removeFromList () {
   events.pop()
   draw()
 }
 
-var showEvent = function (event) {
-  guid += 1
-  event.id = guid
+function showEvent (event) {
+  event.id = ++guid
   addToList(event)
   draw()
 }
 
-var draw = function () {
-  React.render(
-    <Events list={events} />,
-    document.querySelector('.paragraph-example-events')
-  )
+function draw () {
+  React.render(<Events list={events} />, document.querySelector('.paragraph-example-events'))
 }
 
-var isFromFirstExample = function (elem) {
-  if ($(elem).closest('.paragraph-example').length) return true
+function isFromFirstExample (elem) {
+  return !!$(elem).closest('.paragraph-example').length
 }
 
-module.exports = {
-  setup: function (editable) {
-    editable.on('focus', function (elem) {
-      if (!isFromFirstExample(elem)) return
-      var event = {
-        name: 'focus'
-      }
-      showEvent(event)
+export default function (editable) {
+  editable
+
+  .on('focus', (elem) => {
+    if (!isFromFirstExample(elem)) return
+    showEvent({
+      name: 'focus'
     })
+  })
 
-    editable.on('blur', function (elem) {
-      if (!isFromFirstExample(elem)) return
-      var event = {
-        name: 'blur'
-      }
-      showEvent(event)
+  .on('blur', (elem) => {
+    if (!isFromFirstExample(elem)) return
+    showEvent({
+      name: 'blur'
     })
+  })
 
-    editable.on('cursor', function (elem, cursor) {
-      if (!isFromFirstExample(elem)) return
-      if (cursor) {
-        var before = $(cursor.before()).text()
-        var after = $(cursor.after()).text()
-        var beforeMatch = /[^ ]{0,10}[ ]?$/.exec(before)
-        var afterMatch = /^[ ]?[^ ]{0,10}/.exec(after)
-        if (beforeMatch) before = beforeMatch[0]
-        if (beforeMatch) after = afterMatch[0]
-        var event = {
-          name: 'cursor',
-          content: <CursorPosition before={before} after={after} />
-        }
-        showEvent(event)
-      }
+  .on('cursor', (elem, cursor) => {
+    if (!isFromFirstExample(elem)) return
+    if (!cursor) return
+    let before = $(cursor.before()).text()
+    let after = $(cursor.after()).text()
+    const beforeMatch = /[^ ]{0,10}[ ]?$/.exec(before)
+    const afterMatch = /^[ ]?[^ ]{0,10}/.exec(after)
+    if (beforeMatch) before = beforeMatch[0]
+    if (beforeMatch) after = afterMatch[0]
+    showEvent({
+      name: 'cursor',
+      content: <CursorPosition before={before} after={after} />
     })
+  })
 
-    editable.on('selection', function (elem, selection) {
-      if (!isFromFirstExample(elem)) return
-      if (selection) {
-        var event = {
-          name: 'selection',
-          content: <Selection content={selection.text()} />
-        }
-        showEvent(event)
-      }
+  .on('selection', (elem, selection) => {
+    if (!isFromFirstExample(elem)) return
+    if (!selection) return
+    showEvent({
+      name: 'selection',
+      content: <Selection content={selection.text()} />
     })
+  })
 
-    editable.on('change', function (elem) {
-      if (!isFromFirstExample(elem)) return
-      var event = {
-        name: 'change'
-      }
-      showEvent(event)
+  .on('change', (elem) => {
+    if (!isFromFirstExample(elem)) return
+    showEvent({
+      name: 'change'
     })
+  })
 
-    editable.on('clipboard', function (elem, action, selection) {
-      if (!isFromFirstExample(elem)) return
-      var event = {
-        name: 'clipboard',
-        content: <Clipboard action={action} content={selection.text()} />
-      }
-      showEvent(event)
+  .on('clipboard', (elem, action, selection) => {
+    if (!isFromFirstExample(elem)) return
+    showEvent({
+      name: 'clipboard',
+      content: <Clipboard action={action} content={selection.text()} />
     })
+  })
 
-    editable.on('paste', function (elem, blocks, cursor) {
-      if (!isFromFirstExample(elem)) return
+  .on('paste', (elem, blocks, cursor) => {
+    if (!isFromFirstExample(elem)) return
 
-      console.log(blocks)
-      var text = blocks.join(' ')
-      if (text.length > 40) {
-        text = text.substring(0, 38) + '...'
-      }
+    console.log(blocks)
+    let text = blocks.join(' ')
+    if (text.length > 40) text = text.substring(0, 38) + '...'
 
-      var event = {
-        name: 'paste',
-        content: <Clipboard content={text} />
-      }
-      showEvent(event)
+    showEvent({
+      name: 'paste',
+      content: <Clipboard content={text} />
     })
+  })
 
-    editable.on('insert', function (elem, direction, cursor) {
-      if (!isFromFirstExample(elem)) return
-      var content = direction === 'after'
-        ? 'Insert a new block after the current one'
-        : 'Insert a new block before the current one'
+  .on('insert', (elem, direction, cursor) => {
+    if (!isFromFirstExample(elem)) return
+    const content = direction === 'after'
+      ? 'Insert a new block after the current one'
+      : 'Insert a new block before the current one'
 
-      var event = {
-        name: 'insert',
-        content: content
-      }
-      showEvent(event)
+    showEvent({
+      name: 'insert',
+      content
     })
+  })
 
-    editable.on('split', function (elem, fragmentA, fragmentB, cursor) {
-      if (!isFromFirstExample(elem)) return
-      var event = {
-        name: 'split',
-        content: 'Split this block'
-      }
-      showEvent(event)
+  .on('split', (elem, fragmentA, fragmentB, cursor) => {
+    if (!isFromFirstExample(elem)) return
+    showEvent({
+      name: 'split',
+      content: 'Split this block'
     })
+  })
 
-    editable.on('merge', function (elem, direction) {
-      if (!isFromFirstExample(elem)) return
-      var content = direction === 'after'
-        ? 'Merge this block with the following block'
-        : 'Merge this block with the previous block'
+  .on('merge', (elem, direction) => {
+    if (!isFromFirstExample(elem)) return
+    const content = direction === 'after'
+      ? 'Merge this block with the following block'
+      : 'Merge this block with the previous block'
 
-      var event = {
-        name: 'merge',
-        content: content
-      }
-      showEvent(event)
+    showEvent({
+      name: 'merge',
+      content: content
     })
+  })
 
-    editable.on('switch', function (elem, direction, cursor) {
-      if (!isFromFirstExample(elem)) return
-      var content = direction === 'after'
-        ? 'Set the focus to the following block'
-        : 'Set the focus to the previous block'
+  .on('switch', (elem, direction, cursor) => {
+    if (!isFromFirstExample(elem)) return
+    const content = direction === 'after'
+      ? 'Set the focus to the following block'
+      : 'Set the focus to the previous block'
 
-      var event = {
-        name: 'switch',
-        content: content
-      }
-      showEvent(event)
+    showEvent({
+      name: 'switch',
+      content: content
     })
+  })
 
-    editable.on('newline', function (elem) {
-      if (!isFromFirstExample(elem)) return
-      var event = {
-        name: 'newline'
-      }
-      showEvent(event)
+  .on('newline', (elem) => {
+    if (!isFromFirstExample(elem)) return
+    showEvent({
+      name: 'newline'
     })
+  })
 
-    draw()
-  }
+  draw()
 }
