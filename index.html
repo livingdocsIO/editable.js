@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <script src="/hmr.js"></script>
+    <script src="dist/styles.js"></script>
+  </head>
+  <body>
+
+    <section class="logo-section">
+      <div class="logo">
+        <div class="square">
+          <h1>editable.js</h1>
+        </div>
+        <h2>friendly contenteditable API</h2>
+      </div>
+    </section>
+
+
+    <!-- Editable Paragraph -->
+
+    <section class="example-section space-after">
+      <div class="section-content">
+        <h2 class="example-title">An editable paragraph</h2>
+
+        <div class="paragraph-example example-sheet">
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla.
+          </p>
+        </div>
+
+        <div>
+          <h3>Fired Events:</h3>
+          <div class="paragraph-example-events"></div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- Formatting -->
+
+    <section class="example-section space-after">
+      <div class="section-content">
+        <h2 class="example-title">Text Formatting</h2>
+
+        <div class="formatting-example example-sheet">
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero.
+          </p>
+        </div>
+
+        <div class="code-example">
+          <h3>HTML</h3>
+<pre><code class="formatting-code-js language-markup">&lt;p&gt;
+  Lorem ipsum dolor sit amet...
+&lt;/p&gt;</code></pre>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- Highlight -->
+
+    <section class="example-section space-after">
+      <div class="section-content">
+        <h2 class="example-title">Highlighting</h2>
+
+        <div class="highlighting-example example-sheet">
+          <p>
+            Is everybody happy? I want everybody to be happy. I know I'm happy.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Copy/Paste -->
+
+    <section class="example-section space-after">
+      <div class="section-content">
+        <h2 class="example-title">Copy and Paste</h2>
+
+        <div class="pasting-example example-sheet">
+          <p>
+            Paste here...
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- iFrame -->
+
+    <section class="example-section space-after">
+      <div class="section-content">
+        <h2 class="example-title">iFrame</h2>
+
+        <div class="iframe-sheet">
+          <iframe class="iframe-example" src='iframe.html'></iframe>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Documentation - Events -->
+    <section class="example-section space-after">
+      <div class="section-content">
+        <h2 class="example-title">Events</h2>
+
+        <!-- focus/blur -->
+        <div class="documentation">
+          <h4>
+            <span>focus</span> <span>blur</span>
+          </h4>
+          <p>Fired when when editable block gets focus and after it is blurred. </p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable
+
+.on('focus', elem => {
+  // your code...
+})
+
+.on('blur', elem => {
+  // your code...
+})
+</code></pre>
+          </div>
+
+        </div>
+
+        <!-- selection -->
+        <div class="documentation">
+          <h4>
+            <span>selection</span>
+          </h4>
+
+          <p>Fired when the user selects some text inside an editable block.</p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('selection', (elem, selection) => {
+  if (!selection) {
+    // nothing selected
+  } else {
+    const coords = selection.getCoordinates()
+    const text = selection.text()
+    const html = selection.html()
+    // your code...
+  }
+})
+</code></pre>
+          </div>
+
+        </div>
+
+        <div class="documentation">
+          <h4>
+            <span>cursor</span>
+          </h4>
+          <p>Fired when the user selects some text inside an editable block.</p>
+
+          <div class="code-example">
+          <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('cursor', (elem, cursor) => {
+  if (!cursor) {
+    // no cursor anymore in that editable block
+  } else {
+    // example if you wanted to insert an element right before the cursor
+    cursor.insertBefore($('<span>')[0])
+  }
+})
+</code></pre>
+          </div>
+
+        </div>
+
+        <div class="documentation">
+          <h4>
+            <span>change</span>
+          </h4>
+          <p>Fired when the user selects some text inside an editable block.</p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('change', elem => {
+  const currentContent = editable.getContent(elem);
+})
+</code></pre>
+          </div>
+
+        </div>
+
+        <!-- clipboard -->
+        <div class="documentation">
+          <h4>
+            <span>clipboard</span>
+          </h4>
+
+          <p>Fired for `copy` and `cut` events.</p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('clipboard', (elem, action, selection) => {
+  if (action === 'cut') {
+    const cutOutText = selection.text()
+  }
+})
+</code></pre>
+          </div>
+
+        </div>
+
+        <!-- paste -->
+        <div class="documentation">
+          <h4>
+            <span>paste</span>
+          </h4>
+
+          <p>Fired for a `paste` event.</p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('paste', (elem, blocks, cursor) => {
+  // blocks is an array of strings preprocessed by editable.js.
+  // If the pasted content contains HTML it is split up by block
+  // level elements and cleaned and normalized.
+  const text = blocks.join(' ')
+})
+</code></pre>
+          </div>
+
+        </div>
+
+        <!-- insert -->
+        <div class="documentation">
+          <h4>
+            <span>insert</span>
+          </h4>
+          <p>Fired when the user presses enter (&#x23ce;) at the beginning or end of an editable (For example you can insert a new paragraph after the element if this happens).</p>
+
+          <p class="edit-example">
+            The end<span class="cursor">&nbsp;</span>
+          <p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('insert', (elem, direction, cursor) => {
+  if (direction === 'after') {
+    // your code...
+  } else if (direction === 'before') {
+    // your code...
+  }
+})
+</code></pre>
+          </div>
+
+        </div>
+
+        <!-- split -->
+        <div class="documentation">
+          <h4>
+            <span>split</span>
+          </h4>
+          <p>Fired when the user presses return (&#x23ce;) in the middle of an editable.</p>
+
+          <p class="edit-example">
+            a<span class="cursor">&nbsp;</span>b
+          <p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('split', (elem, before, after, cursor) => {
+  // before and after are document fragments with the content
+  // from before and after the cursor in it.
+})
+</code></pre>
+          </div>
+
+        </div>
+
+        <!-- merge -->
+        <div class="documentation">
+          <h4>
+            <span>merge</span>
+          </h4>
+          <p>Fired when the user pressed forward delete (&#x2326;) at the end or backspace (&#x232B;) at the beginning of an editable.</p>
+
+          <p class="edit-example">
+            <span class="cursor">&nbsp;</span>ab
+          <p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('merge', (elem, direction, cursor) => {
+  if (direction === 'after') {
+    // your code...
+  } else if (direction === 'before') {
+    // your code...
+  }
+})
+</code></pre>
+          </div>
+
+        </div>
+
+        <!-- switch -->
+        <div class="documentation">
+          <h4>
+            <span>switch</span>
+          </h4>
+
+          <p>Fired when the user pressed an arrow key at the top or bottom so that you may want to set the cursor into the preceding or following editale element.</p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('switch', (elem, direction, cursor) => {
+  if (direction === 'after') {
+    // your code...
+  } else if (direction === 'before') {
+    // your code...
+  }
+})
+</code></pre>
+          </div>
+
+        </div>
+
+        <!-- newline -->
+        <div class="documentation">
+          <h4>
+            <span>newline</span>
+          </h4>
+          <p>Fired when the user presses shift and enter (&#x21E7; + &#x23ce;) to insert a newline.</p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('newline', (elem, cursor) => {
+  // your code...
+})
+</code></pre>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <script src="dist/bundle.js"></script>
+  </body>
+</html>
