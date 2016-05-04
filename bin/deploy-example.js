@@ -1,9 +1,9 @@
 if (!process.env.GH_TOKEN) throw new Error('no token')
 
-var repo = require('url').parse(require('./package.json').repository.url)
+var repo = require('url').parse(require('../package.json').repository.url)
 repo.auth = process.env.GH_TOKEN
 
-require('gh-pages').publish(require('path').join(__dirname, 'examples'), {
+require('gh-pages').publish(require('path').join(__dirname, '../examples'), {
   repo: repo.format(),
   silent: true,
   user: {
@@ -12,5 +12,5 @@ require('gh-pages').publish(require('path').join(__dirname, 'examples'), {
 
   }
 }, function (err) {
-  if (err) throw err
+  if (err) console.log(err)
 })
