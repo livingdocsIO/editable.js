@@ -1,16 +1,15 @@
 // DOM node types
 // https://developer.mozilla.org/en-US/docs/Web/API/Node.nodeType
-module.exports = {
-  elementNode: 1,
-  attributeNode: 2,
-  textNode: 3,
-  cdataSectionNode: 4,
-  entityReferenceNode: 5,
-  entityNode: 6,
-  processingInstructionNode: 7,
-  commentNode: 8,
-  documentNode: 9,
-  documentTypeNode: 10,
-  documentFragmentNode: 11,
-  notationNode: 12
-};
+
+export const elementNode = 1
+export const attributeNode = 2
+export const textNode = 3
+export const cdataSectionNode = 4
+export const entityReferenceNode = 5
+export const entityNode = 6
+export const processingInstructionNode = 7
+export const commentNode = 8
+export const documentNode = 9
+export const documentTypeNode = 10
+export const documentFragmentNode = 11
+export const notationNode = 12

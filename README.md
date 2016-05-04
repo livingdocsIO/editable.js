@@ -1,5 +1,12 @@
-editable.js
-===========
+# editable.js
+[![Build Status](https://travis-ci.org/upfrontIO/editable.js.svg?branch=master)](https://travis-ci.org/upfrontIO/editable.js)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com)
+[![Dependency Status](https://david-dm.org/upfrontIO/editable.js/master.svg)](https://david-dm.org/upfrontIO/editable.js/master)
+[![devDependency Status](https://david-dm.org/upfrontIO/editable.js/master/dev-status.svg)](https://david-dm.org/upfrontIO/editable.js/master#info=devDependencies)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+
+[![NPM](https://nodei.co/npm/upfront-editable.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/upfront-editable/)
+
 
 ## What is it about?
 
@@ -11,18 +18,17 @@ We made editable.js to support our vision of online document editing. Have a loo
 
 ## Installation
 
-Via bower:
+Via npm:
 
 ```shell
-bower install editable
+npm install --save upfront-editable jquery
 ```
 
-Otherwise you can just grab the [editable.js](editable.js) or [editable.min.js](editable.min.js) files from this repo.
-
+jQuery is a peerDependency, so you need to install it alongside editable.js. You can either `require('upfront-editable')` or find a prebuilt file in the npm bundle `dist/editable.js`. The required module will automatically pick up your `jQuery`, while the built version expects it as a global variable.
 
 ## Plnkr Demo
 
-You can check out a [simple demo](http://plnkr.co/edit/12OUl7) of editable.js on plnkr. It features a formatting toolbar and the default insert, split and merge behavior that allow to add and remove content blocks like paragraphs easily.
+You can check out a [simple demo on the website](https://upfrontio.github.io/editable.js/). It features a formatting toolbar and the default insert, split and merge behavior that allow to add and remove content blocks like paragraphs easily.
 
 
 ## Events Overview
@@ -57,7 +63,7 @@ To make an element editable:
 
 ```javascript
 var editable = new Editable()
-editalbe.add($elem)
+editable.add($elem)
 ```
 
 #### Example for Selection Changes
@@ -67,24 +73,22 @@ In a `selection` event you get the editable element that triggered the event as 
 In the following example we are going to show a toolbar on top of the selection whenever the user has selected something inside of an editable element.
 
 ```javascript
-editable.selection(function(editableElement, selection) {
-  if (selection) {
-    // get coordinates relative to the document (suited for absolutely positioned elements)
-    coords = selection.getCoordinates();
+editable.selection((editableElement, selection) => {
+  if (!selection) return toolbar.hide()
 
-    // position toolbar
-    var top = coords.top - toolbar.outerHeight();
-    var left = coords.left + (coords.width / 2) - (toolbar.outerWidth() / 2);
-    toolbar.show().css('top', top).css('left', left);
-  } else {
-    toolbar.hide();
-  }
-});
+  // get coordinates relative to the document (suited for absolutely positioned elements)
+  const coords = selection.getCoordinates()
+
+  // position toolbar
+  const top = coords.top - toolbar.outerHeight()
+  const left = coords.left + (coords.width / 2) - (toolbar.outerWidth() / 2)
+  toolbar.css({top, left}).show()
+})
 ```
 
 #### Dive Deeper
 
-We haven't got around to make this documentation comprehensive enough. In the meantime you can find the API methods in [src/core.js](src/core.js) and the default implemnetation in [src/default-behavior.js](src/default-behavior.js).
+We haven't got around to make this documentation comprehensive enough. In the meantime you can find the API methods in [src/core.js](src/core.js) and the default implementation in [src/default-behavior.js](src/default-behavior.js).
 
 To find out what you can do with the the editable.js `cursor` and `selection` objects see [src/cursor.js](src/cursor.js) and [src/selection.js](src/selection.js).
 
@@ -93,44 +97,34 @@ To find out what you can do with the the editable.js `cursor` and `selection` ob
 
 Setup:
 
-- [PhantomJS](http://phantomjs.org/)
-
 ```bash
-# install PhantomJS with homebrew
-brew install phantomjs
-
 # install node dependencies
 npm install
 ```
 
 
-Grunt tasks:
+Tasks:
 
 ```bash
-# watch and update editable.js and editable-test.js in .tmp/
-# and hands-on browser testing with livereload 
-# (required for running tests)
-grunt dev
+# livereload server with demo app
+npm start
 
-# run tests with PhantomJS
-grunt test
+# run tests with karma on PhantomJS2
+npm run test:karma
+
+# run tests with karma on PhantomJS2 and rerun on changes
+npm run test:watch
 
 # run tests in Chrome, Firefox and Safari
-grunt karma:browsers
+npm run test:karma:all
 
-# javascript linting (configuration in .jshintrc)
-grunt jshint
+# javascript linting (configuration in .eslintrc)
+npm run lint
 
-# run tests, linting and build editable.js
-grunt build
+# run tests and build editable.js
+npm run build
 ```
 
 ## License
 
 editable.js is licensed under the [MIT License](LICENSE).
-
-In Short:
-
-- You can use, copy and modify the software however you want.
-- You can give the software away for free or sell it.
-- The only restriction is that it be accompanied by the license agreement.

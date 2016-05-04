@@ -1,3 +1,7 @@
+@import "~normalize.css";
+@import "~prismjs/themes/prism.css";
+@import "~font-awesome/css/font-awesome.css";
+
 /*
  * HTML5 Boilerplate
  *
@@ -475,4 +479,3 @@ article {
        (min-resolution: 120dpi) {
     /* Style adjustments for high resolution devices */
 }
-

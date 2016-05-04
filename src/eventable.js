@@ -1,104 +1,92 @@
+import $ from 'jquery'
 
 // Eventable Mixin.
 //
 // Simple mixin to add event emitter methods to an object (Publish/Subscribe).
 //
 // Add on, off and notify methods to an object:
-// eventable(obj);
+// eventable(obj)
 //
 // publish an event:
-// obj.notify(context, 'action', param1, param2);
+// obj.notify(context, 'action', param1, param2)
 //
 // Optionally pass a context that will be applied to every event:
-// eventable(obj, context);
+// eventable(obj, context)
 //
 // With this publishing can omit the context argument:
-// obj.notify('action', param1, param2);
+// obj.notify('action', param1, param2)
 //
 // Subscribe to a 'channel'
-// obj.on('action', funtion(param1, param2){ ... });
+// obj.on('action', funtion(param1, param2){ ... })
 //
 // Unsubscribe an individual listener:
-// obj.off('action', method);
+// obj.off('action', method)
 //
 // Unsubscribe all listeners of a channel:
-// obj.off('action');
+// obj.off('action')
 //
 // Unsubscribe all listeners of all channels:
-// obj.off();
-var getEventableModule = function(notifyContext) {
-  var listeners = {};
+// obj.off()
 
-  var addListener = function(event, listener) {
-    if (listeners[event] === undefined) {
-      listeners[event] = [];
-    }
-    listeners[event].push(listener);
-  };
+export default function eventable (obj, notifyContext) {
+  $.extend(obj, getEventableModule(notifyContext))
+}
 
-  var removeListener = function(event, listener) {
-    var eventListeners = listeners[event];
-    if (eventListeners === undefined) return;
+function getEventableModule (notifyContext) {
+  let listeners = {}
 
-    for (var i = 0, len = eventListeners.length; i < len; i++) {
-      if (eventListeners[i] === listener) {
-        eventListeners.splice(i, 1);
-        break;
-      }
-    }
-  };
+  function addListener (event, listener) {
+    listeners[event] = [...listeners[event] || [], listener]
+  }
+
+  function removeListener (event, listener) {
+    const eventListeners = listeners[event]
+    if (eventListeners === undefined) return
+
+    const index = eventListeners.indexOf(listener)
+    if (index < 0) return
+
+    eventListeners.splice(index, 1)
+  }
 
   // Public Methods
   return {
-    on: function(event, listener) {
+    on (event, listener) {
       if (arguments.length === 2) {
-        addListener(event, listener);
+        addListener(event, listener)
       } else if (arguments.length === 1) {
-        var eventObj = event;
-        for (var eventType in eventObj) {
-          addListener(eventType, eventObj[eventType]);
-        }
+        for (let eventType in event) addListener(eventType, event[eventType])
       }
-      return this;
+      return this
     },
 
-    off: function(event, listener) {
+    off (event, listener) {
       if (arguments.length === 2) {
-        removeListener(event, listener);
+        removeListener(event, listener)
       } else if (arguments.length === 1) {
-        listeners[event] = [];
+        listeners[event] = []
       } else {
-        listeners = {};
+        listeners = {}
       }
     },
 
-    notify: function(context, event) {
-      var args = Array.prototype.slice.call(arguments);
+    notify (context, event) {
+      const args = Array.from(arguments)
+
       if (notifyContext) {
-        event = context;
-        context = notifyContext;
-        args = args.splice(1);
+        event = context
+        context = notifyContext
+        args.splice(0, 1)
       } else {
-        args = args.splice(2);
+        args.splice(0, 2)
       }
-      var eventListeners = listeners[event];
-      if (eventListeners === undefined) return;
+
+      const eventListeners = listeners[event]
+      if (eventListeners === undefined) return
 
       // Traverse backwards and execute the newest listeners first.
       // Stop if a listener returns false.
-      for (var i = eventListeners.length - 1; i >= 0; i--) {
-        // debugger
-        if (eventListeners[i].apply(context, args) === false)
-          break;
-      }
+      eventListeners.reverse().every((listener) => listener.apply(context, args) !== false)
     }
-  };
-
-};
-
-module.exports = function(obj, notifyContext) {
-  var module = getEventableModule(notifyContext);
-  for (var prop in module) {
-    obj[prop] = module[prop];
   }
-};
+}

@@ -1,93 +1,91 @@
-var RangeContainer = require('../src/range-container');
+import $ from 'jquery'
+import rangy from 'rangy'
 
-describe('RangeContainer', function() {
+import RangeContainer from '../src/range-container'
 
-  describe('with no params', function() {
+describe('RangeContainer', () => {
+  describe('with no params', () => {
+    let range
+    beforeEach(() => {
+      range = new RangeContainer()
+    })
 
-    beforeEach(function(){
-      this.range = new RangeContainer();
-    });
+    it('has nothing selected', () => {
+      expect(range.isAnythingSelected).toBe(false)
+    })
 
-    it('has nothing selected', function(){
-      expect(this.range.isAnythingSelected).toBe(false);
-    });
+    it('is no Cursor', () => {
+      expect(range.isCursor).toBe(false)
+    })
 
-    it('is no Cursor', function(){
-      expect(this.range.isCursor).toBe(false);
-    });
+    it('is no Selection', () => {
+      expect(range.isSelection).toBe(false)
+    })
 
-    it('is no Selection', function(){
-      expect(this.range.isSelection).toBe(false);
-    });
+    describe('getCursor()', () => {
+      it('returns undefined', () => {
+        expect(range.getCursor()).toBe(undefined)
+      })
+    })
 
-    describe('getCursor()', function(){
+    describe('getSelection()', () => {
+      it('returns undefined', () => {
+        expect(range.getSelection()).toBe(undefined)
+      })
+    })
+  })
 
-      it('returns undefined', function(){
-        expect(this.range.getCursor()).toBe(undefined);
-      });
-    });
+  describe('with a selection', () => {
+    let range
+    beforeEach(() => {
+      var elem = $('<div>Text</div>')
+      range = rangy.createRange()
+      range.selectNodeContents(elem[0])
+      range = new RangeContainer(elem[0], range)
+    })
 
-    describe('getSelection()', function(){
+    it('has something selected', () => {
+      expect(range.isAnythingSelected).toBe(true)
+    })
 
-      it('returns undefined', function(){
-        expect(this.range.getSelection()).toBe(undefined);
-      });
-    });
+    it('is no Cursor', () => {
+      expect(range.isCursor).toBe(false)
+    })
 
-  });
+    it('is a Selection', () => {
+      expect(range.isSelection).toBe(true)
+    })
 
-  describe('with a selection', function() {
+    it('can force a cursor', () => {
+      expect(range.host.innerHTML).toEqual('Text')
 
-    beforeEach(function(){
-      var elem = $('<div>Text</div>');
-      var range = rangy.createRange();
-      range.selectNodeContents(elem[0]);
-      this.range = new RangeContainer(elem[0], range);
-    });
+      const cursor = range.forceCursor()
 
-    it('has something selected', function(){
-      expect(this.range.isAnythingSelected).toBe(true);
-    });
+      expect(cursor.isCursor).toBe(true)
+      expect(range.host.innerHTML).toEqual('')
+    })
+  })
 
-    it('is no Cursor', function(){
-      expect(this.range.isCursor).toBe(false);
-    });
+  describe('with a cursor', () => {
+    let range
+    beforeEach(() => {
+      var elem = $('<div>Text</div>')
+      range = rangy.createRange()
+      range.selectNodeContents(elem[0])
+      range.collapse(true)
+      range = new RangeContainer(elem, range)
+    })
 
-    it('is a Selection', function(){
-      expect(this.range.isSelection).toBe(true);
-    });
+    it('has something selected', () => {
+      expect(range.isAnythingSelected).toBe(true)
+    })
 
-    it('can force a cursor', function(){
-      expect(this.range.host.innerHTML).toEqual('Text');
+    it('is a Cursor', () => {
+      expect(range.isCursor).toBe(true)
+    })
 
-      var cursor = this.range.forceCursor();
-
-      expect(cursor.isCursor).toBe(true);
-      expect(this.range.host.innerHTML).toEqual('');
-    });
-  });
-
-  describe('with a cursor', function() {
-
-    beforeEach(function(){
-      var elem = $('<div>Text</div>');
-      var range = rangy.createRange();
-      range.selectNodeContents(elem[0]);
-      range.collapse(true);
-      this.range = new RangeContainer(elem, range);
-    });
-
-    it('has something selected', function(){
-      expect(this.range.isAnythingSelected).toBe(true);
-    });
-
-    it('is a Cursor', function(){
-      expect(this.range.isCursor).toBe(true);
-    });
-
-    it('is no Selection', function(){
-      expect(this.range.isSelection).toBe(false);
-    });
-  });
-
-});
+    it('is no Selection', () => {
+      expect(range.isSelection).toBe(false)
+    })
+  })
+})

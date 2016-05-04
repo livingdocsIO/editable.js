@@ -7,12 +7,8 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
 
-    <link rel="stylesheet" href="css/prism.css">
-    <link rel="stylesheet" href="css/font-awesome.css">
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/main.css">
+    <script src="/hmr.js"></script>
+    <script src="dist/styles.js"></script>
   </head>
   <body>
 
@@ -129,13 +125,15 @@
           <div class="code-example">
             <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.on('focus', function(elem) {
-  // your code...
-});
+editable
 
-editable.on('blur', function(elem) {
+.on('focus', elem => {
   // your code...
-});
+})
+
+.on('blur', elem => {
+  // your code...
+})
 </code></pre>
           </div>
 
@@ -152,17 +150,16 @@ editable.on('blur', function(elem) {
           <div class="code-example">
             <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.on('selection', function(elem, selection) {
-  if (selection) {
-    var coords = selection.getCoordinates();
-    var text = selection.text();
-    var html = selection.html();
-
-    // your code...
-  } else {
+editable.on('selection', (elem, selection) => {
+  if (!selection) {
     // nothing selected
+  } else {
+    const coords = selection.getCoordinates()
+    const text = selection.text()
+    const html = selection.html()
+    // your code...
   }
-});
+})
 </code></pre>
           </div>
 
@@ -177,14 +174,14 @@ editable.on('selection', function(elem, selection) {
           <div class="code-example">
           <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.on('cursor', function(elem, cursor) {
-  if (cursor) {
-    // example if you wanted to insert an element right before the cursor
-    cursor.insertBefore($('<span>')[0]);
-  } else {
+editable.on('cursor', (elem, cursor) => {
+  if (!cursor) {
     // no cursor anymore in that editable block
+  } else {
+    // example if you wanted to insert an element right before the cursor
+    cursor.insertBefore($('<span>')[0])
   }
-});
+})
 </code></pre>
           </div>
 
@@ -199,9 +196,9 @@ editable.on('cursor', function(elem, cursor) {
           <div class="code-example">
             <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.on('change', function(elem) {
-  var currentContent = editable.getContent(elem);
-});
+editable.on('change', elem => {
+  const currentContent = editable.getContent(elem);
+})
 </code></pre>
           </div>
 
@@ -218,11 +215,11 @@ editable.on('change', function(elem) {
           <div class="code-example">
             <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.on('clipboard', function(elem, action, selection) {
+editable.on('clipboard', (elem, action, selection) => {
   if (action === 'cut') {
-    var cutOutText = selection.text();
+    const cutOutText = selection.text()
   }
-});
+})
 </code></pre>
           </div>
 
@@ -239,12 +236,12 @@ editable.on('clipboard', function(elem, action, selection) {
           <div class="code-example">
             <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.on('paste', function(elem, blocks, cursor) {
+editable.on('paste', (elem, blocks, cursor) => {
   // blocks is an array of strings preprocessed by editable.js.
   // If the pasted content contains HTML it is split up by block
   // level elements and cleaned and normalized.
-  var text = blocks.join(' ');
-});
+  const text = blocks.join(' ')
+})
 </code></pre>
           </div>
 
@@ -264,13 +261,13 @@ editable.on('paste', function(elem, blocks, cursor) {
           <div class="code-example">
             <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.on('insert', function(elem, direction, cursor) {
+editable.on('insert', (elem, direction, cursor) => {
   if (direction === 'after') {
     // your code...
   } else if (direction === 'before') {
     // your code...
   }
-});
+})
 </code></pre>
           </div>
 
@@ -290,10 +287,10 @@ editable.on('insert', function(elem, direction, cursor) {
           <div class="code-example">
             <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.on('split', function(elem, before, after, cursor) {
+editable.on('split', (elem, before, after, cursor) => {
   // before and after are document fragments with the content
   // from before and after the cursor in it.
-});
+})
 </code></pre>
           </div>
 
@@ -313,13 +310,13 @@ editable.on('split', function(elem, before, after, cursor) {
           <div class="code-example">
             <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.on('merge', function(elem, direction, cursor) {
+editable.on('merge', (elem, direction, cursor) => {
   if (direction === 'after') {
     // your code...
   } else if (direction === 'before') {
     // your code...
   }
-});
+})
 </code></pre>
           </div>
 
@@ -336,13 +333,13 @@ editable.on('merge', function(elem, direction, cursor) {
           <div class="code-example">
             <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.on('switch', function(elem, direction, cursor) {
+editable.on('switch', (elem, direction, cursor) => {
   if (direction === 'after') {
     // your code...
   } else if (direction === 'before') {
     // your code...
   }
-});
+})
 </code></pre>
           </div>
 
@@ -358,9 +355,9 @@ editable.on('switch', function(elem, direction, cursor) {
           <div class="code-example">
             <h3>Example:</h3>
 <pre><code class="language-javascript">
-editable.on('newline', function(elem, cursor) {
+editable.on('newline', (elem, cursor) => {
   // your code...
-});
+})
 </code></pre>
           </div>
 
@@ -368,19 +365,6 @@ editable.on('newline', function(elem, cursor) {
       </div>
     </section>
 
-
-    <!-- load editable -->
-    <script src="../bower_components/jquery/dist/jquery.js"></script>
-    <script src="../bower_components/rangy/rangy-core.js"></script>
-    <script src="editable.js"></script>
-
-    <!-- dependencies of this demo site -->
-    <script src="js/prism.js"></script>
-    <script src="https://fb.me/react-with-addons-0.13.3.js"></script>
-
-    <!-- code for this demo site -->
-    <script src="js/react.js"></script>
-    <script src="js/main.js"></script>
-
+    <script src="dist/bundle.js"></script>
   </body>
 </html>

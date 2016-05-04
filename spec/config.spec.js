@@ -1,59 +1,58 @@
-var config = require('../src/config');
-var Editable = require('../src/core');
+import $ from 'jquery'
 
-describe('Editable configuration', function() {
+import * as config from '../src/config'
+import Editable from '../src/core'
 
-  describe('instance configuration', function() {
-    var editable;
+describe('Editable configuration', () => {
+  describe('instance configuration', () => {
+    let editable
 
-    afterEach(function() {
+    afterEach(() => {
       if (editable) {
-        editable.off();
-        editable = undefined;
+        editable.off()
+        editable = undefined
       }
-    });
+    })
 
-    it('has default values', function() {
-      editable = new Editable();
-      expect(editable.config.defaultBehavior).toEqual(true);
-    });
+    it('has default values', () => {
+      editable = new Editable()
+      expect(editable.config.defaultBehavior).toEqual(true)
+    })
 
-    it('does not include the global configuration', function(){
-      editable = new Editable();
-      expect(editable.config.editableClass).toEqual(undefined);
-    });
+    it('does not include the global configuration', () => {
+      editable = new Editable()
+      expect(editable.config.editableClass).toEqual(undefined)
+    })
 
-    it('overrides the default values', function() {
+    it('overrides the default values', () => {
       editable = new Editable({
         defaultBehavior: false
-      });
-      expect(editable.config.defaultBehavior).toEqual(false);
-    });
-  });
+      })
+      expect(editable.config.defaultBehavior).toEqual(false)
+    })
+  })
 
+  describe('globalConfig()', () => {
+    const originalConfig = $.extend({}, config)
 
-  describe('globalConfig()', function() {
-    var originalConfig = $.extend({}, config);
+    afterEach(() => {
+      Editable.globalConfig(originalConfig)
+    })
 
-    afterEach(function() {
-      Editable.globalConfig(originalConfig);
-    });
+    it('has a default value for "editableClass"', () => {
+      expect(config.editableClass).toEqual('js-editable')
+    })
 
-    it('has a default value for "editableClass"', function() {
-      expect(config.editableClass).toEqual('js-editable');
-    });
-
-    it('overrides "editableClass"', function() {
+    it('overrides "editableClass"', () => {
       Editable.globalConfig({
         editableClass: 'editable-instance'
-      });
-      expect(config.editableClass).toEqual('editable-instance');
-    });
+      })
+      expect(config.editableClass).toEqual('editable-instance')
+    })
 
     // Safety check for the test setup
-    it('resets the default after each spec', function() {
-      expect(config.editableClass).toEqual('js-editable');
-    });
-  });
-
-});
+    it('resets the default after each spec', () => {
+      expect(config.editableClass).toEqual('js-editable')
+    })
+  })
+})

@@ -1,19 +1,15 @@
-var config = require('../config');
+import config from '../config'
 
 // Allows for safe error logging
 // Falls back to console.log if console.error is not available
-module.exports = function() {
-  if (config.logErrors === false) { return; }
+export default function error () {
+  if (config.logErrors === false) return
 
-  var args;
-  args = Array.prototype.slice.call(arguments);
-  if (args.length === 1) {
-    args = args[0];
-  }
+  const args = arguments.length === 1 ? arguments[0] : Array.from(arguments)
 
-  if (window.console && typeof window.console.error === 'function') {
-    return console.error(args);
-  } else if (window.console) {
-    return console.log(args);
-  }
-};
+  if (!global.console) return
+
+  if (typeof console.error === 'function') return console.error(args)
+
+  console.log(args)
+}

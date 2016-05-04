@@ -1,5 +1,5 @@
-var Cursor = require('./cursor');
-var Selection = require('./selection');
+import Cursor from './cursor'
+import Selection from './selection'
 
 /** RangeContainer
  *
@@ -8,48 +8,36 @@ var Selection = require('./selection');
  * so we can easily compare them without checking for undefined
  * all the time
  */
-var RangeContainer;
-module.exports = RangeContainer = function(editableHost, rangyRange) {
-  this.host = editableHost && editableHost.jquery ?
-    editableHost[0] :
-    editableHost;
-  this.range = rangyRange;
-  this.isAnythingSelected = (rangyRange !== undefined);
-  this.isCursor = (this.isAnythingSelected && rangyRange.collapsed);
-  this.isSelection = (this.isAnythingSelected && !this.isCursor);
-};
 
-RangeContainer.prototype.getCursor = function() {
-  if (this.isCursor) {
-    return new Cursor(this.host, this.range);
+export default class RangeContainer {
+  constructor (editableHost, rangyRange) {
+    this.host = editableHost && editableHost.jquery
+      ? editableHost[0]
+      : editableHost
+    this.range = rangyRange
+    this.isAnythingSelected = (rangyRange !== undefined)
+    this.isCursor = (this.isAnythingSelected && rangyRange.collapsed)
+    this.isSelection = (this.isAnythingSelected && !this.isCursor)
   }
-};
 
-RangeContainer.prototype.getSelection = function() {
-  if (this.isSelection) {
-    return new Selection(this.host, this.range);
+  getCursor () {
+    if (this.isCursor) return new Cursor(this.host, this.range)
   }
-};
 
-RangeContainer.prototype.forceCursor = function() {
-  if (this.isSelection) {
-    var selection = this.getSelection();
-    return selection.deleteContent();
-  } else {
-    return this.getCursor();
+  getSelection () {
+    if (this.isSelection) return new Selection(this.host, this.range)
   }
-};
 
-RangeContainer.prototype.isDifferentFrom = function(otherRangeContainer) {
-  otherRangeContainer = otherRangeContainer || new RangeContainer();
-  var self = this.range;
-  var other = otherRangeContainer.range;
-  if (self && other) {
-    return !self.equals(other);
-  } else if (!self && !other) {
-    return false;
-  } else {
-    return true;
+  forceCursor () {
+    if (!this.isSelection) return this.getCursor()
+    return this.getSelection().deleteContent()
   }
-};
 
+  isDifferentFrom (otherRangeContainer = new RangeContainer()) {
+    const self = this.range
+    const other = otherRangeContainer.range
+    if (self && other) return !self.equals(other)
+    if (!self && !other) return false
+    return true
+  }
+}
