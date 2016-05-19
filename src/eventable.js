@@ -36,7 +36,11 @@ function getEventableModule (notifyContext) {
   let listeners = {}
 
   function addListener (event, listener) {
-    listeners[event] = [...listeners[event] || [], listener]
+    if (event.indexOf(' ') === -1) {
+      listeners[event] = [...listeners[event] || [], listener]
+    } else {
+      event.split(' ').forEach((event) => addListener(event, listener))
+    }
   }
 
   function removeListener (event, listener) {
