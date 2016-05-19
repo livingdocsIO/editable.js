@@ -39,7 +39,7 @@ function getEventableModule (notifyContext) {
     if (event.indexOf(' ') === -1) {
       listeners[event] = [...listeners[event] || [], listener]
     } else {
-      event.split(' ').forEach((event) => addListener(event, listener));
+      event.split(' ').forEach((event) => addListener(event, listener))
     }
   }
 
