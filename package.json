@@ -40,7 +40,7 @@
     "normalize.css": "^4.1.1",
     "open-browser-webpack-plugin": "0.0.2",
     "prismjs": "^1.4.1",
-    "react": "^0.13.3",
+    "react": "^15.1.0",
     "rimraf": "^2.5.2",
     "semantic-release": "^4.3.5",
     "sinon": "^2.0.0-pre",
