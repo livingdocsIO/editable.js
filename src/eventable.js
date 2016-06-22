@@ -87,7 +87,9 @@ function getEventableModule (notifyContext) {
 
       // Traverse backwards and execute the newest listeners first.
       // Stop if a listener returns false.
-      eventListeners.reverse().every((listener) => listener.apply(context, args) !== false)
+      eventListeners
+      .slice().reverse() // reverse is also in-place, so copy array before
+      .every((listener) => listener.apply(context, args) !== false)
     }
   }
 }
