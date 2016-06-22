@@ -36,7 +36,8 @@ function getEventableModule (notifyContext) {
   let listeners = {}
 
   function addListener (event, listener) {
-    listeners[event] = [...listeners[event] || [], listener]
+    listeners[event] = listeners[event] || []
+    listeners[event].push(listener)
   }
 
   function removeListener (event, listener) {
@@ -82,7 +83,7 @@ function getEventableModule (notifyContext) {
       }
 
       const eventListeners = listeners[event]
-      if (eventListeners === undefined) return
+      if (!Array.isArray(eventListeners)) return
 
       // Traverse backwards and execute the newest listeners first.
       // Stop if a listener returns false.
