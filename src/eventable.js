@@ -37,12 +37,12 @@ function getEventableModule (notifyContext) {
 
   function addListener (event, listener) {
     listeners[event] = listeners[event] || []
-    listeners[event].push(listener)
+    listeners[event].unshift(listener)
   }
 
   function removeListener (event, listener) {
     const eventListeners = listeners[event]
-    if (eventListeners === undefined) return
+    if (!eventListeners) return
 
     const index = eventListeners.indexOf(listener)
     if (index < 0) return
@@ -83,13 +83,11 @@ function getEventableModule (notifyContext) {
       }
 
       const eventListeners = listeners[event]
-      if (!Array.isArray(eventListeners)) return
+      if (!eventListeners) return
 
-      // Traverse backwards and execute the newest listeners first.
+      // Execute the newest listeners first.
       // Stop if a listener returns false.
-      eventListeners
-      .slice().reverse() // reverse is also in-place, so copy array before
-      .every((listener) => listener.apply(context, args) !== false)
+      eventListeners.every((listener) => listener.apply(context, args) !== false)
     }
   }
 }
