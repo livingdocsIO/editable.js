@@ -131,4 +131,31 @@ describe('eventable', () => {
       })
     })
   })
+
+  describe('notify()', () => {
+    let results, obj
+
+    beforeEach(() => {
+      results = []
+      obj = {}
+      eventable(obj)
+
+      obj.on('foo', () => results.push(2))
+
+      obj.on('foo', () => results.push(1))
+    })
+
+    it('executes newest listeners first', () => {
+      obj.notify({}, 'foo')
+
+      expect(results).toEqual([1, 2])
+    })
+
+    it('executes newest listeners first on repeated calls', () => {
+      obj.notify({}, 'foo')
+      obj.notify({}, 'foo')
+
+      expect(results).toEqual([1, 2, 1, 2])
+    })
+  })
 })
