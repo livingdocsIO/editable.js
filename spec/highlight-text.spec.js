@@ -7,9 +7,6 @@ import highlightText from '../src/highlight-text'
 import Spellcheck from '../src/spellcheck'
 
 describe('highlightText', function () {
-  // Helper Methods
-  // --------------
-
   function createParagraphWithTextNodes (firstPart, parts) {
     const elem = $('<p>' + firstPart + '</p>')[0]
     Array.from(arguments).forEach((part) => {
@@ -94,7 +91,8 @@ describe('highlightText', function () {
     })
 
     it('finds the letter "a"', () => {
-      const matches = highlightText.find(this.element, this.regex)
+      const text = highlightText.extractText(this.element)
+      const matches = highlightText.find(text, this.regex)
       const firstMatch = matches[0]
       expect(firstMatch.search).toEqual('a')
       expect(firstMatch.matchIndex).toEqual(0)
@@ -103,7 +101,8 @@ describe('highlightText', function () {
     })
 
     it('does not find the letter "b"', () => {
-      const matches = highlightText.find(this.element, /b/g)
+      const text = highlightText.extractText(this.element)
+      const matches = highlightText.find(text, /b/g)
       expect(matches.length).toEqual(0)
     })
   })
@@ -115,7 +114,8 @@ describe('highlightText', function () {
     })
 
     it('finds the word "juice"', () => {
-      const matches = highlightText.find(this.element, this.regex)
+      const text = highlightText.extractText(this.element)
+      const matches = highlightText.find(text, this.regex)
       const firstMatch = matches[0]
       expect(firstMatch.search).toEqual('juice')
       expect(firstMatch.matchIndex).toEqual(0)
@@ -126,17 +126,17 @@ describe('highlightText', function () {
 
   describe('iterator', () => {
     beforeEach(() => {
-      this.wrapWord = sinon.spy(highlightText, 'wrapWord')
+      this.wrapMatch = sinon.spy(highlightText, 'wrapMatch')
     })
 
     afterEach(() => {
-      this.wrapWord.restore()
+      this.wrapMatch.restore()
     })
 
     it('finds a letter that is its own text node', () => {
       const elem = createParagraphWithTextNodes('a', 'b', 'c')
       highlight(elem, /b/g)
-      const portions = this.wrapWord.firstCall.args[0]
+      const portions = this.wrapMatch.firstCall.args[0]
 
       expect(portions.length).toEqual(1)
       expect(portions[0].text).toEqual('b')
@@ -148,7 +148,7 @@ describe('highlightText', function () {
     it('finds a letter that is in a text node with a letter before', () => {
       const elem = createParagraphWithTextNodes('a', 'xb', 'c')
       highlight(elem, /b/g)
-      const portions = this.wrapWord.firstCall.args[0]
+      const portions = this.wrapMatch.firstCall.args[0]
 
       expect(portions.length).toEqual(1)
       expect(portions[0].text).toEqual('b')
@@ -160,7 +160,7 @@ describe('highlightText', function () {
     it('finds a letter that is in a text node with a letter after', () => {
       const elem = createParagraphWithTextNodes('a', 'bx', 'c')
       highlight(elem, /b/g)
-      const portions = this.wrapWord.firstCall.args[0]
+      const portions = this.wrapMatch.firstCall.args[0]
 
       expect(portions.length).toEqual(1)
       expect(portions[0].text).toEqual('b')
@@ -172,7 +172,7 @@ describe('highlightText', function () {
     it('finds two letters that span over two text nodes', () => {
       const elem = createParagraphWithTextNodes('a', 'b', 'c')
       highlight(elem, /bc/g)
-      const portions = this.wrapWord.firstCall.args[0]
+      const portions = this.wrapMatch.firstCall.args[0]
 
       expect(portions.length).toEqual(2)
       expect(portions[0].text).toEqual('b')
@@ -185,7 +185,7 @@ describe('highlightText', function () {
     it('finds three letters that span over three text nodes', () => {
       const elem = createParagraphWithTextNodes('a', 'b', 'c')
       highlight(elem, /abc/g)
-      const portions = this.wrapWord.firstCall.args[0]
+      const portions = this.wrapMatch.firstCall.args[0]
 
       expect(portions.length).toEqual(3)
       expect(portions[0].text).toEqual('a')
@@ -196,7 +196,7 @@ describe('highlightText', function () {
     it('finds a word that is partially contained in two text nodes', () => {
       const elem = createParagraphWithTextNodes('a', 'bxx', 'xxe')
       highlight(elem, /xxxx/g)
-      const portions = this.wrapWord.firstCall.args[0]
+      const portions = this.wrapMatch.firstCall.args[0]
 
       expect(portions.length).toEqual(2)
       expect(portions[0].text).toEqual('xx')
@@ -211,7 +211,7 @@ describe('highlightText', function () {
     })
   })
 
-  describe('wrapWord', () => {
+  describe('wrapMatch', () => {
     it('wraps a word in a single text node', () => {
       const elem = $('<div>Some juice.</div>')[0]
       highlight(elem, /juice/g)
