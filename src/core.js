@@ -11,7 +11,7 @@ import Dispatcher from './dispatcher'
 import Cursor from './cursor'
 import Highlighting from './highlighting'
 import createDefaultEvents from './create-default-events'
-import { browser } from 'bowser'
+import browser from 'bowser'
 
 /**
  * The Core module provides the Editable class that defines the Editable.JS
