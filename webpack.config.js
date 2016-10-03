@@ -50,11 +50,11 @@ module.exports = {
       filename: 'hmr.js',
       name: 'hmr'
     }),
-    new OpenBrowserPlugin({url: 'http://localhost:9050/examples/index.html'})
+    new OpenBrowserPlugin({url: 'http://localhost:9100/examples/index.html'})
   ],
   devServer: {
     historyApiFallback: true,
     contentBase: './',
-    port: 9050
+    port: 9100
   }
 }
