@@ -11,7 +11,8 @@
     }
   },
   "rules": {
-    "react/jsx-uses-vars": 1,
+    "react/jsx-uses-vars": "warn",
+    "react/jsx-uses-react": "warn"
     "no-multiple-empty-lines": [1, {"max": 2}],
     "padded-blocks": 0
   },
