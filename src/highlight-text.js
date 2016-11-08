@@ -4,37 +4,24 @@ import NodeIterator from './node-iterator'
 import * as nodeType from './node-type'
 
 export default {
-  // Get the text from an editable block
+
+  // Get the text from an editable block with a NodeIterator.
+  // This must work the same as when later iterating over the text
+  // in highlightMatches().
   extractText (element) {
     let text = ''
     getText(element, (part) => { text += part })
     return text
   },
 
-  // highlight matches
-  // 1. reduce element content to text with a NodeIterator
-  // 2. find the matches (offsets) of the characters and words to highlight
-  // 3. go through the element to highlight the matches while keeping the
+  // Go through the element to highlight the matches while keeping the
   // existing html valid (highlighting a match may require inserting multiple
-  // elements)
-  highlight (element, regex, stencilElement) {
-    const text = this.extractText(element)
-    const matches = this.find(text, regex, stencilElement)
-    this.highlightMatches(element, matches)
-  },
-
-  find (text, regex, marker) {
-    const matches = []
-    let match
-    while ((match = regex.exec(text))) matches.push(match)
-
-    return matches.map((entry) => this.prepareMatch(entry, marker))
-  },
-
+  // elements).
+  //
   // @params
   // - matches
   //   Array of positions in the string to highlight:
-  //   e.g [{start: 0, end: 1, match: 'The'}]
+  //   e.g [{startIndex: 0, endIndex: 1, match: 'The'}]
   highlightMatches (element, matches) {
     if (!matches || matches.length === 0) {
       return
@@ -116,12 +103,6 @@ export default {
     }
   },
 
-  getRange (element) {
-    const range = rangy.createRange()
-    range.selectNodeContents(element)
-    return range
-  },
-
   // @return the last wrapped element
   wrapMatch (portions, stencilElement, title) {
     return portions.map((portion) => this.wrapPortion(portion, stencilElement, title)).pop()
@@ -145,29 +126,8 @@ export default {
     }
 
     return node
-  },
-
-  prepareMatch (match, marker) {
-    // Quickfix for the spellcheck regex where we need to match the second subgroup.
-    if (match[2]) return this.prepareMatchForSecondSubgroup(match, marker)
-
-    return {
-      startIndex: match.index,
-      endIndex: match.index + match[0].length,
-      match: match[0],
-      marker: marker
-    }
-  },
-
-  prepareMatchForSecondSubgroup (match, marker) {
-    const startIndex = match.index + match[1].length
-    return {
-      startIndex,
-      endIndex: startIndex + match[2].length,
-      match: match[0],
-      marker: marker
-    }
   }
+
 }
 
 // Extract the text of an element.

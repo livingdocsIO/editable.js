@@ -22,20 +22,16 @@ export default class WordHighlighting {
     this.marker = markerNode
   }
 
-  highlight (text, misspelledWords, callback) {
-    if (!text) return callback(null)
+  findMatches (text, words) {
+    if (!text) return
 
-    if (misspelledWords && misspelledWords.length > 0) {
-      // this works on the old text (may be outdated by now)
-      const matches = this.findMatches(text, misspelledWords)
-      callback(null, matches)
-    } else {
-      callback(null)
+    if (words && words.length > 0) {
+      return this.searchMatches(text, words)
     }
   }
 
-  findMatches (text, misspelledWords) {
-    const regex = this.createRegex(misspelledWords)
+  searchMatches (text, words) {
+    const regex = this.createRegex(words)
     const matches = []
     let match
     while ((match = regex.exec(text))) matches.push(match)
@@ -63,7 +59,7 @@ export default class WordHighlighting {
     return {
       startIndex,
       endIndex: startIndex + match[2].length,
-      match: match[0],
+      match: match[2],
       marker: this.marker
     }
   }

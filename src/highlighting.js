@@ -17,11 +17,13 @@ export default class Highlighting {
     this.timeout = {}
 
     const defaultConfig = {
-      checkOnInit: false, // todo: implement (LP)
-      checkOnFocus: false, // check on focus
-      checkOnChange: true, // check after changes
-      throttle: 1000, // unbounce rate in ms before calling the spellcheck service after changes
-      removeOnCorrection: true, // remove highlights after a change if the cursor is inside a highlight
+      checkOnInit: false,
+      checkOnFocus: false,
+      checkOnChange: true,
+      // unbounce rate in ms before calling the spellcheck service after changes
+      throttle: 1000,
+      // remove highlights after a change if the cursor is inside a highlight
+      removeOnCorrection: true,
       spellcheck: {
         marker: '<span class="highlight-whitespace"></span>',
         throttle: 1000,
@@ -43,18 +45,6 @@ export default class Highlighting {
     this.whitespace = new WhitespaceHighlighting(whitespaceMarker)
 
     this.setupListeners()
-  }
-
-  // Plugins
-  // -------
-
-  activatePlugin (name, plugin) {
-    this.plugins[name] = plugin
-  }
-
-
-  deactivatePlugin (name) {
-    this.plugins[name] = undefined
   }
 
   // Events
@@ -143,17 +133,12 @@ export default class Highlighting {
 
       const matchCollection = new MatchCollection()
 
-      this.spellcheck.highlight(text, misspelledWords, (err, matches) => {
-        if (err) { return }
-        matchCollection.addMatches('spellcheck', matches)
-      })
+      let matches = this.spellcheck.findMatches(text, misspelledWords)
+      matchCollection.addMatches('spellcheck', matches)
 
-      this.whitespace.highlight(text, (err, matches) => {
-        if (err) { return }
-        matchCollection.addMatches('whitespace', matches)
-      })
+      matches = this.whitespace.findMatches(text)
+      matchCollection.addMatches('whitespace', matches)
 
-      // console.log('matchCollection', matchCollection.matches)
       this.safeHighlightMatches(editableHost, matchCollection.matches)
     })
 

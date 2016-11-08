@@ -30,14 +30,9 @@ export default class WhitespaceHighlighting {
     this.marker = markerNode
   }
 
-  highlight (text, callback) {
-    if (!text) callback(null)
+  findMatches (text) {
+    if (!text) return
 
-    const matches = this.findMatches(text)
-    callback(null, matches)
-  }
-
-  findMatches (text, misspelledWords) {
     let regex = `[${specialWhitespaceChars}]`
     regex = new RegExp(regex, 'g')
 
