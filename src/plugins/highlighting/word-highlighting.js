@@ -51,7 +51,7 @@ export default class WordHighlighting {
   }
 
   escapeRegEx (s) {
-    return String(s).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1')
+    return String(s).replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1')
   }
 
   prepareMatch (match) {
