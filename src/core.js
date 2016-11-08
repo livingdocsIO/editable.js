@@ -141,6 +141,7 @@ const Editable = module.exports = class Editable {
     const shouldSpellcheck = this.config.browserSpellcheck
     $elem.each((i, el) => {
       block.init(el, {normalize, shouldSpellcheck})
+      this.dispatcher.notify('init', el)
     })
 
     return this
