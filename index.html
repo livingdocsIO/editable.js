@@ -82,6 +82,31 @@
     </section>
 
 
+    <!-- Whitespace Highlight -->
+
+    <section class="example-section space-after">
+      <div class="section-content">
+        <h2 class="example-title">Whitespace Highlighting</h2>
+
+        <div class="whitespace-highlighting-example example-sheet">
+          <p style="font-family: Georgia, serif">
+            Hair&#8202;space<br>
+            Six-per-em space<br>
+            Thin&thinsp;space<br>
+            Normal space<br>
+            Four-per-em space<br>
+            Mathematical space<br>
+            Punctuation space<br>
+            Three-per-em space<br>
+            En&ensp;space<br>
+            Ideographic　space<br>
+            Em&emsp;space
+          </p>
+        </div>
+      </div>
+    </section>
+
+
     <!-- Copy/Paste -->
 
     <section class="example-section space-after">
@@ -108,6 +133,65 @@
         </div>
       </div>
     </section>
+
+    <!-- Documentation - Setup -->
+    <section class="example-section space-after">
+      <div class="section-content">
+        <h2 class="example-title">Setup</h2>
+
+<pre><code class="language-javascript">
+var editable = new Editable({
+  // here you can pass an iframe window if required
+  window: window,
+
+  // activate the default behaviour for merge, split and insert
+  defaultBehavior: true,
+
+  // fire selection events on mouse move
+  mouseMoveSelectionChanges: false,
+
+  // control the 'spellcheck' attribute on editable elements
+  browserSpellcheck: true
+});
+
+// add and initialize a block element to be made editable
+editable.add(elem)
+</code></pre>
+
+
+<h2 class="example-title">Setup Highlighting</h2>
+
+<pre><code class="language-javascript">
+editable.setupHighlighting({
+  // control when the highlighting is triggered
+  checkOnInit: true,
+  checkOnFocus: false,
+  checkOnChange: true,
+
+  // debounce calls to the spellcheckService
+  throttle: 500,
+
+  spellcheck: {
+    marker: '&lt;span class="highlight-spellcheck"&gt;&lt;/span&gt;',
+    spellcheckService: function (text, callback) {
+      // Return an array of words to be highlighted.
+      // This only works with complete words. The spellchecker
+      // wont highlight parts of words.
+      callback(['happy'])
+    }
+  },
+
+  whitespace: {
+    marker: '&lt;span class="highlight-whitespace"&gt;&lt;/span&gt;'
+  }
+})
+</code></pre>
+
+      </div>
+    </section>
+
+
+
 
 
     <!-- Documentation - Events -->
