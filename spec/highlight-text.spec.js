@@ -4,7 +4,7 @@ import sinon from 'sinon'
 
 import Cursor from '../src/cursor'
 import highlightText from '../src/highlight-text'
-import Spellcheck from '../src/spellcheck'
+import WordHighlighter from '../src/plugins/highlighting/word-highlighting'
 
 describe('highlightText', function () {
   function createParagraphWithTextNodes (firstPart, parts) {
@@ -94,8 +94,7 @@ describe('highlightText', function () {
       const text = highlightText.extractText(this.element)
       const matches = highlightText.find(text, this.regex)
       const firstMatch = matches[0]
-      expect(firstMatch.search).toEqual('a')
-      expect(firstMatch.matchIndex).toEqual(0)
+      expect(firstMatch.match).toEqual('a')
       expect(firstMatch.startIndex).toEqual(0)
       expect(firstMatch.endIndex).toEqual(1)
     })
@@ -117,8 +116,7 @@ describe('highlightText', function () {
       const text = highlightText.extractText(this.element)
       const matches = highlightText.find(text, this.regex)
       const firstMatch = matches[0]
-      expect(firstMatch.search).toEqual('juice')
-      expect(firstMatch.matchIndex).toEqual(0)
+      expect(firstMatch.match).toEqual('juice')
       expect(firstMatch.startIndex).toEqual(5)
       expect(firstMatch.endIndex).toEqual(10)
     })
@@ -254,7 +252,7 @@ describe('highlightText', function () {
 
     it('works with a more complex regex', () => {
       const elem = $('<div><em>a</em> or b</div>')[0]
-      const regex = Spellcheck.prototype.createRegex(['b', 'a'])
+      const regex = WordHighlighter.prototype.createRegex(['b', 'a'])
       highlight(elem, regex)
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -263,7 +261,7 @@ describe('highlightText', function () {
 
     it('wraps two words with a tag in between', () => {
       const elem = $('<div>A word <em>is</em> not necessary</div>')[0]
-      const regex = Spellcheck.prototype.createRegex(['word', 'not'])
+      const regex = WordHighlighter.prototype.createRegex(['word', 'not'])
       highlight(elem, regex)
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -272,7 +270,7 @@ describe('highlightText', function () {
 
     it('wraps two characters in the same textnode, when the first match has an offset', () => {
       const elem = $('<div>a, b or c, d</div>')[0]
-      const regex = Spellcheck.prototype.createRegex(['b', 'c'])
+      const regex = WordHighlighter.prototype.createRegex(['b', 'c'])
       highlight(elem, regex)
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -281,7 +279,7 @@ describe('highlightText', function () {
 
     it('wraps a character after a <br>', () => {
       const elem = $('<div>a<br>b</div>')[0]
-      const regex = Spellcheck.prototype.createRegex(['b'])
+      const regex = WordHighlighter.prototype.createRegex(['b'])
       highlight(elem, regex)
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -290,7 +288,7 @@ describe('highlightText', function () {
 
     it('stores data-word-id on a highlight', () => {
       const elem = $('<div>a</div>')[0]
-      const regex = Spellcheck.prototype.createRegex(['a'])
+      const regex = WordHighlighter.prototype.createRegex(['a'])
       highlight(elem, regex)
       removeSpellcheckAttr(elem)
       expect(elem.outerHTML)
@@ -299,7 +297,7 @@ describe('highlightText', function () {
 
     it('stores data-word-id on different matches', () => {
       const elem = $('<div>a b</div>')[0]
-      const regex = Spellcheck.prototype.createRegex(['a', 'b'])
+      const regex = WordHighlighter.prototype.createRegex(['a', 'b'])
       highlight(elem, regex)
       removeSpellcheckAttr(elem)
       expect(elem.outerHTML)
@@ -308,7 +306,7 @@ describe('highlightText', function () {
 
     it('stores same data-word-id on multiple highlights for the same match', () => {
       const elem = $('<div>a<i>b</i></div>')[0]
-      const regex = Spellcheck.prototype.createRegex(['ab'])
+      const regex = WordHighlighter.prototype.createRegex(['ab'])
       highlight(elem, regex)
       removeSpellcheckAttr(elem)
       expect(elem.outerHTML)

@@ -3,10 +3,13 @@ import rangy from 'rangy'
 import sinon from 'sinon'
 
 import Editable from '../src/core'
-import Spellcheck from '../src/spellcheck'
+import Highlighting from '../src/highlighting'
 import Cursor from '../src/cursor'
 
+// import Spellcheck from '../src/plugins/highlighting/spellcheck'
+
 describe('Spellcheck', function () {
+
   // Helpers
 
   function createCursor (host, elem, offset) {
@@ -22,39 +25,36 @@ describe('Spellcheck', function () {
     this.editable = new Editable()
   })
 
-  describe('new instance', () => {
-    it('is created and has a reference to editable', () => {
-      const spellcheck = new Spellcheck(this.editable)
-      expect(spellcheck.editable).toEqual(this.editable)
-    })
-  })
-
   describe('with a simple sentence', () => {
+
     beforeEach(() => {
       this.p = $('<p>A simple sentence.</p>')[0]
       this.errors = ['simple']
-      this.spellcheck = new Spellcheck(this.editable, {
-        markerNode: $('<span class="misspelled-word"></span>')[0],
-        spellcheckService: (text, callback) => {
-          callback(this.errors)
+      this.highlighting = new Highlighting(this.editable, {
+        spellcheck: {
+          marker: '<span class="misspelled-word"></span>',
+          spellcheckService: (text, callback) => {
+            callback(this.errors)
+          }
         }
       })
     })
 
-    describe('checkSpelling()', () => {
-      it('calls highlight()', () => {
-        const highlight = sinon.spy(this.spellcheck, 'highlight')
-        this.spellcheck.checkSpelling(this.p)
-        expect(highlight.called).toEqual(true)
+    describe('highlight()', () => {
+
+      it('calls highlightMatches()', () => {
+        const highlightMatches = sinon.spy(this.highlighting, 'highlightMatches')
+        this.highlighting.highlight(this.p)
+        expect(highlightMatches.called).toEqual(true)
       })
 
       it('highlights a match with the given marker node', () => {
-        this.spellcheck.checkSpelling(this.p)
+        this.highlighting.highlight(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
       })
 
       it('removes a corrected highlighted match.', () => {
-        this.spellcheck.checkSpelling(this.p)
+        this.highlighting.highlight(this.p)
         let $misspelledWord = $(this.p).find('.misspelled-word')
         expect($misspelledWord.length).toEqual(1)
 
@@ -62,49 +62,52 @@ describe('Spellcheck', function () {
         $misspelledWord.html('simpler')
         this.errors = []
 
-        this.spellcheck.checkSpelling(this.p)
+        this.highlighting.highlight(this.p)
+        // console.log('this.p.outerHTML', this.p.outerHTML)
         $misspelledWord = $(this.p).find('.misspelled-word')
         expect($misspelledWord.length).toEqual(0)
       })
 
       it('match highlights are marked with "ui-unwrap"', () => {
-        this.spellcheck.checkSpelling(this.p)
+        this.highlighting.highlight(this.p)
         const $spellcheck = $(this.p).find('.misspelled-word').first()
         const dataEditable = $spellcheck.attr('data-editable')
         expect(dataEditable).toEqual('ui-unwrap')
       })
 
       it('calls highlight() for an empty wordlist', () => {
-        const highlight = sinon.spy(this.spellcheck, 'highlight')
-        this.spellcheck.config.spellcheckService = function (text, callback) {
+        const highlight = sinon.spy(this.highlighting, 'highlight')
+        this.highlighting.config.spellcheckService = function (text, callback) {
           callback([])
         }
-        this.spellcheck.checkSpelling(this.p)
+        this.highlighting.highlight(this.p)
         expect(highlight.called).toEqual(true)
       })
 
       it('calls highlight() for an undefined wordlist', () => {
-        const highlight = sinon.spy(this.spellcheck, 'highlight')
-        this.spellcheck.config.spellcheckService = function (text, callback) {
+        const highlight = sinon.spy(this.highlighting, 'highlight')
+        this.highlighting.config.spellcheckService = function (text, callback) {
           callback()
         }
-        this.spellcheck.checkSpelling(this.p)
+        this.highlighting.highlight(this.p)
         expect(highlight.called).toEqual(true)
       })
     })
 
     describe('removeHighlights()', () => {
+
       it('removes the highlights', () => {
-        this.spellcheck.checkSpelling(this.p)
+        this.highlighting.highlight(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
-        this.spellcheck.removeHighlights(this.p)
+        this.highlighting.removeHighlights(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(0)
       })
     })
 
     describe('removeHighlightsAtCursor()', () => {
+
       beforeEach(() => {
-        this.spellcheck.checkSpelling(this.p)
+        this.highlighting.highlight(this.p)
         this.highlight = $(this.p).find('.misspelled-word')[0]
       })
 
@@ -115,23 +118,24 @@ describe('Spellcheck', function () {
       it('does remove the highlights if cursor is within a match', () => {
         sinon.stub(this.editable, 'getSelection', () => createCursor(this.p, this.highlight, 0))
 
-        this.spellcheck.removeHighlightsAtCursor(this.p)
+        this.highlighting.removeHighlightsAtCursor(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(0)
       })
 
       it('does not remove the highlights if cursor is outside a match', () => {
         sinon.stub(this.editable, 'getSelection', () => createCursor(this.p, this.p.firstChild, 0))
 
-        this.spellcheck.removeHighlightsAtCursor(this.p)
+        this.highlighting.removeHighlightsAtCursor(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
       })
     })
 
     describe('retains cursor position', () => {
+
       it('in the middle of a text node', () => {
         const cursor = createCursor(this.p, this.p.firstChild, 4)
         cursor.save()
-        this.spellcheck.checkSpelling(this.p)
+        this.highlighting.highlight(this.p)
         cursor.restore()
 
         // These are the child nodes of the paragraph we expect after restoring the cursor:
