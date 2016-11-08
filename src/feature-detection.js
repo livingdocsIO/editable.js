@@ -1,4 +1,4 @@
-import { browser } from 'bowser'
+import browser from 'bowser'
 
 /**
 * Check for contenteditable support
