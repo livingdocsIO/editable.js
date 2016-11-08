@@ -4,27 +4,38 @@ import NodeIterator from './node-iterator'
 import * as nodeType from './node-type'
 
 export default {
+  // Get the text from an editable block
   extractText (element) {
     let text = ''
     getText(element, (part) => { text += part })
     return text
   },
 
+  // highlight matches
+  // 1. reduce element content to text with a NodeIterator
+  // 2. find the matches (offsets) of the characters and words to highlight
+  // 3. go through the element to highlight the matches while keeping the
+  // existing html valid (highlighting a match may require inserting multiple
+  // elements)
   highlight (element, regex, stencilElement) {
     const text = this.extractText(element)
-    const matches = this.find(text, regex)
-    this.highlightMatches(element, matches, stencilElement)
+    const matches = this.find(text, regex, stencilElement)
+    this.highlightMatches(element, matches)
   },
 
-  find (text, regex) {
+  find (text, regex, marker) {
     const matches = []
     let match
     while ((match = regex.exec(text))) matches.push(match)
 
-    return matches.map(this.prepareMatch.bind(this))
+    return matches.map((entry) => this.prepareMatch(entry, marker))
   },
 
-  highlightMatches (element, matches, stencilElement) {
+  // @params
+  // - matches
+  //   Array of positions in the string to highlight:
+  //   e.g [{start: 0, end: 1, match: 'The'}]
+  highlightMatches (element, matches) {
     if (!matches || matches.length === 0) {
       return
     }
@@ -87,7 +98,7 @@ export default {
         portions.push(portion)
 
         if (isLastPortion) {
-          var lastNode = this.wrapMatch(portions, stencilElement)
+          var lastNode = this.wrapMatch(portions, currentMatch.marker, currentMatch.title)
           iterator.replaceCurrent(lastNode)
 
           // recalculate nodeEndOffset if we have to replace the current node.
@@ -112,16 +123,17 @@ export default {
   },
 
   // @return the last wrapped element
-  wrapMatch (portions, stencilElement) {
-    return portions.map((portion) => this.wrapPortion(portion, stencilElement)).pop()
+  wrapMatch (portions, stencilElement, title) {
+    return portions.map((portion) => this.wrapPortion(portion, stencilElement, title)).pop()
   },
 
-  wrapPortion (portion, stencilElement) {
+  wrapPortion (portion, stencilElement, title) {
     const range = rangy.createRange()
     range.setStart(portion.element, portion.offset)
     range.setEnd(portion.element, portion.offset + portion.length)
     const node = stencilElement.cloneNode(true)
     node.setAttribute('data-word-id', portion.wordId)
+    if (title) node.setAttribute('title', title)
     range.surroundContents(node)
 
     // Fix a weird behaviour where an empty text node is inserted after the range
@@ -135,25 +147,25 @@ export default {
     return node
   },
 
-  prepareMatch (match, matchIndex) {
+  prepareMatch (match, marker) {
     // Quickfix for the spellcheck regex where we need to match the second subgroup.
-    if (match[2]) return this.prepareMatchForSecondSubgroup(match, matchIndex)
+    if (match[2]) return this.prepareMatchForSecondSubgroup(match, marker)
 
     return {
       startIndex: match.index,
       endIndex: match.index + match[0].length,
-      matchIndex,
-      search: match[0]
+      match: match[0],
+      marker: marker
     }
   },
 
-  prepareMatchForSecondSubgroup (match, matchIndex) {
+  prepareMatchForSecondSubgroup (match, marker) {
     const startIndex = match.index + match[1].length
     return {
       startIndex,
       endIndex: startIndex + match[2].length,
-      matchIndex,
-      search: match[0]
+      match: match[0],
+      marker: marker
     }
   }
 }

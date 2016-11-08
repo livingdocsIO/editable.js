@@ -8,7 +8,7 @@ import * as content from './content'
 import * as clipboard from './clipboard'
 import Dispatcher from './dispatcher'
 import Cursor from './cursor'
-import Spellcheck from './spellcheck'
+import Highlighting from './highlighting'
 import createDefaultEvents from './create-default-events'
 import { browser } from 'bowser'
 
@@ -306,8 +306,8 @@ const Editable = module.exports = class Editable {
    *
    * @chainable
    */
-  setupSpellcheck (spellcheckConfig) {
-    this.spellcheck = new Spellcheck(this, spellcheckConfig)
+  setupHighlighting (hightlightingConfig) {
+    this.highlighting = new Highlighting(this, hightlightingConfig)
 
     return this
   }
