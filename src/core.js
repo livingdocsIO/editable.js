@@ -4,11 +4,12 @@ import rangy from 'rangy'
 import * as config from './config'
 import error from './util/error'
 import * as parser from './parser'
+import * as block from './block'
 import * as content from './content'
 import * as clipboard from './clipboard'
 import Dispatcher from './dispatcher'
 import Cursor from './cursor'
-import Spellcheck from './spellcheck'
+import Highlighting from './highlighting'
 import createDefaultEvents from './create-default-events'
 import { browser } from 'bowser'
 
@@ -120,11 +121,7 @@ const Editable = module.exports = class Editable {
   disable ($elem) {
     const body = this.win.document.body
     $elem = $elem || $('.' + config.editableClass, body)
-
-    $elem
-    .removeAttr('contenteditable spellcheck')
-    .removeClass(config.editableClass)
-    .addClass(config.editableDisabledClass)
+    $elem.each((i, el) => block.disable(el))
 
     return this
   }
@@ -141,15 +138,11 @@ const Editable = module.exports = class Editable {
     const body = this.win.document.body
     $elem = $elem || $('.' + config.editableDisabledClass, body)
 
-    $elem
-    .attr({
-      contenteditable: true,
-      spellcheck: this.config.browserSpellcheck
+    const shouldSpellcheck = this.config.browserSpellcheck
+    $elem.each((i, el) => {
+      block.init(el, {normalize, shouldSpellcheck})
+      this.dispatcher.notify('init', el)
     })
-    .removeClass(config.editableDisabledClass)
-    .addClass(config.editableClass)
-
-    if (normalize) $elem.each((i, el) => content.tidyHtml(el))
 
     return this
   }
@@ -306,8 +299,8 @@ const Editable = module.exports = class Editable {
    *
    * @chainable
    */
-  setupSpellcheck (spellcheckConfig) {
-    this.spellcheck = new Spellcheck(this, spellcheckConfig)
+  setupHighlighting (hightlightingConfig) {
+    this.highlighting = new Highlighting(this, hightlightingConfig)
 
     return this
   }

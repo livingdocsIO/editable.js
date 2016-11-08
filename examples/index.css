@@ -127,7 +127,7 @@ html {
    ========================================================================== */
 
 section {
-    padding: 2em 0;
+    padding: 0 0 2em 0;
 }
 
 .section-content {
@@ -264,15 +264,23 @@ article {
    Spellcheck & Highlight
    ========================================================================== */
 
-.spellcheck {
-    border-bottom: 2px solid orange;
-}
 
 .highlight {
     background: #ecbc3f;
     color: #fff;
     border-radius: 10px;
     padding: 1px 5px;
+}
+
+.highlight-spellcheck {
+  border-bottom: 1px solid #e55e4e;
+  background-color: #fdefee;
+}
+
+.highlight-whitespace {
+  background: rgba(7, 165, 206, .1);
+  border-bottom: 1px solid rgba(7, 165, 206, .5);
+
 }
 
 

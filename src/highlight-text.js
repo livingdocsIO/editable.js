@@ -4,45 +4,25 @@ import NodeIterator from './node-iterator'
 import * as nodeType from './node-type'
 
 export default {
+
+  // Get the text from an editable block with a NodeIterator.
+  // This must work the same as when later iterating over the text
+  // in highlightMatches().
   extractText (element) {
     let text = ''
-    this.getText(element, (part) => { text += part })
+    getText(element, (part) => { text += part })
     return text
   },
 
-  // Extract the text of an element.
-  // This has two notable behaviours:
-  // - It uses a NodeIterator which will skip elements
-  //   with data-editable="remove"
-  // - It returns a space for <br> elements
-  //   (The only block level element allowed inside of editables)
-  getText (element, callback) {
-    const iterator = new NodeIterator(element)
-    let next
-    while ((next = iterator.getNext())) {
-      if (next.nodeType === nodeType.textNode && next.data !== '') {
-        callback(next.data)
-      } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
-        callback(' ')
-      }
-    }
-  },
-
-  highlight (element, regex, stencilElement) {
-    const matches = this.find(element, regex)
-    this.highlightMatches(element, matches, stencilElement)
-  },
-
-  find (element, regex) {
-    const text = this.extractText(element)
-    const matches = []
-    let match
-    while ((match = regex.exec(text))) matches.push(match)
-
-    return matches.map(this.prepareMatch.bind(this))
-  },
-
-  highlightMatches (element, matches, stencilElement) {
+  // Go through the element to highlight the matches while keeping the
+  // existing html valid (highlighting a match may require inserting multiple
+  // elements).
+  //
+  // @params
+  // - matches
+  //   Array of positions in the string to highlight:
+  //   e.g [{startIndex: 0, endIndex: 1, match: 'The'}]
+  highlightMatches (element, matches) {
     if (!matches || matches.length === 0) {
       return
     }
@@ -105,7 +85,7 @@ export default {
         portions.push(portion)
 
         if (isLastPortion) {
-          var lastNode = this.wrapWord(portions, stencilElement)
+          var lastNode = this.wrapMatch(portions, currentMatch.marker, currentMatch.title)
           iterator.replaceCurrent(lastNode)
 
           // recalculate nodeEndOffset if we have to replace the current node.
@@ -123,23 +103,18 @@ export default {
     }
   },
 
-  getRange (element) {
-    const range = rangy.createRange()
-    range.selectNodeContents(element)
-    return range
-  },
-
   // @return the last wrapped element
-  wrapWord (portions, stencilElement) {
-    return portions.map((portion) => this.wrapPortion(portion, stencilElement)).pop()
+  wrapMatch (portions, stencilElement, title) {
+    return portions.map((portion) => this.wrapPortion(portion, stencilElement, title)).pop()
   },
 
-  wrapPortion (portion, stencilElement) {
+  wrapPortion (portion, stencilElement, title) {
     const range = rangy.createRange()
     range.setStart(portion.element, portion.offset)
     range.setEnd(portion.element, portion.offset + portion.length)
     const node = stencilElement.cloneNode(true)
     node.setAttribute('data-word-id', portion.wordId)
+    if (title) node.setAttribute('title', title)
     range.surroundContents(node)
 
     // Fix a weird behaviour where an empty text node is inserted after the range
@@ -151,27 +126,24 @@ export default {
     }
 
     return node
-  },
+  }
 
-  prepareMatch (match, matchIndex) {
-    // Quickfix for the spellcheck regex where we need to match the second subgroup.
-    if (match[2]) return this.prepareMatchForSecondSubgroup(match, matchIndex)
+}
 
-    return {
-      startIndex: match.index,
-      endIndex: match.index + match[0].length,
-      matchIndex,
-      search: match[0]
-    }
-  },
-
-  prepareMatchForSecondSubgroup (match, matchIndex) {
-    const startIndex = match.index + match[1].length
-    return {
-      startIndex,
-      endIndex: startIndex + match[2].length,
-      matchIndex,
-      search: match[0]
+// Extract the text of an element.
+// This has two notable behaviours:
+// - It uses a NodeIterator which will skip elements
+//   with data-editable="remove"
+// - It returns a space for <br> elements
+//   (The only block level element allowed inside of editables)
+function getText (element, callback) {
+  const iterator = new NodeIterator(element)
+  let next
+  while ((next = iterator.getNext())) {
+    if (next.nodeType === nodeType.textNode && next.data !== '') {
+      callback(next.data)
+    } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
+      callback(' ')
     }
   }
 }

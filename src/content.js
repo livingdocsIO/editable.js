@@ -16,21 +16,17 @@ const zeroWidthSpace = /\u200B/g
 const zeroWidthNonBreakingSpace = /\uFEFF/g
 const whitespaceExceptSpace = /[^\S ]/g
 
-/**
- * Clean up the Html.
- */
+// Clean up the Html.
 export function tidyHtml (element) {
   // if (element.normalize) element.normalize()
   normalizeTags(element)
 }
 
-/**
- * Remove empty tags and merge consecutive tags (they must have the same
- * attributes).
- *
- * @method normalizeTags
- * @param  {HTMLElement} element The element to process.
- */
+// Remove empty tags and merge consecutive tags (they must have the same
+// attributes).
+//
+// @method normalizeTags
+// @param  {HTMLElement} element The element to process.
 export function normalizeTags (element) {
   const fragment = document.createDocumentFragment()
 
@@ -65,27 +61,23 @@ export function normalizeWhitespace (text) {
   return text.replace(whitespaceExceptSpace, ' ')
 }
 
-/**
- * Clean the element from character, tags, etc... added by the plugin logic.
- *
- * @method cleanInternals
- * @param  {HTMLElement} element The element to process.
- */
+// Clean the element from character, tags, etc... added by the plugin logic.
+//
+// @method cleanInternals
+// @param  {HTMLElement} element The element to process.
 export function cleanInternals (element) {
   // Uses extract content for simplicity. A custom method
   // that does not clone the element could be faster if needed.
   element.innerHTML = extractContent(element, true)
 }
 
-/**
- * Extracts the content from a host element.
- * Does not touch or change the host. Just returns
- * the content and removes elements marked for removal by editable.
- *
- * @param {DOM node or document framgent} Element where to clean out the innerHTML. If you pass a document fragment it will be empty after this call.
- * @param {Boolean} Flag whether to keep ui elements like spellchecking highlights.
- * @returns {String} The cleaned innerHTML of the passed element or document fragment.
- */
+// Extracts the content from a host element.
+// Does not touch or change the host. Just returns
+// the content and removes elements marked for removal by editable.
+//
+// @param {DOM node or document framgent} Element where to clean out the innerHTML. If you pass a document fragment it will be empty after this call.
+// @param {Boolean} Flag whether to keep ui elements like spellchecking highlights.
+// @returns {String} The cleaned innerHTML of the passed element or document fragment.
 export function extractContent (element, keepUiElements) {
   const innerHtml = (element.nodeType === nodeType.documentFragmentNode
     ? getInnerHtmlOfFragment(element)
@@ -107,10 +99,8 @@ export function getInnerHtmlOfFragment (documentFragment) {
   return div.innerHTML
 }
 
-/**
- * Create a document fragment from an html string
- * @param {String} e.g. 'some html <span>text</span>.'
- */
+// Create a document fragment from an html string
+// @param {String} e.g. 'some html <span>text</span>.'
 export function createFragmentFromString (htmlString) {
   const fragment = document.createDocumentFragment()
 
@@ -127,14 +117,12 @@ export function adoptElement (node, doc) {
     : node
 }
 
-/**
- * This is a slight variation of the cloneContents method of a rangyRange.
- * It will return a fragment with the cloned contents of the range
- * without the commonAncestorElement.
- *
- * @param {rangyRange}
- * @return {DocumentFragment}
- */
+// This is a slight variation of the cloneContents method of a rangyRange.
+// It will return a fragment with the cloned contents of the range
+// without the commonAncestorElement.
+//
+// @param {rangyRange}
+// @return {DocumentFragment}
 export function cloneRangeContents (range) {
   const rangeFragment = range.cloneContents()
   const parent = rangeFragment.childNodes[0]
@@ -143,14 +131,12 @@ export function cloneRangeContents (range) {
   return fragment
 }
 
-/**
- * Remove elements that were inserted for internal or user interface purposes
- *
- * @param {DOM node}
- * @param {Boolean} whether to keep ui elements like spellchecking highlights
- * Currently:
- * - Saved ranges
- */
+// Remove elements that were inserted for internal or user interface purposes
+//
+// @param {DOM node}
+// @param {Boolean} whether to keep ui elements like spellchecking highlights
+// Currently:
+// - Saved ranges
 export function unwrapInternalNodes (sibling, keepUiElements) {
   while (sibling) {
     const nextSibling = sibling.nextSibling
@@ -174,9 +160,7 @@ export function unwrapInternalNodes (sibling, keepUiElements) {
   }
 }
 
-/**
- * Get all tags that start or end inside the range
- */
+// Get all tags that start or end inside the range
 export function getTags (host, range, filterFunc) {
   const tags = getInnerTags(range, filterFunc)
 
@@ -196,19 +180,15 @@ export function getTagsByName (host, range, tagName) {
   })
 }
 
-/**
- * Get all tags that start or end inside the range
- */
+// Get all tags that start or end inside the range
 export function getInnerTags (range, filterFunc) {
   return range.getNodes([nodeType.elementNode], filterFunc)
 }
 
-/**
- * Transform an array of elements into a an array
- * of tagnames in uppercase
- *
- * @return example: ['STRONG', 'B']
- */
+ // Transform an array of elements into a an array
+ // of tagnames in uppercase
+ //
+ // @return example: ['STRONG', 'B']
 export function getTagNames (elements = []) {
   return elements.map((element) => element.nodeName)
 }
@@ -218,13 +198,18 @@ export function isAffectedBy (host, range, tagName) {
   .some((elem) => elem.nodeName === tagName.toUpperCase())
 }
 
-/**
- * Check if the range selects all of the elements contents,
- * not less or more.
- *
- * @param visible: Only compare visible text. That way it does not
- *   matter if the user selects an additional whitespace or not.
- */
+// select a whole element
+export function selectNodeContents (element) {
+  const range = rangy.createRange()
+  range.selectNodeContents(element)
+  return range
+}
+
+// Check if the range selects all of the elements contents,
+// not less or more.
+//
+// @param visible: Only compare visible text. That way it does not
+//   matter if the user selects an additional whitespace or not.
 export function isExactSelection (range, elem, visible) {
   const elemRange = rangy.createRange()
   elemRange.selectNodeContents(elem)
@@ -306,10 +291,8 @@ export function removeFormatting (host, range, tagName) {
   })
 }
 
-/**
- * Unwrap all tags this range is affected by.
- * Can also affect content outside of the range.
- */
+// Unwrap all tags this range is affected by.
+// Can also affect content outside of the range.
 export function nuke (host, range, tagName) {
   getTags(host, range).forEach((elem) => {
     if (elem.nodeName !== 'BR' && (!tagName || elem.nodeName === tagName.toUpperCase())) {
@@ -318,10 +301,8 @@ export function nuke (host, range, tagName) {
   })
 }
 
-/**
- * Insert a single character (or string) before or after the
- * the range.
- */
+// Insert a single character (or string) before or after the
+// the range.
 export function insertCharacter (range, character, atStart) {
   const insertEl = document.createTextNode(character)
   const boundaryRange = range.cloneRange()
@@ -332,22 +313,18 @@ export function insertCharacter (range, character, atStart) {
   range.normalizeBoundaries()
 }
 
-/**
- * Surround the range with characters like start and end quotes.
- *
- * @method surround
- */
+// Surround the range with characters like start and end quotes.
+//
+// @method surround
 export function surround (host, range, startCharacter, endCharacter) {
   insertCharacter(range, endCharacter || startCharacter, false)
   insertCharacter(range, startCharacter, true)
   return range
 }
 
-/**
- * Removes a character from the text within a range.
- *
- * @method deleteCharacter
- */
+// Removes a character from the text within a range.
+//
+// @method deleteCharacter
 export function deleteCharacter (host, range, character) {
   if (!containsString(range, character)) return range
 
@@ -371,10 +348,8 @@ export function containsString (range, str) {
   return range.toString().indexOf(str) >= 0
 }
 
-/**
- * Unwrap all tags this range is affected by.
- * Can also affect content outside of the range.
- */
+// Unwrap all tags this range is affected by.
+// Can also affect content outside of the range.
 export function nukeTag (host, range, tagName) {
   getTags(host, range).forEach((elem) => {
     if (elem.nodeName === tagName) unwrap(elem)
