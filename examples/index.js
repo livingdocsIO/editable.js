@@ -5,7 +5,9 @@ import Editable from '../src/core'
 import eventList from './events.js'
 
 // Paragraph Example
-const editable = new Editable({})
+const editable = new Editable({
+  browserSpellcheck: false
+})
 
 // Paragraph
 // ---------
@@ -120,20 +122,32 @@ function updateCode (elem) {
 // Highlighting
 // ------------
 
-const $highlightExample = $('.highlighting-example p')
-editable.add($highlightExample)
-
 function highlightService (text, callback) {
   callback(['happy'])
 }
 
-editable.setupSpellcheck({
-  spellcheckService: highlightService,
-  markerNode: $('<span class="highlight"></span>'),
-  throttle: 0
+editable.setupHighlighting({
+  checkOnInit: true,
+  throttle: 0,
+  spellcheck: {
+    marker: '<span class="highlight-spellcheck"></span>',
+    spellcheckService: highlightService
+  },
+  whitespace: {
+    marker: '<span class="highlight-whitespace"></span>'
+  }
 })
 
-editable.spellcheck.checkSpelling($highlightExample[0])
+const $highlightExample = $('.highlighting-example p')
+editable.add($highlightExample)
+
+
+// Whitespace Highlighting
+// -----------------------
+
+const $highlightExample2 = $('.whitespace-highlighting-example p')
+editable.add($highlightExample2)
+
 
 // Pasting
 // -------
