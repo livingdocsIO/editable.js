@@ -5,11 +5,43 @@ import Selection from '../src/selection'
 import Cursor from '../src/cursor'
 
 describe('Selection', function () {
+
   it('should be defined', () => {
     expect(Selection).toBeDefined()
   })
 
+  describe('insertCharacter()', () => {
+
+    beforeEach(() => {
+      this.div = $('<div>f</div>')[0]
+      const range = rangy.createRange()
+      range.selectNodeContents(this.div)
+      this.selection = new Selection(this.div, range)
+    })
+
+    it('returns a cursor', () => {
+      const cursor = this.selection.insertCharacter('x')
+      expect(cursor.isCursor).toEqual(true)
+    })
+
+    it('replaces the selection with the character', () => {
+      this.selection.insertCharacter('x')
+      expect(this.div.innerHTML).toEqual('x')
+    })
+
+    it('inserts the text before the cursor', () => {
+      const cursor = this.selection.insertCharacter('x')
+      expect(cursor.beforeHtml()).toEqual('x')
+    })
+
+    it('inserts an emoji', () => {
+      this.selection.insertCharacter('😘')
+      expect(this.div.innerHTML).toEqual('😘')
+    })
+  })
+
   describe('with a range', () => {
+
     beforeEach(() => {
       this.oneWord = $('<div>foobar</div>')[0]
       const range = rangy.createRange()
@@ -26,6 +58,7 @@ describe('Selection', function () {
     })
 
     describe('isAllSelected()', () => {
+
       it('returns true if all is selected', () => {
         expect(this.selection.isAllSelected()).toEqual(true)
       })
@@ -48,6 +81,7 @@ describe('Selection', function () {
   })
 
   describe('inherits form Cursor', () => {
+
     it('has isAtEnd() method from Cursor in its protoype chain', () => {
       expect(Selection.prototype.hasOwnProperty('isAtEnd')).toEqual(false)
       expect(Cursor.prototype.hasOwnProperty('isAtEnd')).toEqual(true)

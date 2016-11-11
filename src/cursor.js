@@ -241,6 +241,10 @@ export default class Cursor {
     return this.win.document.createElement(tagName)
   }
 
+  createTextNode (text) {
+    return this.win.document.createTextNode(text)
+  }
+
   // Make sure a node has the correct ownerWindow
   // (see: https://developer.mozilla.org/en-US/docs/Web/API/Document/importNode)
   adoptElement (node) {

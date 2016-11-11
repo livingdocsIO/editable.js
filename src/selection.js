@@ -109,6 +109,14 @@ export default class Selection extends Cursor {
     this.toggle(em)
   }
 
+  insertCharacter (character) {
+    var cursor = this.deleteContent()
+    var textNode = cursor.createTextNode(character)
+    cursor.insertBefore(textNode)
+    cursor.setSelection()
+    return cursor
+  }
+
   // Surround the selection with characters like quotes.
   //
   // @param {String} E.g. '«'
