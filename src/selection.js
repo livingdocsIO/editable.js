@@ -27,28 +27,16 @@ export default class Selection extends Cursor {
     this.isSelection = true
   }
 
-  /**
-  * Get the text inside the selection.
-  *
-  * @method text
-  */
+  // Get the text inside the selection.
   text () {
     return this.range.toString()
   }
 
-  /**
-  * Get the html inside the selection.
-  *
-  * @method html
-  */
+  // Get the html inside the selection.
   html () {
     return this.range.toHtml()
   }
 
-  /**
-  *
-  * @method isAllSelected
-  */
   isAllSelected () {
     return parser.isBeginningOfHost(
       this.host,
@@ -61,20 +49,15 @@ export default class Selection extends Cursor {
     )
   }
 
-  /**
-  * Get the ClientRects of this selection.
-  * Use this if you want more precision than getBoundingClientRect can give.
-  */
+  // Get the ClientRects of this selection.
+  // Use this if you want more precision than getBoundingClientRect can give.
   getRects () {
     // todo: translate into absolute positions
     // just like Cursor#getCoordinates()
     return this.range.nativeRange.getClientRects()
   }
 
-  /**
-  *
-  * @method link
-  */
+
   link (href, attrs = {}) {
     const $link = $(this.createElement('a'))
     if (href) attrs.href = href
@@ -106,10 +89,6 @@ export default class Selection extends Cursor {
     this.setSelection()
   }
 
-  /**
-  *
-  * @method makeBold
-  */
   makeBold () {
     const bold = this.createElement(config.boldTag)
     this.forceWrap(bold)
@@ -120,10 +99,6 @@ export default class Selection extends Cursor {
     this.toggle(bold)
   }
 
-  /**
-  *
-  * @method giveEmphasis
-  */
   giveEmphasis () {
     const em = this.createElement(config.italicTag)
     this.forceWrap(em)
@@ -134,13 +109,10 @@ export default class Selection extends Cursor {
     this.toggle(em)
   }
 
-  /**
-  * Surround the selection with characters like quotes.
-  *
-  * @method surround
-  * @param {String} E.g. '«'
-  * @param {String} E.g. '»'
-  */
+  // Surround the selection with characters like quotes.
+  //
+  // @param {String} E.g. '«'
+  // @param {String} E.g. '»'
   surround (startCharacter, endCharacter) {
     this.range = content.surround(this.host, this.range, startCharacter, endCharacter)
     this.setSelection()
@@ -161,127 +133,97 @@ export default class Selection extends Cursor {
     }
   }
 
-  /**
-  * @method removeFormatting
-  * @param {String} tagName. E.g. 'a' to remove all links.
-  */
+  // @param {String} tagName. E.g. 'a' to remove all links.
   removeFormatting (tagName) {
     this.range = content.removeFormatting(this.host, this.range, tagName)
     this.setSelection()
   }
 
-  /**
-  * Delete the contents inside the range. After that the selection will be a
-  * cursor.
-  *
-  * @method deleteContent
-  * @return Cursor instance
-  */
+  // Delete the contents inside the range. After that the selection will be a
+  // cursor.
+  //
+  // @return Cursor instance
   deleteContent () {
     this.range.deleteContents()
     return new Cursor(this.host, this.range)
   }
 
-  /**
-  * Expand the current selection.
-  *
-  * @method expandTo
-  * @param {DOM Node}
-  */
+  // Expand the current selection.
+  //
+  // @param {DOM Node}
   expandTo (elem) {
     this.range = content.expandTo(this.host, this.range, elem)
     this.setSelection()
   }
 
-  /**
-  *  Collapse the selection at the beginning of the selection
-  *
-  *  @return Cursor instance
-  */
+  //  Collapse the selection at the beginning of the selection
+  //
+  //  @return Cursor instance
   collapseAtBeginning (elem) {
     this.range.collapse(true)
     this.setSelection()
     return new Cursor(this.host, this.range)
   }
 
-  /**
-  *  Collapse the selection at the end of the selection
-  *
-  *  @return Cursor instance
-  */
+  //  Collapse the selection at the end of the selection
+  //
+  //  @return Cursor instance
   collapseAtEnd (elem) {
     this.range.collapse(false)
     this.setSelection()
     return new Cursor(this.host, this.range)
   }
 
-  /**
-  * Wrap the selection with the specified tag. If any other tag with
-  * the same tagName is affecting the selection this tag will be
-  * remove first.
-  *
-  * @method forceWrap
-  */
+  // Wrap the selection with the specified tag. If any other tag with
+  // the same tagName is affecting the selection this tag will be
+  // remove first.
   forceWrap (elem) {
     elem = this.adoptElement(elem)
     this.range = content.forceWrap(this.host, this.range, elem)
     this.setSelection()
   }
 
-  /**
-  * Get all tags that affect the current selection. Optionally pass a
-  * method to filter the returned elements.
-  *
-  * @method getTags
-  * @param {Function filter(node)} [Optional] Method to filter the returned
-  *   DOM Nodes.
-  * @return {Array of DOM Nodes}
-  */
+  // Get all tags that affect the current selection. Optionally pass a
+  // method to filter the returned elements.
+  //
+  // @param {Function filter(node)} [Optional] Method to filter the returned
+  //   DOM Nodes.
+  // @return {Array of DOM Nodes}
   getTags (filterFunc) {
     return content.getTags(this.host, this.range, filterFunc)
   }
 
-  /**
-  * Get all tags of the specified type that affect the current selection.
-  *
-  * @method getTagsByName
-  * @param {String} tagName. E.g. 'a' to get all links.
-  * @return {Array of DOM Nodes}
-  */
+  // Get all tags of the specified type that affect the current selection.
+  //
+  // @method getTagsByName
+  // @param {String} tagName. E.g. 'a' to get all links.
+  // @return {Array of DOM Nodes}
   getTagsByName (tagName) {
     return content.getTagsByName(this.host, this.range, tagName)
   }
 
-  /**
-  * Check if the selection is the same as the elements contents.
-  *
-  * @method isExactSelection
-  * @param {DOM Node}
-  * @param {flag:  undefined or 'visible'} if 'visible' is passed
-  *   whitespaces at the beginning or end of the selection will
-  *   be ignored.
-  * @return {Boolean}
-  */
+  // Check if the selection is the same as the elements contents.
+  //
+  // @method isExactSelection
+  // @param {DOM Node}
+  // @param {flag:  undefined or 'visible'} if 'visible' is passed
+  //   whitespaces at the beginning or end of the selection will
+  //   be ignored.
+  // @return {Boolean}
   isExactSelection (elem, onlyVisible) {
     return content.isExactSelection(this.range, elem, onlyVisible)
   }
 
-  /**
-  * Check if the selection contains the passed string.
-  *
-  * @method containsString
-  * @return {Boolean}
-  */
+  // Check if the selection contains the passed string.
+  //
+  // @method containsString
+  // @return {Boolean}
   containsString (str) {
     return content.containsString(this.range, str)
   }
 
-  /**
-  * Delete all occurences of the specified character from the
-  * selection.
-  *
-  * @method deleteCharacter
-  */
+  // Delete all occurences of the specified character from the
+  // selection.
   deleteCharacter (character) {
     this.range = content.deleteCharacter(this.host, this.range, character)
     this.setSelection()
