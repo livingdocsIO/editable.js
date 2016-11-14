@@ -1,6 +1,7 @@
 import $ from 'jquery'
-import React, { Component, PropTypes } from 'react/addons'
-const ReactCSSTransitionGroup = React.addons.CSSTransitionGroup
+import React, { Component, PropTypes } from 'react'
+import ReactDOM from 'react-dom'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
 class Events extends Component {
   render () {
@@ -9,7 +10,7 @@ class Events extends Component {
     })
 
     return (<div className='events-list'>
-      <ReactCSSTransitionGroup transitionName='events' transitionLeave={false}>
+      <ReactCSSTransitionGroup transitionName='events' transitionLeave={false} transitionEnterTimeout={500}>
         {content.length ? content : (<div key='empty-entry'>
           Nothing to see yet.
         </div>)}
@@ -90,7 +91,7 @@ function showEvent (event) {
 }
 
 function draw () {
-  React.render(<Events list={events} />, document.querySelector('.paragraph-example-events'))
+  ReactDOM.render(<Events list={events} />, document.querySelector('.paragraph-example-events'))
 }
 
 function isFromFirstExample (elem) {
