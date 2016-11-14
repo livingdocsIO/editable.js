@@ -52,11 +52,9 @@ export default class Cursor {
     )
   }
 
-  /**
-  * Insert content before the cursor
-  *
-  * @param {String, DOM node or document fragment}
-  */
+  // Insert content before the cursor
+  //
+  // @param {String, DOM node or document fragment}
   insertBefore (element) {
     if (string.isString(element)) element = content.createFragmentFromString(element)
     if (parser.isDocumentFragmentWithoutChildren(element)) return
@@ -74,11 +72,9 @@ export default class Cursor {
     this.range.setEndAfter(preceedingElement)
   }
 
-  /**
-  * Insert content after the cursor
-  *
-  * @param {String, DOM node or document fragment}
-  */
+  // Insert content after the cursor
+  //
+  // @param {String, DOM node or document fragment}
   insertAfter (element) {
     if (string.isString(element)) element = content.createFragmentFromString(element)
     if (parser.isDocumentFragmentWithoutChildren(element)) return
@@ -87,9 +83,7 @@ export default class Cursor {
     this.range.insertNode(element)
   }
 
-  /**
-  * Alias for #setVisibleSelection()
-  */
+  // Alias for #setVisibleSelection()
   setSelection () {
     this.setVisibleSelection()
   }
@@ -103,55 +97,45 @@ export default class Cursor {
     rangy.getSelection(this.win).setSingleRange(this.range)
   }
 
-  /**
-  * Take the following example:
-  * (The character '|' represents the cursor position)
-  *
-  * <div contenteditable="true">fo|o</div>
-  * before() will return a document frament containing a text node 'fo'.
-  *
-  * @returns {Document Fragment} content before the cursor or selection.
-  */
+  // Take the following example:
+  // (The character '|' represents the cursor position)
+  //
+  // <div contenteditable="true">fo|o</div>
+  // before() will return a document frament containing a text node 'fo'.
+  //
+  // @returns {Document Fragment} content before the cursor or selection.
   before () {
     const range = this.range.cloneRange()
     range.setStartBefore(this.host)
     return content.cloneRangeContents(range)
   }
 
-  /**
-  * Same as before() but returns a string.
-  */
+  // Same as before() but returns a string.
   beforeHtml () {
     return content.getInnerHtmlOfFragment(this.before())
   }
 
-  /**
-  * Take the following example:
-  * (The character '|' represents the cursor position)
-  *
-  * <div contenteditable="true">fo|o</div>
-  * after() will return a document frament containing a text node 'o'.
-  *
-  * @returns {Document Fragment} content after the cursor or selection.
-  */
+  // Take the following example:
+  // (The character '|' represents the cursor position)
+  //
+  // <div contenteditable="true">fo|o</div>
+  // after() will return a document frament containing a text node 'o'.
+  //
+  // @returns {Document Fragment} content after the cursor or selection.
   after () {
     const range = this.range.cloneRange()
     range.setEndAfter(this.host)
     return content.cloneRangeContents(range)
   }
 
-  /**
-  * Same as after() but returns a string.
-  */
+  // Same as after() but returns a string.
   afterHtml () {
     return content.getInnerHtmlOfFragment(this.after())
   }
 
-  /**
-  * Get the BoundingClientRect of the cursor.
-  * The returned values are transformed to be absolute
-  # (relative to the document).
-  */
+  // Get the BoundingClientRect of the cursor.
+  // The returned values are transformed to be absolute
+  // (relative to the document).
   getCoordinates (positioning = 'absolute') {
     const coords = this.range.nativeRange.getBoundingClientRect()
     if (positioning === 'fixed') return coords
@@ -186,9 +170,7 @@ export default class Cursor {
     if (this.isSelection) return new Cursor(this.host, this.range)
   }
 
-  /**
-  * Move the cursor to the beginning of the host.
-  */
+  // Move the cursor to the beginning of the host.
   moveAtBeginning (element = this.host) {
     this.updateHost(element)
     this.range.selectNodeContents(element)
@@ -196,9 +178,7 @@ export default class Cursor {
     if (this.isSelection) return new Cursor(this.host, this.range)
   }
 
-  /**
-  * Move the cursor to the end of the host.
-  */
+  // Move the cursor to the end of the host.
   moveAtEnd (element = this.host) {
     this.updateHost(element)
     this.range.selectNodeContents(element)
@@ -206,9 +186,7 @@ export default class Cursor {
     if (this.isSelection) return new Cursor(this.host, this.range)
   }
 
-  /**
-  * Move the cursor after the last visible character of the host.
-  */
+  // Move the cursor after the last visible character of the host.
   moveAtTextEnd (element) {
     return this.moveAtEnd(parser.latestChild(element))
   }
@@ -261,6 +239,10 @@ export default class Cursor {
   // (see: http://www.w3.org/DOM/faq.html#ownerdoc)
   createElement (tagName) {
     return this.win.document.createElement(tagName)
+  }
+
+  createTextNode (text) {
+    return this.win.document.createTextNode(text)
   }
 
   // Make sure a node has the correct ownerWindow

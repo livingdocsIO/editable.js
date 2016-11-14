@@ -50,6 +50,8 @@ function setupTooltip () {
     '<button class="js-format js-format-italic"><i class="fa fa-italic"></i></button>' +
     '<button class="js-format js-format-link"><i class="fa fa-link"></i></button>' +
     '<button class="js-format js-format-quote"><i class="fa fa-quote-left"></i></button>' +
+    '<button class="js-format js-format-emoji"><i class="fa fa-smile-o"></i></button>' +
+    '<button class="js-format js-format-whitespace"><i class="fa fa-arrows-h"></i></button>' +
     '<button class="js-format js-format-clear"><i class="fa fa-eraser"></i></button>' +
     '</div>')
   $(document.body).append(tooltip)
@@ -100,6 +102,21 @@ function setupTooltipListeners () {
   .on('click', '.js-format-quote', (event) => {
     if (currentSelection.isSelection) {
       currentSelection.toggleSurround('«', '»')
+      currentSelection.triggerChange()
+    }
+  })
+
+  .on('click', '.js-format-emoji', (event) => {
+    if (currentSelection.isSelection) {
+      currentSelection.insertCharacter('😍')
+      currentSelection.triggerChange()
+    }
+  })
+
+  .on('click', '.js-format-whitespace', (event) => {
+    if (currentSelection.isSelection) {
+      // insert a special whitespace 'em-space'
+      currentSelection.insertCharacter(' ')
       currentSelection.triggerChange()
     }
   })
