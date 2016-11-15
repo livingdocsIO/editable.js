@@ -305,6 +305,29 @@ const Editable = module.exports = class Editable {
     return this
   }
 
+  // For backwards compatibility
+  setupSpellcheck (config) {
+    let marker
+
+    if (config.markerNode) {
+      marker = config.markerNode.outerHTML
+    }
+
+    this.setupHighlighting({
+      throttle: config.throttle,
+      spellcheck: {
+        marker: marker,
+        spellcheckService: config.spellcheckService
+      }
+    })
+
+    this.spellcheck = {
+      checkSpelling: (elem) => {
+        this.highlighting.highlight(elem)
+      }
+    }
+  }
+
   /**
    * Subscribe a callback function to a custom event fired by the API.
    *
