@@ -90,12 +90,12 @@ export default class Selection extends Cursor {
   }
 
   makeBold () {
-    const bold = this.createElement(config.boldTag)
+    const bold = this.createElement(config.boldMarkup.tagName, config.boldMarkup.attributes)
     this.forceWrap(bold)
   }
 
   toggleBold () {
-    const bold = this.createElement(config.boldTag)
+    const bold = this.createElement(config.boldMarkup.tagName, config.boldMarkup.attributes)
     this.toggle(bold)
   }
 
