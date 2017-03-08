@@ -116,14 +116,14 @@ describe('Spellcheck', function () {
       })
 
       it('does remove the highlights if cursor is within a match', () => {
-        sinon.stub(this.editable, 'getSelection', () => createCursor(this.p, this.highlight, 0))
+        sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.highlight, 0))
 
         this.highlighting.removeHighlightsAtCursor(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(0)
       })
 
       it('does not remove the highlights if cursor is outside a match', () => {
-        sinon.stub(this.editable, 'getSelection', () => createCursor(this.p, this.p.firstChild, 0))
+        sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.p.firstChild, 0))
 
         this.highlighting.removeHighlightsAtCursor(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
