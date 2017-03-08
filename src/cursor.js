@@ -239,7 +239,9 @@ export default class Cursor {
   // (see: http://www.w3.org/DOM/faq.html#ownerdoc)
   createElement (tagName, attributes = []) {
     const element = this.win.document.createElement(tagName)
-    for (const {attributeName, attributeValue} of attributes) {
+    // I'd like to use for .. of with Object.entries() here but no IE support...
+    for (const attributeName of Object.keys(attributes)) {
+      const attributeValue = attributes[attributeName]
       element.setAttribute(attributeName, attributeValue)
     }
     return element

@@ -59,18 +59,18 @@ export default class Selection extends Cursor {
 
 
   link (href, attrs = {}) {
-    const $link = $(this.createElement('a'))
+    const $link = $(this.createElement(config.linkMarkup.name, config.linkMarkup.attribs))
     if (href) attrs.href = href
     $link.attr(attrs)
     this.forceWrap($link[0])
   }
 
   unlink () {
-    this.removeFormatting('a')
+    this.removeFormatting(config.linkMarkup.name)
   }
 
   toggleLink (href, attrs) {
-    const links = this.getTagsByName('a')
+    const links = this.getTagsByName(config.linkMarkup.name)
     if (links.length >= 1) {
       const firstLink = links[0]
       if (this.isExactSelection(firstLink, 'visible')) {
@@ -90,22 +90,22 @@ export default class Selection extends Cursor {
   }
 
   makeBold () {
-    const bold = this.createElement(config.boldMarkup.tagName, config.boldMarkup.attributes)
+    const bold = this.createElement(config.boldMarkup.name, config.boldMarkup.attribs)
     this.forceWrap(bold)
   }
 
   toggleBold () {
-    const bold = this.createElement(config.boldMarkup.tagName, config.boldMarkup.attributes)
+    const bold = this.createElement(config.boldMarkup.name, config.boldMarkup.attribs)
     this.toggle(bold)
   }
 
   giveEmphasis () {
-    const em = this.createElement(config.italicTag)
+    const em = this.createElement(config.italicMarkup.name, config.italicMarkup.attribs)
     this.forceWrap(em)
   }
 
   toggleEmphasis () {
-    const em = this.createElement(config.italicTag)
+    const em = this.createElement(config.italicMarkup.name, config.italicMarkup.attribs)
     this.toggle(em)
   }
 
