@@ -78,6 +78,62 @@ describe('Selection', function () {
         expect(selection.isAllSelected()).toEqual(false)
       })
     })
+
+    describe('bold:', function () {
+      it('makes the selection bold with the configured class', function () {
+        this.selection.makeBold()
+        const boldTags = this.selection.getTagsByName('strong')
+        const html = getHtml(boldTags[0])
+        expect(html).toEqual('<strong class="foo">foobar</strong>')
+      })
+
+      it('toggles the bold selection', function () {
+        this.selection.makeBold()
+        this.selection.toggleBold()
+        const boldTags = this.selection.getTagsByName('strong')
+        expect(boldTags.length).toEqual(0)
+      })
+    })
+
+    describe('italic:', function () {
+      it('makes the selection italic with the configured class', function () {
+        this.selection.giveEmphasis()
+        const emphasisTags = this.selection.getTagsByName('em')
+        const html = getHtml(emphasisTags[0])
+        expect(html).toEqual('<em class="bar">foobar</em>')
+      })
+
+      it('toggles the italic selection', function () {
+        this.selection.giveEmphasis()
+        this.selection.toggleEmphasis()
+        const emphasisTags = this.selection.getTagsByName('em')
+        expect(emphasisTags.length).toEqual(0)
+      })
+    })
+
+    describe('links:', function () {
+      it('sets a link with the configured class', function () {
+        this.selection.link('https://livingdocs.io')
+        const linkTags = this.selection.getTagsByName('a')
+        const html = getHtml(linkTags[0])
+        expect(html).toEqual('<a class="foo bar" href="https://livingdocs.io">foobar</a>')
+      })
+
+      it('toggles a link', function () {
+        this.selection.link('https://livingdocs.io')
+        this.selection.toggleLink()
+        const linkTags = this.selection.getTagsByName('a')
+        expect(linkTags.length).toEqual(0)
+      })
+
+      it('removes a link', function () {
+        this.selection.link('https://livingdocs.io')
+        this.selection.unlink()
+        const linkTags = this.selection.getTagsByName('a')
+        expect(linkTags.length).toEqual(0)
+      })
+    })
+
   })
 
   describe('inherits form Cursor', function () {
@@ -89,3 +145,9 @@ describe('Selection', function () {
     })
   })
 })
+
+const getHtml = function (tag) {
+  const testTag = window.document.createElement('div')
+  testTag.appendChild(tag)
+  return testTag.innerHTML
+}
