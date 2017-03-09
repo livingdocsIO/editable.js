@@ -237,8 +237,13 @@ export default class Cursor {
 
   // Create an element with the correct ownerWindow
   // (see: http://www.w3.org/DOM/faq.html#ownerdoc)
-  createElement (tagName) {
-    return this.win.document.createElement(tagName)
+  createElement (tagName, attributes = {}) {
+    const element = this.win.document.createElement(tagName)
+    for (const attributeName in attributes) {
+      const attributeValue = attributes[attributeName]
+      element.setAttribute(attributeName, attributeValue)
+    }
+    return element
   }
 
   createTextNode (text) {

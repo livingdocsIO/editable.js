@@ -9,8 +9,21 @@ export const logErrors = true
 export const editableClass = 'js-editable'
 export const editableDisabledClass = 'js-editable-disabled'
 export const pastingAttribute = 'data-editable-is-pasting'
-export const boldTag = 'strong'
-export const italicTag = 'em'
+export const boldMarkup = {
+  type: 'tag',
+  name: 'strong',
+  attribs: {}
+}
+export const italicMarkup = {
+  type: 'tag',
+  name: 'em',
+  attribs: {}
+}
+export const linkMarkup = {
+  type: 'tag',
+  name: 'a',
+  attribs: {}
+}
 
 // Rules that are applied when filtering pasted content
 export const pastedHtmlRules = {
