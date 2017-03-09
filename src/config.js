@@ -12,23 +12,17 @@ export const pastingAttribute = 'data-editable-is-pasting'
 export const boldMarkup = {
   type: 'tag',
   name: 'strong',
-  attribs: {
-    'class': 'foo'
-  }
+  attribs: {}
 }
 export const italicMarkup = {
   type: 'tag',
   name: 'em',
-  attribs: {
-    'class': 'bar'
-  }
+  attribs: {}
 }
 export const linkMarkup = {
   type: 'tag',
   name: 'a',
-  attribs: {
-    'class': 'foo bar'
-  }
+  attribs: {}
 }
 
 // Rules that are applied when filtering pasted content

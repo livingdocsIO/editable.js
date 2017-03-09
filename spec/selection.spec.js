@@ -3,6 +3,7 @@ import rangy from 'rangy'
 
 import Selection from '../src/selection'
 import Cursor from '../src/cursor'
+import * as config from '../src/config'
 
 describe('Selection', function () {
 
@@ -80,6 +81,22 @@ describe('Selection', function () {
     })
 
     describe('bold:', function () {
+
+      beforeEach(function () {
+        this.oldBoldMarkup = config.boldMarkup
+        config.boldMarkup = {
+          type: 'tag',
+          name: 'strong',
+          attribs: {
+            'class': 'foo'
+          }
+        }
+      })
+
+      afterEach(function () {
+        config.boldMarkup = this.oldBoldMarkup
+      })
+
       it('makes the selection bold with the configured class', function () {
         this.selection.makeBold()
         const boldTags = this.selection.getTagsByName('strong')
@@ -96,6 +113,21 @@ describe('Selection', function () {
     })
 
     describe('italic:', function () {
+      beforeEach(function () {
+        this.oldItalicMarkup = config.italicMarkup
+        config.italicMarkup = {
+          type: 'tag',
+          name: 'em',
+          attribs: {
+            'class': 'bar'
+          }
+        }
+      })
+
+      afterEach(function () {
+        config.italicMarkup = this.oldItalicMarkup
+      })
+
       it('makes the selection italic with the configured class', function () {
         this.selection.giveEmphasis()
         const emphasisTags = this.selection.getTagsByName('em')
@@ -112,6 +144,21 @@ describe('Selection', function () {
     })
 
     describe('links:', function () {
+      beforeEach(function () {
+        this.oldLinkMarkup = config.italicMarkup
+        config.linkMarkup = {
+          type: 'tag',
+          name: 'a',
+          attribs: {
+            'class': 'foo bar'
+          }
+        }
+      })
+
+      afterEach(function () {
+        config.linkMarkup = this.oldLinkMarkup
+      })
+
       it('sets a link with the configured class', function () {
         this.selection.link('https://livingdocs.io')
         const linkTags = this.selection.getTagsByName('a')
