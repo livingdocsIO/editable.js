@@ -109,6 +109,16 @@ export default class Selection extends Cursor {
     this.toggle(em)
   }
 
+  makeUnderline () {
+    const u = this.createElement(config.underlineMarkup.name, config.underlineMarkup.attribs)
+    this.forceWrap(u)
+  }
+
+  toggleUnderline () {
+    const u = this.createElement(config.underlineMarkup.name, config.underlineMarkup.attribs)
+    this.toggle(u)
+  }
+
   insertCharacter (character) {
     var cursor = this.deleteContent()
     var textNode = cursor.createTextNode(character)

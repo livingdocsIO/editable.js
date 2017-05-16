@@ -143,6 +143,37 @@ describe('Selection', function () {
       })
     })
 
+    describe('underline:', function () {
+      beforeEach(function () {
+        this.oldUnderlineMarkup = config.underlineMarkup
+        config.underlineMarkup = {
+          type: 'tag',
+          name: 'u',
+          attribs: {
+            'class': 'bar'
+          }
+        }
+      })
+
+      afterEach(function () {
+        config.underlineMarkup = this.oldUnderlineMarkup
+      })
+
+      it('makes the selection underline with the configured class', function () {
+        this.selection.makeUnderline()
+        const underlineTags = this.selection.getTagsByName('u')
+        const html = getHtml(underlineTags[0])
+        expect(html).toEqual('<u class="bar">foobar</u>')
+      })
+
+      it('toggles the underline selection', function () {
+        this.selection.makeUnderline()
+        this.selection.toggleUnderline()
+        const underlineTags = this.selection.getTagsByName('u')
+        expect(underlineTags.length).toEqual(0)
+      })
+    })
+
     describe('links:', function () {
       beforeEach(function () {
         this.oldLinkMarkup = config.italicMarkup

@@ -48,6 +48,7 @@ function setupTooltip () {
   const tooltip = $('<div class="selection-tip" style="display:none;">' +
     '<button class="js-format js-format-bold"><i class="fa fa-bold"></i></button>' +
     '<button class="js-format js-format-italic"><i class="fa fa-italic"></i></button>' +
+    '<button class="js-format js-format-underline"><i class="fa fa-underline"></i></button>' +
     '<button class="js-format js-format-link"><i class="fa fa-link"></i></button>' +
     '<button class="js-format js-format-quote"><i class="fa fa-quote-left"></i></button>' +
     '<button class="js-format js-format-emoji"><i class="fa fa-smile-o"></i></button>' +
@@ -88,6 +89,13 @@ function setupTooltipListeners () {
   .on('click', '.js-format-italic', (event) => {
     if (currentSelection.isSelection) {
       currentSelection.toggleEmphasis()
+      currentSelection.triggerChange()
+    }
+  })
+
+  .on('click', '.js-format-underline', (event) => {
+    if (currentSelection.isSelection) {
+      currentSelection.toggleUnderline()
       currentSelection.triggerChange()
     }
   })

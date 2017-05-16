@@ -19,6 +19,11 @@ export const italicMarkup = {
   name: 'em',
   attribs: {}
 }
+export const underlineMarkup = {
+  type: 'tag',
+  name: 'u',
+  attribs: {}
+}
 export const linkMarkup = {
   type: 'tag',
   name: 'a',
