@@ -145,7 +145,10 @@ export function shouldKeepNode (nodeName, node) {
 }
 
 export function cleanWhitespace (str) {
-  return str.replace(/(.)\u00A0/g, (match, group) => group + (/[\u0020]/.test(group)
+  return str
+  .replace(/\n/g, ' ')
+  .replace(/ {2,}/g, ' ')
+  .replace(/(.)\u00A0/g, (match, group) => group + (/[\u0020]/.test(group)
     ? '\u00A0'
     : ' '
   ))
