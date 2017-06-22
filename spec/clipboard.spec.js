@@ -73,6 +73,14 @@ describe('Clipboard', () => {
       checkWhitespace('a&nbsp;<span>b</span>', 'a b')
     })
 
+    it('collapses multiple whitespaces', () => {
+      checkWhitespace('A  B   C    D', 'A B C D')
+    })
+
+    it('removes newlines', () => {
+      checkWhitespace('A\nB \n C', 'A B C')
+    })
+
     // Remove Elements
     // ---------------
 
