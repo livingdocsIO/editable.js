@@ -63,5 +63,7 @@ export const pastedHtmlRules = {
   blockLevelElements: [
     'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'p', 'pre', 'hr', 'blockquote',
     'article', 'figure', 'header', 'footer', 'ul', 'ol', 'li', 'section', 'table', 'video'
-  ]
+  ],
+
+  blacklistedElements: ['style']
 }

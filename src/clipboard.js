@@ -4,7 +4,8 @@ import * as config from './config'
 import * as string from './util/string'
 import * as nodeType from './node-type'
 
-let allowedElements, requiredAttributes, transformElements, blockLevelElements, splitIntoBlocks
+let allowedElements, requiredAttributes, transformElements, blockLevelElements
+let splitIntoBlocks, blacklistedElements
 let whitespaceOnly = /^\s*$/
 let blockPlaceholder = '<!-- BLOCK -->'
 
@@ -14,6 +15,7 @@ export function updateConfig (config) {
   allowedElements = rules.allowedElements || {}
   requiredAttributes = rules.requiredAttributes || {}
   transformElements = rules.transformElements || {}
+  blacklistedElements = rules.blacklistedElements || []
 
   blockLevelElements = {}
   rules.blockLevelElements.forEach((name) => { blockLevelElements[name] = true })
@@ -81,6 +83,10 @@ export function parseContent (element) {
 
 export function filterHtmlElements (elem) {
   return Array.from(elem.childNodes).reduce((content, child) => {
+    if (blacklistedElements.indexOf(child.nodeName.toLowerCase()) !== -1) {
+      return ''
+    }
+
     if (child.nodeType === nodeType.elementNode) {
       const childContent = filterHtmlElements(child)
       return content + conditionalNodeWrap(child, childContent)
