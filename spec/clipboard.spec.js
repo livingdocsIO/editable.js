@@ -132,13 +132,15 @@ describe('Clipboard', () => {
 
     it('removes blacklisted HTML elements (e.g. <style>)', () => {
       const div = document.createElement('div')
-      div.innerHTML = `<style type="text/css">
-        p.p1 {font: 30.0px Georgia; color: #000000; -webkit-text-stroke: #000000}
-        span.s1 {font-kerning: none}
+      div.innerHTML = `
+        <style type="text/css">
+          .foo { color: red; }
         </style>
-        <p class="p1"><span class="s1"><b>foo</b></span></p>`
+        <p class="foo">
+          bar
+        </p>`
 
-      expect(parseContent(div)[0]).toEqual('<strong>foo</strong>')
+      expect(parseContent(div)[0]).toEqual('bar')
     })
   })
 })
