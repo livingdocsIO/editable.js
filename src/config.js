@@ -33,6 +33,9 @@ export const linkMarkup = {
 // Rules that are applied when filtering pasted content
 export const pastedHtmlRules = {
   // Elements and their attributes to keep in pasted text
+  // Note that elements not explicitly allowed here will not be removed, their
+  // tags will get stripped but their content will be kept. Use `blacklistedElements`
+  // to get rid of a whole element (tag+content)
   allowedElements: {
     'a': {
       'href': true
@@ -65,5 +68,7 @@ export const pastedHtmlRules = {
     'article', 'figure', 'header', 'footer', 'ul', 'ol', 'li', 'section', 'table', 'video'
   ],
 
-  blacklistedElements: ['style']
+  // A list of elements that will get completly removed when pasted. Their tags
+  // and content (text content and child elements) will get removed.
+  blacklistedElements: ['style', 'script']
 }
