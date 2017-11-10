@@ -1,5 +1,5 @@
 import rangy from 'rangy'
-import * as error from './util/error'
+import error from './util/error'
 import * as nodeType from './node-type'
 
 /**

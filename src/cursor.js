@@ -6,7 +6,7 @@ import * as content from './content'
 import * as parser from './parser'
 import * as string from './util/string'
 import * as nodeType from './node-type'
-import * as error from './util/error'
+import error from './util/error'
 import * as rangeSaveRestore from './range-save-restore'
 
 /**
