@@ -5,7 +5,7 @@ import * as content from './content'
 import * as parser from './parser'
 import * as string from './util/string'
 import * as nodeType from './node-type'
-import * as error from './util/error'
+import error from './util/error'
 import * as rangeSaveRestore from './range-save-restore'
 
 /**
@@ -92,8 +92,21 @@ export default class Cursor {
     // Without setting focus() Firefox is not happy (seems setting a selection is not enough.
     // Probably because Firefox can handle multiple selections).
     if (this.win.document.activeElement !== this.host) {
+      const previousWindowTop = $(window).scrollTop()
+
       $(this.host).focus()
+
+      const hostBottom = $(this.host).position().top + $(this.host).outerHeight()
+      const windowHeight = $(window).height()
+      const isHostBottomVisible = hostBottom < previousWindowTop + windowHeight && hostBottom > previousWindowTop
+
+      if (isHostBottomVisible) {
+        $(window).scrollTop(previousWindowTop)
+      } else {
+        $(window).scrollTop(parseInt(hostBottom - windowHeight / 2, 10))
+      }
     }
+
     rangy.getSelection(this.win).setSingleRange(this.range)
   }
 

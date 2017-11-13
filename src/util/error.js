@@ -1,4 +1,4 @@
-import config from '../config'
+import * as config from '../config'
 
 // Allows for safe error logging
 // Falls back to console.log if console.error is not available
