@@ -1,6 +1,6 @@
 import $ from 'jquery'
 import rangy from 'rangy'
-import viewport from './util/viewport'
+import * as viewport from './util/viewport'
 
 import * as content from './content'
 import * as parser from './parser'
