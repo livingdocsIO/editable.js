@@ -104,7 +104,7 @@ export default class Cursor {
   // (The character '|' represents the cursor position)
   //
   // <div contenteditable="true">fo|o</div>
-  // before() will return a document frament containing a text node 'fo'.
+  // before() will return a document fragment containing a text node 'fo'.
   //
   // @returns {Document Fragment} content before the cursor or selection.
   before () {
@@ -122,7 +122,7 @@ export default class Cursor {
   // (The character '|' represents the cursor position)
   //
   // <div contenteditable="true">fo|o</div>
-  // after() will return a document frament containing a text node 'o'.
+  // after() will return a document fragment containing a text node 'o'.
   //
   // @returns {Document Fragment} content after the cursor or selection.
   after () {
