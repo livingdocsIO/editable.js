@@ -1,11 +1,12 @@
 import $ from 'jquery'
 import rangy from 'rangy'
+import * as viewport from './util/viewport'
 
 import * as content from './content'
 import * as parser from './parser'
 import * as string from './util/string'
 import * as nodeType from './node-type'
-import * as error from './util/error'
+import error from './util/error'
 import * as rangeSaveRestore from './range-save-restore'
 
 /**
@@ -92,7 +93,9 @@ export default class Cursor {
     // Without setting focus() Firefox is not happy (seems setting a selection is not enough.
     // Probably because Firefox can handle multiple selections).
     if (this.win.document.activeElement !== this.host) {
+      const {x, y} = viewport.getScrollPosition(this.win)
       $(this.host).focus()
+      this.win.scrollTo(x, y)
     }
     rangy.getSelection(this.win).setSingleRange(this.range)
   }
@@ -101,7 +104,7 @@ export default class Cursor {
   // (The character '|' represents the cursor position)
   //
   // <div contenteditable="true">fo|o</div>
-  // before() will return a document frament containing a text node 'fo'.
+  // before() will return a document fragment containing a text node 'fo'.
   //
   // @returns {Document Fragment} content before the cursor or selection.
   before () {
@@ -119,7 +122,7 @@ export default class Cursor {
   // (The character '|' represents the cursor position)
   //
   // <div contenteditable="true">fo|o</div>
-  // after() will return a document frament containing a text node 'o'.
+  // after() will return a document fragment containing a text node 'o'.
   //
   // @returns {Document Fragment} content after the cursor or selection.
   after () {
@@ -140,12 +143,9 @@ export default class Cursor {
     const coords = this.range.nativeRange.getBoundingClientRect()
     if (positioning === 'fixed') return coords
 
-    // code from mdn: https://developer.mozilla.org/en-US/docs/Web/API/window.scrollX
-    const win = this.win
-    const x = (win.pageXOffset !== undefined) ? win.pageXOffset : (win.document.documentElement || win.document.body.parentNode || win.document.body).scrollLeft
-    const y = (win.pageYOffset !== undefined) ? win.pageYOffset : (win.document.documentElement || win.document.body.parentNode || win.document.body).scrollTop
 
     // translate into absolute positions
+    const {x, y} = viewport.getScrollPosition(this.win)
     return {
       top: coords.top + y,
       bottom: coords.bottom + y,
