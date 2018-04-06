@@ -275,7 +275,7 @@ export default class Dispatcher {
 
         // Without this timeout the previous selection is active
         // until the mouseup event (no. not good).
-        setTimeout($.proxy(selectionWatcher, 'selectionChanged'), 0)
+        setTimeout(selectionWatcher.selectionChanged.bind(selectionWatcher), 0)
       }
 
       $document.on('mouseup.editableSelection', (event) => {
@@ -307,7 +307,7 @@ export default class Dispatcher {
       // In Opera when clicking outside of a block
       // it does not update the selection as it should
       // without the timeout
-      setTimeout($.proxy(selectionWatcher, 'selectionChanged'), 0)
+      setTimeout(selectionWatcher.selectionChanged.bind(selectionWatcher)), 0)
     })
 
     // listen for selection changes by keys

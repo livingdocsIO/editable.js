@@ -50,11 +50,11 @@ export default class Spellcheck {
 
   setup (editable) {
     if (this.config.checkOnFocus) {
-      this.editable.on('focus', $.proxy(this, 'onFocus'))
-      this.editable.on('blur', $.proxy(this, 'onBlur'))
+      this.editable.on('focus', this.onFocus.bind(this))
+      this.editable.on('blur', this.onBlur.bind(this))
     }
     if (this.config.checkOnChange || this.config.removeOnCorrection) {
-      this.editable.on('change', $.proxy(this, 'onChange'))
+      this.editable.on('change', this.onChange.bind(this))
     }
   }
 
@@ -131,7 +131,7 @@ export default class Spellcheck {
   }
 
   createRegex (words) {
-    const escapedWords = $.map(words, (word) => escapeRegEx(word))
+    const escapedWords = words.map((word) => escapeRegEx(word))
 
     const regex = `([^${letterChars}]|^)` +
       `(${escapedWords.join('|')})` +
