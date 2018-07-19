@@ -61,7 +61,7 @@ export default class Keyboard {
         if (!notifyCharacterEvent) return
         // Don't notify character events as long as either the ctrl or
         // meta key are pressed.
-        // see: https://github.com/upfrontIO/editable.js/pull/125
+        // see: https://github.com/livingdocsIO/editable.js/pull/125
         if (!event.ctrlKey && !event.metaKey) return this.notify(target, 'character', event)
     }
   }

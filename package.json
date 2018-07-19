@@ -69,7 +69,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/upfrontIO/editable.js.git"
+    "url": "https://github.com/livingdocsIO/editable.js.git"
   },
   "scripts": {
     "start": "webpack-dev-server --inline --hot",

@@ -1,8 +1,8 @@
 # editable.js
-[![Build Status](https://travis-ci.org/upfrontIO/editable.js.svg?branch=master)](https://travis-ci.org/upfrontIO/editable.js)
+[![Build Status](https://travis-ci.org/livingdocsIO/editable.js.svg?branch=master)](https://travis-ci.org/livingdocsIO/editable.js)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com)
-[![Dependency Status](https://david-dm.org/upfrontIO/editable.js/master.svg)](https://david-dm.org/upfrontIO/editable.js/master)
-[![devDependency Status](https://david-dm.org/upfrontIO/editable.js/master/dev-status.svg)](https://david-dm.org/upfrontIO/editable.js/master#info=devDependencies)
+[![Dependency Status](https://david-dm.org/livingdocsIO/editable.js/master.svg)](https://david-dm.org/livingdocsIO/editable.js/master)
+[![devDependency Status](https://david-dm.org/livingdocsIO/editable.js/master/dev-status.svg)](https://david-dm.org/livingdocsIO/editable.js/master#info=devDependencies)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 [![NPM](https://nodei.co/npm/upfront-editable.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/upfront-editable/)
@@ -28,7 +28,7 @@ jQuery is a peerDependency, so you need to install it alongside editable.js. You
 
 ## Plnkr Demo
 
-You can check out a [simple demo on the website](https://upfrontio.github.io/editable.js/). It features a formatting toolbar and the default insert, split and merge behavior that allow to add and remove content blocks like paragraphs easily.
+You can check out a [simple demo on the website](https://livingdocsio.github.io/editable.js/). It features a formatting toolbar and the default insert, split and merge behavior that allow to add and remove content blocks like paragraphs easily.
 
 
 ## Events Overview
