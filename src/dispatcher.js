@@ -66,65 +66,64 @@ export default class Dispatcher {
     const selector = this.editableSelector
 
     this.$document
+      .on('focus.editable', selector, function (event) {
+        if (this.getAttribute(config.pastingAttribute)) return
+        self.notify('focus', this)
+      })
 
-    .on('focus.editable', selector, function (event) {
-      if (this.getAttribute(config.pastingAttribute)) return
-      self.notify('focus', this)
-    })
+      .on('blur.editable', selector, function (event) {
+        if (this.getAttribute(config.pastingAttribute)) return
+        self.notify('blur', this)
+      })
 
-    .on('blur.editable', selector, function (event) {
-      if (this.getAttribute(config.pastingAttribute)) return
-      self.notify('blur', this)
-    })
-
-    .on('copy.editable', selector, function (event) {
-      const selection = self.selectionWatcher.getFreshSelection()
-      if (selection.isSelection) {
-        self.notify('clipboard', this, 'copy', selection)
-      }
-    })
-
-    .on('cut.editable', selector, function (event) {
-      const selection = self.selectionWatcher.getFreshSelection()
-      if (selection.isSelection) {
-        self.notify('clipboard', this, 'cut', selection)
-        self.triggerChangeEvent(this)
-      }
-    })
-
-    .on('paste.editable', selector, function (event) {
-      const element = this
-
-      function afterPaste (blocks, cursor) {
-        if (blocks.length) {
-          self.notify('paste', element, blocks, cursor)
-
-          // The input event does not fire when we process the content manually
-          // and insert it via script
-          self.notify('change', element)
-        } else {
-          cursor.setVisibleSelection()
+      .on('copy.editable', selector, function (event) {
+        const selection = self.selectionWatcher.getFreshSelection()
+        if (selection.isSelection) {
+          self.notify('clipboard', this, 'copy', selection)
         }
-      }
+      })
 
-      const cursor = self.selectionWatcher.getFreshSelection()
-      clipboard.paste(this, cursor, afterPaste)
-    })
+      .on('cut.editable', selector, function (event) {
+        const selection = self.selectionWatcher.getFreshSelection()
+        if (selection.isSelection) {
+          self.notify('clipboard', this, 'cut', selection)
+          self.triggerChangeEvent(this)
+        }
+      })
 
-    .on('input.editable', selector, function (event) {
-      if (isInputEventSupported) {
+      .on('paste.editable', selector, function (event) {
+        const element = this
+
+        function afterPaste (blocks, cursor) {
+          if (blocks.length) {
+            self.notify('paste', element, blocks, cursor)
+
+            // The input event does not fire when we process the content manually
+            // and insert it via script
+            self.notify('change', element)
+          } else {
+            cursor.setVisibleSelection()
+          }
+        }
+
+        const cursor = self.selectionWatcher.getFreshSelection()
+        clipboard.paste(this, cursor, afterPaste)
+      })
+
+      .on('input.editable', selector, function (event) {
+        if (isInputEventSupported) {
+          self.notify('change', this)
+        } else {
+          // Most likely the event was already handled manually by
+          // triggerChangeEvent so the first time we just switch the
+          // isInputEventSupported flag without notifiying the change event.
+          isInputEventSupported = true
+        }
+      })
+
+      .on('formatEditable.editable', selector, function (event) {
         self.notify('change', this)
-      } else {
-        // Most likely the event was already handled manually by
-        // triggerChangeEvent so the first time we just switch the
-        // isInputEventSupported flag without notifiying the change event.
-        isInputEventSupported = true
-      }
-    })
-
-    .on('formatEditable.editable', selector, function (event) {
-      self.notify('change', this)
-    })
+      })
   }
 
   /**
@@ -181,66 +180,65 @@ export default class Dispatcher {
     })
 
     this.keyboard
+      .on('left up', function (event) {
+        self.dispatchSwitchEvent(event, this, 'before')
+      })
 
-    .on('left up', function (event) {
-      self.dispatchSwitchEvent(event, this, 'before')
-    })
+      .on('right down', function (event) {
+        self.dispatchSwitchEvent(event, this, 'after')
+      })
 
-    .on('right down', function (event) {
-      self.dispatchSwitchEvent(event, this, 'after')
-    })
+      .on('tab shiftTab esc', () => {})
 
-    .on('tab shiftTab esc', () => {})
+      .on('backspace', function (event) {
+        const range = self.selectionWatcher.getFreshRange()
+        if (!range.isCursor) return self.triggerChangeEvent(this)
 
-    .on('backspace', function (event) {
-      const range = self.selectionWatcher.getFreshRange()
-      if (!range.isCursor) return self.triggerChangeEvent(this)
+        const cursor = range.getCursor()
+        if (!cursor.isAtBeginning()) return self.triggerChangeEvent(this)
 
-      const cursor = range.getCursor()
-      if (!cursor.isAtBeginning()) return self.triggerChangeEvent(this)
+        event.preventDefault()
+        event.stopPropagation()
+        self.notify('merge', this, 'before', cursor)
+      })
 
-      event.preventDefault()
-      event.stopPropagation()
-      self.notify('merge', this, 'before', cursor)
-    })
+      .on('delete', function (event) {
+        const range = self.selectionWatcher.getFreshRange()
+        if (!range.isCursor) return self.triggerChangeEvent(this)
 
-    .on('delete', function (event) {
-      const range = self.selectionWatcher.getFreshRange()
-      if (!range.isCursor) return self.triggerChangeEvent(this)
+        const cursor = range.getCursor()
+        if (!cursor.isAtTextEnd()) return self.triggerChangeEvent(this)
 
-      const cursor = range.getCursor()
-      if (!cursor.isAtTextEnd()) return self.triggerChangeEvent(this)
+        event.preventDefault()
+        event.stopPropagation()
+        self.notify('merge', this, 'after', cursor)
+      })
 
-      event.preventDefault()
-      event.stopPropagation()
-      self.notify('merge', this, 'after', cursor)
-    })
+      .on('enter', function (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        const range = self.selectionWatcher.getFreshRange()
+        const cursor = range.forceCursor()
 
-    .on('enter', function (event) {
-      event.preventDefault()
-      event.stopPropagation()
-      const range = self.selectionWatcher.getFreshRange()
-      const cursor = range.forceCursor()
+        if (cursor.isAtTextEnd()) {
+          self.notify('insert', this, 'after', cursor)
+        } else if (cursor.isAtBeginning()) {
+          self.notify('insert', this, 'before', cursor)
+        } else {
+          self.notify('split', this, cursor.before(), cursor.after(), cursor)
+        }
+      })
 
-      if (cursor.isAtTextEnd()) {
-        self.notify('insert', this, 'after', cursor)
-      } else if (cursor.isAtBeginning()) {
-        self.notify('insert', this, 'before', cursor)
-      } else {
-        self.notify('split', this, cursor.before(), cursor.after(), cursor)
-      }
-    })
+      .on('shiftEnter', function (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        const cursor = self.selectionWatcher.forceCursor()
+        self.notify('newline', this, cursor)
+      })
 
-    .on('shiftEnter', function (event) {
-      event.preventDefault()
-      event.stopPropagation()
-      const cursor = self.selectionWatcher.forceCursor()
-      self.notify('newline', this, cursor)
-    })
-
-    .on('character', function (event) {
-      self.notify('change', this)
-    })
+      .on('character', function (event) {
+        self.notify('change', this)
+      })
   }
 
   /**
