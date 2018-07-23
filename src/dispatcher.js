@@ -19,6 +19,7 @@ var isInputEventSupported = false
  * @submodule dispatcher
  */
 export default class Dispatcher {
+
   constructor (editable) {
     const win = editable.win
     eventable(this, editable)
@@ -39,11 +40,12 @@ export default class Dispatcher {
   */
   setup () {
     // setup all events notifications
-    this.setupElementEvents()
+    this.setupElementListeners()
     this.setupKeyboardEvents()
+    this.setupKeydownListener()
 
     if (selectionchange) {
-      this.setupSelectionChangeEvents()
+      this.setupSelectionChangeListeners()
     } else {
       this.setupSelectionChangeFallback()
     }
@@ -57,11 +59,9 @@ export default class Dispatcher {
   /**
   * Sets up events that are triggered on modifying an element.
   *
-  * @method setupElementEvents
-  * @param {HTMLElement} $document: The document element.
-  * @param {Function} notifier: The callback to be triggered when the event is caught.
+  * @method setupElementListeners
   */
-  setupElementEvents () {
+  setupElementListeners () {
     const self = this
     const selector = this.editableSelector
 
@@ -164,20 +164,28 @@ export default class Dispatcher {
   }
 
   /**
-  * Sets up events that are triggered on keyboard events.
-  * Keyboard definitions are in {{#crossLink "Keyboard"}}{{/crossLink}}.
+  * Sets up listener for keydown event which forwards events to
+  * the Keyboard instance.
   *
-  * @method setupKeyboardEvents
-  * @param {HTMLElement} $document: The document element.
-  * @param {Function} notifier: The callback to be triggered when the event is caught.
+  * @method setupKeydownListener
   */
-  setupKeyboardEvents () {
+  setupKeydownListener () {
     const self = this
 
     this.$document.on('keydown.editable', this.editableSelector, function (event) {
       const notifyCharacterEvent = !isInputEventSupported
       self.keyboard.dispatchKeyEvent(event, this, notifyCharacterEvent)
     })
+  }
+
+  /**
+  * Sets up handlers for the keyboard events.
+  * Keyboard definitions are in {{#crossLink "Keyboard"}}{{/crossLink}}.
+  *
+  * @method setupKeyboardEvents
+  */
+  setupKeyboardEvents () {
+    const self = this
 
     this.keyboard
       .on('left up', function (event) {
@@ -244,11 +252,11 @@ export default class Dispatcher {
   /**
   * Sets up events that are triggered on a selection change.
   *
-  * @method setupSelectionChangeEvents
+  * @method setupSelectionChangeListeners
   * @param {HTMLElement} $document: The document element.
   * @param {Function} notifier: The callback to be triggered when the event is caught.
   */
-  setupSelectionChangeEvents () {
+  setupSelectionChangeListeners () {
     let selectionDirty = false
     let suppressSelectionChanges = false
     const $document = this.$document
