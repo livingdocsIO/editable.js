@@ -39,21 +39,37 @@ export default class Dispatcher {
   * @method setup
   */
   setup () {
-    // setup all events notifications
-    this.setupElementListeners()
+    // setup all events listeners and keyboard handlers
     this.setupKeyboardEvents()
-    this.setupKeydownListener()
-
-    if (selectionchange) {
-      this.setupSelectionChangeListeners()
-    } else {
-      this.setupSelectionChangeFallback()
-    }
+    this.setupEventListeners()
   }
 
   unload () {
     this.off()
     this.$document.off('.editable')
+  }
+
+  suspend () {
+    if (this.suspended) return
+    this.suspended = true
+    this.$document.off('.editable')
+  }
+
+  continue () {
+    if (!this.suspended) return
+    this.suspended = false
+    this.setupEventListeners()
+  }
+
+  setupEventListeners () {
+    this.setupElementListeners()
+    this.setupKeydownListener()
+
+    if (selectionchange) {
+      this.setupSelectionChangeListeners()
+    } else {
+      this.setupSelectionChangeFallbackListeners()
+    }
   }
 
   /**
@@ -300,16 +316,14 @@ export default class Dispatcher {
   * Fallback solution to support selection change events on browsers that don't
   * support selectionChange.
   *
-  * @method setupSelectionChangeFallback
-  * @param {HTMLElement} $document: The document element.
-  * @param {Function} notifier: The callback to be triggered when the event is caught.
+  * @method setupSelectionChangeFallbackListeners
   */
-  setupSelectionChangeFallback () {
+  setupSelectionChangeFallbackListeners () {
     const $document = this.$document
     const selectionWatcher = this.selectionWatcher
 
     // listen for selection changes by mouse
-    $document.on('mouseup.editableSelection', (event) => {
+    $document.on('mouseup.editable', (event) => {
       // In Opera when clicking outside of a block
       // it does not update the selection as it should
       // without the timeout
