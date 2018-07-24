@@ -160,6 +160,7 @@ const Editable = module.exports = class Editable {
     $elem = $elem || $('.' + config.editableClass, body)
 
     $elem.removeAttr('contenteditable')
+    this.dispatcher.suspend()
     return this
   }
 
@@ -174,6 +175,7 @@ const Editable = module.exports = class Editable {
     $elem = $elem || $('.' + config.editableClass, body)
 
     $elem.attr('contenteditable', true)
+    this.dispatcher.continue()
     return this
   }
   /**
