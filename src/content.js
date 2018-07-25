@@ -83,8 +83,8 @@ export function extractContent (element, keepUiElements) {
     ? getInnerHtmlOfFragment(element)
     : element.innerHTML
   )
-  .replace(zeroWidthNonBreakingSpace, '') // Used for forcing inline elments to have a height
-  .replace(zeroWidthSpace, '<br>') // Used for cross-browser newlines
+    .replace(zeroWidthNonBreakingSpace, '') // Used for forcing inline elments to have a height
+    .replace(zeroWidthSpace, '<br>') // Used for cross-browser newlines
 
   const clone = document.createElement('div')
   clone.innerHTML = innerHtml
@@ -185,17 +185,17 @@ export function getInnerTags (range, filterFunc) {
   return range.getNodes([nodeType.elementNode], filterFunc)
 }
 
- // Transform an array of elements into a an array
- // of tagnames in uppercase
- //
- // @return example: ['STRONG', 'B']
+// Transform an array of elements into a an array
+// of tagnames in uppercase
+//
+// @return example: ['STRONG', 'B']
 export function getTagNames (elements = []) {
   return elements.map((element) => element.nodeName)
 }
 
 export function isAffectedBy (host, range, tagName) {
   return getTags(host, range)
-  .some((elem) => elem.nodeName === tagName.toUpperCase())
+    .some((elem) => elem.nodeName === tagName.toUpperCase())
 }
 
 // select a whole element
@@ -335,9 +335,9 @@ export function deleteCharacter (host, range, character) {
     range.getNodes([nodeType.textNode], (node) => {
       return node.nodeValue.search(charRegexp) >= 0
     })
-    .forEach((node) => {
-      node.nodeValue = node.nodeValue.replace(charRegexp, '')
-    })
+      .forEach((node) => {
+        node.nodeValue = node.nodeValue.replace(charRegexp, '')
+      })
   })
 
   restoredRange.normalizeBoundaries()

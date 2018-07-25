@@ -49,16 +49,16 @@ export function paste (element, cursor, callback) {
 
 export function injectPasteholder (document) {
   const pasteHolder = $('<div>')
-  .attr('contenteditable', true)
-  .css({
-    position: 'fixed',
-    right: '5px',
-    top: '50%',
-    width: '1px',
-    height: '1px',
-    overflow: 'hidden',
-    outline: 'none'
-  })
+    .attr('contenteditable', true)
+    .css({
+      position: 'fixed',
+      right: '5px',
+      top: '50%',
+      width: '1px',
+      height: '1px',
+      overflow: 'hidden',
+      outline: 'none'
+    })
 
   $(document.body).append(pasteHolder)
   return pasteHolder.get(0)
@@ -76,9 +76,9 @@ export function parseContent (element) {
   // Filter pasted content
   return filterHtmlElements(element)
   // Handle Blocks
-  .split(blockPlaceholder)
-  .map((entry) => string.trim(cleanWhitespace(entry)))
-  .filter((entry) => !whitespaceOnly.test(entry))
+    .split(blockPlaceholder)
+    .map((entry) => string.trim(cleanWhitespace(entry)))
+    .filter((entry) => !whitespaceOnly.test(entry))
 }
 
 export function filterHtmlElements (elem) {
@@ -152,10 +152,10 @@ export function shouldKeepNode (nodeName, node) {
 
 export function cleanWhitespace (str) {
   return str
-  .replace(/\n/g, ' ')
-  .replace(/ {2,}/g, ' ')
-  .replace(/(.)\u00A0/g, (match, group) => group + (/[\u0020]/.test(group)
-    ? '\u00A0'
-    : ' '
-  ))
+    .replace(/\n/g, ' ')
+    .replace(/ {2,}/g, ' ')
+    .replace(/(.)\u00A0/g, (match, group) => group + (/[\u0020]/.test(group)
+      ? '\u00A0'
+      : ' '
+    ))
 }

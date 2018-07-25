@@ -173,7 +173,7 @@ export default function createDefaultBehavior (editable) {
 
       // focus last element
       editable.createCursorAtEnd(currentElement)
-      .setVisibleSelection()
+        .setVisibleSelection()
     },
 
     clipboard (element, action, cursor) {
