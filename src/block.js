@@ -16,8 +16,8 @@ export function init (elem, {normalize, shouldSpellcheck}) {
   elem.setAttribute('spellcheck', Boolean(shouldSpellcheck))
 
   $(elem)
-  .removeClass(config.editableDisabledClass)
-  .addClass(config.editableClass)
+    .removeClass(config.editableDisabledClass)
+    .addClass(config.editableClass)
 
   if (normalize) content.tidyHtml(elem)
 }
@@ -30,8 +30,8 @@ export function disable (elem) {
   setState(elem, undefined)
 
   $(elem)
-  .removeClass(config.editableClass)
-  .addClass(config.editableDisabledClass)
+    .removeClass(config.editableClass)
+    .addClass(config.editableDisabledClass)
 }
 
 

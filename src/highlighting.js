@@ -168,9 +168,9 @@ export default class Highlighting {
 
   removeHighlights (editableHost) {
     $(editableHost).find('[data-highlight]')
-    .each((index, elem) => {
-      content.unwrap(elem)
-    })
+      .each((index, elem) => {
+        content.unwrap(elem)
+      })
   }
 
   removeHighlightsAtCursor (editableHost) {
