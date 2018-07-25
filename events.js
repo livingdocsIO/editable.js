@@ -101,122 +101,122 @@ function isFromFirstExample (elem) {
 export default function (editable) {
   editable
 
-  .on('focus', (elem) => {
-    if (!isFromFirstExample(elem)) return
-    showEvent({
-      name: 'focus'
+    .on('focus', (elem) => {
+      if (!isFromFirstExample(elem)) return
+      showEvent({
+        name: 'focus'
+      })
     })
-  })
 
-  .on('blur', (elem) => {
-    if (!isFromFirstExample(elem)) return
-    showEvent({
-      name: 'blur'
+    .on('blur', (elem) => {
+      if (!isFromFirstExample(elem)) return
+      showEvent({
+        name: 'blur'
+      })
     })
-  })
 
-  .on('cursor', (elem, cursor) => {
-    if (!isFromFirstExample(elem)) return
-    if (!cursor) return
-    let before = $(cursor.before()).text()
-    let after = $(cursor.after()).text()
-    const beforeMatch = /[^ ]{0,10}[ ]?$/.exec(before)
-    const afterMatch = /^[ ]?[^ ]{0,10}/.exec(after)
-    if (beforeMatch) before = beforeMatch[0]
-    if (beforeMatch) after = afterMatch[0]
-    showEvent({
-      name: 'cursor',
-      content: <CursorPosition before={before} after={after} />
+    .on('cursor', (elem, cursor) => {
+      if (!isFromFirstExample(elem)) return
+      if (!cursor) return
+      let before = $(cursor.before()).text()
+      let after = $(cursor.after()).text()
+      const beforeMatch = /[^ ]{0,10}[ ]?$/.exec(before)
+      const afterMatch = /^[ ]?[^ ]{0,10}/.exec(after)
+      if (beforeMatch) before = beforeMatch[0]
+      if (beforeMatch) after = afterMatch[0]
+      showEvent({
+        name: 'cursor',
+        content: <CursorPosition before={before} after={after} />
+      })
     })
-  })
 
-  .on('selection', (elem, selection) => {
-    if (!isFromFirstExample(elem)) return
-    if (!selection) return
-    showEvent({
-      name: 'selection',
-      content: <Selection content={selection.text()} />
+    .on('selection', (elem, selection) => {
+      if (!isFromFirstExample(elem)) return
+      if (!selection) return
+      showEvent({
+        name: 'selection',
+        content: <Selection content={selection.text()} />
+      })
     })
-  })
 
-  .on('change', (elem) => {
-    if (!isFromFirstExample(elem)) return
-    showEvent({
-      name: 'change'
+    .on('change', (elem) => {
+      if (!isFromFirstExample(elem)) return
+      showEvent({
+        name: 'change'
+      })
     })
-  })
 
-  .on('clipboard', (elem, action, selection) => {
-    if (!isFromFirstExample(elem)) return
-    showEvent({
-      name: 'clipboard',
-      content: <Clipboard action={action} content={selection.text()} />
+    .on('clipboard', (elem, action, selection) => {
+      if (!isFromFirstExample(elem)) return
+      showEvent({
+        name: 'clipboard',
+        content: <Clipboard action={action} content={selection.text()} />
+      })
     })
-  })
 
-  .on('paste', (elem, blocks, cursor) => {
-    if (!isFromFirstExample(elem)) return
+    .on('paste', (elem, blocks, cursor) => {
+      if (!isFromFirstExample(elem)) return
 
-    console.log(blocks)
-    let text = blocks.join(' ')
-    if (text.length > 40) text = text.substring(0, 38) + '...'
+      console.log(blocks)
+      let text = blocks.join(' ')
+      if (text.length > 40) text = text.substring(0, 38) + '...'
 
-    showEvent({
-      name: 'paste',
-      content: <Clipboard content={text} />
+      showEvent({
+        name: 'paste',
+        content: <Clipboard content={text} />
+      })
     })
-  })
 
-  .on('insert', (elem, direction, cursor) => {
-    if (!isFromFirstExample(elem)) return
-    const content = direction === 'after'
-      ? 'Insert a new block after the current one'
-      : 'Insert a new block before the current one'
+    .on('insert', (elem, direction, cursor) => {
+      if (!isFromFirstExample(elem)) return
+      const content = direction === 'after'
+        ? 'Insert a new block after the current one'
+        : 'Insert a new block before the current one'
 
-    showEvent({
-      name: 'insert',
-      content
+      showEvent({
+        name: 'insert',
+        content
+      })
     })
-  })
 
-  .on('split', (elem, fragmentA, fragmentB, cursor) => {
-    if (!isFromFirstExample(elem)) return
-    showEvent({
-      name: 'split',
-      content: 'Split this block'
+    .on('split', (elem, fragmentA, fragmentB, cursor) => {
+      if (!isFromFirstExample(elem)) return
+      showEvent({
+        name: 'split',
+        content: 'Split this block'
+      })
     })
-  })
 
-  .on('merge', (elem, direction) => {
-    if (!isFromFirstExample(elem)) return
-    const content = direction === 'after'
-      ? 'Merge this block with the following block'
-      : 'Merge this block with the previous block'
+    .on('merge', (elem, direction) => {
+      if (!isFromFirstExample(elem)) return
+      const content = direction === 'after'
+        ? 'Merge this block with the following block'
+        : 'Merge this block with the previous block'
 
-    showEvent({
-      name: 'merge',
-      content: content
+      showEvent({
+        name: 'merge',
+        content: content
+      })
     })
-  })
 
-  .on('switch', (elem, direction, cursor) => {
-    if (!isFromFirstExample(elem)) return
-    const content = direction === 'after'
-      ? 'Set the focus to the following block'
-      : 'Set the focus to the previous block'
+    .on('switch', (elem, direction, cursor) => {
+      if (!isFromFirstExample(elem)) return
+      const content = direction === 'after'
+        ? 'Set the focus to the following block'
+        : 'Set the focus to the previous block'
 
-    showEvent({
-      name: 'switch',
-      content: content
+      showEvent({
+        name: 'switch',
+        content: content
+      })
     })
-  })
 
-  .on('newline', (elem) => {
-    if (!isFromFirstExample(elem)) return
-    showEvent({
-      name: 'newline'
+    .on('newline', (elem) => {
+      if (!isFromFirstExample(elem)) return
+      showEvent({
+        name: 'newline'
+      })
     })
-  })
 
   draw()
 }

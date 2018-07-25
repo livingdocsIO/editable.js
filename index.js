@@ -68,7 +68,7 @@ function setupTooltip () {
     const left = coords.left + (coords.width / 2) - (tooltip.outerWidth() / 2)
     tooltip.css({top, left}).show()
   })
-  .blur(() => tooltip.hide())
+    .blur(() => tooltip.hide())
 
   setupTooltipListeners()
 }
@@ -77,64 +77,64 @@ function setupTooltipListeners () {
   // prevent editable from loosing focus
   $(document)
 
-  .on('mousedown', '.js-format', (event) => event.preventDefault())
+    .on('mousedown', '.js-format', (event) => event.preventDefault())
 
-  .on('click', '.js-format-bold', (event) => {
-    if (currentSelection.isSelection) {
-      currentSelection.toggleBold()
-      currentSelection.triggerChange()
-    }
-  })
+    .on('click', '.js-format-bold', (event) => {
+      if (currentSelection.isSelection) {
+        currentSelection.toggleBold()
+        currentSelection.triggerChange()
+      }
+    })
 
-  .on('click', '.js-format-italic', (event) => {
-    if (currentSelection.isSelection) {
-      currentSelection.toggleEmphasis()
-      currentSelection.triggerChange()
-    }
-  })
+    .on('click', '.js-format-italic', (event) => {
+      if (currentSelection.isSelection) {
+        currentSelection.toggleEmphasis()
+        currentSelection.triggerChange()
+      }
+    })
 
-  .on('click', '.js-format-underline', (event) => {
-    if (currentSelection.isSelection) {
-      currentSelection.toggleUnderline()
-      currentSelection.triggerChange()
-    }
-  })
+    .on('click', '.js-format-underline', (event) => {
+      if (currentSelection.isSelection) {
+        currentSelection.toggleUnderline()
+        currentSelection.triggerChange()
+      }
+    })
 
-  .on('click', '.js-format-link', (event) => {
-    if (currentSelection.isSelection) {
-      currentSelection.toggleLink('www.upfront.io')
-      currentSelection.triggerChange()
-    }
-  })
+    .on('click', '.js-format-link', (event) => {
+      if (currentSelection.isSelection) {
+        currentSelection.toggleLink('www.upfront.io')
+        currentSelection.triggerChange()
+      }
+    })
 
-  .on('click', '.js-format-quote', (event) => {
-    if (currentSelection.isSelection) {
-      currentSelection.toggleSurround('«', '»')
-      currentSelection.triggerChange()
-    }
-  })
+    .on('click', '.js-format-quote', (event) => {
+      if (currentSelection.isSelection) {
+        currentSelection.toggleSurround('«', '»')
+        currentSelection.triggerChange()
+      }
+    })
 
-  .on('click', '.js-format-emoji', (event) => {
-    if (currentSelection.isSelection) {
-      currentSelection.insertCharacter('😍')
-      currentSelection.triggerChange()
-    }
-  })
+    .on('click', '.js-format-emoji', (event) => {
+      if (currentSelection.isSelection) {
+        currentSelection.insertCharacter('😍')
+        currentSelection.triggerChange()
+      }
+    })
 
-  .on('click', '.js-format-whitespace', (event) => {
-    if (currentSelection.isSelection) {
+    .on('click', '.js-format-whitespace', (event) => {
+      if (currentSelection.isSelection) {
       // insert a special whitespace 'em-space'
-      currentSelection.insertCharacter(' ')
-      currentSelection.triggerChange()
-    }
-  })
+        currentSelection.insertCharacter(' ')
+        currentSelection.triggerChange()
+      }
+    })
 
-  .on('click', '.js-format-clear', (event) => {
-    if (currentSelection.isSelection) {
-      currentSelection.removeFormatting()
-      currentSelection.triggerChange()
-    }
-  })
+    .on('click', '.js-format-clear', (event) => {
+      if (currentSelection.isSelection) {
+        currentSelection.removeFormatting()
+        currentSelection.triggerChange()
+      }
+    })
 }
 
 function updateCode (elem) {
