@@ -38,12 +38,12 @@
     "karma-webpack": "^1.7.0",
     "normalize.css": "^4.1.1",
     "open-browser-webpack-plugin": "0.0.2",
+    "phantomjs-prebuilt": "^2.1.16",
     "prismjs": "^1.4.1",
     "react": "^15.3.2",
     "react-addons-css-transition-group": "^15.3.2",
     "react-dom": "^15.3.2",
     "rimraf": "^2.5.2",
-    "semantic-release": "^4.3.5",
     "sinon": "^2.0.0-pre",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
@@ -86,8 +86,6 @@
     "test:karma": "karma start",
     "test:watch": "npm run test:karma -s -- --single-run false",
     "lint": "eslint --ignore-path .gitignore .",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "postsemantic-release": "node ./bin/deploy-example.js",
     "coverage": "cat coverage/lcov/lcov.info | coveralls"
   }
 }
