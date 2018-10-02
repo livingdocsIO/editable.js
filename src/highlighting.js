@@ -27,7 +27,7 @@ export default class Highlighting {
       // remove highlights after a change if the cursor is inside a highlight
       removeOnCorrection: true,
       spellcheck: {
-        marker: '<span class="highlight-whitespace"></span>',
+        marker: '<span class="highlight-spellcheck"></span>',
         throttle: 1000,
         spellcheckService: function () {}
       },
