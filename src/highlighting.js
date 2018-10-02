@@ -5,7 +5,7 @@ import * as content from './content'
 import highlightText from './highlight-text'
 import SpellcheckService from './plugins/highlighting/spellcheck-service'
 import WhitespaceHighlighting from './plugins/highlighting/whitespace-highlighting'
-import WordHighlighting from './plugins/highlighting/word-highlighting'
+import WordHighlighting from './plugins/highlighting/text-highlighting'
 import MatchCollection from './plugins/highlighting/match-collection'
 
 export default class Highlighting {
