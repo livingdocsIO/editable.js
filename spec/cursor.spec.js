@@ -100,6 +100,13 @@ describe('Cursor', function () {
       })
     })
 
+    describe('textBefore()', () => {
+      it('gets the text before', () => {
+        const textBefore = this.cursor.textBefore()
+        expect(textBefore).toEqual('foobar')
+      })
+    })
+
     describe('beforeHtml()', () => {
       it('gets the content before', () => {
         expect(this.cursor.beforeHtml()).toEqual('foobar')
@@ -110,6 +117,13 @@ describe('Cursor', function () {
       it('gets the content after', () => {
         var fragment = this.cursor.after()
         expect(content.getInnerHtmlOfFragment(fragment)).toEqual('')
+      })
+    })
+
+    describe('textAfter()', () => {
+      it('gets the text after', () => {
+        var textAfter = this.cursor.textAfter()
+        expect(textAfter).toEqual('')
       })
     })
 

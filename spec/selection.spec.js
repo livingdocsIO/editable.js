@@ -41,6 +41,29 @@ describe('Selection', function () {
     })
   })
 
+  describe('textBefore() / textAfter()', function () {
+
+    beforeEach(function () {
+      // <div>a|b|c</div>
+      const host = $('<div>abc</div>')[0]
+      const range = rangy.createRange()
+      range.setStart(host.firstChild, 1)
+      range.setEnd(host.firstChild, 2)
+
+      this.selection = new Selection(host, range)
+    })
+
+    it('returns the text before', function () {
+      const textBefore = this.selection.textBefore()
+      expect(textBefore).toEqual('a')
+    })
+
+    it('returns the text after', function () {
+      const textAfter = this.selection.textAfter()
+      expect(textAfter).toEqual('c')
+    })
+  })
+
   describe('with a range', function () {
 
     beforeEach(function () {

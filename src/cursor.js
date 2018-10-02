@@ -109,8 +109,16 @@ export default class Cursor {
   // @returns {Document Fragment} content before the cursor or selection.
   before () {
     const range = this.range.cloneRange()
+    range.collapse(true)
     range.setStartBefore(this.host)
     return content.cloneRangeContents(range)
+  }
+
+  textBefore () {
+    const range = this.range.cloneRange()
+    range.collapse(true)
+    range.setStartBefore(this.host)
+    return range.toString()
   }
 
   // Same as before() but returns a string.
@@ -127,8 +135,16 @@ export default class Cursor {
   // @returns {Document Fragment} content after the cursor or selection.
   after () {
     const range = this.range.cloneRange()
+    range.collapse(false)
     range.setEndAfter(this.host)
     return content.cloneRangeContents(range)
+  }
+
+  textAfter () {
+    const range = this.range.cloneRange()
+    range.collapse(false)
+    range.setEndAfter(this.host)
+    return range.toString()
   }
 
   // Same as after() but returns a string.
