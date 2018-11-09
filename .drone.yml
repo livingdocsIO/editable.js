@@ -20,7 +20,7 @@ pipeline:
 
   build:
     image: node:8-alpine
-    commands: ["npm build"]
+    commands: ["npm run build"]
 
   # Disabled because phantomJS does not run on DroneCI at the moment
   # test:
