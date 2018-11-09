@@ -343,7 +343,6 @@ const Editable = module.exports = class Editable {
   // @param text {String}
   // @param highlightId {String} Optional
   //   Added to the highlight markups in the property `data-word-id`
-  // @param remove {Boolean} Optional
   highlight ({editableHost, text, highlightId}) {
     return highlightSupport.highlightText(editableHost, text, highlightId)
   }
