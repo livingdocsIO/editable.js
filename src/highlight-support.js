@@ -18,7 +18,18 @@ const highlightSupport = {
     if (matches && matches.length) {
       if (highlightId) matches[0].id = highlightId
       highlightText.highlightMatches(editableHost, matches)
+      return matches[0].startIndex
     }
+  },
+
+  updateHighlight (editableHost, highlightId, addCssClass, removeCssClass) {
+    if (!document.documentElement.classList) return
+
+    $(editableHost).find(`[data-word-id="${highlightId}"]`)
+      .each((index, elem) => {
+        if (removeCssClass) elem.classList.remove(removeCssClass)
+        if (addCssClass) elem.classList.add(addCssClass)
+      })
   },
 
   removeHighlight (editableHost, highlightId) {

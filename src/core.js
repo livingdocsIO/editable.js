@@ -344,12 +344,16 @@ const Editable = module.exports = class Editable {
   // @param highlightId {String} Optional
   //   Added to the highlight markups in the property `data-word-id`
   // @param remove {Boolean} Optional
-  highlight ({editableHost, text, highlightId, remove}) {
-    if (!remove) {
-      highlightSupport.highlightText(editableHost, text, highlightId)
-    } else {
-      highlightSupport.removeHighlight(editableHost, highlightId)
-    }
+  highlight ({editableHost, text, highlightId}) {
+    return highlightSupport.highlightText(editableHost, text, highlightId)
+  }
+
+  removeHighlight ({editableHost, highlightId}) {
+    highlightSupport.removeHighlight(editableHost, highlightId)
+  }
+
+  decorateHighlight ({editableHost, highlightId, addCssClass, removeCssClass}) {
+    highlightSupport.updateHighlight(editableHost, highlightId, addCssClass, removeCssClass)
   }
 
   /**
