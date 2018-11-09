@@ -18,6 +18,10 @@ pipeline:
   #   image: marcbachmann/eslint:5.2.0
   #   secrets: [gh_token]
 
+  build:
+    image: node:8-alpine
+    commands: ["npm build"]
+
   # Disabled because phantomJS does not run on DroneCI at the moment
   # test:
   #   group: test
