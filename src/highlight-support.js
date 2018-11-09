@@ -7,6 +7,8 @@ import TextHighlighting from './plugins/highlighting/text-highlighting'
 const highlightSupport = {
 
   highlightText (editableHost, text, highlightId) {
+    if (this.hasHighlight(editableHost, highlightId)) return
+
     let blockText = highlightText.extractText(editableHost)
 
     const marker = '<span class="highlight-comment"></span>'
@@ -37,6 +39,11 @@ const highlightSupport = {
       .each((index, elem) => {
         content.unwrap(elem)
       })
+  },
+
+  hasHighlight (editableHost, highlightId) {
+    const matches = $(editableHost).find(`[data-word-id="${highlightId}"]`)
+    return !!matches.length
   },
 
   createMarkerNode (markerMarkup, win) {
