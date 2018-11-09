@@ -5,10 +5,12 @@ import * as content from './content'
 import highlightText from './highlight-text'
 import SpellcheckService from './plugins/highlighting/spellcheck-service'
 import WhitespaceHighlighting from './plugins/highlighting/whitespace-highlighting'
-import WordHighlighting from './plugins/highlighting/word-highlighting'
+import WordHighlighting from './plugins/highlighting/text-highlighting'
 import MatchCollection from './plugins/highlighting/match-collection'
+import highlightSupport from './highlight-support'
 
 export default class Highlighting {
+
   constructor (editable, configuration, spellcheckConfig) {
     this.editable = editable
     this.win = editable.win
@@ -25,7 +27,7 @@ export default class Highlighting {
       // remove highlights after a change if the cursor is inside a highlight
       removeOnCorrection: true,
       spellcheck: {
-        marker: '<span class="highlight-whitespace"></span>',
+        marker: '<span class="highlight-spellcheck"></span>',
         throttle: 1000,
         spellcheckService: function () {}
       },
@@ -37,12 +39,14 @@ export default class Highlighting {
     this.config = $.extend(true, defaultConfig, configuration)
 
     let spellcheckService = this.config.spellcheck.spellcheckService
-    let spellcheckMarker = this.createMarkerNode(this.config.spellcheck.marker)
-    let whitespaceMarker = this.createMarkerNode(this.config.whitespace.marker)
+    const spellcheckMarker = this.config.spellcheck.marker
+    const whitespaceMarker = this.config.whitespace.marker
+    const spellcheckMarkerNode = highlightSupport.createMarkerNode(spellcheckMarker, this.win)
+    const whitespaceMarkerNode = highlightSupport.createMarkerNode(whitespaceMarker, this.win)
 
     this.spellcheckService = new SpellcheckService(spellcheckService)
-    this.spellcheck = new WordHighlighting(spellcheckMarker)
-    this.whitespace = new WhitespaceHighlighting(whitespaceMarker)
+    this.spellcheck = new WordHighlighting(spellcheckMarkerNode)
+    this.whitespace = new WhitespaceHighlighting(whitespaceMarkerNode)
 
     this.setupListeners()
   }
@@ -89,18 +93,6 @@ export default class Highlighting {
     }
   }
 
-  // Marker
-  // ------
-
-  createMarkerNode (markerMarkup) {
-    let marker = $(markerMarkup)[0]
-    marker = content.adoptElement(marker, this.win.document)
-
-    marker.setAttribute('data-editable', 'ui-unwrap')
-    marker.setAttribute('data-highlight', 'highlight')
-    return marker
-  }
-
   // Manage Highlights
   // -----------------
 
@@ -144,6 +136,8 @@ export default class Highlighting {
 
   }
 
+  // Calls highlightMatches internally but ensures
+  // that the selection stays the same
   safeHighlightMatches (editableHost, matches) {
     const selection = this.editable.getSelection(editableHost)
     if (selection) {

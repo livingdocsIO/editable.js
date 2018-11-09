@@ -51,7 +51,7 @@ export default {
         let isFirstPortion = isLastPortion = false
         if (totalOffset <= currentMatch.startIndex) {
           isFirstPortion = true
-          var wordId = currentMatch.startIndex
+          var wordId = currentMatch.id || currentMatch.startIndex
         }
         if (nodeEndOffset >= currentMatch.endIndex) {
           var isLastPortion = true

@@ -9,6 +9,7 @@ import * as content from './content'
 import * as clipboard from './clipboard'
 import Dispatcher from './dispatcher'
 import Cursor from './cursor'
+import highlightSupport from './highlight-support'
 import Highlighting from './highlighting'
 import createDefaultEvents from './create-default-events'
 import browser from 'bowser'
@@ -35,6 +36,7 @@ import browser from 'bowser'
  */
 
 const Editable = module.exports = class Editable {
+
   constructor (instanceConfig) {
     const defaultInstanceConfig = {
       window: window,
@@ -328,6 +330,29 @@ const Editable = module.exports = class Editable {
         this.highlighting.highlight(elem)
       }
     }
+  }
+
+  // Highlight text within an editable.
+  //
+  // The first occurrence of the provided 'text' will be highlighted.
+  //
+  // The markup used for the highlighting will be removed from
+  // the final content.
+  //
+  // @param editableHost {DomNode}
+  // @param text {String}
+  // @param highlightId {String} Optional
+  //   Added to the highlight markups in the property `data-word-id`
+  highlight ({editableHost, text, highlightId}) {
+    return highlightSupport.highlightText(editableHost, text, highlightId)
+  }
+
+  removeHighlight ({editableHost, highlightId}) {
+    highlightSupport.removeHighlight(editableHost, highlightId)
+  }
+
+  decorateHighlight ({editableHost, highlightId, addCssClass, removeCssClass}) {
+    highlightSupport.updateHighlight(editableHost, highlightId, addCssClass, removeCssClass)
   }
 
   /**

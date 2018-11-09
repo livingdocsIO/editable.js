@@ -8,7 +8,7 @@ import Cursor from '../src/cursor'
 
 // import Spellcheck from '../src/plugins/highlighting/spellcheck'
 
-describe('Spellcheck', function () {
+describe('Spellcheck:', function () {
 
   // Helpers
 

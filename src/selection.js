@@ -4,6 +4,8 @@ import Cursor from './cursor'
 import * as content from './content'
 import * as parser from './parser'
 import * as config from './config'
+import highlightSupport from './highlight-support'
+import highlightText from './highlight-text'
 
 /**
  * The Selection module provides a cross-browser abstraction layer for range
@@ -52,7 +54,7 @@ export default class Selection extends Cursor {
   // Get the ClientRects of this selection.
   // Use this if you want more precision than getBoundingClientRect can give.
   getRects () {
-    // todo: translate into absolute positions
+    // consider: translate into absolute positions
     // just like Cursor#getCoordinates()
     return this.range.nativeRange.getClientRects()
   }
@@ -83,6 +85,29 @@ export default class Selection extends Cursor {
     }
   }
 
+  // Maunally add a highlight
+  // Note: the current code does not work with newlines (LP)
+  highlight ({highlightId}) {
+    const textBefore = this.textBefore()
+    const currentTextContent = this.text()
+
+    const marker = '<span class="highlight-comment"></span>'
+    const markerNode = highlightSupport.createMarkerNode(marker, this.win)
+
+    markerNode.setAttribute('data-match', currentTextContent)
+
+    const match = {
+      startIndex: textBefore.length,
+      endIndex: textBefore.length + currentTextContent.length,
+      match: currentTextContent,
+      marker: markerNode
+    }
+
+    // Note: highlighting won't retain the selection
+    highlightText.highlightMatches(this.host, [match])
+  }
+
+  // toggle('<em>')
   toggle (elem) {
     elem = this.adoptElement(elem)
     this.range = content.toggleTag(this.host, this.range, elem)

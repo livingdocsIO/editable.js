@@ -4,7 +4,7 @@ import sinon from 'sinon'
 
 import Cursor from '../src/cursor'
 import highlightText from '../src/highlight-text'
-import WordHighlighter from '../src/plugins/highlighting/word-highlighting'
+import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
 
 describe('highlightText', function () {
 

@@ -2,7 +2,7 @@ import $ from 'jquery'
 
 import Editable from '../src/core'
 import Highlighting from '../src/highlighting'
-import WordHighlighter from '../src/plugins/highlighting/word-highlighting'
+import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
 
 describe('Highlighting', function () {
 
