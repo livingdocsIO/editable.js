@@ -6,6 +6,7 @@
     "jasmine": true
   },
   "parserOptions": {
+    "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true
     }
