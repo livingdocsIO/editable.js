@@ -85,7 +85,7 @@ export default class Selection extends Cursor {
     }
   }
 
-  // Maunally add a highlight
+  // Manually add a highlight
   // Note: the current code does not work with newlines (LP)
   highlight ({highlightId}) {
     const textBefore = this.textBefore()

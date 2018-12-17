@@ -12,7 +12,7 @@ const highlightSupport = {
     let blockText = highlightText.extractText(editableHost)
 
     const marker = '<span class="highlight-comment"></span>'
-    const markerNode = highlightSupport.createMarkerNode(marker, this.win)
+    const markerNode = highlightSupport.createMarkerNode(marker, 'highlight', this.win)
 
     const textSearch = new TextHighlighting(markerNode, 'text')
     const matches = textSearch.findMatches(blockText, [text])
@@ -46,7 +46,7 @@ const highlightSupport = {
     return !!matches.length
   },
 
-  createMarkerNode (markerMarkup, win) {
+  createMarkerNode (markerMarkup, highlightType, win) {
     let marker = $(markerMarkup)[0]
 
     if (win) {
@@ -54,7 +54,7 @@ const highlightSupport = {
     }
 
     marker.setAttribute('data-editable', 'ui-unwrap')
-    marker.setAttribute('data-highlight', 'highlight')
+    marker.setAttribute('data-highlight', highlightType)
     return marker
   }
 

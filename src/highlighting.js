@@ -41,8 +41,10 @@ export default class Highlighting {
     let spellcheckService = this.config.spellcheck.spellcheckService
     const spellcheckMarker = this.config.spellcheck.marker
     const whitespaceMarker = this.config.whitespace.marker
-    const spellcheckMarkerNode = highlightSupport.createMarkerNode(spellcheckMarker, this.win)
-    const whitespaceMarkerNode = highlightSupport.createMarkerNode(whitespaceMarker, this.win)
+    const spellcheckMarkerNode = highlightSupport
+      .createMarkerNode(spellcheckMarker, 'spellcheck', this.win)
+    const whitespaceMarkerNode = highlightSupport
+      .createMarkerNode(whitespaceMarker, 'spellcheck', this.win)
 
     this.spellcheckService = new SpellcheckService(spellcheckService)
     this.spellcheck = new WordHighlighting(spellcheckMarkerNode)
@@ -161,7 +163,7 @@ export default class Highlighting {
   }
 
   removeHighlights (editableHost) {
-    $(editableHost).find('[data-highlight]')
+    $(editableHost).find('[data-highlight="spellcheck"]')
       .each((index, elem) => {
         content.unwrap(elem)
       })
