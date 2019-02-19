@@ -84,7 +84,8 @@ export default class Dispatcher {
     this.$document
       .on('focus.editable', selector, function (event) {
         if (this.getAttribute(config.pastingAttribute)) return
-        self.notify('focus', this)
+        const selection = self.selectionWatcher.getFreshSelection()
+        self.notify('focus', this, selection)
       })
 
       .on('blur.editable', selector, function (event) {

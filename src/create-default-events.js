@@ -11,8 +11,10 @@ export default function createDefaultEvents (editable) {
      * @event focus
      * @param {HTMLElement} element The element triggering the event.
      */
-    focus (element) {
+    focus (element, selection) {
+      console.log(element, selection)
       behavior.focus(element)
+      behavior.selection(element, selection)
     },
 
     /**
@@ -35,7 +37,10 @@ export default function createDefaultEvents (editable) {
      * @param {String} action The flow action: "start" or "pause".
      */
     flow (element, action) {
-      behavior.flow(element, action)
+      behavior.flow(
+        element,
+        action
+      )
     },
 
     /**
