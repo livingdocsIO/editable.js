@@ -12,7 +12,6 @@ export default function createDefaultEvents (editable) {
      * @param {HTMLElement} element The element triggering the event.
      */
     focus (element, selection) {
-      console.log(element, selection)
       behavior.focus(element)
       behavior.selection(element, selection)
     },
