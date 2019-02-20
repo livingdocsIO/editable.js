@@ -5,10 +5,9 @@ import Cursor from '../src/cursor'
 import Editable from '../src/core'
 
 describe('Default Events', () => {
-  let $elem, editable, focus, blur
 
   // create a Cursor object and set the selection to it
-  function createCursor (range) {
+  function createCursor ($elem, range) {
     const cursor = new Cursor($elem[0], range)
     cursor.setSelection()
     return cursor
@@ -23,7 +22,7 @@ describe('Default Events', () => {
 
   let onListener
   // register one listener per test
-  function on (eventName, func) {
+  function on (editable, eventName, func) {
     // off() // make sure the last listener is unregistered
     const obj = { calls: 0 }
     function proxy () {
@@ -36,7 +35,7 @@ describe('Default Events', () => {
   }
 
   // unregister the event listener registered with 'on'
-  function off () {
+  function off (editable) {
     if (onListener) {
       editable.unload()
       onListener = undefined
@@ -44,34 +43,33 @@ describe('Default Events', () => {
   }
 
   describe('for editable', () => {
-    beforeEach(() => {
-      $elem = $('<div contenteditable="true"></div>')
-      $(document.body).append($elem)
-      editable = new Editable()
-      editable.add($elem)
-      $elem.focus()
-    })
 
-    afterEach(() => {
-      off()
-      editable.dispatcher.off()
-      $elem.remove()
-    })
 
     describe('on focus', () => {
-      beforeEach(() => {
-        focus = $.Event('focus')
-        blur = $.Event('blur')
+
+      beforeEach(function () {
+        this.focus = $.Event('focus')
+        this.blur = $.Event('blur')
+        this.$elem = $('<div />')
+        $(document.body).append(this.$elem)
+        this.editable = new Editable()
+        this.editable.add(this.$elem)
+        this.$elem.focus()
+      })
+      afterEach(function () {
+        off(this.editable)
+        this.editable.dispatcher.off()
+        this.$elem.remove()
       })
 
-      it('always dispatches with virtual and native ranges in sync.', () => {
+      it('always dispatches with virtual and native ranges in sync.', function () {
         // <div>foo\</div>
-        $elem.html('foo')
-        createCursor(createRangeAtEnd($elem[0]))
+        this.$elem.html('foo')
+        createCursor(this.$elem, createRangeAtEnd(this.$elem[0]))
 
-        const onFocus = on('focus', (element, selection) => {
+        const onFocus = on(this.editable, 'focus', (element, selection) => {
           if (!selection) return
-          expect(element).toEqual($elem[0])
+          expect(element).toEqual(this.$elem[0])
           const range = selection.range
           const nativeRange = range.nativeRange
           expect(range.startContainer).toEqual(nativeRange.startContainer)
@@ -80,9 +78,9 @@ describe('Default Events', () => {
           expect(range.endOffset).toEqual(nativeRange.endOffset)
         })
 
-        $elem.trigger(focus)
-        $elem.trigger(blur)
-        $elem.trigger(focus)
+        this.$elem.trigger(this.focus)
+        this.$elem.trigger(this.blur)
+        this.$elem.trigger(this.focus)
         expect(onFocus.calls).toEqual(2)
       })
     })
