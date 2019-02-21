@@ -11,9 +11,8 @@ export default function createDefaultEvents (editable) {
      * @event focus
      * @param {HTMLElement} element The element triggering the event.
      */
-    focus (element, selection) {
+    focus (element) {
       behavior.focus(element)
-      behavior.selection(element, selection)
     },
 
     /**
