@@ -35,10 +35,7 @@ export default function createDefaultEvents (editable) {
      * @param {String} action The flow action: "start" or "pause".
      */
     flow (element, action) {
-      behavior.flow(
-        element,
-        action
-      )
+      behavior.flow(element, action)
     },
 
     /**
