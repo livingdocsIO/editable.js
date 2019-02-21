@@ -23,11 +23,18 @@ export default class SelectionWatcher {
   }
 
   /**
+   * Updates the internal selection pointer to the current rangy selection.
+   */
+  syncSelection () {
+    this.rangySelection = rangy.getSelection(this.win)
+  }
+
+  /**
   * Return a RangeContainer if the current selection is within an editable
   * otherwise return an empty RangeContainer
   */
   getRangeContainer () {
-    this.rangySelection = rangy.getSelection(this.win)
+    this.syncSelection()
 
     // rangeCount is 0 or 1 in all browsers except firefox
     // firefox can work with multiple ranges
