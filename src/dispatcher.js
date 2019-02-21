@@ -84,6 +84,7 @@ export default class Dispatcher {
     this.$document
       .on('focus.editable', selector, function (event) {
         if (this.getAttribute(config.pastingAttribute)) return
+        self.selectionWatcher.syncSelection()
         self.notify('focus', this)
       })
 
