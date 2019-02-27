@@ -24,6 +24,25 @@ const highlightSupport = {
     }
   },
 
+  highlightRange (editableHost, text, highlightId, startIndex, endIndex) {
+    if (this.hasHighlight(editableHost, highlightId)) return
+    const marker = highlightSupport.createMarkerNode(
+      '<span class="highlight-comment"></span>',
+      'highlight',
+      this.win
+    )
+
+    const match = {
+      id: highlightId,
+      startIndex,
+      endIndex,
+      match: text,
+      marker: marker
+    }
+    highlightText.highlightMatches(editableHost, [match])
+    return match.startIndex
+  },
+
   updateHighlight (editableHost, highlightId, addCssClass, removeCssClass) {
     if (!document.documentElement.classList) return
 

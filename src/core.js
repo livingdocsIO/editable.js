@@ -1,5 +1,6 @@
 import $ from 'jquery'
 import rangy from 'rangy'
+import 'rangy/lib/rangy-textrange'
 
 import * as config from './config'
 import error from './util/error'
@@ -332,19 +333,36 @@ const Editable = module.exports = class Editable {
     }
   }
 
-  // Highlight text within an editable.
-  //
-  // The first occurrence of the provided 'text' will be highlighted.
-  //
-  // The markup used for the highlighting will be removed from
-  // the final content.
-  //
-  // @param editableHost {DomNode}
-  // @param text {String}
-  // @param highlightId {String} Optional
-  //   Added to the highlight markups in the property `data-word-id`
-  highlight ({editableHost, text, highlightId}) {
-    return highlightSupport.highlightText(editableHost, text, highlightId)
+  /**
+   * Highlight text within an editable.
+   *
+   * By default highlights all occurences of `text`.
+   * Pass it a `textRange` object to highlight a
+   * specific text portion.
+   *
+   * The markup used for the highlighting will be removed
+   * from the final content.
+   *
+   *
+   * @param  {Object} options
+   * @param  {DOMNode} options.editableHost
+   * @param  {String} options.text
+   * @param  {String} options.highlightId Added to the highlight markups in the property `data-word-id`
+   * @param  {Object} [options.textRange] An optional range which gets used to set the markers.
+   * @param  {Number} [options.textRange.start]
+   * @param  {Number} [options.textRange.end]
+   * @return {Number}
+   */
+  highlight ({editableHost, text, highlightId, textRange}) {
+    return !textRange
+      ? highlightSupport.highlightText(editableHost, text, highlightId)
+      : (
+        typeof textRange.start === 'number' && typeof textRange.end === 'number'
+          ? highlightSupport.highlightRange(editableHost, text, highlightId, textRange.start, textRange.end)
+          : !error(
+            'Error in editable.highlight: You passed a textRange object with invalid keys. Expected shape: { start: Number, end: Number }'
+          ) && -1
+      )
   }
 
   removeHighlight ({editableHost, highlightId}) {
