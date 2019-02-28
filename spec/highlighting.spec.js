@@ -4,6 +4,7 @@ import Editable from '../src/core'
 import Highlighting from '../src/highlighting'
 import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
 
+
 describe('Highlighting', function () {
 
   // Specs
@@ -51,6 +52,63 @@ describe('Highlighting', function () {
       expect(firstMatch.match).toEqual('juice')
       expect(firstMatch.startIndex).toEqual(5)
       expect(firstMatch.endIndex).toEqual(10)
+    })
+  })
+
+  describe('highlightSupport', () => {
+
+    beforeEach(() => {
+      this.$div = $('<div>Foobarista</div>').appendTo(document.body)
+      this.editable = new Editable()
+      this.editable.add(this.$div)
+    })
+
+    afterEach(() => {
+      this.$div.remove()
+      this.editable.off()
+      this.editable = undefined
+    })
+
+    it('can highlight text range matches', () => {
+      const startIndex = this.editable.highlight({
+        editableHost: this.$div[0],
+        text: 'bari',
+        highlightId: 'myId',
+        textRange: {start: 3, end: 7}
+      })
+      const highlightSpan = this.$div.find('[data-word-id="myId"]')
+      expect(highlightSpan.length).toEqual(1)
+      expect(highlightSpan.text()).toEqual('bari')
+      expect(startIndex).toEqual(3)
+    })
+
+    it('skips if a highlight with the given id is already present', () => {
+      this.editable.highlight({
+        editableHost: this.$div[0],
+        text: 'bari',
+        highlightId: 'myId',
+        textRange: {start: 3, end: 7}
+      })
+      this.editable.highlight({
+        editableHost: this.$div[0],
+        text: 'Foobari',
+        highlightId: 'myId',
+        textRange: {start: 0, end: 7}
+      })
+      const highlightSpan = this.$div.find('[data-word-id="myId"]')
+      expect(highlightSpan.length).toEqual(1)
+      expect(highlightSpan.text()).toEqual('bari')
+    })
+
+    it('skips if an invalid range object was passed', () => {
+      this.editable.highlight({
+        editableHost: this.$div[0],
+        text: 'bari',
+        highlightId: 'myId',
+        textRange: {foo: 3, bar: 7}
+      })
+      const highlightSpan = this.$div.find('[data-word-id="myId"]')
+      expect(highlightSpan.length).toEqual(0)
     })
   })
 
