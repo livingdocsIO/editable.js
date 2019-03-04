@@ -2,6 +2,7 @@ import $ from 'jquery'
 import rangy from 'rangy'
 import 'rangy/lib/rangy-textrange'
 
+
 import * as config from './config'
 import error from './util/error'
 import * as parser from './parser'
@@ -363,6 +364,13 @@ const Editable = module.exports = class Editable {
             'Error in editable.highlight: You passed a textRange object with invalid keys. Expected shape: { start: Number, end: Number }'
           ) && -1
       )
+  }
+
+  getHighlightPositions ({ editableHost }) {
+    return highlightSupport.extractHighlightedRanges(
+      editableHost,
+      this.getSelection(editableHost),
+    )
   }
 
   removeHighlight ({editableHost, highlightId}) {

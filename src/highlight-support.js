@@ -65,6 +65,29 @@ const highlightSupport = {
     return !!matches.length
   },
 
+  extractHighlightedRanges (editableHost, selection) {
+    const markers = $(editableHost).find('[data-word-id]')
+    if (!markers.length) {
+      return
+    }
+    const res = {}
+    markers.each((_, marker) => {
+      const highlightId = $(marker).data('word-id')
+      res[highlightId] = this.extractMarkerNodePosition(
+        editableHost, selection, marker
+      )
+    })
+    return res
+  },
+
+  extractMarkerNodePosition (editableHost, selection, marker) {
+    const range = selection && selection.range
+    if (range) {
+      range.selectNode(marker)
+      return range.toCharacterRange(editableHost)
+    }
+  },
+
   createMarkerNode (markerMarkup, highlightType, win) {
     let marker = $(markerMarkup)[0]
 
