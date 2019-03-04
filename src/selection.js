@@ -7,6 +7,9 @@ import * as config from './config'
 import highlightSupport from './highlight-support'
 import highlightText from './highlight-text'
 
+import 'rangy/lib/rangy-textrange'
+
+
 /**
  * The Selection module provides a cross-browser abstraction layer for range
  * and selection.
@@ -49,6 +52,10 @@ export default class Selection extends Cursor {
       this.range.endContainer,
       this.range.endOffset
     )
+  }
+
+  getTextRange () {
+    return this.range.toCharacterRange(this.host)
   }
 
   // Get the ClientRects of this selection.
