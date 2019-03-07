@@ -1,9 +1,8 @@
 import $ from 'jquery'
-
+import rangy from 'rangy'
 import * as content from './content'
 import highlightText from './highlight-text'
 import TextHighlighting from './plugins/highlighting/text-highlighting'
-import rangy from 'rangy'
 
 const highlightSupport = {
 
@@ -26,7 +25,9 @@ const highlightSupport = {
   },
 
   highlightRange (editableHost, text, highlightId, startIndex, endIndex) {
-    if (this.hasHighlight(editableHost, highlightId)) return
+    if (this.hasHighlight(editableHost, highlightId)) {
+      this.removeHighlight(editableHost, highlightId)
+    }
     const marker = highlightSupport.createMarkerNode(
       '<span class="highlight-comment"></span>',
       'highlight',
@@ -71,21 +72,42 @@ const highlightSupport = {
     if (!markers.length) {
       return
     }
-    const res = {}
+    const groups = {}
     markers.each((_, marker) => {
       const highlightId = $(marker).data('word-id')
-      res[highlightId] = this.extractMarkerNodePosition(
-        editableHost, marker
-      )
+      if (!groups[highlightId]) {
+        groups[highlightId] = $(editableHost).find('[data-word-id="' + highlightId + '"]')
+      }
     })
+    const res = {}
+    Object.keys(groups).forEach(highlightId => {
+      const position = this.extractMarkerNodePosition(editableHost, groups[highlightId])
+      if (position) {
+        res[highlightId] = position
+      }
+    })
+
     return res
   },
 
-  extractMarkerNodePosition (editableHost, marker) {
+  extractMarkerNodePosition (editableHost, markers) {
     const range = rangy.createRange()
-    if (range) {
-      range.selectNode(marker)
-      return range.toCharacterRange(editableHost)
+    if (markers.length > 1) {
+      range.setStartBefore(markers.first()[0])
+      range.setEndAfter(markers.last()[0])
+    } else {
+      range.selectNode(markers[0])
+    }
+    const rangeUntilMarker = rangy.createRange()
+    rangeUntilMarker.setStart(editableHost, 0)
+    rangeUntilMarker.setEnd(range.startContainer, range.startOffset)
+
+    const numNewLinesBefore = $('<div>' + rangeUntilMarker.toHtml() + '</div>').find('br').length
+    const numNewLinesWithin = $('<div>' + range.toHtml() + '</div>').find('br').length
+    const textRange = range.toCharacterRange(editableHost)
+    return {
+      start: textRange.start + numNewLinesBefore,
+      end: textRange.end + numNewLinesWithin + numNewLinesBefore
     }
   },
 
