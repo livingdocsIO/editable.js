@@ -1,14 +1,12 @@
 import $ from 'jquery'
 
+import 'rangy/lib/rangy-textrange'
 import Cursor from './cursor'
 import * as content from './content'
 import * as parser from './parser'
 import * as config from './config'
 import highlightSupport from './highlight-support'
 import highlightText from './highlight-text'
-
-import 'rangy/lib/rangy-textrange'
-
 
 /**
  * The Selection module provides a cross-browser abstraction layer for range
