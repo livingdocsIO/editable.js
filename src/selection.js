@@ -1,6 +1,6 @@
-import $ from 'jquery'
 
 import 'rangy/lib/rangy-textrange'
+import $ from 'jquery'
 import Cursor from './cursor'
 import * as content from './content'
 import * as parser from './parser'

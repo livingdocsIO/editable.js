@@ -1,8 +1,5 @@
 import $ from 'jquery'
 import rangy from 'rangy'
-import 'rangy/lib/rangy-textrange'
-
-
 import * as config from './config'
 import error from './util/error'
 import * as parser from './parser'
