@@ -352,18 +352,25 @@ const Editable = module.exports = class Editable {
    * @param  {Object} [options.textRange] An optional range which gets used to set the markers.
    * @param  {Number} [options.textRange.start]
    * @param  {Number} [options.textRange.end]
-   * @return {Number}
+   * @return {Number} The text-based start offset of the newly applied highlight or `-1` if the range was considered invalid.
    */
   highlight ({editableHost, text, highlightId, textRange}) {
-    return !textRange
-      ? highlightSupport.highlightText(editableHost, text, highlightId)
-      : (
-        typeof textRange.start === 'number' && typeof textRange.end === 'number'
-          ? highlightSupport.highlightRange(editableHost, text, highlightId, textRange.start, textRange.end)
-          : !error(
-            'Error in editable.highlight: You passed a textRange object with invalid keys. Expected shape: { start: Number, end: Number }'
-          ) && -1
+    if (!textRange) {
+      return highlightSupport.highlightText(editableHost, text, highlightId)
+    }
+    if (typeof textRange.start !== 'number' || typeof textRange.end !== 'number') {
+      error(
+        'Error in Editable.highlight: You passed a textRange object with invalid keys. Expected shape: { start: Number, end: Number }'
       )
+      return -1
+    }
+    if (textRange.start === textRange.end) {
+      error(
+        'Error in Editable.highlight: You passed a textRange object with equal start and end offsets, which is considered a cursor and therefore unfit to create a highlight.'
+      )
+      return -1
+    }
+    return highlightSupport.highlightRange(editableHost, text, highlightId, textRange.start, textRange.end)
   }
 
   /**
