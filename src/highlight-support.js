@@ -3,6 +3,7 @@ import $ from 'jquery'
 import * as content from './content'
 import highlightText from './highlight-text'
 import TextHighlighting from './plugins/highlighting/text-highlighting'
+import rangy from 'rangy'
 
 const highlightSupport = {
 
@@ -65,7 +66,7 @@ const highlightSupport = {
     return !!matches.length
   },
 
-  extractHighlightedRanges (editableHost, selection) {
+  extractHighlightedRanges (editableHost) {
     const markers = $(editableHost).find('[data-word-id]')
     if (!markers.length) {
       return
@@ -74,14 +75,14 @@ const highlightSupport = {
     markers.each((_, marker) => {
       const highlightId = $(marker).data('word-id')
       res[highlightId] = this.extractMarkerNodePosition(
-        editableHost, selection, marker
+        editableHost, marker
       )
     })
     return res
   },
 
-  extractMarkerNodePosition (editableHost, selection, marker) {
-    const range = selection && selection.range
+  extractMarkerNodePosition (editableHost, marker) {
+    const range = rangy.createRange()
     if (range) {
       range.selectNode(marker)
       return range.toCharacterRange(editableHost)
