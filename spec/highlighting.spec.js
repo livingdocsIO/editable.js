@@ -1,15 +1,38 @@
 import $ from 'jquery'
-
-import Selection from '../src/selection'
-import rangy from 'rangy'
-import highlightSupport from '../src/highlight-support'
 import Editable from '../src/core'
 import Highlighting from '../src/highlighting'
 import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
 
-describe('Highlighting', function () {
-  // Specs
 
+function setupHighlightEnv (context, text) {
+  context.text = text
+  context.$div = $('<div>' + context.text + '</div>').appendTo(document.body)
+  context.editable = new Editable()
+  context.editable.add(context.$div)
+
+  context.highlightRange = (highlightId, start, end) => {
+    return context.editable.highlight({
+      editableHost: context.$div[0],
+      text: context.text.substring(start, end),
+      highlightId,
+      textRange: { start, end }
+    })
+  }
+
+  context.extract = () => {
+    return context.editable.getHighlightPositions({editableHost: context.$div[0]})
+  }
+}
+
+function teardownHighlightEnv (context) {
+  context.$div.remove()
+  context.editable.off()
+  context.editable = undefined
+  context.highlightRange = undefined
+  context.assertUniqueSpan = undefined
+}
+
+describe('Highlighting', function () {
   beforeEach(() => {
     this.editable = new Editable()
   })
@@ -55,82 +78,212 @@ describe('Highlighting', function () {
 
   describe('highlightSupport', () => {
     beforeEach(() => {
-      this.$div = $('<div>Foobarista</div>').appendTo(document.body)
-      this.editable = new Editable()
-      this.editable.add(this.$div)
-      const range = rangy.createRange()
-      range.selectNodeContents(this.$div[0])
-      this.selection = new Selection(this.$div[0], range)
+      setupHighlightEnv(this, 'People Make The <br> World Go Round')
     })
 
     afterEach(() => {
-      this.$div.remove()
-      this.editable.off()
-      this.editable = undefined
+      teardownHighlightEnv(this)
     })
 
-    it('can highlight text range matches', () => {
-      const startIndex = this.editable.highlight({
-        editableHost: this.$div[0],
-        text: 'bari',
-        highlightId: 'myId',
-        textRange: { start: 3, end: 7 }
+    it('can handle a single highlight', () => {
+      const startIndex = this.highlightRange('myId', 3, 7)
+      expect(
+        this.extract()
+      ).toEqual({
+        myId: {
+          start: 3,
+          end: 7
+        }
       })
-      const highlightSpan = this.$div.find('[data-word-id="myId"]')
-      expect(highlightSpan.length).toEqual(1)
-      expect(highlightSpan.text()).toEqual('bari')
       expect(startIndex).toEqual(3)
     })
 
-    it('can extract a text-based range object', () => {
-      const editableHost = this.$div[0]
-      this.editable.highlight({
-        editableHost,
-        text: 'bari',
-        highlightId: 'myId',
-        textRange: { start: 3, end: 7 }
-      })
+    it('can handle adjaccent highlights', () => {
+      this.highlightRange('first', 0, 1)
+      this.highlightRange('second', 1, 2)
+      this.highlightRange('third', 2, 3)
+      this.highlightRange('fourth', 3, 4)
 
-      this.editable.highlight({
-        editableHost,
-        text: 'Fo',
-        highlightId: 'mySecondId',
-        textRange: { start: 0, end: 2 }
+      expect(
+        this.extract()
+      ).toEqual({
+        first: {
+          start: 0,
+          end: 1
+        },
+        second: {
+          start: 1,
+          end: 2
+        },
+        third: {
+          start: 2,
+          end: 3
+        },
+        fourth: {
+          start: 3,
+          end: 4
+        }
       })
-      const extractedHighlightPositions = highlightSupport.extractHighlightedRanges(editableHost, this.selection)
-      expect(extractedHighlightPositions.myId).toBeDefined()
-      expect(extractedHighlightPositions.myId.start).toEqual(3)
-      expect(extractedHighlightPositions.myId.end).toEqual(7)
-      expect(extractedHighlightPositions.mySecondId).toBeDefined()
-      expect(extractedHighlightPositions.mySecondId.start).toEqual(0)
-      expect(extractedHighlightPositions.mySecondId.end).toEqual(2)
     })
 
-    it('skips if a highlight with the given id is already present', () => {
-      this.editable.highlight({
-        editableHost: this.$div[0],
-        text: 'bari',
-        highlightId: 'myId',
-        textRange: { start: 3, end: 7 }
+    it('can handle nested highlights', () => {
+      this.highlightRange('first', 0, 1)
+      this.highlightRange('second', 1, 2)
+      this.highlightRange('third', 2, 6)
+      this.highlightRange('fourth', 0, 6)
+      expect(
+        this.extract()
+      ).toEqual({
+        first: {
+          start: 0,
+          end: 1
+        },
+        second: {
+          start: 1,
+          end: 2
+        },
+        third: {
+          start: 2,
+          end: 6
+        },
+        fourth: {
+          start: 0,
+          end: 6
+        }
       })
-      this.editable.highlight({
-        editableHost: this.$div[0],
-        text: 'Foobari',
-        highlightId: 'myId',
-        textRange: { start: 0, end: 7 }
-      })
-      const highlightSpan = this.$div.find('[data-word-id="myId"]')
-      expect(highlightSpan.length).toEqual(1)
-      expect(highlightSpan.text()).toEqual('bari')
     })
 
-    it('skips if an invalid range object was passed', () => {
+    it('can handle intersecting highlights', () => {
+      this.highlightRange('first', 0, 3)
+      this.highlightRange('second', 3, 7)
+      this.highlightRange('third', 4, 6)
+      expect(
+        this.extract()
+      ).toEqual({
+        first: {
+          start: 0,
+          end: 3
+        },
+        second: {
+          start: 3,
+          end: 7
+        },
+        third: {
+          start: 4,
+          end: 6
+        }
+      })
+    })
+
+    it('can handle highlights containing newlines', () => {
+      this.highlightRange('first', 11, 22)
+      expect(
+        this.extract()
+      ).toEqual({
+        first: {
+          start: 11,
+          end: 22
+        }
+      })
+    })
+
+    it('can handle identical ranges', () => {
+      this.highlightRange('first', 11, 22)
+      this.highlightRange('second', 11, 22)
+      expect(
+        this.extract()
+      ).toEqual({
+        first: {
+          start: 11,
+          end: 22
+        },
+        second: {
+          start: 11,
+          end: 22
+        }
+      })
+    })
+
+    it('will update any existing range found under `highlightId` aka upsert', () => {
+      this.highlightRange('first', 11, 22)
+      this.highlightRange('first', 8, 9)
+      expect(
+        this.extract()
+      ).toEqual({
+        first: {
+          start: 8,
+          end: 9
+        }
+      })
+    })
+
+    it('can handle all cases combined', () => {
+      this.highlightRange('first', 4, 8)
+      this.highlightRange('second', 2, 10)
+      this.highlightRange('third', 4, 5)
+      this.highlightRange('first', 0, 24)
+      this.highlightRange('fourth', 20, 32)
+      this.highlightRange('fifth', 15, 16)
+      this.highlightRange('sixth', 15, 16)
+      expect(
+        this.extract()
+      ).toEqual({
+        first: {
+          start: 0,
+          end: 24
+        },
+        second: {
+          start: 2,
+          end: 10
+        },
+        third: {
+          start: 4,
+          end: 5
+        },
+        fourth: {
+          start: 20,
+          end: 32
+        },
+        fifth: {
+          start: 15,
+          end: 16
+        },
+        sixth: {
+          start: 15,
+          end: 16
+        }
+      })
+    })
+
+    it('creates consistent output', () => {
+      this.highlightRange('first', 11, 22)
+      const ranges = this.extract()
+      const content = this.editable.getContent(this.$div[0])
+      expect(content).toEqual(this.text)
+      this.$div.html(content)
+      this.highlightRange('first', ranges.first.start, ranges.first.end)
+      expect(this.extract()).toEqual(ranges)
+    })
+
+    it('skips and warns if an invalid range object was passed', () => {
       this.editable.highlight({
         editableHost: this.$div[0],
-        text: 'bari',
+        text: 'ple ',
         highlightId: 'myId',
         textRange: { foo: 3, bar: 7 }
       })
+      const highlightSpan = this.$div.find('[data-word-id="myId"]')
+      expect(highlightSpan.length).toEqual(0)
+    })
+
+    it('skips and warns if the range object represents a cursor', () => {
+      this.editable.highlight({
+        editableHost: this.$div[0],
+        text: 'ple ',
+        highlightId: 'myId',
+        textRange: { start: 3, end: 3 }
+      })
+
       const highlightSpan = this.$div.find('[data-word-id="myId"]')
       expect(highlightSpan.length).toEqual(0)
     })
