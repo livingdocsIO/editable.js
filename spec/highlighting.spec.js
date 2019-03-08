@@ -265,8 +265,8 @@ describe('Highlighting', function () {
       for (let highlightId in ranges) {
         this.highlightRange(
           highlightId,
-          expectedRanges[highlightId].start,
-          expectedRanges[highlightId].end
+          ranges[highlightId].start,
+          ranges[highlightId].end
         )
       }
       expect(
