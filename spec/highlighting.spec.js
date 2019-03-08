@@ -233,7 +233,7 @@ describe('Highlighting', function () {
         },
         fourth: {
           start: 20,
-          end: 32
+          end: 31
         },
         fifth: {
           start: 15,
@@ -249,7 +249,7 @@ describe('Highlighting', function () {
       this.highlightRange('second', 2, 10)
       this.highlightRange('third', 4, 5)
       this.highlightRange('first', 0, 24)
-      this.highlightRange('fourth', 20, 32)
+      this.highlightRange('fourth', 20, 31)
       this.highlightRange('fifth', 15, 16)
       this.highlightRange('sixth', 15, 16)
       const ranges = this.extract()
@@ -269,6 +269,7 @@ describe('Highlighting', function () {
           ranges[highlightId].end
         )
       }
+
       expect(
         this.extract()
       ).toEqual(expectedRanges)
