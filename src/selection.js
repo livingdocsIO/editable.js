@@ -53,17 +53,7 @@ export default class Selection extends Cursor {
   }
 
   getTextRange () {
-    const rangeUntilSelection = this.range.cloneRange()
-    rangeUntilSelection.setStart(this.host, 0)
-    rangeUntilSelection.setEnd(this.range.startContainer, this.range.startOffset)
-
-    const numNewLinesBefore = $('<div>' + rangeUntilSelection.toHtml() + '</div>').find('br').length
-    const numNewLinesWithin = $('<div>' + this.range.toHtml() + '</div>').find('br').length
-    const textRange = this.range.toCharacterRange(this.host)
-    return {
-      start: textRange.start + numNewLinesBefore,
-      end: textRange.end + numNewLinesWithin + numNewLinesBefore
-    }
+    return this.range.toCharacterRange(this.host)
   }
 
   // Get the ClientRects of this selection.
