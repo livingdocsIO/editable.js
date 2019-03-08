@@ -217,17 +217,8 @@ describe('Highlighting', function () {
       })
     })
 
-    it('can handle all cases combined', () => {
-      this.highlightRange('first', 4, 8)
-      this.highlightRange('second', 2, 10)
-      this.highlightRange('third', 4, 5)
-      this.highlightRange('first', 0, 24)
-      this.highlightRange('fourth', 20, 32)
-      this.highlightRange('fifth', 15, 16)
-      this.highlightRange('sixth', 15, 16)
-      expect(
-        this.extract()
-      ).toEqual({
+    it('can handle all cases combined and creates consistent output', () => {
+      const expectedRanges = {
         first: {
           start: 0,
           end: 24
@@ -252,17 +243,35 @@ describe('Highlighting', function () {
           start: 15,
           end: 16
         }
-      })
-    })
+      }
 
-    it('creates consistent output', () => {
-      this.highlightRange('first', 11, 22)
+      this.highlightRange('first', 4, 8)
+      this.highlightRange('second', 2, 10)
+      this.highlightRange('third', 4, 5)
+      this.highlightRange('first', 0, 24)
+      this.highlightRange('fourth', 20, 32)
+      this.highlightRange('fifth', 15, 16)
+      this.highlightRange('sixth', 15, 16)
       const ranges = this.extract()
+
+      expect(
+        ranges
+      ).toEqual(expectedRanges)
       const content = this.editable.getContent(this.$div[0])
-      expect(content).toEqual(this.text)
       this.$div.html(content)
-      this.highlightRange('first', ranges.first.start, ranges.first.end)
-      expect(this.extract()).toEqual(ranges)
+      expect(content).toEqual(this.text)
+
+
+      for (let highlightId in ranges) {
+        this.highlightRange(
+          highlightId,
+          expectedRanges[highlightId].start,
+          expectedRanges[highlightId].end
+        )
+      }
+      expect(
+        this.extract()
+      ).toEqual(expectedRanges)
     })
 
     it('skips and warns if an invalid range object was passed', () => {
