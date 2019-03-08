@@ -28,11 +28,6 @@ const highlightSupport = {
     if (this.hasHighlight(editableHost, highlightId)) {
       this.removeHighlight(editableHost, highlightId)
     }
-    const marker = highlightSupport.createMarkerNode(
-      '<span class="highlight-comment"></span>',
-      'highlight',
-      this.win
-    )
 
     const match = {
       id: highlightId,
@@ -41,7 +36,18 @@ const highlightSupport = {
       match: text,
       marker: marker
     }
-    highlightText.highlightMatches(editableHost, [match])
+
+    const marker = highlightSupport.createMarkerNode(
+      '<span class="highlight-comment" data-word-id="' + highlightId + '"></span>',
+      'highlight',
+      this.win
+    )
+    const range = rangy.createRange()
+    range.selectCharacters(editableHost, startIndex, endIndex)
+    const fragment = range.extractContents()
+    marker.appendChild(fragment)
+    range.deleteContents()
+    range.insertNode(marker)
     return match.startIndex
   },
 
@@ -98,17 +104,7 @@ const highlightSupport = {
     } else {
       range.selectNode(markers[0])
     }
-    const rangeUntilMarker = rangy.createRange()
-    rangeUntilMarker.setStart(editableHost, 0)
-    rangeUntilMarker.setEnd(range.startContainer, range.startOffset)
-
-    const numNewLinesBefore = $('<div>' + rangeUntilMarker.toHtml() + '</div>').find('br').length
-    const numNewLinesWithin = $('<div>' + range.toHtml() + '</div>').find('br').length
-    const textRange = range.toCharacterRange(editableHost)
-    return {
-      start: textRange.start + numNewLinesBefore,
-      end: textRange.end + numNewLinesWithin + numNewLinesBefore
-    }
+    return range.toCharacterRange(editableHost)
   },
 
   createMarkerNode (markerMarkup, highlightType, win) {
