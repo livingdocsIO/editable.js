@@ -29,14 +29,6 @@ const highlightSupport = {
       this.removeHighlight(editableHost, highlightId)
     }
 
-    const match = {
-      id: highlightId,
-      startIndex,
-      endIndex,
-      match: text,
-      marker: marker
-    }
-
     const marker = highlightSupport.createMarkerNode(
       '<span class="highlight-comment" data-word-id="' + highlightId + '"></span>',
       'highlight',
@@ -48,7 +40,7 @@ const highlightSupport = {
     marker.appendChild(fragment)
     range.deleteContents()
     range.insertNode(marker)
-    return match.startIndex
+    return startIndex
   },
 
   updateHighlight (editableHost, highlightId, addCssClass, removeCssClass) {
