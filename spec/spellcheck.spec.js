@@ -78,7 +78,7 @@ describe('Spellcheck:', function () {
       it('calls highlight() for an empty wordlist', () => {
         const highlight = sinon.spy(this.highlighting, 'highlight')
         this.highlighting.config.spellcheckService = function (text, callback) {
-          callback([])
+          callback([]) // eslint-disable-line standard/no-callback-literal
         }
         this.highlighting.highlight(this.p)
         expect(highlight.called).toEqual(true)

@@ -148,7 +148,7 @@ function updateCode (elem) {
 // ------------
 
 function highlightService (text, callback) {
-  callback(['happy'])
+  callback(['happy']) // eslint-disable-line standard/no-callback-literal
 }
 
 editable.setupHighlighting({

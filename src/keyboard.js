@@ -1,4 +1,4 @@
-var rangy = require('rangy')
+import rangy from 'rangy'
 
 import { contenteditableSpanBug } from './feature-detection'
 import * as nodeType from './node-type'

@@ -150,9 +150,9 @@ export function unwrapInternalNodes (sibling, keepUiElements) {
 
     if (sibling.firstChild) unwrapInternalNodes(sibling.firstChild, keepUiElements)
 
-    if (attr === 'remove' || attr === 'ui-remove' && !keepUiElements) {
+    if (attr === 'remove' || (attr === 'ui-remove' && !keepUiElements)) {
       $(sibling).remove()
-    } if (attr === 'unwrap' || attr === 'ui-unwrap' && !keepUiElements) {
+    } if (attr === 'unwrap' || (attr === 'ui-unwrap' && !keepUiElements)) {
       unwrap(sibling)
     }
 
