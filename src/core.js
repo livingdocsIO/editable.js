@@ -13,6 +13,7 @@ import highlightSupport from './highlight-support'
 import Highlighting from './highlighting'
 import createDefaultEvents from './create-default-events'
 import browser from 'bowser'
+import VirtualSpan from './contrib/virtual-span'
 
 /**
  * The Core module provides the Editable class that defines the Editable.JS
@@ -401,6 +402,10 @@ const Editable = module.exports = class Editable {
 Editable.parser = parser
 Editable.content = content
 Editable.browser = browser
+
+Editable.Contrib = {
+  VirtualSpan
+}
 
 // Set up callback functions for several events.
 ;['focus', 'blur', 'flow', 'selection', 'cursor', 'newline',
