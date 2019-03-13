@@ -109,10 +109,10 @@ Tasks:
 # livereload server with demo app
 npm start
 
-# run tests with karma on PhantomJS2
+# run tests with karma on Headless Chrome
 npm run test:karma
 
-# run tests with karma on PhantomJS2 and rerun on changes
+# run tests with karma on Headless Chrome and rerun on changes
 npm run test:watch
 
 # run tests in Chrome, Firefox and Safari
