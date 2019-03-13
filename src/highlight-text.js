@@ -33,6 +33,7 @@ export default {
     let currentMatch = matches[currentMatchIndex]
     let portions = []
     let next
+    let wordId
     while ((next = iterator.getNext())) {
       // Account for <br> elements
       if (next.nodeType === nodeType.textNode && next.data !== '') {
@@ -48,13 +49,11 @@ export default {
       let nodeEndOffset = totalOffset + nodeText.length
       if (currentMatch.startIndex < nodeEndOffset && totalOffset < currentMatch.endIndex) {
         // get portion position (fist, last or in the middle)
-        let isFirstPortion = isLastPortion = false
-        if (totalOffset <= currentMatch.startIndex) {
-          isFirstPortion = true
-          var wordId = currentMatch.id || currentMatch.startIndex
-        }
-        if (nodeEndOffset >= currentMatch.endIndex) {
-          var isLastPortion = true
+        const isFirstPortion = totalOffset <= currentMatch.startIndex
+        const isLastPortion = nodeEndOffset >= currentMatch.endIndex
+
+        if (isFirstPortion) {
+          wordId = currentMatch.id || currentMatch.startIndex
         }
 
         // calculate offset and length
@@ -85,7 +84,7 @@ export default {
         portions.push(portion)
 
         if (isLastPortion) {
-          var lastNode = this.wrapMatch(portions, currentMatch.marker, currentMatch.title)
+          const lastNode = this.wrapMatch(portions, currentMatch.marker, currentMatch.title)
           iterator.replaceCurrent(lastNode)
 
           // recalculate nodeEndOffset if we have to replace the current node.
@@ -143,7 +142,7 @@ function getText (element, callback) {
     if (next.nodeType === nodeType.textNode && next.data !== '') {
       callback(next.data)
     } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
-      callback(' ')
+      callback(' ') // eslint-disable-line standard/no-callback-literal
     }
   }
 }

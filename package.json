@@ -17,7 +17,9 @@
     "babel-preset-react": "^6.5.0",
     "css-loader": "^0.25.0",
     "eslint": "^5.2.0",
-    "eslint-config-standard": "^6.2.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-config-standard": "^11.0.0",
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-react": "^7.10.0",
     "eslint-plugin-standard": "^3.1.0",
@@ -84,8 +86,11 @@
     "test:all": "npm run test:karma -s -- --browsers Chrome,Firefox,Safari",
     "test:karma": "karma start",
     "test:watch": "npm run test:karma -s -- --single-run false",
-    "lint": "eslint --ignore-path .gitignore .",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "postsemantic-release": "node ./bin/deploy-example.js"
+    "postsemantic-release": "node ./bin/deploy-example.js",
+    "lint": "eslint --ignore-path .gitignore ."
+  },
+  "release": {
+    "extends": "@livingdocs/semantic-release-presets/npm-github-verify"
   }
 }

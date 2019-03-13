@@ -1,4 +1,4 @@
-var $ = require('jquery')
+import $ from 'jquery'
 
 import Cursor from './cursor'
 import * as content from './content'
