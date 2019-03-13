@@ -1,0 +1,49 @@
+---
+kind: pipeline
+name: default
+
+clone:
+  depth: 50
+
+steps:
+- name: eslint
+  image: marcbachmann/eslint:5.10.1
+  environment:
+    GH_TOKEN:
+      from_secret: GH_TOKEN
+
+- name: npm-install
+  image: node:8-alpine
+  commands: [npm install]
+
+- name: test
+  image: cypress/browsers:chrome67
+  commands: ["npm run test:ci -s"]
+
+- name: release
+  image: livingdocs/semantic-release:v1.0.0
+  environment:
+    GH_TOKEN:
+      from_secret: GH_TOKEN
+    NPM_TOKEN:
+      from_secret: NPM_TOKEN
+  when:
+    event: [push]
+
+- name: publish-gh-pages
+  image: plugins/gh-pages
+  settings:
+    pages_directory: examples/
+    username: x-oauth-basic
+    password:
+      from_secret: GH_TOKEN
+  when:
+    event: [tag]
+
+trigger:
+  event: [push, tag]
+---
+kind: signature
+hmac: 4f3c0483103f0a412f092328bffcf477c6af8a6d501450233c32ed95d5e7caa9
+
+...

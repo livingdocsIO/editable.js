@@ -44,7 +44,14 @@ module.exports = function (config) {
 
     autoWatch: true,
 
-    browsers: ['PhantomJS2'],
+    browsers: ['ChromeHeadlessNoSandbox'],
+
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox']
+      }
+    },
 
     captureTimeout: 8000,
 
