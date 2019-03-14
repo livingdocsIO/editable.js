@@ -34,7 +34,7 @@ module.exports = function (config) {
 
     webpackMiddleware: {noInfo: true},
 
-    reporters: ['progress', 'coverage'],
+    reporters: ['dots', 'coverage'],
 
     port: 9876,
 
