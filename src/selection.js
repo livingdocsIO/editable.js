@@ -6,6 +6,7 @@ import * as parser from './parser'
 import * as config from './config'
 import highlightSupport from './highlight-support'
 import highlightText from './highlight-text'
+
 /**
  * The Selection module provides a cross-browser abstraction layer for range
  * and selection.
@@ -39,17 +40,14 @@ export default class Selection extends Cursor {
   }
 
   isAllSelected () {
-    return (
-      parser.isBeginningOfHost(
-        this.host,
-        this.range.startContainer,
-        this.range.startOffset
-      ) &&
-      parser.isTextEndOfHost(
-        this.host,
-        this.range.endContainer,
-        this.range.endOffset
-      )
+    return parser.isBeginningOfHost(
+      this.host,
+      this.range.startContainer,
+      this.range.startOffset
+    ) && parser.isTextEndOfHost(
+      this.host,
+      this.range.endContainer,
+      this.range.endOffset
     )
   }
 
@@ -65,10 +63,9 @@ export default class Selection extends Cursor {
     return this.range.nativeRange.getClientRects()
   }
 
+
   link (href, attrs = {}) {
-    const $link = $(
-      this.createElement(config.linkMarkup.name, config.linkMarkup.attribs)
-    )
+    const $link = $(this.createElement(config.linkMarkup.name, config.linkMarkup.attribs))
     if (href) attrs.href = href
     $link.attr(attrs)
     this.forceWrap($link[0])
@@ -94,7 +91,7 @@ export default class Selection extends Cursor {
 
   // Manually add a highlight
   // Note: the current code does not work with newlines (LP)
-  highlight ({ highlightId }) {
+  highlight ({highlightId}) {
     const textBefore = this.textBefore()
     const currentTextContent = this.text()
 
@@ -122,50 +119,32 @@ export default class Selection extends Cursor {
   }
 
   makeBold () {
-    const bold = this.createElement(
-      config.boldMarkup.name,
-      config.boldMarkup.attribs
-    )
+    const bold = this.createElement(config.boldMarkup.name, config.boldMarkup.attribs)
     this.forceWrap(bold)
   }
 
   toggleBold () {
-    const bold = this.createElement(
-      config.boldMarkup.name,
-      config.boldMarkup.attribs
-    )
+    const bold = this.createElement(config.boldMarkup.name, config.boldMarkup.attribs)
     this.toggle(bold)
   }
 
   giveEmphasis () {
-    const em = this.createElement(
-      config.italicMarkup.name,
-      config.italicMarkup.attribs
-    )
+    const em = this.createElement(config.italicMarkup.name, config.italicMarkup.attribs)
     this.forceWrap(em)
   }
 
   toggleEmphasis () {
-    const em = this.createElement(
-      config.italicMarkup.name,
-      config.italicMarkup.attribs
-    )
+    const em = this.createElement(config.italicMarkup.name, config.italicMarkup.attribs)
     this.toggle(em)
   }
 
   makeUnderline () {
-    const u = this.createElement(
-      config.underlineMarkup.name,
-      config.underlineMarkup.attribs
-    )
+    const u = this.createElement(config.underlineMarkup.name, config.underlineMarkup.attribs)
     this.forceWrap(u)
   }
 
   toggleUnderline () {
-    const u = this.createElement(
-      config.underlineMarkup.name,
-      config.underlineMarkup.attribs
-    )
+    const u = this.createElement(config.underlineMarkup.name, config.underlineMarkup.attribs)
     this.toggle(u)
   }
 
@@ -182,12 +161,7 @@ export default class Selection extends Cursor {
   // @param {String} E.g. '«'
   // @param {String} E.g. '»'
   surround (startCharacter, endCharacter) {
-    this.range = content.surround(
-      this.host,
-      this.range,
-      startCharacter,
-      endCharacter
-    )
+    this.range = content.surround(this.host, this.range, startCharacter, endCharacter)
     this.setSelection()
   }
 
@@ -198,10 +172,8 @@ export default class Selection extends Cursor {
   }
 
   toggleSurround (startCharacter, endCharacter) {
-    if (
-      this.containsString(startCharacter) &&
-      this.containsString(endCharacter)
-    ) {
+    if (this.containsString(startCharacter) &&
+    this.containsString(endCharacter)) {
       this.removeSurround(startCharacter, endCharacter)
     } else {
       this.surround(startCharacter, endCharacter)
