@@ -1,6 +1,6 @@
 import $ from 'jquery'
 import rangy from 'rangy'
-import { unwrap, adoptElement } from './content'
+import { unwrap, adoptElement } from '../content'
 
 function defaultMarkerConstructor (id, namespace) {
   const marker = $('span')[0]
@@ -33,6 +33,10 @@ class VirtualSpan {
     this.win = win
   }
 
+  getHost (host) {
+    return host || (this.win && this.win.document.body)
+  }
+
   extractRanges (host, markers) {
     const range = rangy.createRange()
     if (markers.length > 1) {
@@ -41,7 +45,10 @@ class VirtualSpan {
     } else {
       range.selectNode(markers[0])
     }
-    return range.toCharacterRange(host)
+    const textRange = range.toCharacterRange(host)
+    if (textRange.start > 0) textRange.start -= 1
+    if (textRange.end > 0) textRange.end -= 1
+    return textRange
   }
 
   getIdSelector (id) {
@@ -50,6 +57,14 @@ class VirtualSpan {
 
   getIdAttrSelector () {
     return `[${this.idAttribute}]`
+  }
+
+  cleanOrphaned (ids, maybeHost) {
+    const host = this.getHost(maybeHost)
+    const query = $(host).find(this.getIdAttrSelector())
+    ids
+      .reduce((q, id) => q.not(this.getIdSelector(id)), query)
+      .each((_, m) => unwrap(m))
   }
 
   createMarkerNode (id) {
@@ -73,19 +88,21 @@ class VirtualSpan {
     range.insertNode(marker)
   }
 
-  has (host, id) {
-    const matches = $(host).find(this.getIdSelector(id))
-    return !!matches.length
-  }
-
   insert (host, id, startIndex, endIndex) {
-    if (this.has(host, id)) {
-      this.removeVSpan(host, id)
+    if (this.has(id, host)) {
+      this.remove(id, host)
     }
     this.insertIntoHost(host, id, startIndex, endIndex)
   }
 
-  remove (host, id) {
+  has (id, maybeHost) {
+    const host = this.getHost(maybeHost)
+    const matches = $(host).find(this.getIdSelector(id))
+    return !!matches.length
+  }
+
+  remove (id, maybeHost) {
+    const host = this.getHost(maybeHost)
     $(host)
       .find(this.getIdSelector(id))
       .each((index, elem) => {
@@ -93,8 +110,9 @@ class VirtualSpan {
       })
   }
 
-  update (host, id, addCssClass, removeCssClass) {
+  update (id, { addCssClass, removeCssClass }, maybeHost) {
     if (!this.win || !this.win.document.documentElement.classList) return
+    const host = this.getHost(maybeHost)
     $(host)
       .find(this.getIdSelector(id))
       .each((index, elem) => {
@@ -122,13 +140,14 @@ class VirtualSpan {
       const position = this.extractRanges($host[0], groups[id])
       const namespace = groups[id].attr(this.namespaceAttribute)
       if (position) {
-        res[id] = {
-          ...position,
-          namespace
-        }
+        res[id] = Object.assign({}, position, { namespace })
       }
     })
     return res
+  }
+
+  containsAny (contentStr) {
+    return !!$(`<div>${contentStr}</div>`).find(this.getIdAttrSelector()).length
   }
 
   applyData (contentStr, data) {
