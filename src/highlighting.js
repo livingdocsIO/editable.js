@@ -25,7 +25,7 @@ export default class Highlighting {
       // unbounce rate in ms before calling the spellcheck service after changes
       throttle: 1000,
       // remove highlights after a change if the cursor is inside a highlight
-      removeOnCorrection: true,
+      removeOnCorrection: false,
       spellcheck: {
         marker: '<span class="highlight-spellcheck"></span>',
         throttle: 1000,
