@@ -286,6 +286,17 @@ describe('Highlighting', function () {
       expect(highlightSpan.length).toEqual(0)
     })
 
+    it('skips if the range exceeds the content length', () => {
+      const result = this.editable.highlight({
+        editableHost: this.$div[0],
+        highlightId: 'myId',
+        textRange: { foo: 3, bar: 32 }
+      })
+      const highlightSpan = this.$div.find('[data-word-id="myId"]')
+      expect(highlightSpan.length).toEqual(0)
+      expect(result).toEqual(-1)
+    })
+
     it('skips and warns if the range object represents a cursor', () => {
       this.editable.highlight({
         editableHost: this.$div[0],

@@ -4,6 +4,13 @@ import * as content from './content'
 import highlightText from './highlight-text'
 import TextHighlighting from './plugins/highlighting/text-highlighting'
 
+function isInHost (el, host) {
+  if (!el.closest) {
+    el = el.parentNode
+  }
+  return el.closest('[data-editable]:not([data-word-id])') === host
+}
+
 const highlightSupport = {
 
   highlightText (editableHost, text, highlightId) {
@@ -28,14 +35,18 @@ const highlightSupport = {
     if (this.hasHighlight(editableHost, highlightId)) {
       this.removeHighlight(editableHost, highlightId)
     }
+    const range = rangy.createRange()
+    range.selectCharacters(editableHost, startIndex, endIndex)
+
+    if (!isInHost(range.commonAncestorContainer, editableHost)) {
+      return -1
+    }
 
     const marker = highlightSupport.createMarkerNode(
       '<span class="highlight-comment" data-word-id="' + highlightId + '"></span>',
       'highlight',
       this.win
     )
-    const range = rangy.createRange()
-    range.selectCharacters(editableHost, startIndex, endIndex)
     const fragment = range.extractContents()
     marker.appendChild(fragment)
     range.deleteContents()
