@@ -31,7 +31,7 @@ const highlightSupport = {
     }
   },
 
-  highlightRange (editableHost, text, highlightId, startIndex, endIndex) {
+  highlightRange (editableHost, highlightId, startIndex, endIndex) {
     if (this.hasHighlight(editableHost, highlightId)) {
       this.removeHighlight(editableHost, highlightId)
     }

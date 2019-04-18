@@ -367,7 +367,7 @@ const Editable = module.exports = class Editable {
       )
       return -1
     }
-    return highlightSupport.highlightRange(editableHost, text, highlightId, textRange.start, textRange.end)
+    return highlightSupport.highlightRange(editableHost, highlightId, textRange.start, textRange.end)
   }
 
   /**
