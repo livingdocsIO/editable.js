@@ -347,8 +347,8 @@ const Editable = module.exports = class Editable {
    * @param  {String} options.text
    * @param  {String} options.highlightId Added to the highlight markups in the property `data-word-id`
    * @param  {Object} [options.textRange] An optional range which gets used to set the markers.
-   * @param  {Number} [options.textRange.start]
-   * @param  {Number} [options.textRange.end]
+   * @param  {Number} options.textRange.start
+   * @param  {Number} options.textRange.end
    * @return {Number} The text-based start offset of the newly applied highlight or `-1` if the range was considered invalid.
    */
   highlight ({editableHost, text, highlightId, textRange}) {
