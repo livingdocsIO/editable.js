@@ -107,7 +107,12 @@ const highlightSupport = {
     } else {
       range.selectNode(markers[0])
     }
-    return range.toCharacterRange(editableHost)
+    const textRange = range.toCharacterRange(editableHost)
+    return {
+      start: textRange.start,
+      end: textRange.end,
+      text: range.text()
+    }
   },
 
   createMarkerNode (markerMarkup, highlightType, win) {

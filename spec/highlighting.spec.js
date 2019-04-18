@@ -105,17 +105,15 @@ describe('Highlighting', function () {
       const startIndex = this.highlightRange('myId', 3, 7)
       const expectedRanges = {
         myId: {
+          text: 'ple ',
           start: 3,
           end: 7
         }
       }
-      const expectedTexts = {myId: 'ple '}
 
       const extractedRanges = this.extract()
-      const extractedTexts = this.extractTexts(extractedRanges)
 
       expect(extractedRanges).toEqual(expectedRanges)
-      expect(extractedTexts).toEqual(expectedTexts)
       expect(startIndex).toEqual(3)
     })
 
@@ -127,34 +125,31 @@ describe('Highlighting', function () {
 
       const expectedRanges = {
         first: {
+          text: 'P',
           start: 0,
           end: 1
         },
         second: {
+          text: 'e',
           start: 1,
           end: 2
         },
         third: {
+          text: 'o',
           start: 2,
           end: 3
         },
         fourth: {
+          text: 'p',
           start: 3,
           end: 4
         }
       }
-      const expectedTexts = {
-        first: 'P',
-        second: 'e',
-        third: 'o',
-        fourth: 'p'
-      }
+
 
       const extractedRanges = this.extract()
-      const extractedTexts = this.extractTexts(extractedRanges)
-
       expect(extractedRanges).toEqual(expectedRanges)
-      expect(extractedTexts).toEqual(expectedTexts)
+
     })
 
     it('can handle nested highlights', () => {
@@ -164,36 +159,29 @@ describe('Highlighting', function () {
       this.highlightRange('fourth', 0, 6)
       const expectedRanges = {
         first: {
+          text: 'P',
           start: 0,
           end: 1
         },
         second: {
+          text: 'e',
           start: 1,
           end: 2
         },
         third: {
+          text: 'ople',
           start: 2,
           end: 6
         },
         fourth: {
+          text: 'People',
           start: 0,
           end: 6
         }
       }
 
-
-      const expectedTexts = {
-        first: 'P',
-        second: 'e',
-        third: 'ople',
-        fourth: 'People'
-      }
-
       const extractedRanges = this.extract()
-      const extractedTexts = this.extractTexts(extractedRanges)
-
       expect(extractedRanges).toEqual(expectedRanges)
-      expect(extractedTexts).toEqual(expectedTexts)
     })
 
     it('can handle intersecting highlights', () => {
@@ -202,47 +190,39 @@ describe('Highlighting', function () {
       this.highlightRange('third', 4, 6)
       const expectedRanges = {
         first: {
+          text: 'Peo',
           start: 0,
           end: 3
         },
         second: {
+          text: 'ple ',
           start: 3,
           end: 7
         },
         third: {
+          text: 'le',
           start: 4,
           end: 6
         }
       }
-
-      const expectedTexts = {
-        first: 'Peo',
-        second: 'ple ',
-        third: 'le'
-      }
       const extractedRanges = this.extract()
-      const extractedTexts = this.extractTexts(extractedRanges)
-
       expect(extractedRanges).toEqual(expectedRanges)
-      expect(extractedTexts).toEqual(expectedTexts)
+
     })
 
     it('can handle highlights containing newlines', () => {
       this.highlightRange('first', 11, 22)
       const expectedRanges = {
         first: {
+          text: ' The \nWorld',
           start: 11,
           end: 22
         }
       }
-      const expectedTexts = {
-        first: ' The \nWorld'
-      }
-      const extractedRanges = this.extract()
-      const extractedTexts = this.extractTexts(extractedRanges)
 
+      const extractedRanges = this.extract()
       expect(extractedRanges).toEqual(expectedRanges)
-      expect(extractedTexts).toEqual(expectedTexts)
+
     })
 
     it('can handle identical ranges', () => {
@@ -250,23 +230,20 @@ describe('Highlighting', function () {
       this.highlightRange('second', 11, 22)
       const expectedRanges = {
         first: {
+          text: ' The \nWorld',
           start: 11,
           end: 22
         },
         second: {
+          text: ' The \nWorld',
           start: 11,
           end: 22
         }
       }
-      const expectedTexts = {
-        first: ' The \nWorld',
-        second: ' The \nWorld'
-      }
-      const extractedRanges = this.extract()
-      const extractedTexts = this.extractTexts(extractedRanges)
 
+      const extractedRanges = this.extract()
       expect(extractedRanges).toEqual(expectedRanges)
-      expect(extractedTexts).toEqual(expectedTexts)
+
     })
 
     it('will update any existing range found under `highlightId` aka upsert', () => {
@@ -274,19 +251,15 @@ describe('Highlighting', function () {
       this.highlightRange('first', 8, 9)
       const expectedRanges = {
         first: {
+          text: 'a',
           start: 8,
           end: 9
         }
       }
-      const expectedTexts = {
-        first: 'a'
-      }
+
 
       const extractedRanges = this.extract()
-      const extractedTexts = this.extractTexts(extractedRanges)
-
       expect(extractedRanges).toEqual(expectedRanges)
-      expect(extractedTexts).toEqual(expectedTexts)
     })
 
     it('can handle all cases combined and creates consistent output', () => {
@@ -300,43 +273,39 @@ describe('Highlighting', function () {
 
       const expectedRanges = {
         first: {
+          text: 'People Make The \nWorld G',
           start: 0,
           end: 24
         },
         second: {
+          text: 'ople Mak',
           start: 2,
           end: 10
         },
         third: {
+          text: 'l',
           start: 4,
           end: 5
         },
         fourth: {
+          text: 'ld Go Round',
           start: 20,
           end: 31
         },
         fifth: {
+          text: ' ',
           start: 15,
           end: 16
         },
         sixth: {
+          text: ' ',
           start: 15,
           end: 16
         }
       }
-      const expectedTexts = {
-        first: 'People Make The \nWorld G',
-        second: 'ople Mak',
-        third: 'l',
-        fourth: 'ld Go Round',
-        sixth: ' ',
-        fifth: ' '
-      }
-      const extractedRanges = this.extract()
-      const extractedTexts = this.extractTexts(extractedRanges)
 
+      const extractedRanges = this.extract()
       expect(extractedRanges).toEqual(expectedRanges)
-      expect(extractedTexts).toEqual(expectedTexts)
 
       const content = this.editable.getContent(this.$div[0])
       this.$div.html(content)

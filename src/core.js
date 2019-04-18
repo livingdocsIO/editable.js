@@ -374,7 +374,10 @@ const Editable = module.exports = class Editable {
    * Extracts positions of all DOMNodes that match `[data-word-id]`.
    *
    * Returns an object where the keys represent a highlight id and the value
-   * a text range object.
+   * a text range object of shape:
+   * ```
+   * { start: number, end: number, text: string}
+   * ```
    *
    * @param  {Object} options
    * @param  {DOMNode} options.editableHos
