@@ -51,6 +51,7 @@ const highlightSupport = {
     marker.appendChild(fragment)
     range.deleteContents()
     range.insertNode(marker)
+    highlightSupport.cleanupStaleMarkerNodes(editableHost, 'comment')
     return startIndex
   },
 
@@ -113,6 +114,15 @@ const highlightSupport = {
       end: textRange.end,
       text: range.text()
     }
+  },
+
+  cleanupStaleMarkerNodes (editableHost, highlightType) {
+    editableHost.querySelectorAll('span[data-highlight="' + highlightType + '"]')
+      .forEach(node => {
+        if (!node.textContent.length) {
+          node.parentNode.removeChild(node)
+        }
+      })
   },
 
   createMarkerNode (markerMarkup, highlightType, win) {
