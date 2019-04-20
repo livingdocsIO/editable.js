@@ -1,4 +1,5 @@
 import $ from 'jquery'
+import rangy from 'rangy'
 import Editable from '../src/core'
 import Highlighting from '../src/highlighting'
 import highlightSupport from '../src/highlight-support'
@@ -216,7 +217,7 @@ Make The <br> World Go Round`)
       expect(this.extract()).toEqual(expectedRanges)
     })
 
-    it('can handle highlights containing newlines', () => {
+    it('can handle highlights containing break tags', () => {
       this.highlightRange('first', 11, 22)
       const expectedRanges = {
         first: {
@@ -358,7 +359,6 @@ o Round</span>`)
     it('skips and warns if an invalid range object was passed', () => {
       this.editable.highlight({
         editableHost: this.$div[0],
-        text: 'ple ',
         highlightId: 'myId',
         textRange: { foo: 3, bar: 7 }
       })
@@ -380,13 +380,104 @@ o Round</span>`)
     it('skips and warns if the range object represents a cursor', () => {
       this.editable.highlight({
         editableHost: this.$div[0],
-        text: 'ple ',
         highlightId: 'myId',
         textRange: { start: 3, end: 3 }
       })
 
       const highlightSpan = this.$div.find('[data-word-id="myId"]')
       expect(highlightSpan.length).toEqual(0)
+    })
+  })
+
+  describe('highlightSupport with special characters', () => {
+    beforeEach(() => {
+      setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
+    })
+
+    afterEach(() => {
+      teardownHighlightEnv(this)
+    })
+
+    it('maps selection offsets to ranges containing multibyte symbols consistently', () => {
+      const range = rangy.createRange()
+      const node = this.$div[0]
+      range.setStart(node.firstChild, 0)
+      range.setEnd(node.firstChild, 2)
+      const {start, end} = range.toCharacterRange(this.$div[0])
+
+      this.highlightRange('first', start, end)
+      const expectedRanges = {
+        first: {
+          text: '😐',
+          start: 0,
+          end: 2
+        }
+      }
+
+      const expectedHtml = '<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">😐</span> Make&nbsp;The \n 🌍 Go \n🔄'
+
+      expect(this.extract()).toEqual(expectedRanges)
+      expect(this.getHtml()).toEqual(expectedHtml)
+    })
+
+    it('treats non-breakable spaces consistently', () => {
+      this.highlightRange('first', 2, 9)
+      const expectedRanges = {
+        first: {
+          text: ' Make T',
+          start: 2,
+          end: 9
+        }
+      }
+      const expectedHtml = '😐<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"> Make&nbsp;T</span>he \n 🌍 Go \n🔄'
+      expect(this.getHtml()).toEqual(expectedHtml)
+      expect(this.extract()).toEqual(expectedRanges)
+
+
+    })
+
+    it('treats \\n\\r spaces consistently', () => {
+      this.highlightRange('first', 8, 15)
+      const expectedRanges = {
+        first: {
+          text: 'The 🌍 ',
+          start: 8,
+          end: 15
+        }
+      }
+
+      const expectedHtml = '😐 Make&nbsp;<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">The \n 🌍 </span>Go \n🔄'
+      expect(this.getHtml()).toEqual(expectedHtml)
+      expect(this.extract()).toEqual(expectedRanges)
+
+    })
+
+    it('treats \\n spaces consistently', () => {
+      this.highlightRange('first', 15, 20)
+      const expectedRanges = {
+        first: {
+          text: 'Go 🔄',
+          start: 15,
+          end: 20
+        }
+      }
+      const expectedHtml = '😐 Make&nbsp;The \n 🌍 <span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">Go \n🔄</span>'
+      expect(this.getHtml()).toEqual(expectedHtml)
+      expect(this.extract()).toEqual(expectedRanges)
+    })
+
+    it('extracts a readable text', () => {
+      this.highlightRange('first', 0, 20)
+      const expectedRanges = {
+        first: {
+          text: '😐 Make The 🌍 Go 🔄',
+          start: 0,
+          end: 20
+        }
+      }
+      const expectedHtml = '<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">😐 Make&nbsp;The \n 🌍 Go \n🔄</span>'
+      expect(this.getHtml()).toEqual(expectedHtml)
+      expect(this.extract()).toEqual(expectedRanges)
     })
   })
 })
