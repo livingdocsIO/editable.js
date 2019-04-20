@@ -1,5 +1,4 @@
 import $ from 'jquery'
-import rangy from 'rangy'
 import Editable from '../src/core'
 import Highlighting from '../src/highlighting'
 import highlightSupport from '../src/highlight-support'
@@ -23,20 +22,12 @@ function setupHighlightEnv (context, text) {
     return context.editable.getHighlightPositions({editableHost: context.$div[0]})
   }
 
-  context.extractTexts = (ranges) => {
-    return Object.keys(ranges).reduce(
-      (result, highlightId) => {
-        const range = rangy.createRange()
-        range.selectCharacters(
-          context.$div[0],
-          ranges[highlightId].start,
-          ranges[highlightId].end
-        )
-        result[highlightId] = range.text()
-        return result
-      },
-      {}
-    )
+  context.getHtml = () => {
+    return context.$div[0].innerHTML
+  }
+
+  context.formatHtml = string => {
+    return $('<div>' + string.replace(/\n/gm, '') + '</div>')[0].innerHTML
   }
 }
 
@@ -110,10 +101,12 @@ describe('Highlighting', function () {
           end: 7
         }
       }
+      const expectedHtml = this.formatHtml(`Peo
+<span class="highlight-comment" data-word-id="myId" data-editable="ui-unwrap" data-highlight="comment">ple </span>
+Make The <br> World Go Round`)
 
-      const extractedRanges = this.extract()
-
-      expect(extractedRanges).toEqual(expectedRanges)
+      expect(this.getHtml()).toEqual(expectedHtml)
+      expect(this.extract()).toEqual(expectedRanges)
       expect(startIndex).toEqual(3)
     })
 
@@ -145,10 +138,14 @@ describe('Highlighting', function () {
           end: 4
         }
       }
+      const expectedHtml = this.formatHtml(`<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">P</span>
+<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">e</span>
+<span class="highlight-comment" data-word-id="third" data-editable="ui-unwrap" data-highlight="comment">o</span>
+<span class="highlight-comment" data-word-id="fourth" data-editable="ui-unwrap" data-highlight="comment">p</span>
+le Make The <br> World Go Round`)
 
-
-      const extractedRanges = this.extract()
-      expect(extractedRanges).toEqual(expectedRanges)
+      expect(this.getHtml()).toEqual(expectedHtml)
+      expect(this.extract()).toEqual(expectedRanges)
 
     })
 
@@ -179,9 +176,14 @@ describe('Highlighting', function () {
           end: 6
         }
       }
-
-      const extractedRanges = this.extract()
-      expect(extractedRanges).toEqual(expectedRanges)
+      const expectedHtml = this.formatHtml(`<span class="highlight-comment" data-word-id="fourth" data-editable="ui-unwrap" data-highlight="comment">
+<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">P</span>
+<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">e</span>
+<span class="highlight-comment" data-word-id="third" data-editable="ui-unwrap" data-highlight="comment">ople</span>
+</span>
+ Make The <br> World Go Round`)
+      expect(this.getHtml()).toEqual(expectedHtml)
+      expect(this.extract()).toEqual(expectedRanges)
     })
 
     it('can handle intersecting highlights', () => {
@@ -205,9 +207,13 @@ describe('Highlighting', function () {
           end: 6
         }
       }
-      const extractedRanges = this.extract()
-      expect(extractedRanges).toEqual(expectedRanges)
-
+      const expectedHtml = this.formatHtml(`<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">Peo</span>
+<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">p
+<span class="highlight-comment" data-word-id="third" data-editable="ui-unwrap" data-highlight="comment">le</span>
+ </span>
+Make The <br> World Go Round`)
+      expect(this.getHtml()).toEqual(expectedHtml)
+      expect(this.extract()).toEqual(expectedRanges)
     })
 
     it('can handle highlights containing newlines', () => {
@@ -219,9 +225,12 @@ describe('Highlighting', function () {
           end: 22
         }
       }
+      const expectedHtml = this.formatHtml(`People Make
+<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"> The <br> World</span>
+ Go Round`)
 
-      const extractedRanges = this.extract()
-      expect(extractedRanges).toEqual(expectedRanges)
+      expect(this.extract()).toEqual(expectedRanges)
+      expect(this.getHtml()).toEqual(expectedHtml)
 
     })
 
@@ -240,9 +249,15 @@ describe('Highlighting', function () {
           end: 22
         }
       }
+      const expectedHtml = this.formatHtml(`People Make
+<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">
+<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"> The <br> World</span>
+</span>
+ Go Round`)
 
-      const extractedRanges = this.extract()
-      expect(extractedRanges).toEqual(expectedRanges)
+
+      expect(this.getHtml()).toEqual(expectedHtml)
+      expect(this.extract()).toEqual(expectedRanges)
 
     })
 
@@ -256,10 +271,13 @@ describe('Highlighting', function () {
           end: 9
         }
       }
+      const expectedHtml = this.formatHtml(`People M
+<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">a</span>
+</span>
+ke The <br> World Go Round`)
 
-
-      const extractedRanges = this.extract()
-      expect(extractedRanges).toEqual(expectedRanges)
+      expect(this.extract()).toEqual(expectedRanges)
+      expect(this.getHtml()).toEqual(expectedHtml)
     })
 
     it('can handle all cases combined and creates consistent output', () => {
@@ -303,23 +321,38 @@ describe('Highlighting', function () {
           end: 16
         }
       }
+      const expectedHtml = this.formatHtml(`<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">Pe
+<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">op
+<span class="highlight-comment" data-word-id="third" data-editable="ui-unwrap" data-highlight="comment">l</span>
+e Mak</span>e The<span class="highlight-comment" data-word-id="sixth" data-editable="ui-unwrap" data-highlight="comment">
+<span class="highlight-comment" data-word-id="fifth" data-editable="ui-unwrap" data-highlight="comment"> </span>
+</span>
+<br> Wor</span>
+<span class="highlight-comment" data-word-id="fourth" data-editable="ui-unwrap" data-highlight="comment">
+<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">ld G</span>
+o Round</span>`)
 
+      const extractedHtml = this.getHtml()
       const extractedRanges = this.extract()
+
       expect(extractedRanges).toEqual(expectedRanges)
+      expect(extractedHtml).toEqual(expectedHtml)
+
 
       const content = this.editable.getContent(this.$div[0])
       this.$div.html(content)
       expect(content).toEqual(this.text)
-
-      for (let highlightId in extractedRanges) {
+      const ids = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
+      ids.forEach(highlightId => {
         this.highlightRange(
           highlightId,
           extractedRanges[highlightId].start,
           extractedRanges[highlightId].end
         )
-      }
+      })
 
       expect(this.extract()).toEqual(expectedRanges)
+      expect(this.getHtml()).toEqual(expectedHtml)
     })
 
     it('skips and warns if an invalid range object was passed', () => {
