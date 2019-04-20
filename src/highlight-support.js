@@ -44,7 +44,7 @@ const highlightSupport = {
 
     const marker = highlightSupport.createMarkerNode(
       '<span class="highlight-comment" data-word-id="' + highlightId + '"></span>',
-      'highlight',
+      'comment',
       this.win
     )
     const fragment = range.extractContents()

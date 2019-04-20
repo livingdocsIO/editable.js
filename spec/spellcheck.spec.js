@@ -122,6 +122,22 @@ describe('Spellcheck:', function () {
         expect($(this.p).find('.misspelled-word').length).toEqual(0)
       })
 
+      it('does not remove the highlights config.removeOnCorrection is set to false', () => {
+        this.highlighting.config.removeOnCorrection = false
+        sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.highlight, 0))
+
+        this.highlighting.onChange(this.p)
+        expect($(this.p).find('.misspelled-word').length).toEqual(1)
+      })
+
+      it('does not remove the highlights if cursor is within a match of highlight type != spellcheck', () => {
+        $(this.p).find('.misspelled-word').attr('data-highlight', 'comment')
+        sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.highlight, 0))
+
+        this.highlighting.removeHighlightsAtCursor(this.p)
+        expect($(this.p).find('.misspelled-word').length).toEqual(1)
+      })
+
       it('does not remove the highlights if cursor is outside a match', () => {
         sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.p.firstChild, 0))
 

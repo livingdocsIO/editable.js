@@ -25,7 +25,7 @@ export default class Highlighting {
       // unbounce rate in ms before calling the spellcheck service after changes
       throttle: 1000,
       // remove highlights after a change if the cursor is inside a highlight
-      removeOnCorrection: false,
+      removeOnCorrection: true,
       spellcheck: {
         marker: '<span class="highlight-spellcheck"></span>',
         throttle: 1000,
@@ -180,7 +180,8 @@ export default class Highlighting {
       let wordId
       do {
         if (elementAtCursor === editableHost) return
-        if (elementAtCursor.hasAttribute('data-word-id')) {
+        const highlightType = elementAtCursor.getAttribute('data-highlight')
+        if (highlightType === 'spellcheck') {
           wordId = elementAtCursor.getAttribute('data-word-id')
           break
         }
