@@ -180,7 +180,8 @@ export default class Highlighting {
       let wordId
       do {
         if (elementAtCursor === editableHost) return
-        if (elementAtCursor.hasAttribute('data-word-id')) {
+        const highlightType = elementAtCursor.getAttribute('data-highlight')
+        if (highlightType === 'spellcheck') {
           wordId = elementAtCursor.getAttribute('data-word-id')
           break
         }

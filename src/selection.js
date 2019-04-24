@@ -1,5 +1,6 @@
-import $ from 'jquery'
 
+import 'rangy/lib/rangy-textrange'
+import $ from 'jquery'
 import Cursor from './cursor'
 import * as content from './content'
 import * as parser from './parser'
@@ -49,6 +50,10 @@ export default class Selection extends Cursor {
       this.range.endContainer,
       this.range.endOffset
     )
+  }
+
+  getTextRange () {
+    return this.range.toCharacterRange(this.host)
   }
 
   // Get the ClientRects of this selection.

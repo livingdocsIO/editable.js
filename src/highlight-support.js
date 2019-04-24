@@ -1,8 +1,15 @@
 import $ from 'jquery'
-
+import rangy from 'rangy'
 import * as content from './content'
 import highlightText from './highlight-text'
 import TextHighlighting from './plugins/highlighting/text-highlighting'
+
+function isInHost (el, host) {
+  if (!el.closest) {
+    el = el.parentNode
+  }
+  return el.closest('[data-editable]:not([data-word-id])') === host
+}
 
 const highlightSupport = {
 
@@ -22,6 +29,30 @@ const highlightSupport = {
       highlightText.highlightMatches(editableHost, matches)
       return matches[0].startIndex
     }
+  },
+
+  highlightRange (editableHost, highlightId, startIndex, endIndex) {
+    if (this.hasHighlight(editableHost, highlightId)) {
+      this.removeHighlight(editableHost, highlightId)
+    }
+    const range = rangy.createRange()
+    range.selectCharacters(editableHost, startIndex, endIndex)
+
+    if (!isInHost(range.commonAncestorContainer, editableHost)) {
+      return -1
+    }
+
+    const marker = highlightSupport.createMarkerNode(
+      '<span class="highlight-comment" data-word-id="' + highlightId + '"></span>',
+      'comment',
+      this.win
+    )
+    const fragment = range.extractContents()
+    marker.appendChild(fragment)
+    range.deleteContents()
+    range.insertNode(marker)
+    highlightSupport.cleanupStaleMarkerNodes(editableHost, 'comment')
+    return startIndex
   },
 
   updateHighlight (editableHost, highlightId, addCssClass, removeCssClass) {
@@ -44,6 +75,54 @@ const highlightSupport = {
   hasHighlight (editableHost, highlightId) {
     const matches = $(editableHost).find(`[data-word-id="${highlightId}"]`)
     return !!matches.length
+  },
+
+  extractHighlightedRanges (editableHost) {
+    const markers = $(editableHost).find('[data-word-id]')
+    if (!markers.length) {
+      return
+    }
+    const groups = {}
+    markers.each((_, marker) => {
+      const highlightId = $(marker).data('word-id')
+      if (!groups[highlightId]) {
+        groups[highlightId] = $(editableHost).find('[data-word-id="' + highlightId + '"]')
+      }
+    })
+    const res = {}
+    Object.keys(groups).forEach(highlightId => {
+      const position = this.extractMarkerNodePosition(editableHost, groups[highlightId])
+      if (position) {
+        res[highlightId] = position
+      }
+    })
+
+    return res
+  },
+
+  extractMarkerNodePosition (editableHost, markers) {
+    const range = rangy.createRange()
+    if (markers.length > 1) {
+      range.setStartBefore(markers.first()[0])
+      range.setEndAfter(markers.last()[0])
+    } else {
+      range.selectNode(markers[0])
+    }
+    const textRange = range.toCharacterRange(editableHost)
+    return {
+      start: textRange.start,
+      end: textRange.end,
+      text: range.text()
+    }
+  },
+
+  cleanupStaleMarkerNodes (editableHost, highlightType) {
+    editableHost.querySelectorAll('span[data-highlight="' + highlightType + '"]')
+      .forEach(node => {
+        if (!node.textContent.length) {
+          node.parentNode.removeChild(node)
+        }
+      })
   },
 
   createMarkerNode (markerMarkup, highlightType, win) {
