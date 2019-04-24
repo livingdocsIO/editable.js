@@ -189,7 +189,7 @@ le Make The <br> World Go Round`)
 
     it('can handle intersecting highlights', () => {
       this.highlightRange('first', 0, 3)
-      this.highlightRange('second', 3, 7)
+      this.highlightRange('second', 2, 7)
       this.highlightRange('third', 4, 6)
       const expectedRanges = {
         first: {
@@ -198,8 +198,8 @@ le Make The <br> World Go Round`)
           end: 3
         },
         second: {
-          text: 'ple ',
-          start: 3,
+          text: 'ople ',
+          start: 2,
           end: 7
         },
         third: {
@@ -208,11 +208,10 @@ le Make The <br> World Go Round`)
           end: 6
         }
       }
-      const expectedHtml = this.formatHtml(`<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">Peo</span>
-<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">p
-<span class="highlight-comment" data-word-id="third" data-editable="ui-unwrap" data-highlight="comment">le</span>
- </span>
-Make The <br> World Go Round`)
+      const expectedHtml = this.formatHtml(`<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">Pe</span>
+<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">
+<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">o</span>p
+<span class="highlight-comment" data-word-id="third" data-editable="ui-unwrap" data-highlight="comment">le</span> </span>Make The <br> World Go Round`)
       expect(this.getHtml()).toEqual(expectedHtml)
       expect(this.extract()).toEqual(expectedRanges)
     })
@@ -424,6 +423,30 @@ o Round</span>`)
         }
         teardownHighlightEnv(this)
       })
+    })
+  })
+
+  describe('highlightSupport on formatted text', () => {
+    it('can handle highlights surrounding <span> tags', () => {
+      setupHighlightEnv(this, 'a<span>b</span>cd')
+      this.highlightRange('first', 1, 3)
+      const extract = this.extract()
+
+      expect(extract.first.text).toEqual('bc')
+
+      const content = this.getHtml()
+      expect(content).toEqual('a<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"><span>b</span>c</span>d')
+    })
+
+    it('can handle highlights intersecting <span> tags', () => {
+      setupHighlightEnv(this, 'a<span data-word-id="x">bc</span>d')
+      this.highlightRange('first', 0, 2)
+      const extract = this.extract()
+
+      expect(extract.first.text).toEqual('ab')
+
+      const content = this.getHtml()
+      expect(content).toEqual('<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">a<span data-word-id="x">b</span></span><span data-word-id="x">c</span>d')
     })
   })
 
