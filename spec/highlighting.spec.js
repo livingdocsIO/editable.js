@@ -274,8 +274,9 @@ Make The <br> World Go Round`)
       }
       const expectedHtml = this.formatHtml(`People M
 <span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">a</span>
-</span>
 ke The <br> World Go Round`)
+
+      console.log(expectedHtml)
 
       expect(this.extract()).toEqual(expectedRanges)
       expect(this.getHtml()).toEqual(expectedHtml)
@@ -386,6 +387,43 @@ o Round</span>`)
 
       const highlightSpan = this.$div.find('[data-word-id="myId"]')
       expect(highlightSpan.length).toEqual(0)
+    })
+  })
+
+  describe('highlight support with special characters', () => {
+    it('treats special characters as expected', () => {
+      // actual / expected length / expected text
+      const characters = [
+        ['😐', 2, '😐'],
+        ['&nbsp;', 1, ' '], // eslint-disable-line
+        [' ', 1, ' '], // eslint-disable-line
+        [' ', 1, ' '], // eslint-disable-line,
+        [' ', 1, ' '], // eslint-disable-line,
+        ['\r', 0],
+        ['\n', 0],
+        ['<br>', 0]
+      ]
+
+      characters.forEach(([char, expectedLength, expectedText]) => {
+        setupHighlightEnv(this, char)
+        const range = rangy.createRange()
+        const node = this.$div[0]
+        range.selectNode(node.firstChild)
+        const { start, end } = range.toCharacterRange(this.$div[0])
+        this.highlightRange('char', start, end)
+        if (expectedLength === 0) {
+          expect(this.extract()).toEqual(undefined)
+        } else {
+          expect(this.extract()).toEqual({
+            char: {
+              start: 0,
+              end: expectedLength,
+              text: expectedText
+            }
+          })
+        }
+        teardownHighlightEnv(this)
+      })
     })
   })
 
