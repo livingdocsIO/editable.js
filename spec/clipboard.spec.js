@@ -1,4 +1,5 @@
-import { parseContent } from '../src/clipboard'
+import { parseContent, updateConfig } from '../src/clipboard'
+import * as config from '../src/config'
 
 describe('Clipboard', () => {
   describe('parseContent()', () => {
@@ -141,6 +142,13 @@ describe('Clipboard', () => {
         </p>`
 
       expect(parseContent(div)[0]).toEqual('bar')
+    })
+
+    it('keeps internal links of a anchorTag with an href attribute', () => {
+      expect(extractSingleBlock('<a href="http://localhost:9876/test123">a</a>')).toEqual('<a href="http://localhost:9876/test123">a</a>')
+      config.pastedHtmlRules.keepInternalRelativeLinks = true
+      updateConfig(config)
+      expect(extractSingleBlock('<a href="http://localhost:9876/test123">a</a>')).toEqual('<a href="/test123">a</a>')
     })
   })
 })

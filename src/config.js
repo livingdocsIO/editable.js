@@ -70,5 +70,7 @@ export const pastedHtmlRules = {
 
   // A list of elements that will get completly removed when pasted. Their tags
   // and content (text content and child elements) will get removed.
-  blacklistedElements: ['style', 'script']
+  blacklistedElements: ['style', 'script'],
+
+  keepInternalRelativeLinks: false
 }

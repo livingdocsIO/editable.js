@@ -8,6 +8,7 @@ let allowedElements, requiredAttributes, transformElements, blockLevelElements
 let splitIntoBlocks, blacklistedElements
 let whitespaceOnly = /^\s*$/
 let blockPlaceholder = '<!-- BLOCK -->'
+let keepInternalRelativeLinks
 
 updateConfig(config)
 export function updateConfig (config) {
@@ -16,6 +17,7 @@ export function updateConfig (config) {
   requiredAttributes = rules.requiredAttributes || {}
   transformElements = rules.transformElements || {}
   blacklistedElements = rules.blacklistedElements || []
+  keepInternalRelativeLinks = rules.keepInternalRelativeLinks || false
 
   blockLevelElements = {}
   rules.blockLevelElements.forEach((name) => { blockLevelElements[name] = true })
@@ -41,7 +43,6 @@ export function paste (element, cursor, callback) {
     const blocks = parseContent(pasteHolder)
     $(pasteHolder).remove()
     element.removeAttribute(config.pastingAttribute)
-
     cursor.restore()
     callback(blocks, cursor)
   }, 0)
@@ -68,6 +69,8 @@ export function injectPasteholder (document) {
  * - Parse pasted content
  * - Split it up into blocks
  * - clean and normalize every block
+ * - optionally strip the host location an anchorTag-href
+ *   www.livindocs.io/internalLink -> /internalLink
  *
  * @param {DOM node} A container where the pasted content is located.
  * @returns {Array of Strings} An array of cleaned innerHTML like strings.
@@ -87,6 +90,12 @@ export function filterHtmlElements (elem) {
       return ''
     }
 
+    // Keep internal relative links relative (on paste).
+    if (keepInternalRelativeLinks && child.nodeName === 'A' && child.href) {
+      const stripInternalHost = child.href.replace(window.location.origin, '')
+      child.setAttribute('href', stripInternalHost)
+    }
+
     if (child.nodeType === nodeType.elementNode) {
       const childContent = filterHtmlElements(child)
       return content + conditionalNodeWrap(child, childContent)
@@ -94,7 +103,6 @@ export function filterHtmlElements (elem) {
 
     // Escape HTML characters <, > and &
     if (child.nodeType === nodeType.textNode) return content + string.escapeHtml(child.nodeValue)
-
     return content
   }, '')
 }
