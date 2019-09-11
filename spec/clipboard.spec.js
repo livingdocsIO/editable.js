@@ -1,8 +1,14 @@
 import { parseContent, updateConfig } from '../src/clipboard'
+import cloneDeep from 'lodash.clonedeep'
 import * as config from '../src/config'
 
 describe('Clipboard', () => {
   describe('parseContent()', () => {
+
+    afterEach(() => {
+      updateConfig(config)
+    })
+
     function extract (str) {
       const div = document.createElement('div')
       div.innerHTML = str
@@ -24,8 +30,36 @@ describe('Clipboard', () => {
       expect(extractSingleBlock(' a ')).toEqual('a')
     })
 
-    it('keeps a <a> element with an href attribute', () => {
+    it('keeps a <a> element with an href attribute with an absolute link', () => {
       expect(extractSingleBlock('<a href="http://link.com">a</a>')).toEqual('<a href="http://link.com">a</a>')
+    })
+
+    it('keeps a <a> element with an href attribute with an relative link', () => {
+      expect(extractSingleBlock('<a href="/link/1337">a</a>')).toEqual('<a href="/link/1337">a</a>')
+    })
+
+    it('keeps a <a> element with an a list of whitelisted-attributes', () => {
+      const updatedConfig = cloneDeep(config)
+      console.log(updatedConfig)
+      updatedConfig.pastedHtmlRules.allowedElements = { a: { href: true, rel: true, target: true } }
+
+      updateConfig(updatedConfig)
+      expect(
+        extractSingleBlock(
+          '<a target="_blank" rel="nofollow" href="/link/1337">a</a>'
+        )
+      ).toEqual('<a target="_blank" rel="nofollow" href="/link/1337">a</a>')
+    })
+
+    it('removes attributes that arent whitelisted for an <a> element ', () => {
+      const updatedConfig = cloneDeep(config)
+      updatedConfig.pastedHtmlRules.allowedElements = { a: { href: true } }
+      updateConfig(updatedConfig)
+      expect(
+        extractSingleBlock(
+          '<a target="_blank" rel="nofollow" href="/link/1337">a</a>'
+        )
+      ).toEqual('<a href="/link/1337">a</a>')
     })
 
     it('keeps a <strong> element', () => {
@@ -93,6 +127,11 @@ describe('Clipboard', () => {
       expect(extractSingleBlock('<a>a</a>')).toEqual('a')
     })
 
+
+    it('removes an <a> element with an empty href attribute', () => {
+      expect(extractSingleBlock('<a href>a</a>')).toEqual('a')
+    })
+
     it('removes an <a> element with an empty href attribute', () => {
       expect(extractSingleBlock('<a href="">a</a>')).toEqual('a')
     })
@@ -120,6 +159,14 @@ describe('Clipboard', () => {
       expect(extractSingleBlock('<b>a</b>')).toEqual('<strong>a</strong>')
     })
 
+    it('changes absolute links to relative ones with the keepInternalRelativeLinks flag set to true', () => {
+      const updatedConfig = cloneDeep(config)
+      updatedConfig.pastedHtmlRules.keepInternalRelativeLinks = true
+      console.log(updatedConfig)
+      updateConfig(updatedConfig)
+      expect(extractSingleBlock(`<a href="${window.location.origin}/test123">a</a>`)).toEqual('<a href="/test123">a</a>')
+    })
+
     // Escape Content
     // --------------
 
@@ -142,13 +189,6 @@ describe('Clipboard', () => {
         </p>`
 
       expect(parseContent(div)[0]).toEqual('bar')
-    })
-
-    it('keeps internal links of a anchorTag with an href attribute', () => {
-      expect(extractSingleBlock('<a href="http://localhost:9876/test123">a</a>')).toEqual('<a href="http://localhost:9876/test123">a</a>')
-      config.pastedHtmlRules.keepInternalRelativeLinks = true
-      updateConfig(config)
-      expect(extractSingleBlock('<a href="http://localhost:9876/test123">a</a>')).toEqual('<a href="/test123">a</a>')
     })
   })
 })
