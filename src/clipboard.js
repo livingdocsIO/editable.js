@@ -92,7 +92,7 @@ export function filterHtmlElements (elem) {
 
     // Keep internal relative links relative (on paste).
     if (keepInternalRelativeLinks && child.nodeName === 'A' && child.href) {
-      const stripInternalHost = child.href.replace(window.location.origin, '')
+      const stripInternalHost = child.getAttribute('href').replace(window.location.origin, '')
       child.setAttribute('href', stripInternalHost)
     }
 
@@ -112,7 +112,7 @@ export function conditionalNodeWrap (child, content) {
   nodeName = transformNodeName(nodeName)
 
   if (shouldKeepNode(nodeName, child)) {
-    var attributes = filterAttributes(nodeName, child)
+    const attributes = filterAttributes(nodeName, child)
 
     if (nodeName === 'br') return `<${nodeName + attributes}>`
 
@@ -134,10 +134,11 @@ export function conditionalNodeWrap (child, content) {
   return content
 }
 
+// returns string of concatenated attributes e.g. 'target="_blank" rel="nofollow" href="/test.com"'
 export function filterAttributes (nodeName, node) {
-  return Array.from(node.attributes).reduce((attributes, {name, value}) => {
-    if ((allowedElements[nodeName][name]) && value) {
-      return ` ${name}="${value}"`
+  return Array.from(node.attributes).reduce((attributes, { name, value }) => {
+    if (allowedElements[nodeName][name] && value) {
+      return `${attributes} ${name}="${value}"`
     }
     return attributes
   }, '')
