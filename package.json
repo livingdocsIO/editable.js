@@ -36,6 +36,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
+    "lodash.clonedeep": "^4.5.0",
     "normalize.css": "^4.1.1",
     "open-browser-webpack-plugin": "0.0.2",
     "prismjs": "^1.4.1",
