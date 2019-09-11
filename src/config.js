@@ -38,7 +38,9 @@ export const pastedHtmlRules = {
   // to get rid of a whole element (tag+content)
   allowedElements: {
     'a': {
-      'href': true
+      'href': true,
+      'rel': true,
+      'target': true
     },
     'strong': {},
     'em': {},
