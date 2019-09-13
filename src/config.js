@@ -38,7 +38,9 @@ export const pastedHtmlRules = {
   // to get rid of a whole element (tag+content)
   allowedElements: {
     'a': {
-      'href': true
+      'href': true,
+      'rel': true,
+      'target': true
     },
     'strong': {},
     'em': {},
@@ -70,5 +72,7 @@ export const pastedHtmlRules = {
 
   // A list of elements that will get completly removed when pasted. Their tags
   // and content (text content and child elements) will get removed.
-  blacklistedElements: ['style', 'script']
+  blacklistedElements: ['style', 'script'],
+
+  keepInternalRelativeLinks: false
 }
