@@ -356,9 +356,10 @@ const Editable = module.exports = class Editable {
    * @param  {Object} [options.textRange] An optional range which gets used to set the markers.
    * @param  {Number} options.textRange.start
    * @param  {Number} options.textRange.end
+   * @param  {Boolean} options.raiseEvents do throw change events
    * @return {Number} The text-based start offset of the newly applied highlight or `-1` if the range was considered invalid.
    */
-  highlight ({editableHost, text, highlightId, textRange}) {
+  highlight ({editableHost, text, highlightId, textRange, raiseEvents}) {
     if (!textRange) {
       return highlightSupport.highlightText(editableHost, text, highlightId)
     }
@@ -374,7 +375,7 @@ const Editable = module.exports = class Editable {
       )
       return -1
     }
-    return highlightSupport.highlightRange(editableHost, highlightId, textRange.start, textRange.end)
+    return highlightSupport.highlightRange(editableHost, highlightId, textRange.start, textRange.end, raiseEvents ? this.dispatcher : undefined)
   }
 
   /**
@@ -396,8 +397,8 @@ const Editable = module.exports = class Editable {
     )
   }
 
-  removeHighlight ({editableHost, highlightId}) {
-    highlightSupport.removeHighlight(editableHost, highlightId)
+  removeHighlight ({editableHost, highlightId, raiseEvents}) {
+    highlightSupport.removeHighlight(editableHost, highlightId, raiseEvents ? this.dispatcher : undefined)
   }
 
   decorateHighlight ({editableHost, highlightId, addCssClass, removeCssClass}) {

@@ -11,11 +11,21 @@ function setupHighlightEnv (context, text) {
   context.$div = $('<div>' + context.text + '</div>').appendTo(document.body)
   context.editable = new Editable()
   context.editable.add(context.$div)
-  context.highlightRange = (highlightId, start, end) => {
+  context.highlightRange = (highlightId, start, end, dispatcher) => {
     return highlightSupport.highlightRange(
       context.$div[0],
       highlightId,
-      start, end
+      start,
+      end,
+      dispatcher
+    )
+  }
+
+  context.removeHighlight = (highlightId, dispatcher) => {
+    return highlightSupport.removeHighlight(
+      context.$div[0],
+      highlightId,
+      dispatcher
     )
   }
 
@@ -537,6 +547,23 @@ o Round</span>`)
       const expectedHtml = '<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">😐 Make&nbsp;The \n 🌍 Go \n🔄</span>'
       expect(this.getHtml()).toEqual(expectedHtml)
       expect(this.extract()).toEqual(expectedRanges)
+    })
+
+    it('notify change on add highlight when dispatcher is given', () => {
+      let called = 0
+      const dispatcher = {notify: () => called++}
+      this.highlightRange('first', 0, 20, dispatcher)
+
+      expect(called).toEqual(1)
+    })
+
+    it('notify change on remove highlight when dispatcher is given', () => {
+      let called = 0
+      const dispatcher = {notify: () => called++}
+      this.highlightRange('first', 0, 20)
+      this.removeHighlight('first', dispatcher)
+
+      expect(called).toEqual(1)
     })
   })
 })
