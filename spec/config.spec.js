@@ -39,6 +39,18 @@ describe('Editable configuration', () => {
       Editable.globalConfig(originalConfig)
     })
 
+    it('retreives the default config', () => {
+      expect(originalConfig).toEqual(Editable.getGlobalConfig())
+    })
+
+    it('retrieves the default config after changes to the globalConfig', () => {
+      Editable.globalConfig({
+        editableClass: 'editable-instance'
+      })
+
+      expect(originalConfig).not.toEqual(Editable.getGlobalConfig())
+    })
+
     it('has a default value for "editableClass"', () => {
       expect(config.editableClass).toEqual('js-editable')
     })
