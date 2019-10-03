@@ -275,8 +275,6 @@ le Make The <br> World Go Round`)
 <span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">a</span>
 ke The <br> World Go Round`)
 
-      console.log(expectedHtml)
-
       expect(this.extract()).toEqual(expectedRanges)
       expect(this.getHtml()).toEqual(expectedHtml)
     })

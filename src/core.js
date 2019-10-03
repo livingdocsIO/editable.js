@@ -59,6 +59,13 @@ const Editable = module.exports = class Editable {
   }
 
   /**
+   * @returns the default Editable configs from config.js
+   */
+  static getGlobalConfig () {
+    return config
+  }
+
+  /**
   * Set configuration options that affect all editable
   * instances.
   *

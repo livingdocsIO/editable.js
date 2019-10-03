@@ -40,7 +40,6 @@ describe('Clipboard', () => {
 
     it('keeps a <a> element with an a list of whitelisted-attributes', () => {
       const updatedConfig = cloneDeep(config)
-      console.log(updatedConfig)
       updatedConfig.pastedHtmlRules.allowedElements = { a: { href: true, rel: true, target: true } }
 
       updateConfig(updatedConfig)
@@ -162,7 +161,6 @@ describe('Clipboard', () => {
     it('changes absolute links to relative ones with the keepInternalRelativeLinks flag set to true', () => {
       const updatedConfig = cloneDeep(config)
       updatedConfig.pastedHtmlRules.keepInternalRelativeLinks = true
-      console.log(updatedConfig)
       updateConfig(updatedConfig)
       expect(extractSingleBlock(`<a href="${window.location.origin}/test123">a</a>`)).toEqual('<a href="/test123">a</a>')
     })
