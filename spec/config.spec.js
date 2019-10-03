@@ -39,11 +39,11 @@ describe('Editable configuration', () => {
       Editable.globalConfig(originalConfig)
     })
 
-    it('retreives the default config', () => {
+    it('retreives the config', () => {
       expect(originalConfig).toEqual(Editable.getGlobalConfig())
     })
 
-    it('retrieves the default config after changes to the globalConfig', () => {
+    it('retrieves the current state of the config', () => {
       Editable.globalConfig({
         editableClass: 'editable-instance'
       })
