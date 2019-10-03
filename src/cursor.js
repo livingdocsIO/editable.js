@@ -90,11 +90,8 @@ export default class Cursor {
   }
 
   setVisibleSelection () {
-    // Without setting focus() Firefox is not happy (seems setting a selection is not enough.
-    // Probably because Firefox can handle multiple selections).
     if (this.win.document.activeElement !== this.host) {
       const {x, y} = viewport.getScrollPosition(this.win)
-      $(this.host).focus()
       this.win.scrollTo(x, y)
     }
     rangy.getSelection(this.win).setSingleRange(this.range)

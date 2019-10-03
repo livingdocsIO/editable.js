@@ -31,7 +31,7 @@ const highlightSupport = {
     }
   },
 
-  highlightRange (editableHost, highlightId, startIndex, endIndex) {
+  highlightRange (editableHost, highlightId, startIndex, endIndex, dispatcher) {
     if (this.hasHighlight(editableHost, highlightId)) {
       this.removeHighlight(editableHost, highlightId)
     }
@@ -52,6 +52,9 @@ const highlightSupport = {
     range.deleteContents()
     range.insertNode(marker)
     highlightSupport.cleanupStaleMarkerNodes(editableHost, 'comment')
+    if (dispatcher) {
+      dispatcher.notify('change', editableHost)
+    }
     return startIndex
   },
 
@@ -65,10 +68,13 @@ const highlightSupport = {
       })
   },
 
-  removeHighlight (editableHost, highlightId) {
+  removeHighlight (editableHost, highlightId, dispatcher) {
     $(editableHost).find(`[data-word-id="${highlightId}"]`)
       .each((index, elem) => {
         content.unwrap(elem)
+        if (dispatcher) {
+          dispatcher.notify('change', editableHost)
+        }
       })
   },
 
