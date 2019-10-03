@@ -63,7 +63,7 @@ describe('Spellcheck:', function () {
         this.errors = []
 
         this.highlighting.highlight(this.p)
-        // console.log('this.p.outerHTML', this.p.outerHTML)
+
         $misspelledWord = $(this.p).find('.misspelled-word')
         expect($misspelledWord.length).toEqual(0)
       })
