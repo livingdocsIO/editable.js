@@ -55,7 +55,9 @@ export default function createDefaultBehavior (editable) {
         trailingBr.setAttribute('data-editable', 'remove')
         cursor.insertBefore(trailingBr)
       } else {
-        cursor.insertBefore(document.createElement('br'))
+        const trailingBr = document.createElement('br')
+        trailingBr.setAttribute('data-editable', 'newline')
+        cursor.insertBefore(trailingBr)
       }
 
       cursor.setVisibleSelection()
