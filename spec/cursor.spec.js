@@ -53,6 +53,12 @@ describe('Cursor', function () {
       })
     })
 
+    describe('isAtEnd()', () => {
+      it('is true', () => {
+        expect(this.cursor.isAtTextEnd()).toBe(true)
+      })
+    })
+
     describe('isAtBeginning()', () => {
       it('is false', () => {
         expect(this.cursor.isAtBeginning()).toBe(false)
@@ -66,6 +72,7 @@ describe('Cursor', function () {
         // move the cursor so we can check the restore method.
         this.cursor.moveAtBeginning()
         expect(this.cursor.isAtBeginning()).toBe(true)
+        expect(this.cursor.isAtTextEnd()).toBe(false)
 
         this.cursor.restore()
         expect(this.cursor.isAtEnd()).toBe(true)

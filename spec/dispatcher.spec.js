@@ -195,5 +195,18 @@ describe('Dispatcher', () => {
         $elem.trigger(event)
       })
     })
+
+    describe('on newline', () => {
+      beforeEach(() => {
+        event = $.Event('keydown')
+        event.shiftKey = true
+        event.keyCode = 13
+      })
+
+      it('fires newline when shift + enter is pressed', (done) => {
+        on('newline', done)
+        $elem.trigger(event)
+      })
+    })
   })
 })
