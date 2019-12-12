@@ -10,6 +10,11 @@ import browser from 'bowser'
 */
 export const contenteditable = typeof document.documentElement.contentEditable !== 'undefined'
 
+const parser = browser.getParser(window.navigator.userAgent)
+const browserName = parser.getBrowser()
+const browserEngine = parser.getEngineName()
+const webKit = browserEngine === 'WebKit'
+
 /**
  * Check selectionchange event (currently supported in IE, Chrome and Safari)
  *
@@ -17,7 +22,7 @@ export const contenteditable = typeof document.documentElement.contentEditable !
  * https://github.com/ckeditor/ckeditor-dev/blob/master/core/selection.js#L388
  */
 // not exactly feature detection... is it?
-export const selectionchange = !(browser.gecko || browser.opera)
+export const selectionchange = !(browserEngine === 'Gecko' || browserName === 'Opera')
 
 // See Keyboard.prototype.preventContenteditableBug for more information.
-export const contenteditableSpanBug = !!browser.webkit
+export const contenteditableSpanBug = !!webKit
