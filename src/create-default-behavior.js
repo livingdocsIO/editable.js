@@ -48,19 +48,13 @@ export default function createDefaultBehavior (editable) {
     },
 
     newline (element, cursor) {
-      cursor.insertBefore(document.createElement('br'))
 
-      if (cursor.isAtEnd()) {
-        log('at the end')
-
-        const noWidthSpace = document.createTextNode('\u200B')
-        cursor.insertAfter(noWidthSpace)
-
-        // var trailingBr = document.createElement('br')
-        // trailingBr.setAttribute('type', '-editablejs')
-        // cursor.insertAfter(trailingBr)
+      if (cursor.isAtTextEnd()) {
+        const trailingBr = document.createElement('br')
+        trailingBr.setAttribute('data-editable', 'remove')
+        cursor.insertBefore(trailingBr)
       } else {
-        log('not at the end')
+        cursor.insertBefore(document.createElement('br'))
       }
 
       cursor.setVisibleSelection()
