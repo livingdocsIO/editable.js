@@ -64,7 +64,7 @@
   "license": "MIT",
   "main": "lib/core.js",
   "peerDependencies": {
-    "jquery": "^2.2.4"
+    "jquery": "^3.4.1"
   },
   "repository": {
     "type": "git",
