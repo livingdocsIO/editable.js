@@ -47,8 +47,8 @@ describe('Cursor', function () {
       expect(this.range.endOffset).toEqual(1)
     })
 
-    describe('isAtEnd()', () => {
-      it('is true', () => {
+    describe('isAtTextEnd()', () => {
+      it('returns true when at text end', () => {
         expect(this.cursor.isAtEnd()).toBe(true)
       })
     })
