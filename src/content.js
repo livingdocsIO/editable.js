@@ -180,6 +180,24 @@ export function getTagsByName (host, range, tagName) {
   })
 }
 
+export function getTagsByNameAndAttributes (host, range, elem) {
+  return getTags(host, range, (node) => {
+    return node.nodeName === elem.nodeName.toUpperCase() &&
+      areSameAttributes(node.attributes, elem.attributes)
+  })
+}
+
+export function areSameAttributes (attrs1, attrs2) {
+  if (attrs1.length !== attrs2.length) return false
+
+  for (var i = 0; i < attrs1.length; i++) {
+    const attr = attrs2[attrs1[i].name]
+    if (!(attr && attr.value === attrs1[i].value)) return false
+  }
+
+  return true
+}
+
 // Get all tags that start or end inside the range
 export function getInnerTags (range, filterFunc) {
   return range.getNodes([nodeType.elementNode], filterFunc)
@@ -233,11 +251,11 @@ export function expandTo (host, range, elem) {
 }
 
 export function toggleTag (host, range, elem) {
-  const elems = getTagsByName(host, range, elem.nodeName)
+  const elems = getTagsByNameAndAttributes(host, range, elem)
 
   if (elems.length === 1 &&
     isExactSelection(range, elems[0], 'visible')) {
-    return removeFormatting(host, range, elem.nodeName)
+    return removeFormattingElem(host, range, elem)
   }
 
   return forceWrap(host, range, elem)
@@ -249,7 +267,7 @@ export function isWrappable (range) {
 
 export function forceWrap (host, range, elem) {
   let restoredRange = restoreRange(host, range, () => {
-    nuke(host, range, elem.nodeName)
+    nukeElem(host, range, elem)
   })
 
   // remove all tags if the range is not wrappable
@@ -285,6 +303,12 @@ export function unwrap (elem) {
     : $elem.remove()
 }
 
+export function removeFormattingElem (host, range, elem) {
+  return restoreRange(host, range, () => {
+    nukeElem(host, range, elem)
+  })
+}
+
 export function removeFormatting (host, range, tagName) {
   return restoreRange(host, range, () => {
     nuke(host, range, tagName)
@@ -296,6 +320,18 @@ export function removeFormatting (host, range, tagName) {
 export function nuke (host, range, tagName) {
   getTags(host, range).forEach((elem) => {
     if (elem.nodeName !== 'BR' && (!tagName || elem.nodeName === tagName.toUpperCase())) {
+      unwrap(elem)
+    }
+  })
+}
+
+// Unwrap all tags this range is affected by.
+// Can also affect content outside of the range.
+export function nukeElem (host, range, node) {
+  getTags(host, range).forEach((elem) => {
+    if (elem.nodeName !== 'BR' && (!node ||
+        (elem.nodeName === node.nodeName.toUpperCase() &&
+          areSameAttributes(elem.attributes, node.attributes)))) {
       unwrap(elem)
     }
   })

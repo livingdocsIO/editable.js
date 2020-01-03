@@ -119,6 +119,16 @@ export default class Selection extends Cursor {
     this.setSelection()
   }
 
+  toggleCustom ({elem, attributes}) {
+    const customElem = this.createElement(elem, attributes)
+    this.toggle(customElem)
+  }
+
+  makeCustom ({elem, attributes}) {
+    const customElem = this.createElement(elem, attributes)
+    this.forceWrap(customElem)
+  }
+
   makeBold () {
     const bold = this.createElement(config.boldMarkup.name, config.boldMarkup.attribs)
     this.forceWrap(bold)
