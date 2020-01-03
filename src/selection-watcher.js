@@ -24,9 +24,17 @@ export default class SelectionWatcher {
 
   /**
    * Updates the internal selection pointer to the current rangy selection.
+   * Returns true if no exception occured.
    */
   syncSelection () {
-    this.rangySelection = rangy.getSelection(this.win)
+    // it is possible that rangy has a problem with the nativeSelection
+    try {
+      this.rangySelection = rangy.getSelection(this.win)
+    } catch (err) {
+      return false
+    }
+
+    return true
   }
 
   /**
@@ -34,12 +42,12 @@ export default class SelectionWatcher {
   * otherwise return an empty RangeContainer
   */
   getRangeContainer () {
-    this.syncSelection()
+    const successfulSync = this.syncSelection()
 
     // rangeCount is 0 or 1 in all browsers except firefox
     // firefox can work with multiple ranges
     // (on a mac hold down the command key to select multiple ranges)
-    if (this.rangySelection.rangeCount) {
+    if (this.rangySelection.rangeCount && successfulSync) {
       const range = this.rangySelection.getRangeAt(0)
       const hostNode = parser.getHost(range.commonAncestorContainer)
       if (hostNode) return new RangeContainer(hostNode, range)
