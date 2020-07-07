@@ -169,6 +169,38 @@ describe('Content', () => {
     })
   })
 
+  describe('getTagsByNameAndAttributes()', () => {
+    let range
+    beforeEach(() => {
+      range = rangy.createRange()
+    })
+
+    it('filters tag with attributes match', () => {
+      const test = $('<div><span class="foo"><span class="test">a</span></span></div>')
+      range.setStart(test[0], 0)
+      range.setEnd(test[0], 1)
+      const tags = content.getTagsByNameAndAttributes(test[0], range, $('<span class="foo">')[0])
+      expect(content.getTagNames(tags)).toEqual(['SPAN'])
+    })
+
+    it('filters tag with attributes match', () => {
+      const test = $('<div><span class="foo"><span class="foo">a</span></span></div>')
+      range.setStart(test[0], 0)
+      range.setEnd(test[0], 1)
+      const tags = content.getTagsByNameAndAttributes(test[0], range, $('<span class="foo">')[0])
+      expect(content.getTagNames(tags)).toEqual(['SPAN', 'SPAN'])
+    })
+
+    it('filters inner tags', () => {
+      // <div>|<span class="foo"><span class="test">a</span></span>|</div>
+      const test = $('<div><span class="foo"><span class="test">a</span></span></div>')
+      range.setStart(test[0], 0)
+      range.setEnd(test[0], 1)
+      const tags = content.getTagsByNameAndAttributes(test[0], range, $('<span class="foo">')[0])
+      expect(content.getTagNames(tags)).toEqual(['SPAN'])
+    })
+  })
+
   describe('wrap()', () => {
     let range
 

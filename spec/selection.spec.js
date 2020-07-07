@@ -103,6 +103,27 @@ describe('Selection', function () {
       })
     })
 
+    describe('custom:', function () {
+
+      beforeEach(function () {
+        this.customElement = {tagName: 'span', attributes: {class: 'foo'}}
+      })
+
+      it('makes the selection custom tag with the configured attributes', function () {
+        this.selection.makeCustom(this.customElement)
+        const customTags = this.selection.getTagsByName(this.customElement.tagName)
+        const html = getHtml(customTags[0])
+        expect(html).toEqual('<span class="foo">foobar</span>')
+      })
+
+      it('toggles the custom selection', function () {
+        this.selection.makeCustom(this.customElement)
+        this.selection.toggleCustom(this.customElement)
+        const customTags = this.selection.getTagsByName(this.customElement.tagName)
+        expect(customTags.length).toEqual(0)
+      })
+    })
+
     describe('bold:', function () {
 
       beforeEach(function () {
