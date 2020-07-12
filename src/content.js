@@ -176,13 +176,13 @@ export function getTags (host, range, filterFunc) {
 
 export function getTagsByName (host, range, tagName) {
   return getTags(host, range, (node) => {
-    return node.nodeName === tagName.toUpperCase()
+    return node.nodeName.toUpperCase() === tagName.toUpperCase()
   })
 }
 
 export function getTagsByNameAndAttributes (host, range, elem) {
   return getTags(host, range, (node) => {
-    return node.nodeName === elem.nodeName.toUpperCase() &&
+    return node.nodeName.toUpperCase() === elem.nodeName.toUpperCase() &&
       areSameAttributes(node.attributes, elem.attributes)
   })
 }
@@ -190,7 +190,7 @@ export function getTagsByNameAndAttributes (host, range, elem) {
 export function areSameAttributes (attrs1, attrs2) {
   if (attrs1.length !== attrs2.length) return false
 
-  for (var i = 0; i < attrs1.length; i++) {
+  for (let i = 0; i < attrs1.length; i++) {
     const attr = attrs2[attrs1[i].name]
     if (!(attr && attr.value === attrs1[i].value)) return false
   }
@@ -319,7 +319,8 @@ export function removeFormatting (host, range, tagName) {
 // Can also affect content outside of the range.
 export function nuke (host, range, tagName) {
   getTags(host, range).forEach((elem) => {
-    if (elem.nodeName !== 'BR' && (!tagName || elem.nodeName === tagName.toUpperCase())) {
+    if (elem.nodeName.toUpperCase() !== 'BR' &&
+      (!tagName || elem.nodeName.toUpperCase() === tagName.toUpperCase())) {
       unwrap(elem)
     }
   })
@@ -329,8 +330,8 @@ export function nuke (host, range, tagName) {
 // Can also affect content outside of the range.
 export function nukeElem (host, range, node) {
   getTags(host, range).forEach((elem) => {
-    if (elem.nodeName !== 'BR' && (!node ||
-        (elem.nodeName === node.nodeName.toUpperCase() &&
+    if (elem.nodeName.toUpperCase() !== 'BR' && (!node ||
+        (elem.nodeName.toUpperCase() === node.nodeName.toUpperCase() &&
           areSameAttributes(elem.attributes, node.attributes)))) {
       unwrap(elem)
     }
@@ -388,6 +389,6 @@ export function containsString (range, str) {
 // Can also affect content outside of the range.
 export function nukeTag (host, range, tagName) {
   getTags(host, range).forEach((elem) => {
-    if (elem.nodeName === tagName) unwrap(elem)
+    if (elem.nodeName.toUpperCase() === tagName.toUpperCase()) unwrap(elem)
   })
 }
