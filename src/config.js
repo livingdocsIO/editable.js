@@ -24,6 +24,16 @@ export const underlineMarkup = {
   name: 'u',
   attribs: {}
 }
+export const superscriptMarkup = {
+  type: 'tag',
+  name: 'sup',
+  attribs: {}
+}
+export const subscriptMarkup = {
+  type: 'tag',
+  name: 'sub',
+  attribs: {}
+}
 export const linkMarkup = {
   type: 'tag',
   name: 'a',

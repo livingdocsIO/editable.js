@@ -218,6 +218,68 @@ describe('Selection', function () {
       })
     })
 
+    describe('superscript:', function () {
+      beforeEach(function () {
+        this.oldSuperscriptMarkup = config.superscriptMarkup
+        config.superscriptMarkup = {
+          type: 'tag',
+          name: 'sup',
+          attribs: {
+            'class': 'bar'
+          }
+        }
+      })
+
+      afterEach(function () {
+        config.superscriptMarkup = this.oldSuperscriptMarkup
+      })
+
+      it('makes the selection superscript with the configured class', function () {
+        this.selection.makeSuperscript()
+        const superscriptTags = this.selection.getTagsByName('sup')
+        const html = getHtml(superscriptTags[0])
+        expect(html).toEqual('<sup class="bar">foobar</sup>')
+      })
+
+      it('toggles the superscript selection', function () {
+        this.selection.makeSuperscript()
+        this.selection.toggleSuperscript()
+        const superscriptTags = this.selection.getTagsByName('sup')
+        expect(superscriptTags.length).toEqual(0)
+      })
+    })
+
+    describe('subscript:', function () {
+      beforeEach(function () {
+        this.oldSubscriptMarkup = config.subscriptMarkup
+        config.subscriptMarkup = {
+          type: 'tag',
+          name: 'sub',
+          attribs: {
+            'class': 'bar'
+          }
+        }
+      })
+
+      afterEach(function () {
+        config.subscriptMarkup = this.oldSubscriptMarkup
+      })
+
+      it('makes the selection subscript with the configured class', function () {
+        this.selection.makeSubscript()
+        const subscriptTags = this.selection.getTagsByName('sub')
+        const html = getHtml(subscriptTags[0])
+        expect(html).toEqual('<sub class="bar">foobar</sub>')
+      })
+
+      it('toggles the subscript selection', function () {
+        this.selection.makeSubscript()
+        this.selection.toggleSubscript()
+        const subscriptTags = this.selection.getTagsByName('sub')
+        expect(subscriptTags.length).toEqual(0)
+      })
+    })
+
     describe('links:', function () {
       beforeEach(function () {
         this.oldLinkMarkup = config.italicMarkup

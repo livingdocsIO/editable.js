@@ -159,6 +159,26 @@ export default class Selection extends Cursor {
     this.toggle(u)
   }
 
+  makeSuperscript () {
+    const sup = this.createElement(config.superscriptMarkup.name, config.superscriptMarkup.attribs)
+    this.forceWrap(sup)
+  }
+
+  toggleSuperscript () {
+    const sup = this.createElement(config.superscriptMarkup.name, config.superscriptMarkup.attribs)
+    this.toggle(sup)
+  }
+
+  makeSubscript () {
+    const sub = this.createElement(config.subscriptMarkup.name, config.subscriptMarkup.attribs)
+    this.forceWrap(sub)
+  }
+
+  toggleSubscript () {
+    const sub = this.createElement(config.subscriptMarkup.name, config.subscriptMarkup.attribs)
+    this.toggle(sub)
+  }
+
   insertCharacter (character) {
     var cursor = this.deleteContent()
     var textNode = cursor.createTextNode(character)
