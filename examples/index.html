@@ -288,6 +288,22 @@ editable.on('change', elem => {
           </div>
 
         </div>
+        <div class="documentation">
+          <h4>
+            <span>spellcheckUpdated</span>
+          </h4>
+          <p>Fired when the spellcheckService has updated the spellcheck highlights.</p>
+
+          <div class="code-example">
+            <h3>Example:</h3>
+<pre><code class="language-javascript">
+editable.on('spellcheckUpdated', elem => {
+  const currentContent = editable.getContent(elem);
+})
+</code></pre>
+          </div>
+
+        </div>
 
         <!-- clipboard -->
         <div class="documentation">

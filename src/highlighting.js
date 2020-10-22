@@ -135,7 +135,6 @@ export default class Highlighting {
 
       this.safeHighlightMatches(editableHost, matchCollection.matches)
     })
-
   }
 
   // Calls highlightMatches internally but ensures
@@ -148,6 +147,9 @@ export default class Highlighting {
       })
     } else {
       this.highlightMatches(editableHost, matches)
+    }
+    if (this.editable.dispatcher) {
+      this.editable.dispatcher.notify('spellcheckUpdated', editableHost)
     }
   }
 

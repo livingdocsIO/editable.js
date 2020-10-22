@@ -43,6 +43,8 @@ You can check out a [simple demo on the website](https://livingdocsio.github.io/
   Fired when the cursor position changes.
 - **change**  
   Fired when the user has made a change.
+- **spellcheckUpdated**  
+  Fired when the spellcheckService has updated the spellcheck highlights.
 - **clipboard**  
   Fired for `copy`, `cut` and `paste` events.
 - **insert**  
