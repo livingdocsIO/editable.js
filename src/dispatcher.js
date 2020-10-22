@@ -168,14 +168,18 @@ export default class Dispatcher {
 
     const cursor = this.selectionWatcher.getSelection()
     if (!cursor || cursor.isSelection) return
-    // Detect if the browser moved the cursor in the next tick.
-    // If the cursor stays at its position, fire the switch event.
-    setTimeout(() => {
-      var newCursor = this.selectionWatcher.forceCursor()
-      if (newCursor.equals(cursor)) {
-        this.notify('switch', element, direction, newCursor)
-      }
-    })
+
+    if (direction === 'up' && cursor.isAtFirstLine()) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.notify('switch', element, direction, cursor)
+    }
+
+    if (direction === 'down' && cursor.isAtLastLine()) {
+      event.preventDefault()
+      event.stopPropagation()
+      this.notify('switch', element, direction, cursor)
+    }
   }
 
   /**
@@ -204,19 +208,11 @@ export default class Dispatcher {
 
     this.keyboard
       .on('up', function (event) {
-        self.dispatchSwitchEvent(event, this, 'before')
-      })
-
-      .on('left', function (event) {
-        self.dispatchSwitchEvent(event, this, 'before')
-      })
-
-      .on('right', function (event) {
-        self.dispatchSwitchEvent(event, this, 'after')
+        self.dispatchSwitchEvent(event, this, 'up')
       })
 
       .on('down', function (event) {
-        self.dispatchSwitchEvent(event, this, 'after')
+        self.dispatchSwitchEvent(event, this, 'down')
       })
 
       .on('backspace', function (event) {
