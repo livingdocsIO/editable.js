@@ -53,6 +53,13 @@ describe('Spellcheck:', function () {
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
       })
 
+      it('notify spellcheckUpdated on add highlight through spellcheck', function () {
+        let called = 0
+        this.editable.on('spellcheckUpdated', () => called++)
+        this.highlighting.highlight(this.p, true)
+        expect(called).toEqual(1)
+      })
+
       it('removes a corrected highlighted match.', function () {
         this.highlighting.highlight(this.p)
         let $misspelledWord = $(this.p).find('.misspelled-word')
