@@ -173,11 +173,9 @@ export default class Dispatcher {
     setTimeout(() => {
       var newCursor = this.selectionWatcher.forceCursor()
       if (newCursor.equals(cursor)) {
-        event.preventDefault()
-        event.stopPropagation()
         this.notify('switch', element, direction, newCursor)
       }
-    }, 0)
+    })
   }
 
   /**
@@ -205,15 +203,21 @@ export default class Dispatcher {
     const self = this
 
     this.keyboard
-      .on('left up', function (event) {
+      .on('up', function (event) {
         self.dispatchSwitchEvent(event, this, 'before')
       })
 
-      .on('right down', function (event) {
+      .on('left', function (event) {
+        self.dispatchSwitchEvent(event, this, 'before')
+      })
+
+      .on('right', function (event) {
         self.dispatchSwitchEvent(event, this, 'after')
       })
 
-      .on('tab shiftTab esc', () => {})
+      .on('down', function (event) {
+        self.dispatchSwitchEvent(event, this, 'after')
+      })
 
       .on('backspace', function (event) {
         const range = self.selectionWatcher.getFreshRange()
