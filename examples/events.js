@@ -183,7 +183,7 @@ export default function (editable) {
       if (!isFromFirstExample(elem)) return
       showEvent({
         name: 'split',
-        content: 'Split this block'
+        content: <span>Split this block</span>
       })
     })
 
@@ -195,7 +195,7 @@ export default function (editable) {
 
       showEvent({
         name: 'merge',
-        content: content
+        content: <span>{content}</span>
       })
     })
 
@@ -207,7 +207,7 @@ export default function (editable) {
 
       showEvent({
         name: 'switch',
-        content: content
+        content: <span>{content}</span>
       })
     })
 

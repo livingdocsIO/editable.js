@@ -45,6 +45,26 @@ export default class Cursor {
     )
   }
 
+  isAtLastLine () {
+    const range = rangy.createRange()
+    range.selectNodeContents(this.host)
+
+    const hostCoords = range.nativeRange.getBoundingClientRect()
+    const cursorCoords = this.range.nativeRange.getBoundingClientRect()
+
+    return hostCoords.bottom === cursorCoords.bottom
+  }
+
+  isAtFirstLine () {
+    const range = rangy.createRange()
+    range.selectNodeContents(this.host)
+
+    const hostCoords = range.nativeRange.getBoundingClientRect()
+    const cursorCoords = this.range.nativeRange.getBoundingClientRect()
+
+    return hostCoords.top === cursorCoords.top
+  }
+
   isAtBeginning () {
     return parser.isBeginningOfHost(
       this.host,
