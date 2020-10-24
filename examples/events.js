@@ -158,7 +158,6 @@ export default function (editable) {
     .on('paste', (elem, blocks, cursor) => {
       if (!isFromFirstExample(elem)) return
 
-      console.log(blocks)
       let text = blocks.join(' ')
       if (text.length > 40) text = text.substring(0, 38) + '...'
 
