@@ -201,7 +201,7 @@ export default function (editable) {
 
     .on('switch', (elem, direction, cursor) => {
       if (!isFromFirstExample(elem)) return
-      const content = direction === 'after'
+      const content = direction === 'down'
         ? 'Set the focus to the following block'
         : 'Set the focus to the previous block'
 
