@@ -35,8 +35,8 @@ export default function eventable (obj, notifyContext) {
 function getEventableModule (notifyContext) {
   let listeners = {}
 
-  function addListener (event, listener) {
-    event.split(' ').forEach(value => {
+  function addListener (events, listener) {
+    events.split(' ').forEach(value => {
       listeners[value] = listeners[value] || []
       listeners[value].unshift(listener)
     })
