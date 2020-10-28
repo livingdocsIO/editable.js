@@ -4,7 +4,7 @@ import rangy from 'rangy'
 import * as parser from '../src/parser'
 import * as config from '../src/config'
 
-describe('Parser', () => {
+describe('Parser', function () {
   // helper methods
   function createRangyCursorAfter (node) {
     const range = rangy.createRange()
@@ -36,119 +36,126 @@ describe('Parser', () => {
   const linkWithSpan = $('<div><a href="#">foo <span class="important">bar</span></a></div>')[0]
 
   describe('getHost()', function () {
-    beforeEach(() => {
+
+    beforeEach(function () {
       this.$host = $('<div class="' + config.editableClass + '""></div>')
     })
 
-    it('works if host is passed', () => {
+    it('works if host is passed', function () {
       expect(parser.getHost(this.$host[0])).toBe(this.$host[0])
     })
 
-    it('works if a child of host is passed', () => {
+    it('works if a child of host is passed', function () {
       this.$host.html('a<em>b</em>')
       expect(parser.getHost(this.$host.find('em')[0])).toBe(this.$host[0])
     })
 
-    it('works if a text node is passed', () => {
+    it('works if a text node is passed', function () {
       this.$host.html('a<em>b</em>')
       expect(parser.getHost(this.$host[0].firstChild)).toBe(this.$host[0])
     })
   })
 
-  describe('getNodeIndex()', () => {
-    it('gets element index of link in text', () => {
+  describe('getNodeIndex()', function () {
+
+    it('gets element index of link in text', function () {
       const linkNode = $(textWithLink).find('a').first()[0]
       expect(parser.getNodeIndex(linkNode)).toBe(1)
     })
   })
 
-  describe('isVoid()', () => {
-    it('detects an empty node', () => {
+  describe('isVoid()', function () {
+
+    it('detects an empty node', function () {
       expect(empty.childNodes.length).toBe(0)
       expect(parser.isVoid(empty)).toBe(true)
     })
 
-    it('detects an non-empty node', () => {
+    it('detects an non-empty node', function () {
       expect(emptyWithWhitespace.childNodes.length).toBe(1)
       expect(parser.isVoid(emptyWithWhitespace)).toBe(false)
     })
   })
 
-  describe('isWhitespaceOnly()', () => {
-    it('works with void element', () => {
+  describe('isWhitespaceOnly()', function () {
+
+    it('works with void element', function () {
       const textNode = document.createTextNode('')
       expect(parser.isWhitespaceOnly(textNode)).toEqual(true)
     })
 
-    it('works with single whitespace', () => {
+    it('works with single whitespace', function () {
       expect(parser.isWhitespaceOnly(emptyWithWhitespace.firstChild)).toEqual(true)
     })
 
-    it('works with a single character', () => {
+    it('works with a single character', function () {
       expect(parser.isWhitespaceOnly(singleCharacter.firstChild)).toEqual(false)
     })
 
-    it('ignores whitespace after the last element', () => {
+    it('ignores whitespace after the last element', function () {
       expect(parser.isWhitespaceOnly(link.firstChild)).toEqual(false)
     })
   })
 
-  describe('lastOffsetWithContent()', () => {
-    describe('called with a text node', () => {
-      it('works for single character', () => {
+  describe('lastOffsetWithContent()', function () {
+
+    describe('called with a text node', function () {
+
+      it('works for single character', function () {
         // <div>a|</div>
         expect(parser.lastOffsetWithContent(singleCharacter.firstChild)).toEqual(1)
       })
 
-      it('works with a single word text node', () => {
+      it('works with a single word text node', function () {
         // <div>foobar|</div>
         expect(parser.lastOffsetWithContent(oneWord.firstChild)).toEqual(6)
       })
 
-      it('works with a single word text node with whitespace', () => {
+      it('works with a single word text node with whitespace', function () {
         // <div> foobar| </div>
         expect(parser.lastOffsetWithContent(oneWordWithWhitespace.firstChild)).toEqual(7)
       })
     })
 
-    describe('called with an element node', () => {
-      it('works with an empty tag', () => {
+    describe('called with an element node', function () {
+      it('works with an empty tag', function () {
         // <div></div>
         expect(parser.lastOffsetWithContent(empty)).toEqual(0)
       })
 
-      it('works with a single character', () => {
+      it('works with a single character', function () {
         // <div>a</div>
         expect(parser.lastOffsetWithContent(singleCharacter)).toEqual(1)
       })
 
-      it('works with whitespace after last tag', () => {
+      it('works with whitespace after last tag', function () {
         // <div><a href="#">bar</a> </div>
         expect(parser.lastOffsetWithContent(linkWithWhitespace)).toEqual(1)
       })
 
-      it('works with whitespace after last tag', () => {
+      it('works with whitespace after last tag', function () {
         // <div>foo <a href="#">bar</a>.</div>
         expect(parser.lastOffsetWithContent(textWithLink)).toEqual(3)
       })
     })
   })
 
-  describe('isEndOffset()', () => {
-    it('works for single child node', () => {
+  describe('isEndOffset()', function () {
+
+    it('works for single child node', function () {
       // <div>foobar|</div>
       const range = createRangyCursorAfter(oneWord.firstChild)
       expect(range.endOffset).toEqual(1)
       expect(parser.isEndOffset(oneWord, 1)).toEqual(true)
     })
 
-    it('works for empty node', () => {
+    it('works for empty node', function () {
       // <div>|</div>
       const range = createRangyCursorAtEnd(empty)
       expect(parser.isEndOffset(empty, range.endOffset)).toEqual(true)
     })
 
-    it('works with a text node', () => {
+    it('works with a text node', function () {
       // foobar|
       expect(parser.isEndOffset(textNode, 6)).toEqual(true)
 
@@ -156,14 +163,14 @@ describe('Parser', () => {
       expect(parser.isEndOffset(textNode, 5)).toEqual(false)
     })
 
-    it('works with whitespace at the end', () => {
+    it('works with whitespace at the end', function () {
       // <div> foobar| </div>
       expect(parser.isEndOffset(oneWordWithWhitespace.firstChild, 7)).toEqual(false)
       // <div> foobar |</div>
       expect(parser.isEndOffset(oneWordWithWhitespace.firstChild, 8)).toEqual(true)
     })
 
-    it('works with text and element nodes', () => {
+    it('works with text and element nodes', function () {
       // <div>foo <a href='#'>bar</a>.|</div>
       let range = createRangyCursorAfter(textWithLink.childNodes[2])
       expect(range.endOffset).toEqual(3)
@@ -176,8 +183,9 @@ describe('Parser', () => {
     })
   })
 
-  describe('isTextEndOffset()', () => {
-    it('ignores whitespace at the end', () => {
+  describe('isTextEndOffset()', function () {
+
+    it('ignores whitespace at the end', function () {
       // <div> fooba|r </div>
       expect(parser.isTextEndOffset(oneWordWithWhitespace.firstChild, 6)).toEqual(false)
       // <div> foobar| </div>
@@ -186,7 +194,7 @@ describe('Parser', () => {
       expect(parser.isTextEndOffset(oneWordWithWhitespace.firstChild, 8)).toEqual(true)
     })
 
-    it('ignores non-breaking-space at the end', () => {
+    it('ignores non-breaking-space at the end', function () {
       // <div> fooba|r </div>
       expect(parser.isTextEndOffset(oneWordWithNbsp.firstChild, 6)).toEqual(false)
       // <div> foobar| </div>
@@ -195,14 +203,14 @@ describe('Parser', () => {
       expect(parser.isTextEndOffset(oneWordWithNbsp.firstChild, 8)).toEqual(true)
     })
 
-    it('ignores whitespace after the last element', () => {
+    it('ignores whitespace after the last element', function () {
       // <div><a href="#">bar|</a> </div>
       expect(parser.isTextEndOffset(linkWithWhitespace.firstChild.firstChild, 2)).toEqual(false)
       // <div><a href="#">bar|</a> </div>
       expect(parser.isTextEndOffset(linkWithWhitespace.firstChild.firstChild, 3)).toEqual(true)
     })
 
-    it('ignores whitespace after the last element', () => {
+    it('ignores whitespace after the last element', function () {
       // <div><a href="#">bar|</a> </div>
       const range = createRangyCursorAfter(linkWithWhitespace.firstChild.firstChild)
       expect(range.endOffset).toEqual(1)
@@ -210,7 +218,7 @@ describe('Parser', () => {
       expect(parser.isTextEndOffset(linkWithWhitespace.firstChild, 0)).toEqual(false)
     })
 
-    it('ignores whitespace after the last element', () => {
+    it('ignores whitespace after the last element', function () {
       // <div><a href="#">bar</a>| </div>
       const range = createRangyCursorAfter(linkWithWhitespace.firstChild)
       expect(range.endOffset).toEqual(1)
@@ -218,7 +226,7 @@ describe('Parser', () => {
       expect(parser.isTextEndOffset(linkWithWhitespace, 0)).toEqual(false)
     })
 
-    it('ignores a linebreak', () => {
+    it('ignores a linebreak', function () {
       // <div>|<br></div>
       const range = rangy.createRange()
       range.selectNodeContents(linebreak)
@@ -228,18 +236,19 @@ describe('Parser', () => {
     })
   })
 
-  describe('isStartOffset()', () => {
-    it('works for single child node', () => {
+  describe('isStartOffset()', function () {
+
+    it('works for single child node', function () {
       // <div>|foobar</div>
       expect(parser.isStartOffset(oneWord, 0)).toEqual(true)
     })
 
-    it('works for empty node', () => {
+    it('works for empty node', function () {
       // <div>|</div>
       expect(parser.isStartOffset(empty, 0)).toEqual(true)
     })
 
-    it('works with a text node', () => {
+    it('works with a text node', function () {
       // |foobar
       expect(parser.isStartOffset(textNode, 0)).toEqual(true)
 
@@ -247,14 +256,14 @@ describe('Parser', () => {
       expect(parser.isStartOffset(textNode, 1)).toEqual(false)
     })
 
-    it('works with whitespace at the beginning', () => {
+    it('works with whitespace at the beginning', function () {
       // <div> |foobar </div>
       expect(parser.isStartOffset(oneWordWithWhitespace.firstChild, 1)).toEqual(false)
       // <div>| foobar </div>
       expect(parser.isStartOffset(oneWordWithWhitespace.firstChild, 0)).toEqual(true)
     })
 
-    it('works with text and element nodes', () => {
+    it('works with text and element nodes', function () {
       // <div>|foo <a href='#'>bar</a>.</div>
       expect(parser.isStartOffset(textWithLink, 0)).toEqual(true)
 
@@ -263,8 +272,9 @@ describe('Parser', () => {
     })
   })
 
-  describe('isEndOfHost()', () => {
-    it('works with text node in nested content', () => {
+  describe('isEndOfHost()', function () {
+
+    it('works with text node in nested content', function () {
       const endContainer = $(linkWithSpan).find('span')[0].firstChild
       // <div><a href='#'>foo <span class='important'>bar|</span></a></div>
       expect(parser.isEndOfHost(linkWithSpan, endContainer, 3)).toEqual(true)
@@ -273,7 +283,7 @@ describe('Parser', () => {
       expect(parser.isEndOfHost(linkWithSpan, endContainer, 2)).toEqual(false)
     })
 
-    it('works with link node in nested content', () => {
+    it('works with link node in nested content', function () {
       // <div><a href='#'>foo <span class='important'>bar</span>|</a></div>
       const endContainer = $(linkWithSpan).find('a')[0]
       const range = createRangyCursorAtEnd(endContainer)
@@ -284,7 +294,7 @@ describe('Parser', () => {
       expect(parser.isEndOfHost(linkWithSpan, endContainer, 1)).toEqual(false)
     })
 
-    it('works with single text node', () => {
+    it('works with single text node', function () {
       // <div>foobar|</div>
       const endContainer = oneWord.firstChild
       expect(parser.isEndOfHost(oneWord, endContainer, 6)).toEqual(true)
@@ -292,8 +302,9 @@ describe('Parser', () => {
     })
   })
 
-  describe('isBeginningOfHost()', () => {
-    it('works with link node in nested content', () => {
+  describe('isBeginningOfHost()', function () {
+
+    it('works with link node in nested content', function () {
       const endContainer = $(linkWithSpan).find('a')[0]
       // <div><a href='#'>|foo <span class='important'>bar</span></a></div>
       expect(parser.isBeginningOfHost(linkWithSpan, endContainer, 0)).toEqual(true)
@@ -302,7 +313,7 @@ describe('Parser', () => {
       expect(parser.isBeginningOfHost(linkWithSpan, endContainer, 1)).toEqual(false)
     })
 
-    it('works with single text node', () => {
+    it('works with single text node', function () {
       const endContainer = oneWord.firstChild
       // <div>|foobar</div>
       expect(parser.isBeginningOfHost(oneWord, endContainer, 0)).toEqual(true)
@@ -312,58 +323,60 @@ describe('Parser', () => {
     })
   })
 
-  describe('isSameNode()', () => {
-    it('fails when tags are different', () => {
+  describe('isSameNode()', function () {
+
+    it('fails when tags are different', function () {
       const source = text.firstChild
       const target = link.firstChild
       expect(parser.isSameNode(target, source)).toEqual(false)
     })
 
-    it('fails when attributes are different', () => {
+    it('fails when attributes are different', function () {
       const source = link.firstChild
       const target = link.firstChild.cloneNode(true)
       target.setAttribute('key', 'value')
       expect(parser.isSameNode(target, source)).toEqual(false)
     })
 
-    it('works when nodes have same tag and attributes', () => {
+    it('works when nodes have same tag and attributes', function () {
       const source = link.firstChild
       const target = link.firstChild.cloneNode(true)
       expect(parser.isSameNode(target, source)).toEqual(true)
     })
   })
 
-  describe('latestChild()', () => {
-    it('returns the deepest last child', () => {
+  describe('latestChild()', function () {
+
+    it('returns the deepest last child', function () {
       const source = linkWithSpan
       const target = document.createTextNode('bar')
       expect(parser.latestChild(source).isEqualNode(target)).toEqual(true)
     })
   })
 
-  describe('isInlineElement()', () => {
+  describe('isInlineElement()', function () {
     let $elem
 
-    afterEach(() => {
+    afterEach(function () {
       if ($elem) {
         $elem.remove()
         $elem = undefined
       }
     })
 
-    it('returns false for a div', () => {
+    it('returns false for a div', function () {
       $elem = $('<div>')
       $(document.body).append($elem)
       expect(parser.isInlineElement(window, $elem[0])).toEqual(false)
     })
 
-    it('returns true for a span', () => {
+    it('returns true for a span', function () {
       $elem = $('<span>')
       $(document.body).append($elem)
       expect(parser.isInlineElement(window, $elem[0])).toEqual(true)
     })
 
-    it('returns true for a div with display set to "inline-block"', () => {
+    it('returns true for a div with display set to "inline-block"', function () {
       $elem = $('<div style="display:inline-block;">')
       $(document.body).append($elem)
       expect(parser.isInlineElement(window, $elem[0])).toEqual(true)
@@ -371,26 +384,26 @@ describe('Parser', () => {
   })
 })
 
-describe('isDocumentFragmentWithoutChildren()', () => {
-  let frag
-  beforeEach(() => {
-    frag = window.document.createDocumentFragment()
+describe('isDocumentFragmentWithoutChildren()', function () {
+
+  beforeEach(function () {
+    this.frag = window.document.createDocumentFragment()
   })
 
-  it('returns truthy for a fragment with no children', () => {
-    expect(parser.isDocumentFragmentWithoutChildren(frag)).toBeTruthy()
+  it('returns truthy for a fragment with no children', function () {
+    expect(parser.isDocumentFragmentWithoutChildren(this.frag)).toBeTruthy()
   })
 
-  it('returns falsy for a documentFragment with an empty text node as child', () => {
-    frag.appendChild(window.document.createTextNode(''))
-    expect(parser.isDocumentFragmentWithoutChildren(frag)).toBeFalsy()
+  it('returns falsy for a documentFragment with an empty text node as child', function () {
+    this.frag.appendChild(window.document.createTextNode(''))
+    expect(parser.isDocumentFragmentWithoutChildren(this.frag)).toBeFalsy()
   })
 
-  it('returns falsy for undefined', () => {
+  it('returns falsy for undefined', function () {
     expect(parser.isDocumentFragmentWithoutChildren(undefined)).toBeFalsy()
   })
 
-  it('returns falsy for an element node', () => {
+  it('returns falsy for an element node', function () {
     const node = $('<div>')[0]
     expect(parser.isDocumentFragmentWithoutChildren(node)).toBeFalsy()
   })

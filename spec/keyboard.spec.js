@@ -5,10 +5,11 @@ import Keyboard from '../src/keyboard'
 import * as nodeType from '../src/node-type'
 
 describe('Keyboard', function () {
-  describe('dispatchKeyEvent()', () => {
+
+  describe('dispatchKeyEvent()', function () {
     let keyboard, event, called
 
-    beforeEach(() => {
+    beforeEach(function () {
       const mockedSelectionWatcher = {
         getFreshRange: () => ({})
       }
@@ -17,7 +18,7 @@ describe('Keyboard', function () {
       called = 0
     })
 
-    it('notifies a left event', () => {
+    it('notifies a left event', function () {
       keyboard.on('left', () => called++)
 
       event.keyCode = Keyboard.key.left
@@ -25,8 +26,9 @@ describe('Keyboard', function () {
       expect(called).toEqual(1)
     })
 
-    describe('notify "character" event', () => {
-      it('does not fire the event for a "left" key', () => {
+    describe('notify "character" event', function () {
+
+      it('does not fire the event for a "left" key', function () {
         keyboard.on('character', () => called++)
 
         event.keyCode = Keyboard.key.left
@@ -34,7 +36,7 @@ describe('Keyboard', function () {
         expect(called).toEqual(0)
       })
 
-      it('does not fire the event for a "ctrl" key', () => {
+      it('does not fire the event for a "ctrl" key', function () {
         keyboard.on('character', () => called++)
 
         event.keyCode = Keyboard.key.ctrl
@@ -42,7 +44,7 @@ describe('Keyboard', function () {
         expect(called).toEqual(0)
       })
 
-      it('does fire the event for a "e" key', () => {
+      it('does fire the event for a "e" key', function () {
         keyboard.on('character', () => called++)
 
         event.keyCode = 'e'.charCodeAt(0)
@@ -50,7 +52,7 @@ describe('Keyboard', function () {
         expect(called).toEqual(1)
       })
 
-      it('does not fire the event for a "e" key without the notifyCharacterEvent param', () => {
+      it('does not fire the event for a "e" key without the notifyCharacterEvent param', function () {
         keyboard.on('character', (event) => called++)
 
         event.keyCode = 'e'.charCodeAt(0)
@@ -60,50 +62,51 @@ describe('Keyboard', function () {
     })
   })
 
-  describe('getNodeToRemove()', () => {
-    beforeEach(() => {
+  describe('getNodeToRemove()', function () {
+
+    beforeEach(function () {
       this.$contenteditable = $('<CONTENTEDITABLE>Text1<A><B>Text2</B>Text3<C>Text4</C>Text5</A>Text6</CONTENTEDITABLE>')
       destructureNodes(this.$contenteditable[0], this)
       this.range = rangy.createRange()
     })
 
-    it('returns undefined for a ranga within a node', () => {
+    it('returns undefined for a ranga within a node', function () {
       this.range.setStart(this.nodeText2, 0)
       this.range.setEnd(this.nodeText2, 2)
       expect(Keyboard.getNodeToRemove(this.range, this.$contenteditable[0])).toEqual(undefined)
     })
 
-    it('returns the parent node of the start node when the start node is a text node with offset is 0 and end node is outside of the parent node', () => {
+    it('returns the parent node of the start node when the start node is a text node with offset is 0 and end node is outside of the parent node', function () {
       this.range.setStart(this.nodeText2, 0)
       this.range.setEnd(this.nodeText3, 2)
       expect(Keyboard.getNodeToRemove(this.range, this.$contenteditable[0])).toEqual(this.nodeB)
     })
 
-    it('returns the parent node of the start node when the start node is a text node with offset is 0 and end node is within a sibling of the parent node', () => {
+    it('returns the parent node of the start node when the start node is a text node with offset is 0 and end node is within a sibling of the parent node', function () {
       this.range.setStart(this.nodeText2, 0)
       this.range.setEnd(this.nodeText4, 2)
       expect(Keyboard.getNodeToRemove(this.range, this.$contenteditable[0])).toEqual(this.nodeB)
     })
 
-    it('returns the parent node of the start node when the start node is a text node with offset is 0 and end node is after a sibling of the parent node', () => {
+    it('returns the parent node of the start node when the start node is a text node with offset is 0 and end node is after a sibling of the parent node', function () {
       this.range.setStart(this.nodeText2, 0)
       this.range.setEnd(this.nodeText5, 2)
       expect(Keyboard.getNodeToRemove(this.range, this.$contenteditable[0])).toEqual(this.nodeB)
     })
 
-    it('recursively returns the parent if needed', () => {
+    it('recursively returns the parent if needed', function () {
       this.range.setStart(this.nodeText2, 0)
       this.range.setEnd(this.nodeText6, 2)
       expect(Keyboard.getNodeToRemove(this.range, this.$contenteditable[0])).toEqual(this.nodeA)
     })
 
-    it('returns undefined for a range that starts with an offset of 1', () => {
+    it('returns undefined for a range that starts with an offset of 1', function () {
       this.range.setStart(this.nodeText2, 1)
       this.range.setEnd(this.nodeText6, 2)
       expect(Keyboard.getNodeToRemove(this.range, this.$contenteditable[0])).toEqual(undefined)
     })
 
-    it('returns undefined for a range that starts with an offset of 1', () => {
+    it('returns undefined for a range that starts with an offset of 1', function () {
       this.range.setStart(this.nodeText3, 0)
       this.range.setEnd(this.nodeText6, 2)
       expect(Keyboard.getNodeToRemove(this.range, this.$contenteditable[0])).toEqual(undefined)

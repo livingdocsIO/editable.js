@@ -4,7 +4,7 @@ import rangy from 'rangy'
 import Cursor from '../src/cursor'
 import Editable from '../src/core'
 
-describe('Default Events', () => {
+describe('Default Events', function () {
 
   // create a Cursor object and set the selection to it
   function createCursor ($elem, range) {
@@ -42,10 +42,9 @@ describe('Default Events', () => {
     }
   }
 
-  describe('for editable', () => {
+  describe('for editable', function () {
 
-
-    describe('on focus', () => {
+    describe('on focus', function () {
 
       beforeEach(function () {
         this.focus = $.Event('focus')

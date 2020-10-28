@@ -29,15 +29,15 @@ function setupHighlightEnv (context, text) {
     )
   }
 
-  context.extract = () => {
+  context.extract = function () {
     return context.editable.getHighlightPositions({editableHost: context.$div[0]})
   }
 
-  context.getHtml = () => {
+  context.getHtml = function () {
     return context.$div[0].innerHTML
   }
 
-  context.formatHtml = string => {
+  context.formatHtml = (string) => {
     return $('<div>' + string.replace(/\n/gm, '') + '</div>')[0].innerHTML
   }
 }
@@ -51,24 +51,25 @@ function teardownHighlightEnv (context) {
 }
 
 describe('Highlighting', function () {
-  beforeEach(() => {
+
+  beforeEach(function () {
     this.editable = new Editable()
   })
 
-  describe('new Highlighting()', () => {
-    it('creates an instance with a reference to editable', () => {
+  describe('new Highlighting()', function () {
+    it('creates an instance with a reference to editable', function () {
       const highlighting = new Highlighting(this.editable, {})
       expect(highlighting.editable).toEqual(this.editable)
     })
   })
 
-  describe('WordHighlighter', () => {
-    beforeEach(() => {
+  describe('WordHighlighter', function () {
+    beforeEach(function () {
       const markerNode = $('<span class="highlight"></span>')[0]
       this.highlighter = new WordHighlighter(markerNode)
     })
 
-    it('finds the word "a"', () => {
+    it('finds the word "a"', function () {
       const text = 'a'
       const matches = this.highlighter.findMatches(text, ['a'])
 
@@ -78,13 +79,13 @@ describe('Highlighting', function () {
       expect(firstMatch.endIndex).toEqual(1)
     })
 
-    it('does not find the word "b"', () => {
+    it('does not find the word "b"', function () {
       const text = 'a'
       const matches = this.highlighter.findMatches(text, ['b'])
       expect(matches.length).toEqual(0)
     })
 
-    it('finds the word "juice"', () => {
+    it('finds the word "juice"', function () {
       const text = 'Some juice.'
       const matches = this.highlighter.findMatches(text, ['juice'])
       const firstMatch = matches[0]
@@ -94,16 +95,16 @@ describe('Highlighting', function () {
     })
   })
 
-  describe('highlightSupport', () => {
-    beforeEach(() => {
+  describe('highlightSupport', function () {
+    beforeEach(function () {
       setupHighlightEnv(this, 'People Make The <br> World Go Round')
     })
 
-    afterEach(() => {
+    afterEach(function () {
       teardownHighlightEnv(this)
     })
 
-    it('can handle a single highlight', () => {
+    it('can handle a single highlight', function () {
       const startIndex = this.highlightRange('myId', 3, 7)
       const expectedRanges = {
         myId: {
@@ -121,7 +122,7 @@ Make The <br> World Go Round`)
       expect(startIndex).toEqual(3)
     })
 
-    it('can handle adjaccent highlights', () => {
+    it('can handle adjaccent highlights', function () {
       this.highlightRange('first', 0, 1)
       this.highlightRange('second', 1, 2)
       this.highlightRange('third', 2, 3)
@@ -160,7 +161,7 @@ le Make The <br> World Go Round`)
 
     })
 
-    it('can handle nested highlights', () => {
+    it('can handle nested highlights', function () {
       this.highlightRange('first', 0, 1)
       this.highlightRange('second', 1, 2)
       this.highlightRange('third', 2, 6)
@@ -197,7 +198,7 @@ le Make The <br> World Go Round`)
       expect(this.extract()).toEqual(expectedRanges)
     })
 
-    it('can handle intersecting highlights', () => {
+    it('can handle intersecting highlights', function () {
       this.highlightRange('first', 0, 3)
       this.highlightRange('second', 2, 7)
       this.highlightRange('third', 4, 6)
@@ -226,7 +227,7 @@ le Make The <br> World Go Round`)
       expect(this.extract()).toEqual(expectedRanges)
     })
 
-    it('can handle highlights containing break tags', () => {
+    it('can handle highlights containing break tags', function () {
       this.highlightRange('first', 11, 22)
       const expectedRanges = {
         first: {
@@ -244,7 +245,7 @@ le Make The <br> World Go Round`)
 
     })
 
-    it('can handle identical ranges', () => {
+    it('can handle identical ranges', function () {
       this.highlightRange('first', 11, 22)
       this.highlightRange('second', 11, 22)
       const expectedRanges = {
@@ -271,7 +272,7 @@ le Make The <br> World Go Round`)
 
     })
 
-    it('will update any existing range found under `highlightId` aka upsert', () => {
+    it('will update any existing range found under `highlightId` aka upsert', function () {
       this.highlightRange('first', 11, 22)
       this.highlightRange('first', 8, 9)
       const expectedRanges = {
@@ -289,7 +290,7 @@ ke The <br> World Go Round`)
       expect(this.getHtml()).toEqual(expectedHtml)
     })
 
-    it('can handle all cases combined and creates consistent output', () => {
+    it('can handle all cases combined and creates consistent output', function () {
       this.highlightRange('first', 4, 8)
       this.highlightRange('second', 2, 10)
       this.highlightRange('third', 4, 5)
@@ -364,7 +365,7 @@ o Round</span>`)
       expect(this.getHtml()).toEqual(expectedHtml)
     })
 
-    it('skips and warns if an invalid range object was passed', () => {
+    it('skips and warns if an invalid range object was passed', function () {
       this.editable.highlight({
         editableHost: this.$div[0],
         highlightId: 'myId',
@@ -374,7 +375,7 @@ o Round</span>`)
       expect(highlightSpan.length).toEqual(0)
     })
 
-    it('skips if the range exceeds the content length', () => {
+    it('skips if the range exceeds the content length', function () {
       const result = this.editable.highlight({
         editableHost: this.$div[0],
         highlightId: 'myId',
@@ -385,7 +386,7 @@ o Round</span>`)
       expect(result).toEqual(-1)
     })
 
-    it('skips and warns if the range object represents a cursor', () => {
+    it('skips and warns if the range object represents a cursor', function () {
       this.editable.highlight({
         editableHost: this.$div[0],
         highlightId: 'myId',
@@ -397,8 +398,8 @@ o Round</span>`)
     })
   })
 
-  describe('highlight support with special characters', () => {
-    it('treats special characters as expected', () => {
+  describe('highlight support with special characters', function () {
+    it('treats special characters as expected', function () {
       // actual / expected length / expected text
       const characters = [
         ['😐', 2, '😐'],
@@ -434,8 +435,8 @@ o Round</span>`)
     })
   })
 
-  describe('highlightSupport on formatted text', () => {
-    it('can handle highlights surrounding <span> tags', () => {
+  describe('highlightSupport on formatted text', function () {
+    it('can handle highlights surrounding <span> tags', function () {
       setupHighlightEnv(this, 'a<span>b</span>cd')
       this.highlightRange('first', 1, 3)
       const extract = this.extract()
@@ -446,7 +447,7 @@ o Round</span>`)
       expect(content).toEqual('a<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"><span>b</span>c</span>d')
     })
 
-    it('can handle highlights intersecting <span> tags', () => {
+    it('can handle highlights intersecting <span> tags', function () {
       setupHighlightEnv(this, 'a<span data-word-id="x">bc</span>d')
       this.highlightRange('first', 0, 2)
       const extract = this.extract()
@@ -458,16 +459,16 @@ o Round</span>`)
     })
   })
 
-  describe('highlightSupport with special characters', () => {
-    beforeEach(() => {
+  describe('highlightSupport with special characters', function () {
+    beforeEach(function () {
       setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
     })
 
-    afterEach(() => {
+    afterEach(function () {
       teardownHighlightEnv(this)
     })
 
-    it('maps selection offsets to ranges containing multibyte symbols consistently', () => {
+    it('maps selection offsets to ranges containing multibyte symbols consistently', function () {
       const range = rangy.createRange()
       const node = this.$div[0]
       range.setStart(node.firstChild, 0)
@@ -489,7 +490,7 @@ o Round</span>`)
       expect(this.getHtml()).toEqual(expectedHtml)
     })
 
-    it('treats non-breakable spaces consistently', () => {
+    it('treats non-breakable spaces consistently', function () {
       this.highlightRange('first', 2, 9)
       const expectedRanges = {
         first: {
@@ -505,7 +506,7 @@ o Round</span>`)
 
     })
 
-    it('treats \\n\\r spaces consistently', () => {
+    it('treats \\n\\r spaces consistently', function () {
       this.highlightRange('first', 8, 15)
       const expectedRanges = {
         first: {
@@ -521,7 +522,7 @@ o Round</span>`)
 
     })
 
-    it('treats \\n spaces consistently', () => {
+    it('treats \\n spaces consistently', function () {
       this.highlightRange('first', 15, 20)
       const expectedRanges = {
         first: {
@@ -535,7 +536,7 @@ o Round</span>`)
       expect(this.extract()).toEqual(expectedRanges)
     })
 
-    it('extracts a readable text', () => {
+    it('extracts a readable text', function () {
       this.highlightRange('first', 0, 20)
       const expectedRanges = {
         first: {
@@ -549,7 +550,7 @@ o Round</span>`)
       expect(this.extract()).toEqual(expectedRanges)
     })
 
-    it('notify change on add highlight when dispatcher is given', () => {
+    it('notify change on add highlight when dispatcher is given', function () {
       let called = 0
       const dispatcher = {notify: () => called++}
       this.highlightRange('first', 0, 20, dispatcher)
@@ -557,7 +558,7 @@ o Round</span>`)
       expect(called).toEqual(1)
     })
 
-    it('notify change on remove highlight when dispatcher is given', () => {
+    it('notify change on remove highlight when dispatcher is given', function () {
       let called = 0
       const dispatcher = {notify: () => called++}
       this.highlightRange('first', 0, 20)

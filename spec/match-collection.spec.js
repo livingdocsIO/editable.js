@@ -3,25 +3,23 @@ import MatchCollection from '../src/plugins/highlighting/match-collection'
 
 describe('MatchCollection', function () {
 
-  // Specs
+  describe('new MatchCollection()', function () {
 
-  describe('new MatchCollection()', () => {
-
-    it('creates an instance', () => {
+    it('creates an instance', function () {
       const matches = new MatchCollection()
       expect(matches).toBeDefined()
     })
 
   })
 
-  describe('addMatches()', () => {
+  describe('addMatches()', function () {
 
-    beforeEach(() => {
+    beforeEach(function () {
       this.collection = new MatchCollection()
     })
 
 
-    it('adds a match', () => {
+    it('adds a match', function () {
       this.collection.addMatches('test', [{
         startIndex: 0,
         endIndex: 1
@@ -33,7 +31,7 @@ describe('MatchCollection', function () {
       }])
     })
 
-    it('merges two matches', () => {
+    it('merges two matches', function () {
       this.collection.addMatches('test', [{
         startIndex: 0,
         endIndex: 1
@@ -54,7 +52,7 @@ describe('MatchCollection', function () {
     })
 
 
-    it('prevents overlaps', () => {
+    it('prevents overlaps', function () {
       this.collection.addMatches('test', [{
         startIndex: 0,
         endIndex: 2

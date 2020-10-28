@@ -53,37 +53,37 @@ describe('highlightText', function () {
     $(elem).find('[spellcheck]').removeAttr('spellcheck')
   }
 
-  describe('extractText()', () => {
+  describe('extractText()', function () {
 
-    beforeEach(() => {
+    beforeEach(function () {
       this.element = $('<div></div>')[0]
     })
 
-    it('extracts the text', () => {
+    it('extracts the text', function () {
       this.element.innerHTML = 'a'
       const text = highlightText.extractText(this.element)
       expect(text).toEqual('a')
     })
 
-    it('extracts the text with nested elements', () => {
+    it('extracts the text with nested elements', function () {
       this.element.innerHTML = 'a<span>b</span><span></span>c'
       const text = highlightText.extractText(this.element)
       expect(text).toEqual('abc')
     })
 
-    it('extracts a &nbsp; entity', () => {
+    it('extracts a &nbsp; entity', function () {
       this.element.innerHTML = '&nbsp;'
       const text = highlightText.extractText(this.element)
       expect(text).toEqual('\u00A0') // \u00A0 is utf8 for the '&nbsp;' html entity
     })
 
-    it('extracts a zero width no-break space', () => {
+    it('extracts a zero width no-break space', function () {
       this.element.innerHTML = '\ufeff'
       const text = highlightText.extractText(this.element)
       expect(text).toEqual('\ufeff')
     })
 
-    it('skips stored cursor positions', () => {
+    it('skips stored cursor positions', function () {
       this.element = $('<div>ab</div>')[0]
       const cursor = createCursor(this.element, this.element.firstChild, 1)
       cursor.save()
@@ -91,24 +91,24 @@ describe('highlightText', function () {
       expect(text).toEqual('ab')
     })
 
-    it('extracts text with a <br> properly', () => {
+    it('extracts text with a <br> properly', function () {
       this.element = $('<div>a<br>b</div>')[0]
       const text = highlightText.extractText(this.element)
       expect(text).toEqual('a b')
     })
   })
 
-  describe('iterator', () => {
+  describe('iterator', function () {
 
-    beforeEach(() => {
+    beforeEach(function () {
       this.wrapMatch = sinon.spy(highlightText, 'wrapMatch')
     })
 
-    afterEach(() => {
+    afterEach(function () {
       this.wrapMatch.restore()
     })
 
-    it('finds a word that is its own text node', () => {
+    it('finds a word that is its own text node', function () {
       const elem = createParagraphWithTextNodes('a ', 'b', ' c')
       highlight(elem, ['b'])
       const portions = this.wrapMatch.firstCall.args[0]
@@ -120,7 +120,7 @@ describe('highlightText', function () {
       expect(portions[0].isLastPortion).toEqual(true)
     })
 
-    it('finds a word that is in a text node with a character before', () => {
+    it('finds a word that is in a text node with a character before', function () {
       const elem = createParagraphWithTextNodes('a', ' b', ' c')
       highlight(elem, ['b'])
       const portions = this.wrapMatch.firstCall.args[0]
@@ -132,7 +132,7 @@ describe('highlightText', function () {
       expect(portions[0].isLastPortion).toEqual(true)
     })
 
-    it('finds a word that is in a text node with a charcter after', () => {
+    it('finds a word that is in a text node with a charcter after', function () {
       const elem = createParagraphWithTextNodes('a ', 'b x', 'c')
       highlight(elem, ['b'])
       const portions = this.wrapMatch.firstCall.args[0]
@@ -144,7 +144,7 @@ describe('highlightText', function () {
       expect(portions[0].isLastPortion).toEqual(true)
     })
 
-    it('finds a word that span over two text nodes', () => {
+    it('finds a word that span over two text nodes', function () {
       const elem = createParagraphWithTextNodes('a ', 'b', 'c')
       highlight(elem, ['bc'])
       const portions = this.wrapMatch.firstCall.args[0]
@@ -157,7 +157,7 @@ describe('highlightText', function () {
       expect(portions[1].isLastPortion).toEqual(true)
     })
 
-    it('finds a word that spans over three text nodes', () => {
+    it('finds a word that spans over three text nodes', function () {
       const elem = createParagraphWithTextNodes('a', 'b', 'c')
       highlight(elem, ['abc'])
       const portions = this.wrapMatch.firstCall.args[0]
@@ -168,7 +168,7 @@ describe('highlightText', function () {
       expect(portions[2].text).toEqual('c')
     })
 
-    it('finds a word that is partially contained in two text nodes', () => {
+    it('finds a word that is partially contained in two text nodes', function () {
       const elem = createParagraphWithTextNodes('a', ' xx', 'xx ')
       highlight(elem, ['xxxx'])
       const portions = this.wrapMatch.firstCall.args[0]
@@ -186,9 +186,9 @@ describe('highlightText', function () {
     })
   })
 
-  describe('wrapMatch()', () => {
+  describe('wrapMatch()', function () {
 
-    it('wraps a word in a single text node', () => {
+    it('wraps a word in a single text node', function () {
       const elem = $('<div>Some juice.</div>')[0]
       highlight(elem, ['juice'])
       removeWordId(elem)
@@ -196,7 +196,7 @@ describe('highlightText', function () {
         .toEqual('<div>Some <span spellcheck="true">juice</span>.</div>')
     })
 
-    it('wraps a word with a partial <em> element', () => {
+    it('wraps a word with a partial <em> element', function () {
       const elem = $('<div>Some jui<em>ce.</em></div>')[0]
       highlight(elem, ['juice'])
       removeWordId(elem)
@@ -204,7 +204,7 @@ describe('highlightText', function () {
         .toEqual('<div>Some <span spellcheck="true">jui</span><em><span spellcheck="true">ce</span>.</em></div>')
     })
 
-    it('wraps two words in the same text node', () => {
+    it('wraps two words in the same text node', function () {
       const elem = $('<div>a or b</div>')[0]
       highlight(elem, ['a', 'b'])
       removeWordId(elem)
@@ -212,7 +212,7 @@ describe('highlightText', function () {
         .toEqual('<div><span spellcheck="true">a</span> or <span spellcheck="true">b</span></div>')
     })
 
-    it('wraps a word in a <em> element', () => {
+    it('wraps a word in a <em> element', function () {
       const elem = $('<div><em>word</em></div>')[0]
       highlight(elem, ['word'])
       removeWordId(elem)
@@ -220,7 +220,7 @@ describe('highlightText', function () {
         .toEqual('<div><em><span spellcheck="true">word</span></em></div>')
     })
 
-    it('can handle a non-match', () => {
+    it('can handle a non-match', function () {
       const elem = $('<div><em>word</em></div>')[0]
       highlight(elem, ['xxx'])
       removeWordId(elem)
@@ -228,7 +228,7 @@ describe('highlightText', function () {
         .toEqual('<div><em>word</em></div>')
     })
 
-    it('works with a more complex regex', () => {
+    it('works with a more complex regex', function () {
       const elem = $('<div><em>a</em> or b</div>')[0]
       highlight(elem, ['b', 'a'])
       removeWordId(elem)
@@ -236,7 +236,7 @@ describe('highlightText', function () {
         .toEqual('<div><em><span spellcheck="true">a</span></em> or <span spellcheck="true">b</span></div>')
     })
 
-    it('wraps two words with a tag in between', () => {
+    it('wraps two words with a tag in between', function () {
       const elem = $('<div>A word <em>is</em> not necessary</div>')[0]
       highlight(elem, ['word', 'not'])
       removeWordId(elem)
@@ -244,7 +244,7 @@ describe('highlightText', function () {
         .toEqual('<div>A <span spellcheck="true">word</span> <em>is</em> <span spellcheck="true">not</span> necessary</div>')
     })
 
-    it('wraps two characters in the same textnode, when the first match has an offset', () => {
+    it('wraps two characters in the same textnode, when the first match has an offset', function () {
       const elem = $('<div>a, b or c, d</div>')[0]
       highlight(elem, ['b', 'c'])
       removeWordId(elem)
@@ -252,7 +252,7 @@ describe('highlightText', function () {
         .toEqual('<div>a, <span spellcheck="true">b</span> or <span spellcheck="true">c</span>, d</div>')
     })
 
-    it('wraps a character after a <br>', () => {
+    it('wraps a character after a <br>', function () {
       const elem = $('<div>a<br>b</div>')[0]
       highlight(elem, ['b'])
       removeWordId(elem)
@@ -260,7 +260,7 @@ describe('highlightText', function () {
         .toEqual('<div>a<br><span spellcheck="true">b</span></div>')
     })
 
-    it('stores data-word-id on a highlight', () => {
+    it('stores data-word-id on a highlight', function () {
       const elem = $('<div>a</div>')[0]
       highlight(elem, ['a'])
       removeSpellcheckAttr(elem)
@@ -268,7 +268,7 @@ describe('highlightText', function () {
         .toEqual('<div><span data-word-id="0">a</span></div>')
     })
 
-    it('stores data-word-id on different matches', () => {
+    it('stores data-word-id on different matches', function () {
       const elem = $('<div>a b</div>')[0]
       highlight(elem, ['a', 'b'])
       removeSpellcheckAttr(elem)
@@ -276,7 +276,7 @@ describe('highlightText', function () {
         .toEqual('<div><span data-word-id="0">a</span> <span data-word-id="2">b</span></div>')
     })
 
-    it('stores same data-word-id on multiple highlights for the same match', () => {
+    it('stores same data-word-id on multiple highlights for the same match', function () {
       const elem = $('<div>a<i>b</i></div>')[0]
       highlight(elem, ['ab'])
       removeSpellcheckAttr(elem)

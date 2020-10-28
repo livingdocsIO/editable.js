@@ -2,45 +2,47 @@ import $ from 'jquery'
 
 import Editable from '../src/core'
 
-describe('Editable', () => {
+describe('Editable', function () {
   let editable, $div
 
-  afterEach(() => {
+  afterEach(function () {
     if (editable) {
       editable.off()
       editable = undefined
     }
   })
 
-  describe('global variable', () => {
-    it('is not defined', () => {
+  describe('global variable', function () {
+
+    it('is not defined', function () {
       expect(window.Editable).toBeUndefined()
     })
 
-    it('creates a new Editable instance', () => {
+    it('creates a new Editable instance', function () {
       editable = new Editable()
       expect(editable.on).toBeDefined()
     })
 
     // Test no variables are leaking into global namespace
-    it('does not define dispatcher globally', () => {
+    it('does not define dispatcher globally', function () {
       expect(window.dispatcher).not.toBeDefined()
     })
   })
 
-  describe('with an element added', () => {
-    beforeEach(() => {
+  describe('with an element added', function () {
+
+    beforeEach(function () {
       $div = $('<div>').appendTo(document.body)
       editable = new Editable()
       editable.add($div)
     })
 
-    afterEach(() => {
+    afterEach(function () {
       $div.remove()
     })
 
-    describe('getContent()', () => {
-      it('getContent() returns its content', () => {
+    describe('getContent()', function () {
+      it('getContent() returns its content', function () {
         $div.html('a')
         const content = editable.getContent($div[0])
 
@@ -49,8 +51,9 @@ describe('Editable', () => {
       })
     })
 
-    describe('appendTo()', () => {
-      it('appends a document fragment', () => {
+    describe('appendTo()', function () {
+
+      it('appends a document fragment', function () {
         $div.html('a')
         const frag = document.createDocumentFragment()
         frag.appendChild(document.createTextNode('b'))
@@ -58,19 +61,19 @@ describe('Editable', () => {
         expect($div[0].innerHTML).toEqual('ab')
       })
 
-      it('appends text from a string', () => {
+      it('appends text from a string', function () {
         $div.html('a')
         editable.appendTo($div[0], 'b')
         expect($div[0].innerHTML).toEqual('ab')
       })
 
-      it('appends html from a string', () => {
+      it('appends html from a string', function () {
         $div.html('a')
         editable.appendTo($div[0], '<span>b</span>c')
         expect($div[0].innerHTML).toEqual('a<span>b</span>c')
       })
 
-      it('returns a curosr a the right position', () => {
+      it('returns a curosr a the right position', function () {
         $div.html('a')
         const cursor = editable.appendTo($div[0], 'b')
         expect(cursor.beforeHtml()).toEqual('a')
@@ -78,8 +81,9 @@ describe('Editable', () => {
       })
     })
 
-    describe('prependTo()', () => {
-      it('prepends a document fragment', () => {
+    describe('prependTo()', function () {
+
+      it('prepends a document fragment', function () {
         const frag = document.createDocumentFragment()
         frag.appendChild(document.createTextNode('b'))
         $div.html('a')
@@ -87,19 +91,19 @@ describe('Editable', () => {
         expect($div[0].innerHTML).toEqual('ba')
       })
 
-      it('prepends text from a string', () => {
+      it('prepends text from a string', function () {
         $div.html('a')
         editable.prependTo($div[0], 'b')
         expect($div[0].innerHTML).toEqual('ba')
       })
 
-      it('prepends html from a string', () => {
+      it('prepends html from a string', function () {
         $div.html('A sentence.')
         editable.prependTo($div[0], '<span>So</span> be it. ')
         expect($div[0].innerHTML).toEqual('<span>So</span> be it. A sentence.')
       })
 
-      it('returns a curosr a the right position', () => {
+      it('returns a curosr a the right position', function () {
         $div.html('a')
         const cursor = editable.prependTo($div[0], 'b')
         expect(cursor.beforeHtml()).toEqual('b')
@@ -107,7 +111,8 @@ describe('Editable', () => {
       })
     })
 
-    describe('change event', () => {
+    describe('change event', function () {
+
       it('gets triggered after format change', (done) => {
         editable.change((element) => {
           expect(element).toEqual($div[0])
