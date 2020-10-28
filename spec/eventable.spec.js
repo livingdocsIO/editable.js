@@ -83,6 +83,45 @@ describe('eventable', function () {
         this.obj.notify('publish', 'success')
         expect(called).toEqual(1)
       })
+
+      it('accepts multiple whitespace separated event names', function () {
+        let called = 0
+        this.obj.on('publish unpublish', () => {
+          called++
+        })
+
+        this.obj.notify('publish')
+        this.obj.notify('unpublish')
+        this.obj.notify('foo') // should do nothing
+        expect(called).toEqual(2)
+      })
+
+      it('accepts an object to register multiple events', function () {
+        let published = 0
+        let unpublished = 0
+
+        this.obj.on({
+          publish: () => { published++ },
+          unpublish: () => { unpublished++ }
+        })
+
+        this.obj.notify('publish')
+        this.obj.notify('unpublish')
+        expect(published).toEqual(1)
+        expect(unpublished).toEqual(1)
+      })
+
+      it('accepts multiple event names in object form', function () {
+        let called = 0
+
+        this.obj.on({
+          'publish unpublish': () => { called++ }
+        })
+
+        this.obj.notify('publish')
+        this.obj.notify('unpublish')
+        expect(called).toEqual(2)
+      })
     })
 
     describe('off()', function () {
