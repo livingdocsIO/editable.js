@@ -1,5 +1,6 @@
 import $ from 'jquery'
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import { PropTypes } from 'prop-types'
 import ReactDOM from 'react-dom'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
@@ -157,7 +158,6 @@ export default function (editable) {
     .on('paste', (elem, blocks, cursor) => {
       if (!isFromFirstExample(elem)) return
 
-      console.log(blocks)
       let text = blocks.join(' ')
       if (text.length > 40) text = text.substring(0, 38) + '...'
 
@@ -183,7 +183,7 @@ export default function (editable) {
       if (!isFromFirstExample(elem)) return
       showEvent({
         name: 'split',
-        content: 'Split this block'
+        content: <span>Split this block</span>
       })
     })
 
@@ -195,19 +195,19 @@ export default function (editable) {
 
       showEvent({
         name: 'merge',
-        content: content
+        content: <span>{content}</span>
       })
     })
 
     .on('switch', (elem, direction, cursor) => {
       if (!isFromFirstExample(elem)) return
-      const content = direction === 'after'
+      const content = direction === 'down'
         ? 'Set the focus to the following block'
         : 'Set the focus to the previous block'
 
       showEvent({
         name: 'switch',
-        content: content
+        content: <span>{content}</span>
       })
     })
 

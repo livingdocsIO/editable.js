@@ -140,21 +140,22 @@
         <h2 class="example-title">Setup</h2>
 
 <pre><code class="language-javascript">
+// create a new Editable object, and configure it as needed
 var editable = new Editable({
-  // here you can pass an iframe window if required
+  // here you can pass an iframe window if required (default: main window)
   window: window,
 
-  // activate the default behaviour for merge, split and insert
+  // activate the default behaviour for merge, split and insert (default: true)
   defaultBehavior: true,
 
-  // fire selection events on mouse move
+  // fire selection events on mouse move (default: false)
   mouseMoveSelectionChanges: false,
 
-  // control the 'spellcheck' attribute on editable elements
+  // control the 'spellcheck' attribute on editable elements (default: true)
   browserSpellcheck: true
 });
 
-// add and initialize a block element to be made editable
+// add and initialize a block element to make it editable
 editable.add(elem)
 </code></pre>
 
@@ -204,7 +205,7 @@ editable.setupHighlighting({
           <h4>
             <span>focus</span> <span>blur</span>
           </h4>
-          <p>Fired when when editable block gets focus and after it is blurred. </p>
+          <p>Fired when when an editable block gets focus and after it is blurred. </p>
 
           <div class="code-example">
             <h3>Example:</h3>
@@ -253,7 +254,7 @@ editable.on('selection', (elem, selection) => {
           <h4>
             <span>cursor</span>
           </h4>
-          <p>Fired when the user selects some text inside an editable block.</p>
+          <p>Fired when the user moves the cursor within an editable block.</p>
 
           <div class="code-example">
           <h3>Example:</h3>
@@ -275,7 +276,7 @@ editable.on('cursor', (elem, cursor) => {
           <h4>
             <span>change</span>
           </h4>
-          <p>Fired when the user selects some text inside an editable block.</p>
+          <p>Fired when the user changes the content of an editable block.</p>
 
           <div class="code-example">
             <h3>Example:</h3>
@@ -336,7 +337,7 @@ editable.on('paste', (elem, blocks, cursor) => {
           <h4>
             <span>insert</span>
           </h4>
-          <p>Fired when the user presses enter (&#x23ce;) at the beginning or end of an editable (For example you can insert a new paragraph after the element if this happens).</p>
+          <p>Fired when the user presses enter (&#x23ce;) at the beginning or end of an editable (for example you can insert a new paragraph after the element if this happens).</p>
 
           <p class="edit-example">
             The end<span class="cursor">&nbsp;</span>
@@ -412,15 +413,15 @@ editable.on('merge', (elem, direction, cursor) => {
             <span>switch</span>
           </h4>
 
-          <p>Fired when the user pressed an arrow key at the top or bottom so that you may want to set the cursor into the preceding or following editale element.</p>
+          <p>Fired when the user presses an arrow key at the top or bottom so that you may want to set the cursor into the preceding or following editable element.</p>
 
           <div class="code-example">
             <h3>Example:</h3>
 <pre><code class="language-javascript">
 editable.on('switch', (elem, direction, cursor) => {
-  if (direction === 'after') {
+  if (direction === 'down') {
     // your code...
-  } else if (direction === 'before') {
+  } else if (direction === 'up') {
     // your code...
   }
 })
