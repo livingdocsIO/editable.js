@@ -21,13 +21,13 @@ describe('Spellcheck:', function () {
 
   // Specs
 
-  beforeEach(() => {
+  beforeEach(function () {
     this.editable = new Editable()
   })
 
-  describe('with a simple sentence', () => {
+  describe('with a simple sentence', function () {
 
-    beforeEach(() => {
+    beforeEach(function () {
       this.p = $('<p>A simple sentence.</p>')[0]
       this.errors = ['simple']
       this.highlighting = new Highlighting(this.editable, {
@@ -40,20 +40,20 @@ describe('Spellcheck:', function () {
       })
     })
 
-    describe('highlight()', () => {
+    describe('highlight()', function () {
 
-      it('calls highlightMatches()', () => {
+      it('calls highlightMatches()', function () {
         const highlightMatches = sinon.spy(this.highlighting, 'highlightMatches')
         this.highlighting.highlight(this.p)
         expect(highlightMatches.called).toEqual(true)
       })
 
-      it('highlights a match with the given marker node', () => {
+      it('highlights a match with the given marker node', function () {
         this.highlighting.highlight(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
       })
 
-      it('removes a corrected highlighted match.', () => {
+      it('removes a corrected highlighted match.', function () {
         this.highlighting.highlight(this.p)
         let $misspelledWord = $(this.p).find('.misspelled-word')
         expect($misspelledWord.length).toEqual(1)
@@ -68,14 +68,14 @@ describe('Spellcheck:', function () {
         expect($misspelledWord.length).toEqual(0)
       })
 
-      it('match highlights are marked with "ui-unwrap"', () => {
+      it('match highlights are marked with "ui-unwrap"', function () {
         this.highlighting.highlight(this.p)
         const $spellcheck = $(this.p).find('.misspelled-word').first()
         const dataEditable = $spellcheck.attr('data-editable')
         expect(dataEditable).toEqual('ui-unwrap')
       })
 
-      it('calls highlight() for an empty wordlist', () => {
+      it('calls highlight() for an empty wordlist', function () {
         const highlight = sinon.spy(this.highlighting, 'highlight')
         this.highlighting.config.spellcheckService = function (text, callback) {
           callback([]) // eslint-disable-line standard/no-callback-literal
@@ -84,7 +84,7 @@ describe('Spellcheck:', function () {
         expect(highlight.called).toEqual(true)
       })
 
-      it('calls highlight() for an undefined wordlist', () => {
+      it('calls highlight() for an undefined wordlist', function () {
         const highlight = sinon.spy(this.highlighting, 'highlight')
         this.highlighting.config.spellcheckService = function (text, callback) {
           callback()
@@ -94,9 +94,9 @@ describe('Spellcheck:', function () {
       })
     })
 
-    describe('removeHighlights()', () => {
+    describe('removeHighlights()', function () {
 
-      it('removes the highlights', () => {
+      it('removes the highlights', function () {
         this.highlighting.highlight(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
         this.highlighting.removeHighlights(this.p)
@@ -104,25 +104,25 @@ describe('Spellcheck:', function () {
       })
     })
 
-    describe('removeHighlightsAtCursor()', () => {
+    describe('removeHighlightsAtCursor()', function () {
 
-      beforeEach(() => {
+      beforeEach(function () {
         this.highlighting.highlight(this.p)
         this.highlight = $(this.p).find('.misspelled-word')[0]
       })
 
-      afterEach(() => {
+      afterEach(function () {
         this.editable.getSelection.restore()
       })
 
-      it('does remove the highlights if cursor is within a match', () => {
+      it('does remove the highlights if cursor is within a match', function () {
         sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.highlight, 0))
 
         this.highlighting.removeHighlightsAtCursor(this.p)
         expect($(this.p).find('.misspelled-word').length).toEqual(0)
       })
 
-      it('does not remove the highlights config.removeOnCorrection is set to false', () => {
+      it('does not remove the highlights config.removeOnCorrection is set to false', function () {
         this.highlighting.config.removeOnCorrection = false
         sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.highlight, 0))
 
@@ -130,7 +130,7 @@ describe('Spellcheck:', function () {
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
       })
 
-      it('does not remove the highlights if cursor is within a match of highlight type != spellcheck', () => {
+      it('does not remove the highlights if cursor is within a match of highlight type != spellcheck', function () {
         $(this.p).find('.misspelled-word').attr('data-highlight', 'comment')
         sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.highlight, 0))
 
@@ -138,7 +138,7 @@ describe('Spellcheck:', function () {
         expect($(this.p).find('.misspelled-word').length).toEqual(1)
       })
 
-      it('does not remove the highlights if cursor is outside a match', () => {
+      it('does not remove the highlights if cursor is outside a match', function () {
         sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.p.firstChild, 0))
 
         this.highlighting.removeHighlightsAtCursor(this.p)
@@ -146,9 +146,9 @@ describe('Spellcheck:', function () {
       })
     })
 
-    describe('retains cursor position', () => {
+    describe('retains cursor position', function () {
 
-      it('in the middle of a text node', () => {
+      it('in the middle of a text node', function () {
         const cursor = createCursor(this.p, this.p.firstChild, 4)
         cursor.save()
         this.highlighting.highlight(this.p)

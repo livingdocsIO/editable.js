@@ -7,7 +7,7 @@ import Keyboard from '../src/keyboard'
 import Editable from '../src/core'
 const { key } = Keyboard
 
-describe('Dispatcher', () => {
+describe('Dispatcher', function () {
   let $elem, editable, event
 
   // create a Cursor object and set the selection to it
@@ -53,8 +53,9 @@ describe('Dispatcher', () => {
     }
   }
 
-  describe('for editable', () => {
-    beforeEach(() => {
+  describe('for editable', function () {
+
+    beforeEach(function () {
       $elem = $('<div contenteditable="true"></div>')
       $(document.body).append($elem)
       editable = new Editable()
@@ -62,19 +63,20 @@ describe('Dispatcher', () => {
       $elem.focus()
     })
 
-    afterEach(() => {
+    afterEach(function () {
       off()
       editable.dispatcher.off()
       $elem.remove()
     })
 
-    describe('on Enter', () => {
-      beforeEach(() => {
+    describe('on Enter', function () {
+
+      beforeEach(function () {
         event = $.Event('keydown')
         event.keyCode = key.enter
       })
 
-      it('fires insert "after" if cursor is at the end', () => {
+      it('fires insert "after" if cursor is at the end', function () {
         // <div>foo\</div>
         $elem.html('foo')
         createCursor(createRangeAtEnd($elem[0]))
@@ -89,7 +91,7 @@ describe('Dispatcher', () => {
         expect(insert.calls).toEqual(1)
       })
 
-      it('fires insert "before" if cursor is at the beginning', () => {
+      it('fires insert "before" if cursor is at the beginning', function () {
         // <div>|foo</div>
         $elem.html('foo')
         var range = rangy.createRange()
@@ -107,7 +109,7 @@ describe('Dispatcher', () => {
         expect(insert.calls).toEqual(1)
       })
 
-      it('fires merge if cursor is in the middle', () => {
+      it('fires merge if cursor is in the middle', function () {
         // <div>fo|o</div>
         $elem.html('foo')
         const range = rangy.createRange()
@@ -127,8 +129,9 @@ describe('Dispatcher', () => {
       })
     })
 
-    describe('on backspace', () => {
-      beforeEach(() => {
+    describe('on backspace', function () {
+
+      beforeEach(function () {
         event = $.Event('keydown')
         event.keyCode = key.backspace
       })
@@ -158,8 +161,9 @@ describe('Dispatcher', () => {
       })
     })
 
-    describe('on delete', () => {
-      beforeEach(() => {
+    describe('on delete', function () {
+
+      beforeEach(function () {
         event = $.Event('keydown')
         event.keyCode = key['delete']
       })
@@ -184,8 +188,9 @@ describe('Dispatcher', () => {
       })
     })
 
-    describe('on keydown', () => {
-      beforeEach(() => {
+    describe('on keydown', function () {
+
+      beforeEach(function () {
         event = $.Event('keydown')
       })
 
@@ -196,8 +201,9 @@ describe('Dispatcher', () => {
       })
     })
 
-    describe('on newline', () => {
-      beforeEach(() => {
+    describe('on newline', function () {
+
+      beforeEach(function () {
         event = $.Event('keydown')
         event.shiftKey = true
         event.keyCode = 13

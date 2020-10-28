@@ -188,6 +188,7 @@ describe('Selection', function () {
     })
 
     describe('underline:', function () {
+
       beforeEach(function () {
         this.oldUnderlineMarkup = config.underlineMarkup
         config.underlineMarkup = {

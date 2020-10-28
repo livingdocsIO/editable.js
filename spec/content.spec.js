@@ -7,6 +7,7 @@ import * as rangeSaveRestore from '../src/range-save-restore'
 rangy.init()
 
 describe('Content', function () {
+
   describe('normalizeTags()', function () {
     const plain = $('<div>Plain <strong>text</strong><strong>block</strong> example snippet</div>')[0]
     const plainWithSpace = $('<div>Plain <strong>text</strong> <strong>block</strong> example snippet</div>')[0]
@@ -59,6 +60,7 @@ describe('Content', function () {
   })
 
   describe('normalizeWhitespace()', function () {
+
     beforeEach(function () {
       this.element = $('<div></div>')[0]
     })
@@ -76,6 +78,7 @@ describe('Content', function () {
   })
 
   describe('getInnerTags()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -119,6 +122,7 @@ describe('Content', function () {
   })
 
   describe('getTags()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -143,6 +147,7 @@ describe('Content', function () {
   })
 
   describe('getTagsByName()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -167,6 +172,7 @@ describe('Content', function () {
   })
 
   describe('getTagsByNameAndAttributes()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -198,6 +204,7 @@ describe('Content', function () {
   })
 
   describe('wrap()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -214,6 +221,7 @@ describe('Content', function () {
   })
 
   describe('isAffectedBy()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -230,6 +238,7 @@ describe('Content', function () {
   })
 
   describe('containsString()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -247,6 +256,7 @@ describe('Content', function () {
   })
 
   describe('deleteCharacter()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -290,6 +300,7 @@ describe('Content', function () {
   })
 
   describe('toggleTag()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -309,6 +320,7 @@ describe('Content', function () {
   })
 
   describe('nuke()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -353,6 +365,7 @@ describe('Content', function () {
   })
 
   describe('forceWrap()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -394,6 +407,7 @@ describe('Content', function () {
   })
 
   describe('surround()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -447,6 +461,7 @@ describe('Content', function () {
   })
 
   describe('isExactSelection()', function () {
+
     beforeEach(function () {
       this.range = rangy.createRange()
     })
@@ -596,6 +611,7 @@ describe('Content', function () {
     })
 
     describe('called with keepUiElements', function () {
+
       it('does not unwrap a "ui-unwrap" span', function () {
         $host.html('a<span data-editable="ui-unwrap">b</span>c')
         const result = content.extractContent($host[0], true)
@@ -610,6 +626,7 @@ describe('Content', function () {
     })
 
     describe('with ranges', function () {
+
       beforeEach(function () {
         $host.appendTo(document.body)
         this.range = rangy.createRange()

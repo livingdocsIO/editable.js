@@ -6,28 +6,31 @@ import Cursor from '../src/cursor'
 import * as config from '../src/config'
 
 describe('Cursor', function () {
-  it('is defined', () => {
+
+  it('is defined', function () {
     expect(Cursor).toBeDefined()
   })
 
-  describe('instantiation', () => {
-    beforeEach(() => {
+  describe('instantiation', function () {
+
+    beforeEach(function () {
       const range = rangy.createRange()
       this.$elem = $('<div>')
       this.cursor = new Cursor(this.$elem, range)
     })
 
-    it('creates an instance from a jQuery element', () => {
+    it('creates an instance from a jQuery element', function () {
       expect(this.cursor.host).toEqual(this.$elem[0])
     })
 
-    it('sets a reference to window', () => {
+    it('sets a reference to window', function () {
       expect(this.cursor.win).toEqual(window)
     })
   })
 
-  describe('with a collapsed range at the end', () => {
-    beforeEach(() => {
+  describe('with a collapsed range at the end', function () {
+
+    beforeEach(function () {
       this.oneWord = $('<div class="' + config.editableClass + '">foobar</div>')[0]
       this.range = rangy.createRange()
       this.range.selectNodeContents(this.oneWord)
@@ -35,11 +38,11 @@ describe('Cursor', function () {
       this.cursor = new Cursor(this.oneWord, this.range)
     })
 
-    it('sets #isCursor to true', () => {
+    it('sets #isCursor to true', function () {
       expect(this.cursor.isCursor).toBe(true)
     })
 
-    it('has a valid range', () => {
+    it('has a valid range', function () {
       expect(this.range.collapsed).toBe(true)
       expect(this.range.startContainer).toEqual(this.oneWord)
       expect(this.range.endContainer).toEqual(this.oneWord)
@@ -47,26 +50,30 @@ describe('Cursor', function () {
       expect(this.range.endOffset).toEqual(1)
     })
 
-    describe('isAtTextEnd()', () => {
-      it('returns true when at text end', () => {
+    describe('isAtTextEnd()', function () {
+
+      it('returns true when at text end', function () {
         expect(this.cursor.isAtEnd()).toBe(true)
       })
     })
 
-    describe('isAtEnd()', () => {
-      it('is true', () => {
+    describe('isAtEnd()', function () {
+
+      it('is true', function () {
         expect(this.cursor.isAtTextEnd()).toBe(true)
       })
     })
 
-    describe('isAtBeginning()', () => {
-      it('is false', () => {
+    describe('isAtBeginning()', function () {
+
+      it('is false', function () {
         expect(this.cursor.isAtBeginning()).toBe(false)
       })
     })
 
-    describe('save() and restore()', () => {
-      it('saves and restores the cursor', () => {
+    describe('save() and restore()', function () {
+
+      it('saves and restores the cursor', function () {
         this.cursor.save()
 
         // move the cursor so we can check the restore method.
@@ -79,8 +86,9 @@ describe('Cursor', function () {
       })
     })
 
-    describe('insertAfter()', () => {
-      it('can deal with an empty documentFragment', () => {
+    describe('insertAfter()', function () {
+
+      it('can deal with an empty documentFragment', function () {
         function test () {
           const frag = window.document.createDocumentFragment()
           this.cursor.insertAfter(frag)
@@ -90,8 +98,9 @@ describe('Cursor', function () {
       })
     })
 
-    describe('insertBefore()', () => {
-      it('can deal with an empty documentFragment', () => {
+    describe('insertBefore()', function () {
+
+      it('can deal with an empty documentFragment', function () {
         function test () {
           const frag = window.document.createDocumentFragment()
           this.cursor.insertBefore(frag)
@@ -100,42 +109,48 @@ describe('Cursor', function () {
       })
     })
 
-    describe('before()', () => {
-      it('gets the content before', () => {
+    describe('before()', function () {
+
+      it('gets the content before', function () {
         const fragment = this.cursor.before()
         expect(content.getInnerHtmlOfFragment(fragment)).toEqual('foobar')
       })
     })
 
-    describe('textBefore()', () => {
-      it('gets the text before', () => {
+    describe('textBefore()', function () {
+
+      it('gets the text before', function () {
         const textBefore = this.cursor.textBefore()
         expect(textBefore).toEqual('foobar')
       })
     })
 
-    describe('beforeHtml()', () => {
-      it('gets the content before', () => {
+    describe('beforeHtml()', function () {
+
+      it('gets the content before', function () {
         expect(this.cursor.beforeHtml()).toEqual('foobar')
       })
     })
 
-    describe('after()', () => {
-      it('gets the content after', () => {
+    describe('after()', function () {
+
+      it('gets the content after', function () {
         var fragment = this.cursor.after()
         expect(content.getInnerHtmlOfFragment(fragment)).toEqual('')
       })
     })
 
-    describe('textAfter()', () => {
-      it('gets the text after', () => {
+    describe('textAfter()', function () {
+
+      it('gets the text after', function () {
         var textAfter = this.cursor.textAfter()
         expect(textAfter).toEqual('')
       })
     })
 
-    describe('afterHtml()', () => {
-      it('gets the content before', () => {
+    describe('afterHtml()', function () {
+
+      it('gets the content before', function () {
         expect(this.cursor.afterHtml()).toEqual('')
       })
     })
