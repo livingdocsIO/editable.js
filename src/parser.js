@@ -27,8 +27,8 @@ export function getHost (node) {
 }
 
 /**
- * Get the index of a node.
- * So that parent.childNodes[ getIndex(node) ] would return the node again
+ * Get the index of a node so that
+ * parent.childNodes[ getNodeIndex(node) ] would return the node again.
  *
  * @method getNodeIndex
  * @param {HTMLElement}
