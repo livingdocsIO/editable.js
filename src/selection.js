@@ -259,6 +259,16 @@ export default class Selection extends Cursor {
     return content.getTags(this.host, this.range, filterFunc)
   }
 
+  // Get the names of all tags that affect the current selection. Optionally
+  // pass a method to filter the returned elements.
+  //
+  // @param {Function filter(node)} [Optional] Method to filter the DOM
+  //   Nodes whose names are returned.
+  // @return {Array of DOM Node names}
+  getTagNames (filterFunc) {
+    return content.getTagNames(this.getTags(filterFunc))
+  }
+
   // Get all tags of the specified type that affect the current selection.
   //
   // @method getTagsByName
