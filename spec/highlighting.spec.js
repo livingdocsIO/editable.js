@@ -11,13 +11,14 @@ function setupHighlightEnv (context, text) {
   context.$div = $('<div>' + context.text + '</div>').appendTo(document.body)
   context.editable = new Editable()
   context.editable.add(context.$div)
-  context.highlightRange = (highlightId, start, end, dispatcher) => {
+  context.highlightRange = (highlightId, start, end, dispatcher, type) => {
     return highlightSupport.highlightRange(
       context.$div[0],
       highlightId,
       start,
       end,
-      dispatcher
+      dispatcher,
+      type
     )
   }
 
@@ -29,8 +30,8 @@ function setupHighlightEnv (context, text) {
     )
   }
 
-  context.extract = function () {
-    return context.editable.getHighlightPositions({editableHost: context.$div[0]})
+  context.extract = function (type) {
+    return context.editable.getHighlightPositions({editableHost: context.$div[0], type})
   }
 
   context.getHtml = function () {
@@ -395,6 +396,24 @@ o Round</span>`)
 
       const highlightSpan = this.$div.find('[data-word-id="myId"]')
       expect(highlightSpan.length).toEqual(0)
+    })
+
+    it('returns only highlightRanges with specific type', function () {
+      const startIndex = this.highlightRange('myId', 3, 7)
+      this.highlightRange('spellcheckId', 18, 22, undefined, 'spellcheck')
+      const expectedRanges = {
+        myId: {
+          text: 'ple ',
+          start: 3,
+          end: 7
+        }
+      }
+      const expectedHtml = this.formatHtml(`Peo
+<span class="highlight-comment" data-word-id="myId" data-editable="ui-unwrap" data-highlight="comment">ple </span>
+Make The <br> W<span class="highlight-comment" data-word-id="spellcheckId" data-editable="ui-unwrap" data-highlight="spellcheck">orld</span> Go Round`)
+      expect(this.getHtml()).toEqual(expectedHtml)
+      expect(this.extract('comment')).toEqual(expectedRanges)
+      expect(startIndex).toEqual(3)
     })
   })
 
