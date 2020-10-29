@@ -379,7 +379,7 @@ const Editable = module.exports = class Editable {
   }
 
   /**
-   * Extracts positions of all DOMNodes that match `[data-word-id]`.
+   * Extracts positions of all DOMNodes that match `[data-word-id]` and the `[data-highlight]`
    *
    * Returns an object where the keys represent a highlight id and the value
    * a text range object of shape:
@@ -388,12 +388,14 @@ const Editable = module.exports = class Editable {
    * ```
    *
    * @param  {Object} options
-   * @param  {DOMNode} options.editableHos
+   * @param  {DOMNode} options.editableHost
+   * @param  {String} [options.type]
    * @return {Object} ranges
    */
-  getHighlightPositions ({ editableHost }) {
+  getHighlightPositions ({ editableHost, type }) {
     return highlightSupport.extractHighlightedRanges(
-      editableHost
+      editableHost,
+      type
     )
   }
 

@@ -31,7 +31,7 @@ const highlightSupport = {
     }
   },
 
-  highlightRange (editableHost, highlightId, startIndex, endIndex, dispatcher) {
+  highlightRange (editableHost, highlightId, startIndex, endIndex, dispatcher, type) {
     if (this.hasHighlight(editableHost, highlightId)) {
       this.removeHighlight(editableHost, highlightId)
     }
@@ -44,7 +44,7 @@ const highlightSupport = {
 
     const marker = highlightSupport.createMarkerNode(
       '<span class="highlight-comment" data-word-id="' + highlightId + '"></span>',
-      'comment',
+      type || 'comment',
       this.win
     )
     const fragment = range.extractContents()
@@ -83,8 +83,10 @@ const highlightSupport = {
     return !!matches.length
   },
 
-  extractHighlightedRanges (editableHost) {
-    const markers = $(editableHost).find('[data-word-id]')
+  extractHighlightedRanges (editableHost, type) {
+    let findMarkersQuery = '[data-word-id]'
+    if (type) findMarkersQuery += '[data-highlight="' + type + '"]'
+    const markers = $(editableHost).find(findMarkersQuery)
     if (!markers.length) {
       return
     }
