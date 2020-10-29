@@ -78,7 +78,7 @@ export default function createDefaultBehavior (editable) {
     },
 
     split (element, before, after, cursor) {
-      const newNode = element.cloneNode()
+      const newNode = element.cloneNode(false)
       newNode.appendChild(before)
 
       const parent = element.parentNode
