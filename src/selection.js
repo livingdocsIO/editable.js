@@ -249,35 +249,6 @@ export default class Selection extends Cursor {
     this.setSelection()
   }
 
-  // Get all tags that affect the current selection. Optionally pass a
-  // method to filter the returned elements.
-  //
-  // @param {Function filter(node)} [Optional] Method to filter the returned
-  //   DOM Nodes.
-  // @return {Array of DOM Nodes}
-  getTags (filterFunc) {
-    return content.getTags(this.host, this.range, filterFunc)
-  }
-
-  // Get the names of all tags that affect the current selection. Optionally
-  // pass a method to filter the returned elements.
-  //
-  // @param {Function filter(node)} [Optional] Method to filter the DOM
-  //   Nodes whose names are returned.
-  // @return {Array<String> of tag names}
-  getTagNames (filterFunc) {
-    return content.getTagNames(this.getTags(filterFunc))
-  }
-
-  // Get all tags of the specified type that affect the current selection.
-  //
-  // @method getTagsByName
-  // @param {String} tagName. E.g. 'a' to get all links.
-  // @return {Array of DOM Nodes}
-  getTagsByName (tagName) {
-    return content.getTagsByName(this.host, this.range, tagName)
-  }
-
   // Check if the selection is the same as the elements contents.
   //
   // @method isExactSelection
