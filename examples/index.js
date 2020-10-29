@@ -19,11 +19,22 @@ $(() => {
   editable.add('.formatting-example p')
   setupTooltip()
 
+  editable.add('.styling-example p')
+
   const secondExample = document.querySelector('.formatting-example p')
   updateCode(secondExample)
 
   editable.on('change', (elem) => {
     if (elem === secondExample) updateCode(elem)
+  })
+
+  // Styling
+  // -------
+
+  $('select[name="editable-styles"]').on('change', function () {
+    $('.styling-example p')
+      .removeClass('example-style-default example-style-dark')
+      .addClass('example-style-' + $(this).val())
   })
 
   // IFrame
