@@ -139,7 +139,7 @@ export default class Editable {
   disable (target) {
     const document = this.win.document
 
-    target = target ? [target] : Array.from(document.querySelectorAll(`.${config.editableClass}`))
+    target = target ? [target] : [...document.querySelectorAll(`.${config.editableClass}`)]
     target.forEach(element => block.disable(element))
 
     return this
@@ -157,7 +157,7 @@ export default class Editable {
     const document = this.win.document
     const shouldSpellcheck = this.config.browserSpellcheck
 
-    target = target || Array.from(document.querySelectorAll(`.${config.editableDisabledClass}`))
+    target = target || [...document.querySelectorAll(`.${config.editableDisabledClass}`)]
     target.forEach(element => {
       block.init(element, {normalize, shouldSpellcheck})
       this.dispatcher.notify('init', element)
@@ -177,7 +177,7 @@ export default class Editable {
   suspend (target) {
     const document = this.win.document
 
-    target = target ? [target] : Array.from(document.querySelectorAll(`.${config.editableClass}`))
+    target = target ? [target] : [...document.querySelectorAll(`.${config.editableClass}`)]
     target.forEach(element => element.removeAttribute('contenteditable'))
 
     this.dispatcher.suspend()
@@ -193,7 +193,7 @@ export default class Editable {
   continue (target) {
     const document = this.win.document
 
-    target = target ? [target] : Array.from(document.querySelectorAll(`.${config.editableClass}`))
+    target = target ? [target] : [...document.querySelectorAll(`.${config.editableClass}`)]
     target.forEach(element => element.setAttribute('contenteditable', true))
 
     this.dispatcher.continue()
