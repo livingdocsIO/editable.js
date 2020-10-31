@@ -1,5 +1,3 @@
-import $ from 'jquery'
-
 import config from './config'
 import * as content from './content'
 
@@ -15,9 +13,8 @@ export function init (elem, {normalize, shouldSpellcheck}) {
   elem.setAttribute('contenteditable', true)
   elem.setAttribute('spellcheck', Boolean(shouldSpellcheck))
 
-  $(elem)
-    .removeClass(config.editableDisabledClass)
-    .addClass(config.editableClass)
+  elem.classList.remove(config.editableDisabledClass)
+  elem.classList.add(config.editableClass)
 
   if (normalize) content.tidyHtml(elem)
 }
@@ -29,9 +26,8 @@ export function disable (elem) {
 
   setState(elem, undefined)
 
-  $(elem)
-    .removeClass(config.editableClass)
-    .addClass(config.editableDisabledClass)
+  elem.classList.remove(config.editableClass)
+  elem.classList.add(config.editableDisabledClass)
 }
 
 
