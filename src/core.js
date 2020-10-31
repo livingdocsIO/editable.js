@@ -1,4 +1,3 @@
-import $ from 'jquery'
 import rangy from 'rangy'
 import config from './config'
 import error from './util/error'
@@ -14,6 +13,7 @@ import createDefaultEvents from './create-default-events'
 import browser from 'bowser'
 import {textNodesUnder, getTextNodeAndRelativeOffset} from './util/element'
 import {binaryCursorSearch} from './util/binary_search'
+import { domArray, domSelector } from './util/dom'
 
 /**
  * The Core module provides the Editable class that defines the Editable.JS
@@ -45,7 +45,7 @@ export default class Editable {
       browserSpellcheck: true
     }
 
-    this.config = $.extend(defaultInstanceConfig, instanceConfig)
+    this.config = Object.assign(defaultInstanceConfig, instanceConfig)
     this.win = this.config.window
     this.editableSelector = `.${config.editableClass}`
 
@@ -80,7 +80,7 @@ export default class Editable {
   *   italicTag: e.g. '<em>'
   */
   static globalConfig (globalConfig) {
-    $.extend(config, globalConfig)
+    Object.assign(config, globalConfig)
     clipboard.updateConfig(config)
   }
 
@@ -96,7 +96,10 @@ export default class Editable {
    * @chainable
    */
   add (target) {
-    this.enable($(target))
+    const document = this.win.document
+    const targets = domArray(target, document)
+
+    this.enable(targets)
     // TODO check css whitespace settings
     return this
   }
@@ -112,9 +115,15 @@ export default class Editable {
    * @chainable
    */
   remove (target) {
-    const $target = $(target)
-    this.disable($target)
-    $target.removeClass(config.editableDisabledClass)
+    const document = this.win.document
+    const targets = domArray(target, document)
+
+    this.disable(targets)
+
+    targets.forEach(current => {
+      current.classList.remove(config.editableDisabledClass)
+    })
+
     return this
   }
 
@@ -123,14 +132,15 @@ export default class Editable {
   * The target elements are marked as disabled.
   *
   * @method disable
-  * @param { jQuery element | undefined  } target editable root element(s)
+  * @param { HTMLElement | undefined  } elem editable root element(s)
   *    If no param is specified all editables are disabled.
   * @chainable
   */
-  disable ($elem) {
-    const body = this.win.document.body
-    $elem = $elem || $(`.${config.editableClass}`, body)
-    $elem.each((i, el) => block.disable(el))
+  disable (target) {
+    const document = this.win.document
+
+    target = target ? [target] : Array.from(document.querySelectorAll(`.${config.editableClass}`))
+    target.forEach(element => block.disable(element))
 
     return this
   }
@@ -139,18 +149,18 @@ export default class Editable {
   * Adds the Editable.JS API to the given target elements.
   *
   * @method enable
-  * @param { jQuery element | undefined } target editable root element(s)
+  * @param { HTMLElement | undefined } target editable root element(s)
   *    If no param is specified all editables marked as disabled are enabled.
   * @chainable
   */
-  enable ($elem, normalize) {
-    const body = this.win.document.body
-    $elem = $elem || $(`.${config.editableDisabledClass}`, body)
-
+  enable (target, normalize) {
+    const document = this.win.document
     const shouldSpellcheck = this.config.browserSpellcheck
-    $elem.each((i, el) => {
-      block.init(el, {normalize, shouldSpellcheck})
-      this.dispatcher.notify('init', el)
+
+    target = target || Array.from(document.querySelectorAll(`.${config.editableDisabledClass}`))
+    target.forEach(element => {
+      block.init(element, {normalize, shouldSpellcheck})
+      this.dispatcher.notify('init', element)
     })
 
     return this
@@ -162,13 +172,14 @@ export default class Editable {
   * for example.
   *
   * @method suspend
-  * @param jQuery object
+  * @param { HTMLElement | undefined } target
   */
-  suspend ($elem) {
-    const body = this.win.document.body
-    $elem = $elem || $(`.${config.editableClass}`, body)
+  suspend (target) {
+    const document = this.win.document
 
-    $elem.removeAttr('contenteditable')
+    target = target ? [target] : Array.from(document.querySelectorAll(`.${config.editableClass}`))
+    target.forEach(element => element.removeAttribute('contenteditable'))
+
     this.dispatcher.suspend()
     return this
   }
@@ -177,13 +188,14 @@ export default class Editable {
   * Reverse the effects of suspend()
   *
   * @method continue
-  * @param jQuery object
+  * @param { HTMLElement | undefined } target
   */
-  continue ($elem) {
-    const body = this.win.document.body
-    $elem = $elem || $(`.${config.editableClass}`, body)
+  continue (target) {
+    const document = this.win.document
 
-    $elem.attr('contenteditable', true)
+    target = target ? [target] : Array.from(document.querySelectorAll(`.${config.editableClass}`))
+    target.forEach(element => element.setAttribute('contenteditable', true))
+
     this.dispatcher.continue()
     return this
   }
@@ -191,7 +203,8 @@ export default class Editable {
    * Set the cursor inside of an editable block.
    *
    * @method createCursor
-   * @param position 'beginning', 'end', 'before', 'after'
+   * @param { HTMLElement | String } target
+   * @param { 'beginning' | 'end' | 'before' | 'after' } position
    */
 
   createCursor (element, position = 'beginning') {

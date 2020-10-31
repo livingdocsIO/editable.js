@@ -1,4 +1,3 @@
-import $ from 'jquery'
 import rangy from 'rangy'
 import * as viewport from './util/viewport'
 
@@ -374,6 +373,8 @@ export default class Cursor {
   // This is to prevent excessive triggering of the change event during
   // merge or split operations or other manipulations by scripts.
   triggerChange () {
-    $(this.host).trigger('formatEditable')
+    const event = document.createEvent('HTMLEvents')
+    event.initEvent('formatEditable', true, false)
+    this.host.dispatchEvent(event)
   }
 }

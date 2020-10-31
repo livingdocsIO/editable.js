@@ -1,5 +1,3 @@
-import $ from 'jquery'
-
 import config from './config'
 import * as string from './util/string'
 import * as nodeType from './node-type'
@@ -43,28 +41,30 @@ export function paste (element, cursor, callback) {
   // After that grab the pasted content, filter it and restore the focus.
   setTimeout(() => {
     const blocks = parseContent(pasteHolder)
-    $(pasteHolder).remove()
+    pasteHolder.parentNode.removeChild(pasteHolder)
     element.removeAttribute(config.pastingAttribute)
     cursor.restore()
     callback(blocks, cursor)
   }, 0)
 }
 
+/**
+ * @param { Document } document
+ */
 export function injectPasteholder (document) {
-  const pasteHolder = $('<div>')
-    .attr('contenteditable', true)
-    .css({
-      position: 'fixed',
-      right: '5px',
-      top: '50%',
-      width: '1px',
-      height: '1px',
-      overflow: 'hidden',
-      outline: 'none'
-    })
+  const pasteHolder = document.createElement('div')
+  pasteHolder.setAttribute('contenteditable', true)
+  pasteHolder.style.position = 'fixed'
+  pasteHolder.style.right = '5px'
+  pasteHolder.style.top = '50%'
+  pasteHolder.style.width = '1px'
+  pasteHolder.style.height = '1px'
+  pasteHolder.style.overflow = 'hidden'
+  pasteHolder.style.outline = 'none'
 
-  $(document.body).append(pasteHolder)
-  return pasteHolder.get(0)
+  document.body.appendChild(pasteHolder)
+
+  return pasteHolder
 }
 
 /**
