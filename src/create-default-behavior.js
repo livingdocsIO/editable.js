@@ -1,5 +1,3 @@
-import $ from 'jquery'
-
 import * as parser from './parser'
 import * as content from './content'
 import log from './util/log'
@@ -160,7 +158,7 @@ export default function createDefaultBehavior (editable) {
         const newElement = element.cloneNode(false)
         if (newElement.id) newElement.removeAttribute('id')
         const fragment = content.createFragmentFromString(block)
-        $(newElement).append(fragment)
+        newElement.appendChild(fragment)
         parent.insertBefore(newElement, currentElement.nextSibling)
         currentElement = newElement
       })
