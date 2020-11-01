@@ -149,9 +149,10 @@ export default function createDefaultBehavior (editable) {
     },
 
     paste (element, blocks, cursor) {
-      cursor.insertBefore(blocks[0])
+      if (blocks.length === 0) return
 
-      if (blocks.length <= 1) return cursor.setVisibleSelection()
+      cursor.insertBefore(blocks.shift())
+      if (blocks.length === 0) return cursor.setVisibleSelection()
 
       var parent = element.parentNode
       var currentElement = element
