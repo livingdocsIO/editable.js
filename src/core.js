@@ -120,9 +120,9 @@ export default class Editable {
 
     this.disable(targets)
 
-    targets.forEach(current => {
-      current.classList.remove(config.editableDisabledClass)
-    })
+    for (const element of target) {
+      element.classList.remove(config.editableDisabledClass)
+    }
 
     return this
   }
@@ -139,8 +139,10 @@ export default class Editable {
   disable (target) {
     const document = this.win.document
 
-    target = target ? [target] : [...document.querySelectorAll(`.${config.editableClass}`)]
-    target.forEach(element => block.disable(element))
+    target = target ? [target] : document.querySelectorAll(`.${config.editableClass}`)
+    for (const element of target) {
+      block.disable(element)
+    }
 
     return this
   }
@@ -157,11 +159,11 @@ export default class Editable {
     const document = this.win.document
     const shouldSpellcheck = this.config.browserSpellcheck
 
-    target = target || [...document.querySelectorAll(`.${config.editableDisabledClass}`)]
-    target.forEach(element => {
+    target = target ? [target] : document.querySelectorAll(`.${config.editableDisabledClass}`)
+    for (const element of target) {
       block.init(element, {normalize, shouldSpellcheck})
       this.dispatcher.notify('init', element)
-    })
+    }
 
     return this
   }
@@ -177,8 +179,10 @@ export default class Editable {
   suspend (target) {
     const document = this.win.document
 
-    target = target ? [target] : [...document.querySelectorAll(`.${config.editableClass}`)]
-    target.forEach(element => element.removeAttribute('contenteditable'))
+    target = target ? [target] : document.querySelectorAll(`.${config.editableClass}`)
+    for (const element of target) {
+      element.removeAttribute('contenteditable')
+    }
 
     this.dispatcher.suspend()
     return this
@@ -193,8 +197,10 @@ export default class Editable {
   continue (target) {
     const document = this.win.document
 
-    target = target ? [target] : [...document.querySelectorAll(`.${config.editableClass}`)]
-    target.forEach(element => element.setAttribute('contenteditable', true))
+    target = target ? [target] : document.querySelectorAll(`.${config.editableClass}`)
+    for (const element of target) {
+      element.setAttribute('contenteditable', true)
+    }
 
     this.dispatcher.continue()
     return this

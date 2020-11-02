@@ -8,10 +8,10 @@ export const domArray = (target, document) => {
   let targets = []
   switch (true) {
     case isString(target):
-      targets = Array.from(document.querySelectorAll(target))
+      targets = document.querySelectorAll(target)
       break
-    case target instanceof Array:
-      targets = [...target]
+    case Array.isArray(target):
+      targets = target
       break
     case target instanceof HTMLElement:
       targets.push(target)
