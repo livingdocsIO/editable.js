@@ -264,7 +264,7 @@ export default class Selection extends Cursor {
   //
   // @param {Function filter(node)} [Optional] Method to filter the DOM
   //   Nodes whose names are returned.
-  // @return {Array of DOM Node names}
+  // @return {Array<String> of tag names}
   getTagNames (filterFunc) {
     return content.getTagNames(this.getTags(filterFunc))
   }
