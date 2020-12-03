@@ -5,7 +5,7 @@ import * as content from '../src/content'
 import Cursor from '../src/cursor'
 import Keyboard from '../src/keyboard'
 import Editable from '../src/core'
-const { key } = Keyboard
+const {key} = Keyboard
 
 describe('Dispatcher', function () {
   let $elem, editable, event
@@ -35,12 +35,12 @@ describe('Dispatcher', function () {
   // register one listener per test
   function on (eventName, func) {
     // off() // make sure the last listener is unregistered
-    const obj = { calls: 0 }
+    const obj = {calls: 0}
     function proxy () {
       obj.calls += 1
       func.apply(this, arguments)
     }
-    onListener = { event: eventName, listener: proxy }
+    onListener = {event: eventName, listener: proxy}
     editable.on(eventName, proxy)
     return obj
   }
@@ -94,7 +94,7 @@ describe('Dispatcher', function () {
       it('fires insert "before" if cursor is at the beginning', function () {
         // <div>|foo</div>
         $elem.html('foo')
-        var range = rangy.createRange()
+        const range = rangy.createRange()
         range.selectNodeContents($elem[0])
         range.collapse(true)
         createCursor(range)

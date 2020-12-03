@@ -15,7 +15,7 @@ export default class SpellcheckService {
   check (text, callback) {
     if (!text) return callback(null)
 
-    let condensedText = content.normalizeWhitespace(text)
+    const condensedText = content.normalizeWhitespace(text)
 
     this.spellcheckService(condensedText, (misspelledWords) => {
       if (misspelledWords && misspelledWords.length > 0) {

@@ -160,8 +160,8 @@ export default class Selection extends Cursor {
   }
 
   insertCharacter (character) {
-    var cursor = this.deleteContent()
-    var textNode = cursor.createTextNode(character)
+    const cursor = this.deleteContent()
+    const textNode = cursor.createTextNode(character)
     cursor.insertBefore(textNode)
     cursor.setSelection()
     return cursor

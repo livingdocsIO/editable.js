@@ -6,13 +6,13 @@ import * as nodeType from './node-type'
 
 let allowedElements, requiredAttributes, transformElements, blockLevelElements
 let splitIntoBlocks, blacklistedElements
-let whitespaceOnly = /^\s*$/
-let blockPlaceholder = '<!-- BLOCK -->'
+const whitespaceOnly = /^\s*$/
+const blockPlaceholder = '<!-- BLOCK -->'
 let keepInternalRelativeLinks
 
 updateConfig(config)
-export function updateConfig (config) {
-  const rules = config.pastedHtmlRules
+export function updateConfig (conf) {
+  const rules = conf.pastedHtmlRules
   allowedElements = rules.allowedElements || {}
   requiredAttributes = rules.requiredAttributes || {}
   transformElements = rules.transformElements || {}
@@ -129,14 +129,14 @@ export function conditionalNodeWrap (child, content) {
 
   // prevent missing whitespace between text when block-level
   // elements are removed.
-  if (blockLevelElements[nodeName]) return content + ' '
+  if (blockLevelElements[nodeName]) return `${content} `
 
   return content
 }
 
 // returns string of concatenated attributes e.g. 'target="_blank" rel="nofollow" href="/test.com"'
 export function filterAttributes (nodeName, node) {
-  return Array.from(node.attributes).reduce((attributes, { name, value }) => {
+  return Array.from(node.attributes).reduce((attributes, {name, value}) => {
     if (allowedElements[nodeName][name] && value) {
       return `${attributes} ${name}="${value}"`
     }

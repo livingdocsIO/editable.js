@@ -1,7 +1,7 @@
-var path = require('path')
+const path = require('path')
 
 process.env.BUILD_TEST = 'true'
-var webpackConfig = require('./webpack.config')
+const webpackConfig = require('./webpack.config')
 delete webpackConfig.entry
 delete webpackConfig.output
 webpackConfig.module.preLoaders = [{
@@ -27,7 +27,7 @@ module.exports = function (config) {
 
     coverageReporter: {
       dir: 'coverage',
-      reporters: [{ type: 'lcov', subdir: 'lcov' }]
+      reporters: [{type: 'lcov', subdir: 'lcov'}]
     },
 
     webpack: webpackConfig,

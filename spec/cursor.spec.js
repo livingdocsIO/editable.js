@@ -31,7 +31,7 @@ describe('Cursor', function () {
   describe('with a collapsed range at the end', function () {
 
     beforeEach(function () {
-      this.oneWord = $('<div class="' + config.editableClass + '">foobar</div>')[0]
+      this.oneWord = $(`<div class="${config.editableClass}">foobar</div>`)[0]
       this.range = rangy.createRange()
       this.range.selectNodeContents(this.oneWord)
       this.range.collapse(false)
@@ -135,7 +135,7 @@ describe('Cursor', function () {
     describe('after()', function () {
 
       it('gets the content after', function () {
-        var fragment = this.cursor.after()
+        const fragment = this.cursor.after()
         expect(content.getInnerHtmlOfFragment(fragment)).toEqual('')
       })
     })
@@ -143,7 +143,7 @@ describe('Cursor', function () {
     describe('textAfter()', function () {
 
       it('gets the text after', function () {
-        var textAfter = this.cursor.textAfter()
+        const textAfter = this.cursor.textAfter()
         expect(textAfter).toEqual('')
       })
     })

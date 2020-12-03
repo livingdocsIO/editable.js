@@ -1,4 +1,4 @@
-import { escapeHtml } from '../src/util/string'
+import {escapeHtml} from '../src/util/string'
 
 describe('string util', function () {
 

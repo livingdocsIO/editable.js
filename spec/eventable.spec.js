@@ -27,7 +27,7 @@ describe('eventable', function () {
         called++
         expect(this.test).toEqual('A')
       })
-      this.obj.notify({ test: 'A' }, 'publish')
+      this.obj.notify({test: 'A'}, 'publish')
       expect(called).toEqual(1)
     })
   })
@@ -36,7 +36,7 @@ describe('eventable', function () {
 
     beforeEach(function () {
       this.obj = {}
-      eventable(this.obj, { test: 'context' })
+      eventable(this.obj, {test: 'context'})
     })
 
     it('attaches an "on" method', function () {

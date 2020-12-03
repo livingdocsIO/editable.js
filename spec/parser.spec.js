@@ -38,7 +38,7 @@ describe('Parser', function () {
   describe('getHost()', function () {
 
     beforeEach(function () {
-      this.$host = $('<div class="' + config.editableClass + '""></div>')
+      this.$host = $(`<div class="${config.editableClass}""></div>`)
     })
 
     it('works if host is passed', function () {
@@ -80,8 +80,8 @@ describe('Parser', function () {
   describe('isWhitespaceOnly()', function () {
 
     it('works with void element', function () {
-      const textNode = document.createTextNode('')
-      expect(parser.isWhitespaceOnly(textNode)).toEqual(true)
+      const node = document.createTextNode('')
+      expect(parser.isWhitespaceOnly(node)).toEqual(true)
     })
 
     it('works with single whitespace', function () {

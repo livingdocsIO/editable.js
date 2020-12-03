@@ -21,7 +21,7 @@ import * as config from './config'
  * @return {DOM Node}
  */
 export function getHost (node) {
-  const editableSelector = '.' + config.editableClass
+  const editableSelector = `.${config.editableClass}`
   const hostNode = $(node).closest(editableSelector)
   return hostNode[0]
 }
@@ -90,11 +90,11 @@ export function isLinebreak (node) {
  * @method isWhitespaceOnly
  * @param {HTMLElement}
  */
-export function lastOffsetWithContent (node) {
-  if (node.nodeType === nodeType.textNode) return string.trimRight(node.nodeValue).length
+export function lastOffsetWithContent (elem) {
+  if (elem.nodeType === nodeType.textNode) return string.trimRight(elem.nodeValue).length
 
   let lastOffset = 0
-  Array.from(node.childNodes).reverse().every((node, index, nodes) => {
+  Array.from(elem.childNodes).reverse().every((node, index, nodes) => {
     if (this.isWhitespaceOnly(node) || this.isLinebreak(node)) return true
 
     lastOffset = nodes.length - index
@@ -172,7 +172,7 @@ export function isTextEndOffset (container, offset) {
 }
 
 export function isSameNode (target, source) {
-  var i, len, attr
+  let i, len, attr
 
   if (target.nodeType !== source.nodeType) return false
 

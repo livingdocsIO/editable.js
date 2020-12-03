@@ -4,3 +4,5 @@ npm-debug.log
 dist
 lib
 coverage
+hmr.js
+hmr.js.map

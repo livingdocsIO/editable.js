@@ -1,6 +1,6 @@
 import $ from 'jquery'
 
-import { selectionchange } from './feature-detection'
+import {selectionchange} from './feature-detection'
 import * as clipboard from './clipboard'
 import eventable from './eventable'
 import SelectionWatcher from './selection-watcher'
@@ -10,7 +10,7 @@ import Keyboard from './keyboard'
 // This will be set to true once we detect the input event is working.
 // Input event description on MDN:
 // https://developer.mozilla.org/en-US/docs/Web/Reference/Events/input
-var isInputEventSupported = false
+let isInputEventSupported = false
 
 /**
  * The Dispatcher module is responsible for dealing with events and their handlers.
@@ -301,7 +301,7 @@ export default class Dispatcher {
         setTimeout($.proxy(selectionWatcher, 'selectionChanged'), 0)
       }
 
-      $document.on('mouseup.editableSelection', (event) => {
+      $document.on('mouseup.editableSelection', (evt) => {
         $document.off('.editableSelection')
         suppressSelectionChanges = false
 

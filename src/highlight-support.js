@@ -16,7 +16,7 @@ const highlightSupport = {
   highlightText (editableHost, text, highlightId) {
     if (this.hasHighlight(editableHost, highlightId)) return
 
-    let blockText = highlightText.extractText(editableHost)
+    const blockText = highlightText.extractText(editableHost)
 
     const marker = '<span class="highlight-comment"></span>'
     const markerNode = highlightSupport.createMarkerNode(marker, 'highlight', this.win)
@@ -43,7 +43,7 @@ const highlightSupport = {
     }
 
     const marker = highlightSupport.createMarkerNode(
-      '<span class="highlight-comment" data-word-id="' + highlightId + '"></span>',
+      `<span class="highlight-comment" data-word-id="${highlightId}"></span>`,
       type || 'comment',
       this.win
     )
@@ -85,7 +85,7 @@ const highlightSupport = {
 
   extractHighlightedRanges (editableHost, type) {
     let findMarkersQuery = '[data-word-id]'
-    if (type) findMarkersQuery += '[data-highlight="' + type + '"]'
+    if (type) findMarkersQuery += `[data-highlight="${type}"]`
     const markers = $(editableHost).find(findMarkersQuery)
     if (!markers.length) {
       return
@@ -94,7 +94,7 @@ const highlightSupport = {
     markers.each((_, marker) => {
       const highlightId = $(marker).data('word-id')
       if (!groups[highlightId]) {
-        groups[highlightId] = $(editableHost).find('[data-word-id="' + highlightId + '"]')
+        groups[highlightId] = $(editableHost).find(`[data-word-id="${highlightId}"]`)
       }
     })
     const res = {}
@@ -125,7 +125,7 @@ const highlightSupport = {
   },
 
   cleanupStaleMarkerNodes (editableHost, highlightType) {
-    editableHost.querySelectorAll('span[data-highlight="' + highlightType + '"]')
+    editableHost.querySelectorAll(`span[data-highlight="${highlightType}"]`)
       .forEach(node => {
         if (!node.textContent.length) {
           node.parentNode.removeChild(node)

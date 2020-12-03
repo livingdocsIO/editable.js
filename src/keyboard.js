@@ -1,6 +1,6 @@
 import rangy from 'rangy'
 
-import { contenteditableSpanBug } from './feature-detection'
+import {contenteditableSpanBug} from './feature-detection'
 import * as nodeType from './node-type'
 import eventable from './eventable'
 

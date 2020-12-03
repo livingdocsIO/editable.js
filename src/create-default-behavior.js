@@ -154,13 +154,13 @@ export default function createDefaultBehavior (editable) {
       cursor.insertBefore(blocks.shift())
       if (blocks.length === 0) return cursor.setVisibleSelection()
 
-      var parent = element.parentNode
-      var currentElement = element
+      const parent = element.parentNode
+      let currentElement = element
 
-      blocks.forEach((block) => {
+      blocks.forEach((str) => {
         const newElement = element.cloneNode(false)
         if (newElement.id) newElement.removeAttribute('id')
-        const fragment = content.createFragmentFromString(block)
+        const fragment = content.createFragmentFromString(str)
         $(newElement).append(fragment)
         parent.insertBefore(newElement, currentElement.nextSibling)
         currentElement = newElement

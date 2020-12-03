@@ -46,7 +46,7 @@ const Editable = module.exports = class Editable {
 
     this.config = $.extend(defaultInstanceConfig, instanceConfig)
     this.win = this.config.window
-    this.editableSelector = '.' + config.editableClass
+    this.editableSelector = `.${config.editableClass}`
 
     if (!rangy.initialized) {
       rangy.init()
@@ -128,7 +128,7 @@ const Editable = module.exports = class Editable {
   */
   disable ($elem) {
     const body = this.win.document.body
-    $elem = $elem || $('.' + config.editableClass, body)
+    $elem = $elem || $(`.${config.editableClass}`, body)
     $elem.each((i, el) => block.disable(el))
 
     return this
@@ -144,7 +144,7 @@ const Editable = module.exports = class Editable {
   */
   enable ($elem, normalize) {
     const body = this.win.document.body
-    $elem = $elem || $('.' + config.editableDisabledClass, body)
+    $elem = $elem || $(`.${config.editableDisabledClass}`, body)
 
     const shouldSpellcheck = this.config.browserSpellcheck
     $elem.each((i, el) => {
@@ -165,7 +165,7 @@ const Editable = module.exports = class Editable {
   */
   suspend ($elem) {
     const body = this.win.document.body
-    $elem = $elem || $('.' + config.editableClass, body)
+    $elem = $elem || $(`.${config.editableClass}`, body)
 
     $elem.removeAttr('contenteditable')
     this.dispatcher.suspend()
@@ -180,7 +180,7 @@ const Editable = module.exports = class Editable {
   */
   continue ($elem) {
     const body = this.win.document.body
-    $elem = $elem || $('.' + config.editableClass, body)
+    $elem = $elem || $(`.${config.editableClass}`, body)
 
     $elem.attr('contenteditable', true)
     this.dispatcher.continue()
@@ -290,7 +290,7 @@ const Editable = module.exports = class Editable {
     let selection = this.dispatcher.selectionWatcher.getFreshSelection()
     if (!(editableHost && selection)) return selection
 
-    var range = selection.range
+    const range = selection.range
     // Check if the selection is inside the editableHost
     // The try...catch is required if the editableHost was removed from the DOM.
     try {
@@ -316,18 +316,18 @@ const Editable = module.exports = class Editable {
   }
 
   // For backwards compatibility
-  setupSpellcheck (config) {
+  setupSpellcheck (conf) {
     let marker
 
-    if (config.markerNode) {
-      marker = config.markerNode.outerHTML
+    if (conf.markerNode) {
+      marker = conf.markerNode.outerHTML
     }
 
     this.setupHighlighting({
-      throttle: config.throttle,
+      throttle: conf.throttle,
       spellcheck: {
         marker: marker,
-        spellcheckService: config.spellcheckService
+        spellcheckService: conf.spellcheckService
       }
     })
 
@@ -392,7 +392,7 @@ const Editable = module.exports = class Editable {
    * @param  {String} [options.type]
    * @return {Object} ranges
    */
-  getHighlightPositions ({ editableHost, type }) {
+  getHighlightPositions ({editableHost, type}) {
     return highlightSupport.extractHighlightedRanges(
       editableHost,
       type

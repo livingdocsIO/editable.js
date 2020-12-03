@@ -19,7 +19,7 @@ $(() => {
   editable.add('.formatting-example p')
   setupTooltip()
 
-  var secondExample = document.querySelector('.formatting-example p')
+  const secondExample = document.querySelector('.formatting-example p')
   updateCode(secondExample)
 
   editable.on('change', (elem) => {
@@ -65,6 +65,7 @@ function setupTooltip () {
 
     // position tooltip
     const top = coords.top - tooltip.outerHeight() - 15
+    // eslint-disable-next-line
     const left = coords.left + (coords.width / 2) - (tooltip.outerWidth() / 2)
     tooltip.css({top, left}).show()
   })
@@ -148,7 +149,7 @@ function updateCode (elem) {
 // ------------
 
 function highlightService (text, callback) {
-  callback(['happy']) // eslint-disable-line standard/no-callback-literal
+  callback(['happy'])
 }
 
 editable.setupHighlighting({

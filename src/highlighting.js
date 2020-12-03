@@ -38,7 +38,7 @@ export default class Highlighting {
 
     this.config = $.extend(true, defaultConfig, configuration)
 
-    let spellcheckService = this.config.spellcheck.spellcheckService
+    const spellcheckService = this.config.spellcheck.spellcheckService
     const spellcheckMarker = this.config.spellcheck.marker
     const whitespaceMarker = this.config.whitespace.marker
     const spellcheckMarkerNode = highlightSupport
@@ -191,7 +191,7 @@ export default class Highlighting {
 
       if (wordId) {
         selection.retainVisibleSelection(() => {
-          $(editableHost).find('[data-word-id=' + wordId + ']').each((index, elem) => {
+          $(editableHost).find(`[data-word-id=${wordId}]`).each((index, elem) => {
             content.unwrap(elem)
           })
         })

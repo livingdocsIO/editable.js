@@ -1,9 +1,9 @@
-var OpenBrowserPlugin = require('open-browser-webpack-plugin')
-var webpack = require('webpack')
+const OpenBrowserPlugin = require('open-browser-webpack-plugin')
+const webpack = require('webpack')
 
-var dist = process.env.BUILD_DIST === 'true'
-var docs = process.env.BUILD_DOCS === 'true'
-var test = process.env.BUILD_TEST === 'true'
+const dist = process.env.BUILD_DIST === 'true'
+const docs = process.env.BUILD_DOCS === 'true'
+const test = process.env.BUILD_TEST === 'true'
 
 module.exports = {
   devtool: dist || docs || test ? 'sourcemap' : 'eval',
@@ -38,20 +38,22 @@ module.exports = {
       loader: 'url'
     }])
   },
-  plugins: dist || docs ? [
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.OccurenceOrderPlugin(true),
-    new webpack.optimize.UglifyJsPlugin()
-  ].concat(docs ? new webpack.DefinePlugin({
-    'process.env': {
-      'NODE_ENV': '"production"'
-    }
-  }) : []) : test ? [] : [
-    new webpack.optimize.CommonsChunkPlugin({
-      filename: 'hmr.js',
-      name: 'hmr'
-    }),
-    new OpenBrowserPlugin({url: 'http://localhost:9050/examples/index.html'})
+  plugins: [
+    ...(dist || docs ? [
+      new webpack.optimize.DedupePlugin(),
+      new webpack.optimize.OccurenceOrderPlugin(true),
+      new webpack.optimize.UglifyJsPlugin()
+    ] : []),
+    ...(docs ? [new webpack.DefinePlugin({
+      'process.env': {'NODE_ENV': '"production"'}
+    })] : []),
+    ...(test ? [] : [
+      new webpack.optimize.CommonsChunkPlugin({
+        filename: 'hmr.js',
+        name: 'hmr'
+      }),
+      new OpenBrowserPlugin({url: 'http://localhost:9050/examples/index.html'})
+    ])
   ],
   devServer: {
     historyApiFallback: true,
