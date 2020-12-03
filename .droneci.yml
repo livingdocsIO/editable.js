@@ -13,11 +13,11 @@ steps:
       from_secret: GH_TOKEN
 
 - name: npm-install
-  image: node:8-alpine
-  commands: [npm install]
+  image: cypress/browsers:node14.15.0-chrome86-ff82
+  commands: [npm ci]
 
 - name: test
-  image: cypress/browsers:chrome67
+  image: cypress/browsers:node14.15.0-chrome86-ff82
   commands: ["npm run test:ci -s"]
 
 - name: release
@@ -44,6 +44,6 @@ trigger:
   event: [push, tag]
 ---
 kind: signature
-hmac: 4f3c0483103f0a412f092328bffcf477c6af8a6d501450233c32ed95d5e7caa9
+hmac: 9332927c0d8182d04cfb7f531bacec72507f4ffc797e2ca7044dce1451690bcb
 
 ...
