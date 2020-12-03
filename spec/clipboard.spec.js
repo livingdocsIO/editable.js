@@ -1,4 +1,4 @@
-import { parseContent, updateConfig } from '../src/clipboard'
+import {parseContent, updateConfig} from '../src/clipboard'
 import cloneDeep from 'lodash.clonedeep'
 import * as config from '../src/config'
 
@@ -41,7 +41,7 @@ describe('Clipboard', function () {
 
     it('keeps a <a> element with an a list of whitelisted-attributes', function () {
       const updatedConfig = cloneDeep(config)
-      updatedConfig.pastedHtmlRules.allowedElements = { a: { href: true, rel: true, target: true } }
+      updatedConfig.pastedHtmlRules.allowedElements = {a: {href: true, rel: true, target: true}}
 
       updateConfig(updatedConfig)
       expect(
@@ -53,7 +53,7 @@ describe('Clipboard', function () {
 
     it('removes attributes that arent whitelisted for an <a> element ', function () {
       const updatedConfig = cloneDeep(config)
-      updatedConfig.pastedHtmlRules.allowedElements = { a: { href: true } }
+      updatedConfig.pastedHtmlRules.allowedElements = {a: {href: true}}
       updateConfig(updatedConfig)
       expect(
         extractSingleBlock(

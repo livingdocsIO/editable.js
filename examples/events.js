@@ -1,6 +1,6 @@
 import $ from 'jquery'
-import React, { Component } from 'react'
-import { PropTypes } from 'prop-types'
+import React, {Component} from 'react' // eslint-disable-line
+import {PropTypes} from 'prop-types'
 import ReactDOM from 'react-dom'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 
@@ -159,7 +159,7 @@ export default function (editable) {
       if (!isFromFirstExample(elem)) return
 
       let text = blocks.join(' ')
-      if (text.length > 40) text = text.substring(0, 38) + '...'
+      if (text.length > 40) text = `${text.substring(0, 38)}...`
 
       showEvent({
         name: 'paste',

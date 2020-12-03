@@ -24,12 +24,12 @@ describe('Default Events', function () {
   // register one listener per test
   function on (editable, eventName, func) {
     // off() // make sure the last listener is unregistered
-    const obj = { calls: 0 }
+    const obj = {calls: 0}
     function proxy () {
       obj.calls += 1
       func.apply(this, arguments)
     }
-    onListener = { event: eventName, listener: proxy }
+    onListener = {event: eventName, listener: proxy}
     editable.on(eventName, proxy)
     return obj
   }

@@ -22,10 +22,11 @@ export function insertRangeBoundaryMarker (range, atStart) {
   const boundaryRange = range.cloneRange()
   boundaryRange.collapse(atStart)
 
-  // Create the marker element containing a single invisible character using DOM methods and insert it
+  // Create the marker element containing a single
+  // invisible character using DOM methods and insert it
   const doc = container.ownerDocument.defaultView.document
   const markerEl = doc.createElement('span')
-  markerEl.id = 'editable-range-boundary-' + ++boundaryMarkerId
+  markerEl.id = `editable-range-boundary-${++boundaryMarkerId}`
   markerEl.setAttribute('data-editable', 'remove')
   markerEl.style.lineHeight = '0'
   markerEl.style.display = 'none'
@@ -105,5 +106,5 @@ export function restore (host, rangeInfo) {
 }
 
 function getMarker (host, id) {
-  return host.querySelector('#' + id)
+  return host.querySelector(`#${id}`)
 }

@@ -34,10 +34,11 @@ export default {
     let portions = []
     let next
     let wordId
+    let textNode
     while ((next = iterator.getNext())) {
       // Account for <br> elements
       if (next.nodeType === nodeType.textNode && next.data !== '') {
-        var textNode = next
+        textNode = next
       } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
         totalOffset += 1
         continue
@@ -142,7 +143,7 @@ function getText (element, callback) {
     if (next.nodeType === nodeType.textNode && next.data !== '') {
       callback(next.data)
     } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
-      callback(' ') // eslint-disable-line standard/no-callback-literal
+      callback(' ')
     }
   }
 }

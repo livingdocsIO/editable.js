@@ -58,7 +58,7 @@ function getEventableModule (notifyContext) {
       if (arguments.length === 2) {
         addListener(event, listener)
       } else if (arguments.length === 1) {
-        for (let eventType in event) addListener(eventType, event[eventType])
+        for (const eventType in event) addListener(eventType, event[eventType])
       }
       return this
     },

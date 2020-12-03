@@ -53,7 +53,7 @@ describe('Keyboard', function () {
       })
 
       it('does not fire the event for a "e" key without the notifyCharacterEvent param', function () {
-        keyboard.on('character', (event) => called++)
+        keyboard.on('character', (evt) => called++)
 
         event.keyCode = 'e'.charCodeAt(0)
         keyboard.dispatchKeyEvent(event, {}, false)
@@ -114,13 +114,13 @@ describe('Keyboard', function () {
   })
 })
 
-function destructureNodes (node, obj) {
-  Array.from(node.childNodes, (node) => {
+function destructureNodes (elem, obj) {
+  Array.from(elem.childNodes, (node) => {
     if (node.nodeType === nodeType.elementNode) {
-      obj['node' + node.tagName] = node
+      obj[`node${node.tagName}`] = node
       destructureNodes(node, obj)
     } else if (node.nodeType === nodeType.textNode) {
-      obj['node' + node.nodeValue] = node
+      obj[`node${node.nodeValue}`] = node
     }
   })
 }

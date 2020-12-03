@@ -8,7 +8,7 @@ import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
 
 function setupHighlightEnv (context, text) {
   context.text = text
-  context.$div = $('<div>' + context.text + '</div>').appendTo(document.body)
+  context.$div = $(`<div>${context.text}</div>`).appendTo(document.body)
   context.editable = new Editable()
   context.editable.add(context.$div)
   context.highlightRange = (highlightId, start, end, dispatcher, type) => {
@@ -39,7 +39,7 @@ function setupHighlightEnv (context, text) {
   }
 
   context.formatHtml = (string) => {
-    return $('<div>' + string.replace(/\n/gm, '') + '</div>')[0].innerHTML
+    return $(`<div>${string.replace(/\n/gm, '')}</div>`)[0].innerHTML
   }
 }
 
@@ -370,7 +370,7 @@ o Round</span>`)
       this.editable.highlight({
         editableHost: this.$div[0],
         highlightId: 'myId',
-        textRange: { foo: 3, bar: 7 }
+        textRange: {foo: 3, bar: 7}
       })
       const highlightSpan = this.$div.find('[data-word-id="myId"]')
       expect(highlightSpan.length).toEqual(0)
@@ -380,7 +380,7 @@ o Round</span>`)
       const result = this.editable.highlight({
         editableHost: this.$div[0],
         highlightId: 'myId',
-        textRange: { foo: 3, bar: 32 }
+        textRange: {foo: 3, bar: 32}
       })
       const highlightSpan = this.$div.find('[data-word-id="myId"]')
       expect(highlightSpan.length).toEqual(0)
@@ -391,7 +391,7 @@ o Round</span>`)
       this.editable.highlight({
         editableHost: this.$div[0],
         highlightId: 'myId',
-        textRange: { start: 3, end: 3 }
+        textRange: {start: 3, end: 3}
       })
 
       const highlightSpan = this.$div.find('[data-word-id="myId"]')
@@ -436,7 +436,7 @@ Make The <br> W<span class="highlight-comment" data-word-id="spellcheckId" data-
         const range = rangy.createRange()
         const node = this.$div[0]
         range.selectNode(node.firstChild)
-        const { start, end } = range.toCharacterRange(this.$div[0])
+        const {start, end} = range.toCharacterRange(this.$div[0])
         this.highlightRange('char', start, end)
         if (expectedLength === 0) {
           expect(this.extract()).toEqual(undefined)

@@ -40,7 +40,7 @@ describe('RangeContainer', function () {
   describe('with a selection', function () {
 
     beforeEach(function () {
-      var elem = $('<div>Text</div>')
+      const elem = $('<div>Text</div>')
       let range = rangy.createRange()
       range.selectNodeContents(elem[0])
       range = new RangeContainer(elem[0], range)

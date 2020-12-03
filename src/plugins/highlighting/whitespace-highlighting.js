@@ -58,6 +58,6 @@ export default class WhitespaceHighlighting {
 }
 
 function getUnicode (character) {
-  var code = character.charCodeAt(0)
+  const code = character.charCodeAt(0)
   return `${code.toString(16).toUpperCase()}`
 }
