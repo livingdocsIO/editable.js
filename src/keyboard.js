@@ -46,17 +46,29 @@ export default class Keyboard {
       case this.key.enter:
         if (event.shiftKey) return this.notify(target, 'shiftEnter', event)
         return this.notify(target, 'enter', event)
+
       case this.key.ctrl:
       case this.key.shift:
       case this.key.alt:
         return
+
       // Metakey
       case 224: // Firefox: 224
       case 17: // Opera: 17
       case 91: // Chrome/Safari: 91 (Left)
       case 93: // Chrome/Safari: 93 (Right)
         return
+
       default:
+        // Added here to avoid using fallthrough in the switch
+        // when b or i are pressed without ctrlKey or metaKey
+        if (event.keyCode === this.key.b && (event.ctrlKey || event.metaKey)) {
+          return this.notify(target, 'bold', event)
+        }
+        if (event.keyCode === this.key.i && (event.ctrlKey || event.metaKey)) {
+          return this.notify(target, 'italic', event)
+        }
+
         this.preventContenteditableBug(target, event)
         if (!notifyCharacterEvent) return
         // Don't notify character events as long as either the ctrl or
@@ -179,5 +191,7 @@ Keyboard.key = Keyboard.prototype.key = {
   enter: 13,
   shift: 16,
   ctrl: 17,
-  alt: 18
+  alt: 18,
+  b: 66,
+  i: 73
 }
