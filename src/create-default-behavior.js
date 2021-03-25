@@ -173,6 +173,14 @@ export default function createDefaultBehavior (editable) {
 
     clipboard (element, action, cursor) {
       log('Default clipboard behavior')
+    },
+
+    toggleBold (selection) {
+      selection.toggleBold()
+    },
+
+    toggleEmphasis (selection) {
+      selection.toggleEmphasis()
     }
   }
 }

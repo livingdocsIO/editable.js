@@ -59,6 +59,80 @@ describe('Keyboard', function () {
         keyboard.dispatchKeyEvent(event, {}, false)
         expect(called).toEqual(0)
       })
+
+      it('does fire the event for a "b" key', function () {
+        keyboard.on('character', () => called++)
+
+        event.keyCode = Keyboard.key.b
+        keyboard.dispatchKeyEvent(event, {}, true)
+        expect(called).toEqual(1)
+      })
+
+      it('does fire the event for an "i" key', function () {
+        keyboard.on('character', () => called++)
+
+        event.keyCode = Keyboard.key.i
+        keyboard.dispatchKeyEvent(event, {}, true)
+        expect(called).toEqual(1)
+      })
+    })
+
+    describe('notify "bold" event', function () {
+
+      it('does not fire the event for a "b" key without "ctrl" or "meta" key', function () {
+        keyboard.on('bold', () => called++)
+
+        event.keyCode = Keyboard.key.b
+        keyboard.dispatchKeyEvent(event, {}, true)
+        expect(called).toEqual(0)
+      })
+
+      it('does fire the event for a "b" key with "ctrl" key', function () {
+        keyboard.on('bold', () => called++)
+
+        event.keyCode = Keyboard.key.b
+        event.ctrlKey = true
+        keyboard.dispatchKeyEvent(event, {}, true)
+        expect(called).toEqual(1)
+      })
+
+      it('does fire the event for a "b" key with "meta" key', function () {
+        keyboard.on('bold', () => called++)
+
+        event.keyCode = Keyboard.key.b
+        event.metaKey = true
+        keyboard.dispatchKeyEvent(event, {}, true)
+        expect(called).toEqual(1)
+      })
+    })
+
+    describe('notify "italic" event', function () {
+
+      it('does not fire the event for a "i" key without "ctrl" or "meta" key', function () {
+        keyboard.on('italic', () => called++)
+
+        event.keyCode = Keyboard.key.i
+        keyboard.dispatchKeyEvent(event, {}, true)
+        expect(called).toEqual(0)
+      })
+
+      it('does fire the event for a "i" key with "ctrl" key', function () {
+        keyboard.on('italic', () => called++)
+
+        event.keyCode = Keyboard.key.i
+        event.ctrlKey = true
+        keyboard.dispatchKeyEvent(event, {}, true)
+        expect(called).toEqual(1)
+      })
+
+      it('does fire the event for a "i" key with "meta" key', function () {
+        keyboard.on('italic', () => called++)
+
+        event.keyCode = Keyboard.key.i
+        event.metaKey = true
+        keyboard.dispatchKeyEvent(event, {}, true)
+        expect(called).toEqual(1)
+      })
     })
   })
 

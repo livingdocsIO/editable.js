@@ -5,6 +5,7 @@ import * as content from '../src/content'
 import Cursor from '../src/cursor'
 import Keyboard from '../src/keyboard'
 import Editable from '../src/core'
+import Selection from '../src/selection'
 const {key} = Keyboard
 
 describe('Dispatcher', function () {
@@ -28,6 +29,18 @@ describe('Dispatcher', function () {
     const range = rangy.createRange()
     range.selectNodeContents(node)
     range.collapse(true)
+    return range
+  }
+
+  function createSelection (range) {
+    const selection = new Selection($elem[0], range)
+    selection.setSelection()
+    return selection
+  }
+
+  function createFullRange (node) {
+    const range = rangy.createRange()
+    range.selectNodeContents(node)
     return range
   }
 
@@ -211,6 +224,48 @@ describe('Dispatcher', function () {
 
       it('fires newline when shift + enter is pressed', (done) => {
         on('newline', done)
+        $elem.trigger(event)
+      })
+    })
+
+    describe('on bold', function () {
+
+      beforeEach(function () {
+        event = $.Event('keydown')
+        event.ctrlKey = true
+        event.keyCode = key.b
+      })
+
+      it('fires toggleBold when ctrl + b is pressed', (done) => {
+        $elem.html('foo')
+        const elemSelection = createSelection(createFullRange($elem[0]))
+
+        on('toggleBold', (selection) => {
+          expect(selection).toEqual(elemSelection)
+          done()
+        })
+
+        $elem.trigger(event)
+      })
+    })
+
+    describe('on italic', function () {
+
+      beforeEach(function () {
+        event = $.Event('keydown')
+        event.ctrlKey = true
+        event.keyCode = key.i
+      })
+
+      it('fires toggleEmphasis when ctrl + i is pressed', (done) => {
+        $elem.html('foo')
+        const elemSelection = createSelection(createFullRange($elem[0]))
+
+        on('toggleEmphasis', (selection) => {
+          expect(selection).toEqual(elemSelection)
+          done()
+        })
+
         $elem.trigger(event)
       })
     })

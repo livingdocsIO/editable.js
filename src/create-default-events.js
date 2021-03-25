@@ -185,6 +185,26 @@ export default function createDefaultEvents (editable) {
      */
     paste (element, blocks, cursor) {
       behavior.paste(element, blocks, cursor)
+    },
+
+    /**
+     * The toggleBold event is triggered when the bold keyboard shortcut is used
+     *
+     * @event toggleBold
+     * @param {Selection} The selection object.
+     */
+    toggleBold (selection) {
+      behavior.toggleBold(selection)
+    },
+
+    /**
+     * The toggleEmphasis event is triggered when the italic keyboard shortcut is used
+     *
+     * @event toggleEmphasis
+     * @param {Selection} The selection object.
+     */
+    toggleEmphasis (selection) {
+      behavior.toggleEmphasis(selection)
     }
   }
 }

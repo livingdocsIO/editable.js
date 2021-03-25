@@ -261,6 +261,24 @@ export default class Dispatcher {
         self.notify('newline', this, cursor)
       })
 
+      .on('bold', function (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        const selection = self.selectionWatcher.getFreshSelection()
+        if (selection.isSelection) {
+          self.notify('toggleBold', selection)
+        }
+      })
+
+      .on('italic', function (event) {
+        event.preventDefault()
+        event.stopPropagation()
+        const selection = self.selectionWatcher.getFreshSelection()
+        if (selection.isSelection) {
+          self.notify('toggleEmphasis', selection)
+        }
+      })
+
       .on('character', function (event) {
         self.notify('change', this)
       })
