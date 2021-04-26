@@ -3,7 +3,7 @@ import rangy from 'rangy'
 
 import * as content from '../src/content'
 import Cursor from '../src/cursor'
-import * as config from '../src/config'
+import config from '../src/config'
 
 describe('Cursor', function () {
 

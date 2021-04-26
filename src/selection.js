@@ -4,7 +4,7 @@ import $ from 'jquery'
 import Cursor from './cursor'
 import * as content from './content'
 import * as parser from './parser'
-import * as config from './config'
+import config from './config'
 import highlightSupport from './highlight-support'
 import highlightText from './highlight-text'
 

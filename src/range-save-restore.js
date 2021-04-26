@@ -97,8 +97,8 @@ export function restore (host, rangeInfo) {
       console.log('Marker element has been removed. Cannot restore selection.')
     }
   } else {
-    this.setRangeBoundary(host, range, rangeInfo.startMarkerId, true)
-    this.setRangeBoundary(host, range, rangeInfo.endMarkerId, false)
+    setRangeBoundary(host, range, rangeInfo.startMarkerId, true)
+    setRangeBoundary(host, range, rangeInfo.endMarkerId, false)
   }
 
   range.normalizeBoundaries()

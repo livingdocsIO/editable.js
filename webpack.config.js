@@ -1,12 +1,15 @@
-const OpenBrowserPlugin = require('open-browser-webpack-plugin')
 const webpack = require('webpack')
 
 const dist = process.env.BUILD_DIST === 'true'
 const docs = process.env.BUILD_DOCS === 'true'
 const test = process.env.BUILD_TEST === 'true'
 
+const production = dist || docs || test
+
 module.exports = {
-  devtool: dist || docs || test ? 'sourcemap' : 'eval',
+  mode: production ? 'production' : 'development',
+  devtool: 'source-map',
+  target: 'web',
   entry: dist ? {
     'dist/editable': './src/core.js'
   } : {
@@ -16,48 +19,76 @@ module.exports = {
   output: {
     library: dist ? 'Editable' : undefined,
     libraryTarget: 'umd',
-    path: './',
+    path: __dirname,
     filename: '[name].js'
   },
-  externals: dist && {
+  externals: dist ? {
     jquery: 'jQuery'
-  },
+  } : {},
   module: {
-    loaders: [{
-      test: /\.js$/,
-      exclude: /(node_modules)/,
-      loader: 'babel',
-      query: {
-        presets: ['react', 'es2015']
-      }
-    }].concat(dist || test ? [] : [{
-      test: /\.css$/,
-      loaders: ['style', 'css']
-    }, {
-      test: /\.(png|jpe?g|svg|gif|eot|ttf|woff2?)/,
-      loader: 'url'
-    }])
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              plugins: [
+                '@babel/plugin-transform-runtime',
+                ...(test ? ['istanbul'] : [])
+              ],
+              presets: [
+                '@babel/preset-env',
+                ...(!production || docs ? ['@babel/preset-react'] : [])
+              ]
+            }
+          }
+        ]
+      },
+      ...(dist || test
+        ? []
+        : [
+          {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader']
+          }, {
+            test: /\.(png|jpe?g|svg|gif|eot|ttf|woff2?)/,
+            loader: 'url-loader'
+          }
+        ]
+      )
+    ]
+  },
+  optimization: {
+    nodeEnv: dist || docs ? 'production' : false
   },
   plugins: [
-    ...(dist || docs ? [
-      new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.OccurenceOrderPlugin(true),
-      new webpack.optimize.UglifyJsPlugin()
-    ] : []),
-    ...(docs ? [new webpack.DefinePlugin({
-      'process.env': {'NODE_ENV': '"production"'}
-    })] : []),
-    ...(test ? [] : [
-      new webpack.optimize.CommonsChunkPlugin({
-        filename: 'hmr.js',
-        name: 'hmr'
-      }),
-      new OpenBrowserPlugin({url: 'http://localhost:9050/examples/index.html'})
-    ])
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    })
   ],
-  devServer: {
-    historyApiFallback: true,
-    contentBase: './',
-    port: 9050
-  }
+  ...(test
+    ? {
+      resolve: {
+        alias: {
+          sinon: 'sinon/pkg/sinon.js'
+        }
+      }
+    }
+    : {}
+  ),
+  ...(!production
+    ? {
+      devServer: {
+        contentBase: './',
+        port: 9050,
+        historyApiFallback: true,
+        liveReload: true,
+        hot: true,
+        open: true,
+        openPage: 'examples'
+      }
+    }
+    : {})
 }

@@ -2,7 +2,7 @@ import $ from 'jquery'
 
 import * as string from './util/string'
 import * as nodeType from './node-type'
-import * as config from './config'
+import config from './config'
 
 /**
  * The parser module provides helper methods to parse html-chunks
@@ -48,7 +48,7 @@ export function getNodeIndex (node) {
  */
 export function isVoid (node) {
   return Array.from(node.childNodes).every((child) => {
-    if (child.nodeType === nodeType.textNode && !this.isVoidTextNode(child)) {
+    if (child.nodeType === nodeType.textNode && !isVoidTextNode(child)) {
       return false
     }
     if (child.nodeType === nodeType.elementNode) {
@@ -75,7 +75,7 @@ export function isVoidTextNode (node) {
  * @param {HTMLElement}
  */
 export function isWhitespaceOnly (node) {
-  return node.nodeType === nodeType.textNode && this.lastOffsetWithContent(node) === 0
+  return node.nodeType === nodeType.textNode && lastOffsetWithContent(node) === 0
 }
 
 export function isLinebreak (node) {
@@ -95,7 +95,7 @@ export function lastOffsetWithContent (elem) {
 
   let lastOffset = 0
   Array.from(elem.childNodes).reverse().every((node, index, nodes) => {
-    if (this.isWhitespaceOnly(node) || this.isLinebreak(node)) return true
+    if (isWhitespaceOnly(node) || isLinebreak(node)) return true
 
     lastOffset = nodes.length - index
     return false
@@ -104,26 +104,26 @@ export function lastOffsetWithContent (elem) {
 }
 
 export function isBeginningOfHost (host, container, offset) {
-  if (container === host) return this.isStartOffset(container, offset)
+  if (container === host) return isStartOffset(container, offset)
 
-  if (this.isStartOffset(container, offset)) {
+  if (isStartOffset(container, offset)) {
     // The index of the element simulates a range offset
     // right before the element.
-    const offsetInParent = this.getNodeIndex(container)
-    return this.isBeginningOfHost(host, container.parentNode, offsetInParent)
+    const offsetInParent = getNodeIndex(container)
+    return isBeginningOfHost(host, container.parentNode, offsetInParent)
   }
 
   return false
 }
 
 export function isEndOfHost (host, container, offset) {
-  if (container === host) return this.isEndOffset(container, offset)
+  if (container === host) return isEndOffset(container, offset)
 
-  if (this.isEndOffset(container, offset)) {
+  if (isEndOffset(container, offset)) {
     // The index of the element plus one simulates a range offset
     // right after the element.
-    const offsetInParent = this.getNodeIndex(container) + 1
-    return this.isEndOfHost(host, container.parentNode, offsetInParent)
+    const offsetInParent = getNodeIndex(container) + 1
+    return isEndOfHost(host, container.parentNode, offsetInParent)
   }
 
   return false
@@ -148,13 +148,13 @@ export function isEndOffset (container, offset) {
 }
 
 export function isTextEndOfHost (host, container, offset) {
-  if (container === host) return this.isTextEndOffset(container, offset)
+  if (container === host) return isTextEndOffset(container, offset)
 
-  if (this.isTextEndOffset(container, offset)) {
+  if (isTextEndOffset(container, offset)) {
     // The index of the element plus one simulates a range offset
     // right after the element.
-    const offsetInParent = this.getNodeIndex(container) + 1
-    return this.isTextEndOfHost(host, container.parentNode, offsetInParent)
+    const offsetInParent = getNodeIndex(container) + 1
+    return isTextEndOfHost(host, container.parentNode, offsetInParent)
   }
 
   return false
@@ -168,7 +168,7 @@ export function isTextEndOffset (container, offset) {
 
   if (container.childNodes.length === 0) return true
 
-  return offset >= this.lastOffsetWithContent(container)
+  return offset >= lastOffsetWithContent(container)
 }
 
 export function isSameNode (target, source) {
@@ -195,7 +195,7 @@ export function isSameNode (target, source) {
  */
 export function latestChild (container) {
   return container.lastChild
-    ? this.latestChild(container.lastChild)
+    ? latestChild(container.lastChild)
     : container
 }
 

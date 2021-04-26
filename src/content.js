@@ -8,7 +8,7 @@ import * as string from './util/string'
 
 function restoreRange (host, range, func) {
   range = rangeSaveRestore.save(range)
-  func.call(exports)
+  func()
   return rangeSaveRestore.restore(host, range)
 }
 

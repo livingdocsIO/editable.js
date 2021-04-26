@@ -1,6 +1,6 @@
 import $ from 'jquery'
 
-import * as config from './config'
+import config from './config'
 import * as content from './content'
 
 let nextBlockId = 1

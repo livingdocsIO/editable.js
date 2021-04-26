@@ -2,7 +2,7 @@ import $ from 'jquery'
 import rangy from 'rangy'
 
 import * as parser from '../src/parser'
-import * as config from '../src/config'
+import config from '../src/config'
 
 describe('Parser', function () {
   // helper methods
