@@ -4,7 +4,7 @@ import {selectionchange} from './feature-detection'
 import * as clipboard from './clipboard'
 import eventable from './eventable'
 import SelectionWatcher from './selection-watcher'
-import * as config from './config'
+import config from './config'
 import Keyboard from './keyboard'
 
 // This will be set to true once we detect the input event is working.

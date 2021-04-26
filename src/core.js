@@ -1,6 +1,6 @@
 import $ from 'jquery'
 import rangy from 'rangy'
-import * as config from './config'
+import config from './config'
 import error from './util/error'
 import * as parser from './parser'
 import * as block from './block'
@@ -33,8 +33,7 @@ import browser from 'bowser'
  *
  * @class Editable
  */
-
-const Editable = module.exports = class Editable {
+export default class Editable {
 
   constructor (instanceConfig) {
     const defaultInstanceConfig = {

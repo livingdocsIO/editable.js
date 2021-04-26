@@ -1,6 +1,5 @@
-import $ from 'jquery'
-
-import * as config from '../src/config'
+import cloneDeep from 'lodash.clonedeep'
+import config from '../src/config'
 import Editable from '../src/core'
 
 describe('Editable configuration', function () {
@@ -34,7 +33,7 @@ describe('Editable configuration', function () {
   })
 
   describe('globalConfig()', function () {
-    const originalConfig = $.extend({}, config)
+    const originalConfig = cloneDeep(config)
 
     afterEach(function () {
       Editable.globalConfig(originalConfig)
@@ -45,27 +44,22 @@ describe('Editable configuration', function () {
     })
 
     it('retrieves the current state of the config', function () {
-      Editable.globalConfig({
-        editableClass: 'editable-instance'
-      })
-
+      Editable.globalConfig({editableClass: 'editable-instance'})
       expect(originalConfig).not.toEqual(Editable.getGlobalConfig())
     })
 
     it('has a default value for "editableClass"', function () {
-      expect(config.editableClass).toEqual('js-editable')
+      expect(Editable.getGlobalConfig().editableClass).toEqual('js-editable')
     })
 
     it('overrides "editableClass"', function () {
-      Editable.globalConfig({
-        editableClass: 'editable-instance'
-      })
-      expect(config.editableClass).toEqual('editable-instance')
+      Editable.globalConfig({editableClass: 'editable-instance'})
+      expect(Editable.getGlobalConfig().editableClass).toEqual('editable-instance')
     })
 
     // Safety check for the test setup
     it('resets the default after each spec', function () {
-      expect(config.editableClass).toEqual('js-editable')
+      expect(Editable.getGlobalConfig().editableClass).toEqual('js-editable')
     })
   })
 })

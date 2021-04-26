@@ -1,20 +1,25 @@
-const path = require('path')
-
 process.env.BUILD_TEST = 'true'
-const webpackConfig = require('./webpack.config')
-delete webpackConfig.entry
-delete webpackConfig.output
-webpackConfig.module.preLoaders = [{
-  test: /\.js$/,
-  include: path.resolve('src/'),
-  loader: 'babel-istanbul'
-}]
+/* eslint-disable no-unused-vars */
+const {
+  entry: _entry,
+  output: _output,
+  ...webpackConfig
+} = require('./webpack.config')
+/* eslint-enable no-unused-vars */
 
 module.exports = function (config) {
   config.set({
     basePath: './',
 
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'webpack'],
+
+    plugins: [
+      'karma-chrome-launcher',
+      'karma-coverage',
+      'karma-jasmine',
+      'karma-sourcemap-loader',
+      'karma-webpack'
+    ],
 
     files: [{
       pattern: 'spec/*.spec.js',
@@ -27,7 +32,10 @@ module.exports = function (config) {
 
     coverageReporter: {
       dir: 'coverage',
-      reporters: [{type: 'lcov', subdir: 'lcov'}]
+      reporters: [
+        {type: 'lcov', subdir: 'lcov'},
+        {type: 'text-summary', subdir: '.'}
+      ]
     },
 
     webpack: webpackConfig,

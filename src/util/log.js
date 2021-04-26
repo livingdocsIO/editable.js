@@ -1,4 +1,4 @@
-import * as config from '../config'
+import config from '../config'
 
 // Allows for safe console logging
 // If the last param is the string "trace" console.trace will be called

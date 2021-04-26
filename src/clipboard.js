@@ -1,6 +1,6 @@
 import $ from 'jquery'
 
-import * as config from './config'
+import config from './config'
 import * as string from './util/string'
 import * as nodeType from './node-type'
 

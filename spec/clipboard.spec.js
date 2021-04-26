@@ -1,6 +1,6 @@
 import {parseContent, updateConfig} from '../src/clipboard'
 import cloneDeep from 'lodash.clonedeep'
-import * as config from '../src/config'
+import config from '../src/config'
 
 describe('Clipboard', function () {
 

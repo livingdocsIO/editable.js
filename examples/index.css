@@ -314,15 +314,6 @@ article {
   opacity: .99;
 }
 
-.events-list .events-leave {
-  opacity: .6;
-  transition: opacity .4s ease-in;
-}
-
-.events-list .events-leave.events-leave-active {
-  opacity: .01;
-}
-
 
 /* Event styles */
 
