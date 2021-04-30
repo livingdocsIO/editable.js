@@ -1,39 +1,41 @@
 import $ from 'jquery'
-import React, {Component} from 'react' // eslint-disable-line
+import React, {Component} from 'react'
 import {PropTypes} from 'prop-types'
 import ReactDOM from 'react-dom'
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import {CSSTransition, TransitionGroup} from 'react-transition-group'
 
 class Events extends Component {
   render () {
+    const transitionOptions = {
+      classNames: 'events',
+      in: true,
+      timeout: 500
+    }
+
+    const defaultContent = (<CSSTransition key='empty-entry' {...transitionOptions}>
+      <div>Nothing to see yet.</div>
+    </CSSTransition>)
+
     const content = this.props.list.map(function (entry) {
-      return <Events.Entry key={entry.id} { ...entry } />
+      return (<CSSTransition key={entry.id} {...transitionOptions}>
+        <div className='events-list-entry'>
+          <span className='event-name'>{entry.name}</span>
+          {entry.content}
+        </div>
+      </CSSTransition>)
     })
 
     return (<div className='events-list'>
-      <ReactCSSTransitionGroup transitionName='events' transitionLeave={false} transitionEnterTimeout={500}>
-        {content.length ? content : (<div key='empty-entry'>
-          Nothing to see yet.
-        </div>)}
-      </ReactCSSTransitionGroup>
+      <TransitionGroup
+        children={content.length ? content : defaultContent}
+        enter={true}
+        exit={false}
+      />
     </div>)
   }
 }
 Events.propTypes = {
   list: PropTypes.array
-}
-
-Events.Entry = class Entry extends Component {
-  render () {
-    return (<div className='events-list-entry'>
-      <span className='event-name'>{this.props.name}</span>
-      {this.props.content}
-    </div>)
-  }
-}
-Events.Entry.propTypes = {
-  name: PropTypes.string,
-  content: PropTypes.object
 }
 
 class CursorPosition extends Component {
