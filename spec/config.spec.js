@@ -35,6 +35,10 @@ describe('Editable configuration', function () {
   describe('globalConfig()', function () {
     const originalConfig = cloneDeep(config)
 
+    beforeAll(function () {
+      Editable.globalConfig(originalConfig)
+    })
+
     afterEach(function () {
       Editable.globalConfig(originalConfig)
     })
