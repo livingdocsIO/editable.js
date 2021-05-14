@@ -182,6 +182,14 @@ export default class Selection extends Cursor {
     this.setSelection()
   }
 
+  removeChars (chars = []) {
+    for (let i = 0; i < chars.length; i++) {
+      const char = chars[i]
+      this.range = content.deleteCharacter(this.host, this.range, char)
+    }
+    this.setSelection()
+  }
+
   toggleSurround (startCharacter, endCharacter) {
     if (this.containsString(startCharacter) &&
     this.containsString(endCharacter)) {

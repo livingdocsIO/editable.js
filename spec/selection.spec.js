@@ -41,6 +41,19 @@ describe('Selection', function () {
     })
   })
 
+  describe('removeChars()', function () {
+
+    it('removes multiple characters', function () {
+      this.div = $('<div>«Foo "bar" foo»</div>')[0]
+      const range = rangy.createRange()
+      range.selectNodeContents(this.div)
+      this.selection = new Selection(this.div, range)
+
+      this.selection.removeChars(['«', '»', '"'])
+      expect(this.div.innerHTML).toEqual('Foo bar foo')
+    })
+  })
+
   describe('textBefore() / textAfter()', function () {
 
     beforeEach(function () {
