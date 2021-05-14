@@ -75,6 +75,11 @@ export default {
     // and content (text content and child elements) will get removed.
     blacklistedElements: ['style', 'script'],
 
-    keepInternalRelativeLinks: false
+    keepInternalRelativeLinks: false,
+
+    replaceQuotes: {
+      quotes: ['“', '”'],
+      singleQuotes: ['‘', '’']
+    }
   }
 }
