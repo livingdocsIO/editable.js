@@ -3,22 +3,13 @@ import $ from 'jquery'
 import config from './config'
 import * as string from './util/string'
 import * as nodeType from './node-type'
+import * as quotes from './quotes'
 
 let allowedElements, requiredAttributes, transformElements, blockLevelElements, replaceQuotes
 let splitIntoBlocks, blacklistedElements
 const whitespaceOnly = /^\s*$/
 const blockPlaceholder = '<!-- BLOCK -->'
 let keepInternalRelativeLinks
-const doubleQuotePairs = [
-  ['«', '»'], // ch german, french
-  ['»', '«'], // danish
-  ['"', '"'], // danish, not specified
-  ['“', '”'], // english US
-  ['”', '”'], // swedish
-  ['“', '“'], // chinese simplified
-  ['„', '“'] // german
-]
-const quotesRegex = /(["'«»„“])(?![^<]*?>)/g
 
 updateConfig(config)
 export function updateConfig (conf) {
@@ -181,67 +172,9 @@ export function cleanWhitespace (str) {
 }
 
 export function replaceAllQuotes (str) {
-  const quotes = getAllQuotes(str)
-  if (quotes && quotes.length > 0) {
-    const replacementQuotes = getReplacementArray(quotes, 0)
-    return replaceExistingQuotes(str, replacementQuotes)
+  if (replaceQuotes.quotes) {
+    return quotes.replaceAllQuotes(str, replaceQuotes)
   }
+
   return str
-}
-
-function getReplacementArray (quotes, position) {
-  const quotesArray = []
-  if (quotes.length === 1) {
-    return quotes
-  }
-
-  while (position < quotes.length) {
-    const closingTagPosition = findClosingQuote(quotes, position)
-    let nestedArray = []
-
-    if (closingTagPosition !== position + 1 && closingTagPosition !== -1 && closingTagPosition !== undefined) {
-      const nestedquotes = quotes.slice(position + 1, closingTagPosition)
-      if (nestedquotes) {
-        nestedArray = getReplacementArray(nestedquotes, 0)
-      }
-    }
-    if (closingTagPosition) {
-      position = closingTagPosition + 1
-    }
-    if (closingTagPosition === undefined || closingTagPosition === -1) {
-      quotesArray.push(quotes[position])
-      position++
-    } else {
-      quotesArray.push(...[replaceQuotes.quotes[0], ...nestedArray, replaceQuotes.quotes[1]])
-    }
-  }
-
-  return quotesArray
-}
-
-function findClosingQuote (quotes, position) {
-  const openingQuote = quotes[position]
-  for (let i = position + 1; i < quotes.length; i++) {
-    const isIncluded = getPossibleClosingQuotes(openingQuote).includes(quotes[i])
-    if (isIncluded) {
-      return i
-    }
-  }
-}
-
-function getPossibleClosingQuotes (openingQuote) {
-  return doubleQuotePairs.filter(quotePair => quotePair[0] === openingQuote).map((quotePair) => quotePair[1])
-}
-
-function getAllQuotes (str) {
-  return str.match(quotesRegex)
-}
-
-function replaceExistingQuotes (str, replacementQuotes) {
-  let index = 0
-  return str.replace(quotesRegex, (match) => {
-    const replacement = replacementQuotes[index]
-    index++
-    return replacement
-  })
 }
