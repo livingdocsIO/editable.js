@@ -193,6 +193,15 @@ describe('Clipboard', function () {
     // Replace quotation marks
     // ------------------
 
+    it('do nothting when replaceQuotes is not set', function () {
+      const updatedConfig = cloneDeep(config)
+      updatedConfig.pastedHtmlRules.replaceQuotes = undefined
+
+      updateConfig(updatedConfig)
+      const block = extractSingleBlock('text outside "text inside"')
+      expect(block).toEqual('text outside "text inside"')
+    })
+
     it('replace quotation marks', function () {
       const block = extractSingleBlock('text outside "text inside"')
       expect(block).toEqual('text outside “text inside”')
@@ -223,14 +232,29 @@ describe('Clipboard', function () {
       expect(block).toEqual('text outside “text “inside” „second “inside” text”')
     })
 
+    it('replace apostrophe', function () {
+      const block = extractSingleBlock(`don't`)
+      expect(block).toEqual('don’t')
+    })
+
+    it('replace apostrophe inside quotes', function () {
+      const block = extractSingleBlock(`outside "don't"`)
+      expect(block).toEqual('outside “don’t”')
+    })
+
     it('replace single quotation marks', function () {
-      const blocks = extract('text outside \'text inside\'')
-      expect(blocks).toEqual('text outside ‘text inside’')
+      const block = extractSingleBlock('text outside \'text inside\'')
+      expect(block).toEqual('text outside ‘text inside’')
     })
 
     it('replace nested quotes with single quotes inside nested', function () {
       const block = extractSingleBlock('text outside "text \'inside\' „second inside text“"')
       expect(block).toEqual('text outside “text ‘inside’ “second inside text””')
+    })
+
+    it('replace nested quotes with single quotes inside nested', function () {
+      const block = extractSingleBlock(`text outside "text 'inside „second inside text“'"`)
+      expect(block).toEqual('text outside “text ‘inside “second inside text”’”')
     })
 
     it('replace quotation marks around elements', function () {

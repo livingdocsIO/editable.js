@@ -79,7 +79,8 @@ export default {
 
     replaceQuotes: {
       quotes: ['“', '”'],
-      singleQuotes: ['‘', '’']
+      singleQuotes: ['‘', '’'],
+      apostrophe: '’'
     }
   }
 }
