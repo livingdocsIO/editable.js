@@ -77,10 +77,11 @@ export default {
 
     keepInternalRelativeLinks: false,
 
+    // Replace quotes in a pasted content wiht quotes from config.
     replaceQuotes: {
-      quotes: ['“', '”'],
-      singleQuotes: ['‘', '’'],
-      apostrophe: '’'
+      // quotes: ['“', '”'],
+      // singleQuotes: ['‘', '’'],
+      // apostrophe: '’'
     }
   }
 }
