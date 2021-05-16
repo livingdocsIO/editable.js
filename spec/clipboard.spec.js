@@ -191,9 +191,10 @@ describe('Clipboard', function () {
     })
 
     // Replace quotation marks
-    // ------------------
+    // -----------------------
 
     describe('replace quotes', function () {
+
       beforeEach(function () {
         const updatedConfig = cloneDeep(config)
         updatedConfig.pastedHtmlRules.replaceQuotes = {
@@ -205,7 +206,7 @@ describe('Clipboard', function () {
         updateConfig(updatedConfig)
       })
 
-      it('do nothting when replaceQuotes is not set', function () {
+      it('does nothing when replaceQuotes is not set', function () {
         const updatedConfig = cloneDeep(config)
         updatedConfig.pastedHtmlRules.replaceQuotes = undefined
 
@@ -214,77 +215,114 @@ describe('Clipboard', function () {
         expect(block).toEqual('text outside "text inside"')
       })
 
-      it('replace quotation marks', function () {
+      it('does nothing when apostrophe is undefined', function () {
+        const updatedConfig = cloneDeep(config)
+        updatedConfig.pastedHtmlRules.replaceQuotes = {
+          quotes: ['“', '”'],
+          singleQuotes: ['‘', '’'],
+          apostrophe: undefined
+        }
+
+        updateConfig(updatedConfig)
+        const block = extractSingleBlock(`someone: "it's the economy, stupid!"`)
+        expect(block).toEqual(`someone: “it's the economy, stupid!”`)
+      })
+
+      it('does nothing when replaceQuotes is undefined', function () {
+        const updatedConfig = cloneDeep(config)
+        updatedConfig.pastedHtmlRules.replaceQuotes = undefined
+
+        updateConfig(updatedConfig)
+        const block = extractSingleBlock(`"it's a 'wonder'"`)
+        expect(block).toEqual(`"it's a 'wonder'"`)
+      })
+
+      it('replaces quotation marks', function () {
         const block = extractSingleBlock('text outside "text inside"')
         expect(block).toEqual('text outside “text inside”')
       })
 
-      it('replace nested quotation marks', function () {
+      it('replaces empty quotation marks', function () {
+        const block = extractSingleBlock('empty "" quotes')
+        expect(block).toEqual('empty “” quotes')
+      })
+
+      it('replaces empty nested quotation marks', function () {
+        const block = extractSingleBlock(`"''"`)
+        expect(block).toEqual('“‘’”')
+      })
+
+      it('replaces nested double quotation marks', function () {
         const block = extractSingleBlock('text outside "text «inside» text"')
         expect(block).toEqual('text outside “text “inside” text”')
       })
 
-      it('replace multiple nested quotation marks', function () {
+      it('replaces multiple nested quotation marks', function () {
         const block = extractSingleBlock('text outside "text «inside „double nested“» text"')
         expect(block).toEqual('text outside “text “inside “double nested”” text”')
       })
 
-      it('replace quotation marks and ignore not closing marks', function () {
+      it('replaces quotation marks and ignore not closing marks', function () {
         const block = extractSingleBlock('text outside "text «inside „double nested» text"')
         expect(block).toEqual('text outside “text “inside „double nested” text”')
       })
 
-      it('replace nested quotes with multiple quotes inside nested', function () {
+      it('replaces nested quotes with multiple quotes inside nested', function () {
         const block = extractSingleBlock('text outside "text «inside» „second inside text“"')
         expect(block).toEqual('text outside “text “inside” “second inside text””')
       })
 
-      it('replace nested quotes with multiple quotes inside nested and not closing marks', function () {
+      it('replaces nested quotes with multiple quotes inside nested and not closing marks', function () {
         const block = extractSingleBlock('text outside "text «inside» „second «inside» text"')
         expect(block).toEqual('text outside “text “inside” „second “inside” text”')
       })
 
-      it('replace apostrophe', function () {
+      it('replaces apostrophe', function () {
         const block = extractSingleBlock(`don't`)
         expect(block).toEqual('don’t')
       })
 
-      it('replace apostrophe inside quotes', function () {
+      it('replaces apostrophe inside quotes', function () {
         const block = extractSingleBlock(`outside "don't"`)
         expect(block).toEqual('outside “don’t”')
       })
 
-      it('replace single quotation marks', function () {
-        const block = extractSingleBlock('text outside \'text inside\'')
+      it('replaces single quotation marks', function () {
+        const block = extractSingleBlock(`text outside 'text inside'`)
         expect(block).toEqual('text outside ‘text inside’')
       })
 
-      it('replace nested quotes with single quotes inside nested', function () {
-        const block = extractSingleBlock('text outside "text \'inside\' „second inside text“"')
+      it('replaces nested quotes with single quotes inside nested', function () {
+        const block = extractSingleBlock(`text outside "text 'inside' „second inside text“"`)
         expect(block).toEqual('text outside “text ‘inside’ “second inside text””')
       })
 
-      it('replace nested quotes with single quotes inside nested', function () {
+      it('does not replace two apostrophe with quotes', function () {
+        const block = extractSingleBlock(`It's a cat's world.`)
+        expect(block).toEqual(`It’s a cat’s world.`)
+      })
+
+      it('replaces nested quotes with single quotes inside nested', function () {
         const block = extractSingleBlock(`text outside "text 'inside „second inside text“'"`)
         expect(block).toEqual('text outside “text ‘inside “second inside text”’”')
       })
 
-      it('replace quotation marks around elements', function () {
+      it('replaces quotation marks around elements', function () {
         const block = extractSingleBlock('text outside "<b>text inside</b>"')
         expect(block).toEqual('text outside “<strong>text inside</strong>”')
       })
 
-      it('replace quotation marks inside elements', function () {
+      it('replaces quotation marks inside elements', function () {
         const block = extractSingleBlock('text outside <b>"text inside"</b>')
         expect(block).toEqual('text outside <strong>“text inside”</strong>')
       })
 
-      it('do not replace quotation marks inside tag attributes', function () {
+      it('does not replace quotation marks inside tag attributes', function () {
         const block = extractSingleBlock('text outside "<a href="https://livingdocs.io">text inside</a>"')
         expect(block).toEqual('text outside “<a href="https://livingdocs.io">text inside</a>”')
       })
 
-      it('replace quotation marks around elements with attributes', function () {
+      it('replaces quotation marks around elements with attributes', function () {
         const block = extractSingleBlock('text outside "<a href="https://livingdocs.io">text inside</a>"')
         expect(block).toEqual('text outside “<a href="https://livingdocs.io">text inside</a>”')
       })

@@ -22,64 +22,68 @@ const apostrophe = [
   `'` // default
 ]
 const quotesRegex = /([‘’‹›‚'«»"“”„])(?![^<]*?>)/g
-let replaceQuotes
+// whitespace end of tag, or any dash (normal, en or em-dash)
+// or any opening double quote
+const beforeOpeningQuote = /\s|[>\-–—«»”"“„]/
+let replacements
 
 export function replaceAllQuotes (str, replaceQuotesRules) {
-  replaceQuotes = replaceQuotesRules
-  const quotes = getAllQuotes(str)
-  if (quotes && quotes.length > 0) {
-    const replacementQuotes = getReplacementArray(quotes, 0)
-    return replaceExistingQuotes(str, replacementQuotes)
+  replacements = replaceQuotesRules || {}
+  replacements.quotes = replacements.quotes || [undefined, undefined]
+  replacements.singleQuotes = replacements.singleQuotes || [undefined, undefined]
+
+  const matches = getAllQuotes(str)
+  if (matches.length > 0) {
+    replaceMatchedQuotes(matches, 0)
+    return replaceExistingQuotes(str, matches)
   }
 
   return str
 }
 
-function getReplacementArray (quotes, position) {
-  const quotesArray = []
-  if (quotes.length === 1) {
-    const replacedQuote = replaceApostrophe(quotes[0])
-    return [replacedQuote]
-  }
+function replaceMatchedQuotes (matches, position) {
 
-  while (position < quotes.length) {
-    const closingTag = findClosingQuote(quotes, position)
-    let nestedArray = []
+  while (position < matches.length) {
+    const closingTag = findClosingQuote(matches, position)
 
-    if (closingTag !== undefined && closingTag.position !== position + 1 && closingTag.position !== -1) {
-      const nestedquotes = quotes.slice(position + 1, closingTag.position)
-      if (nestedquotes) {
-        nestedArray = getReplacementArray(nestedquotes, 0)
+    if (closingTag) {
+      matches[position].replace = closingTag.type === 'double'
+        ? replacements.quotes[0]
+        : replacements.singleQuotes[0]
+
+      matches[closingTag.position].replace = closingTag.type === 'double'
+        ? replacements.quotes[1]
+        : replacements.singleQuotes[1]
+
+      if (closingTag.position !== position + 1) {
+        const nestedMatches = matches.slice(position + 1, closingTag.position)
+        if (nestedMatches) {
+          replaceMatchedQuotes(nestedMatches, 0)
+        }
       }
-    }
 
-    if (closingTag === undefined || closingTag.position === -1) {
-      const replacedQuote = replaceApostrophe(quotes[position])
-      quotesArray.push(replacedQuote)
-      position++
-    } else {
       position = closingTag.position + 1
-      if (closingTag.type === 'double') {
-        quotesArray.push(...[replaceQuotes.quotes[0], ...nestedArray, replaceQuotes.quotes[1]])
-      }
-      if (closingTag.type === 'single') {
-        quotesArray.push(...[replaceQuotes.singleQuotes[0], ...nestedArray, replaceQuotes.singleQuotes[1]])
-      }
+    } else {
+      matches[position].replace = replaceApostrophe(matches[position].char)
+      position += 1
     }
   }
-
-  return quotesArray
 }
 
-function findClosingQuote (quotes, position) {
-  const openingQuote = quotes[position]
+function findClosingQuote (matches, position) {
+  if (position === matches.length - 1) return
+  const current = matches[position]
+  const openingQuote = current.char
+
+  if (current.before && !beforeOpeningQuote.test(current.before)) return
+
   const possibleClosingSingleQuotes = getPossibleClosingQuotes(openingQuote, singleQuotePairs)
   const possibleClosingDoubleQuotes = getPossibleClosingQuotes(openingQuote, doubleQuotePairs)
-  for (let i = position + 1; i < quotes.length; i++) {
-    if (possibleClosingSingleQuotes.includes(quotes[i])) {
+  for (let i = position + 1; i < matches.length; i++) {
+    if (possibleClosingSingleQuotes.includes(matches[i].char)) {
       return {position: i, type: 'single'}
     }
-    if (possibleClosingDoubleQuotes.includes(quotes[i])) {
+    if (possibleClosingDoubleQuotes.includes(matches[i].char)) {
       return {position: i, type: 'double'}
     }
   }
@@ -91,21 +95,26 @@ function getPossibleClosingQuotes (openingQuote, pairs) {
 
 function replaceApostrophe (quote) {
   if (apostrophe.includes(quote)) {
-    return replaceQuotes.apostrophe
+    return replacements.apostrophe
   }
-
-  return quote
 }
 
 function getAllQuotes (str) {
-  return str.match(quotesRegex)
+  return [...str.matchAll(quotesRegex)].map((match) => {
+    const index = match.index
+    return {
+      char: match[1],
+      before: index > 0 ? str[index - 1] : '',
+      after: (index + 1) < str.length ? str[index + 1] : ''
+    }
+  })
 }
 
-function replaceExistingQuotes (str, replacementQuotes) {
+function replaceExistingQuotes (str, matches) {
   let index = 0
   return str.replace(quotesRegex, (match) => {
-    const replacement = replacementQuotes[index]
-    index++
+    const replacement = matches[index].replace || matches[index].char
+    index += 1
     return replacement
   })
 }
