@@ -172,7 +172,7 @@ export function cleanWhitespace (str) {
 }
 
 export function replaceAllQuotes (str) {
-  if (replaceQuotes.quotes) {
+  if (replaceQuotes.quotes || replaceQuotes.singleQuotes || replaceQuotes.apostrophe) {
     return quotes.replaceAllQuotes(str, replaceQuotes)
   }
 

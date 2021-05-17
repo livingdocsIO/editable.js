@@ -215,7 +215,7 @@ describe('Clipboard', function () {
         expect(block).toEqual('text outside "text inside"')
       })
 
-      it('does nothing when apostrophe is undefined', function () {
+      it('does replace only quotes when apostrophe is undefined', function () {
         const updatedConfig = cloneDeep(config)
         updatedConfig.pastedHtmlRules.replaceQuotes = {
           quotes: ['“', '”'],
@@ -226,6 +226,19 @@ describe('Clipboard', function () {
         updateConfig(updatedConfig)
         const block = extractSingleBlock(`someone: "it's the economy, stupid!"`)
         expect(block).toEqual(`someone: “it's the economy, stupid!”`)
+      })
+
+      it('does replace only apostrophe when quotes are undefined', function () {
+        const updatedConfig = cloneDeep(config)
+        updatedConfig.pastedHtmlRules.replaceQuotes = {
+          quotes: undefined,
+          singleQuotes: undefined,
+          apostrophe: '’'
+        }
+
+        updateConfig(updatedConfig)
+        const block = extractSingleBlock(`someone: "it's the economy, stupid!"`)
+        expect(block).toEqual(`someone: "it’s the economy, stupid!"`)
       })
 
       it('does nothing when replaceQuotes is undefined', function () {
