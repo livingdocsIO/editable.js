@@ -302,6 +302,42 @@ describe('Clipboard', function () {
         expect(block).toEqual(`It’s a cat’s world.`)
       })
 
+      it('does not replace two apostrophe with quotes inside quotes', function () {
+        const updatedConfig = cloneDeep(config)
+        updatedConfig.pastedHtmlRules.replaceQuotes = {
+          quotes: ['«', '»'],
+          singleQuotes: ['‹', '›'],
+          apostrophe: '’'
+        }
+
+        updateConfig(updatedConfig)
+        const block = extractSingleBlock(`'It's a cat's world.'`)
+        expect(block).toEqual(`‹It’s a cat’s world.›`)
+      })
+
+      it('does not replace apostrophe at the beginning or end with quotes', function () {
+        const updatedConfig = cloneDeep(config)
+        updatedConfig.pastedHtmlRules.replaceQuotes = {
+          quotes: ['«', '»'],
+          singleQuotes: ['‹', '›'],
+          apostrophe: '’'
+        }
+
+        updateConfig(updatedConfig)
+        const block = extractSingleBlock(`Can I ask you somethin'? “'Twas the night before Christmas,” he said.`)
+        expect(block).toEqual(`Can I ask you somethin’? «’Twas the night before Christmas,» he said.`)
+      })
+
+      it('does not replace apostrophe at the beginning or end with quotes', function () {
+        const block = extractSingleBlock(`Gehen S' 'nauf!`)
+        expect(block).toEqual(`Gehen S’ ’nauf!`)
+      })
+
+      it('replaces quotes with punctuation after the closing quote', function () {
+        const block = extractSingleBlock(`Beginning of the sentence "inside quote".`)
+        expect(block).toEqual(`Beginning of the sentence “inside quote”.`)
+      })
+
       it('replaces nested quotes with single quotes inside nested', function () {
         const block = extractSingleBlock(`text outside "text 'inside „second inside text“'"`)
         expect(block).toEqual('text outside “text ‘inside “second inside text”’”')

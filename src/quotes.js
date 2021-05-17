@@ -25,6 +25,10 @@ const quotesRegex = /([‘’‹›‚'«»"“”„])(?![^<]*?>)/g
 // whitespace end of tag, or any dash (normal, en or em-dash)
 // or any opening double quote
 const beforeOpeningQuote = /\s|[>\-–—«»”"“„]/
+
+// whitespace begin of tag, or any dash (normal, en or em-dash)
+// or any closing quote, or any punctuation
+const afterClosingQuote = /\s|[<\-–—«»”"“‘’‹›'.;?:,]/
 let replacements
 
 export function replaceAllQuotes (str, replaceQuotesRules) {
@@ -80,11 +84,13 @@ function findClosingQuote (matches, position) {
   const possibleClosingSingleQuotes = getPossibleClosingQuotes(openingQuote, singleQuotePairs)
   const possibleClosingDoubleQuotes = getPossibleClosingQuotes(openingQuote, doubleQuotePairs)
   for (let i = position + 1; i < matches.length; i++) {
-    if (possibleClosingSingleQuotes.includes(matches[i].char)) {
-      return {position: i, type: 'single'}
-    }
-    if (possibleClosingDoubleQuotes.includes(matches[i].char)) {
-      return {position: i, type: 'double'}
+    if ((matches[i].after && afterClosingQuote.test(matches[i].after)) || !matches[i].after) {
+      if (possibleClosingSingleQuotes.includes(matches[i].char)) {
+        return {position: i, type: 'single'}
+      }
+      if (possibleClosingDoubleQuotes.includes(matches[i].char)) {
+        return {position: i, type: 'double'}
+      }
     }
   }
 }
