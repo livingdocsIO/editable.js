@@ -118,7 +118,7 @@ npm run test:karma
 npm run test:watch
 
 # run tests in Chrome, Firefox and Safari
-npm run test:karma:all
+npm run test:all
 
 # javascript linting (configuration in .eslintrc)
 npm run lint
