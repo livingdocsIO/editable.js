@@ -217,6 +217,15 @@ export default class Editable {
     return new Cursor($host[0], range)
   }
 
+  createRangyRange () {
+    return rangy.createRange()
+  }
+
+  createCursor (element, range) {
+    const $host = $(element).closest(this.editableSelector)
+    return new Cursor($host[0], range)
+  }
+
   createCursorAtBeginning (element) {
     return this.createCursor(element, 'beginning')
   }
