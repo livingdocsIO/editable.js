@@ -6,6 +6,7 @@ import eventable from './eventable'
 import SelectionWatcher from './selection-watcher'
 import config from './config'
 import Keyboard from './keyboard'
+import {getTotalCharCount} from './util/element'
 
 // This will be set to true once we detect the input event is working.
 // Input event description on MDN:
@@ -165,17 +166,17 @@ export default class Dispatcher {
 
   dispatchSwitchEvent (event, element, direction) {
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
-
     const cursor = this.selectionWatcher.getSelection()
     if (!cursor || cursor.isSelection) return
-
-    if (direction === 'up' && cursor.isAtFirstLine()) {
+    
+    const totalCharCount = getTotalCharCount(element)
+    if (direction === 'up' && (cursor.isAtFirstLine() || totalCharCount === 0)) {
       event.preventDefault()
       event.stopPropagation()
       this.notify('switch', element, direction, cursor)
     }
 
-    if (direction === 'down' && cursor.isAtLastLine()) {
+    if (direction === 'down' && (cursor.isAtLastLine() || totalCharCount === 0)) {
       event.preventDefault()
       event.stopPropagation()
       this.notify('switch', element, direction, cursor)
