@@ -123,5 +123,79 @@ describe('Editable', function () {
         cursor.triggerChange()
       })
     })
+
+    describe('findClosestCursorOffset:', function () {
+    /*
+Cursor1:                     | (left: 130)
+Comp 1:   Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt.
+Comp 2:   Der Spieler blieb bei fünf Champions-League-Titeln stehen.
+Cursor 2:                    | (offset: 19 chars)
+    */
+      it('finds the index in a text node', function () {
+        $div.html('Der Spieler blieb bei fünf Champions-League-Titeln stehen.')
+        const {wasFound, offset} = editable.findClosestCursorOffset({
+          element: $div[0],
+          origCoordinates: {top: 0, left: 130}
+        })
+        expect(wasFound).toEqual(true)
+        expect(offset).toEqual(19)
+      })
+
+      /*
+Cursor1:                      | (left: 130)
+Comp 1:   Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt.
+Comp 2:   <p>Der <em>Spieler</em> blieb bei fünf <span>Champions-League-Titeln</span> stehen.</p>
+Cursor 2:                                   |
+    */
+      it('finds the index in a nested html tag structure', function () {
+        $div.html('<p>Der <em>Spieler</em> blieb bei fünf <span>Champions-League-Titeln</span> stehen.</p>')
+        const {wasFound, offset} = editable.findClosestCursorOffset({
+          element: $div[0],
+          origCoordinates: {top: 0, left: 130}
+        })
+        console.log('offset', offset)
+        expect(wasFound).toEqual(true)
+        expect(offset).toEqual(19)
+      })
+
+      it('returns not found for empty nodes', function () {
+        $div.html('')
+        const {wasFound} = editable.findClosestCursorOffset({
+          element: $div[0],
+          origCoordinates: {top: 0, left: 130}
+        })
+        expect(wasFound).toEqual(false)
+      })
+
+      /*
+Cursor1:                                                   |
+Comp 1:   Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt.
+Comp 2:   Foo
+Cursor 2: not found
+    */
+      it('returns not found for coordinates that are out of the text area', function () {
+        $div.html('Foo')
+        const {wasFound} = editable.findClosestCursorOffset({
+          element: $div[0],
+          origCoordinates: {top: 0, left: 130}
+        })
+        expect(wasFound).toEqual(false)
+      })
+
+      /*
+        Note: for performance reasons this algorithm will not work on huge paragraphs.
+        In a news case such a huge paragraph is very rare though.
+      */
+      it('stops after 30 binary search iterations', function () {
+        $div.html(`
+          Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt. Mit ihm sollte Juventus – wie lange ersehnt – die Champions League gewinnen. Ronaldo, unter Druck geraten durch die Ermittlungen der spanischen Steuerfahnder und eine Vergewaltigungsanklage, hatte selbst Interesse an einem neuen, störungsfreien Betätigungsfeld und daran, mit einem dritten Klub die Champions-League-Trophäe zu erobern. Doch das ging nicht in Erfüllung. Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt. Mit ihm sollte Juventus – wie lange ersehnt – die Champions League gewinnen. Ronaldo, unter Druck geraten durch die Ermittlungen der spanischen Steuerfahnder und eine Vergewaltigungsanklage, hatte selbst Interesse an einem neuen, störungsfreien Betätigungsfeld und daran, mit einem dritten Klub die Champions-League-Trophäe zu erobern. Doch das ging nicht in Erfüllung. Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt. Mit ihm sollte Juventus – wie lange ersehnt – die Champions League gewinnen. Ronaldo, unter Druck geraten durch die Ermittlungen der spanischen Steuerfahnder und eine Vergewaltigungsanklage, hatte selbst Interesse an einem neuen, störungsfreien Betätigungsfeld und daran, mit einem dritten Klub die Champions-League-Trophäe zu erobern. Doch das ging nicht in Erfüllung. Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt. Mit ihm sollte Juventus – wie lange ersehnt – die Champions League gewinnen. Ronaldo, unter Druck geraten durch die Ermittlungen der spanischen Steuerfahnder und eine Vergewaltigungsanklage, hatte selbst Interesse an einem neuen, störungsfreien Betätigungsfeld und daran, mit einem dritten Klub die Champions-League-Trophäe zu erobern. Doch das ging nicht in Erfüllung. Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt. Mit ihm sollte Juventus – wie lange ersehnt – die Champions League gewinnen. Ronaldo, unter Druck geraten durch die Ermittlungen der spanischen Steuerfahnder und eine Vergewaltigungsanklage, hatte selbst Interesse an einem neuen, störungsfreien Betätigungsfeld und daran, mit einem dritten Klub die Champions-League-Trophäe zu erobern. Doch das ging nicht in Erfüllung. Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt. Mit ihm sollte Juventus – wie lange ersehnt – die Champions League gewinnen. Ronaldo, unter Druck geraten durch die Ermittlungen der spanischen Steuerfahnder und eine Vergewaltigungsanklage, hatte selbst Interesse an einem neuen, störungsfreien Betätigungsfeld und daran, mit einem dritten Klub die Champions-League-Trophäe zu erobern. Doch das ging nicht in Erfüllung.
+        `)
+        const {wasFound} = editable.findClosestCursorOffset({
+          element: $div[0],
+          origCoordinates: {top: 0, left: 530}
+        })
+        expect(wasFound).toEqual(false)
+      })
+    })
   })
 })
