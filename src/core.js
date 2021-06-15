@@ -12,6 +12,7 @@ import highlightSupport from './highlight-support'
 import Highlighting from './highlighting'
 import createDefaultEvents from './create-default-events'
 import browser from 'bowser'
+import {getTotalCharCount, textNodesUnder, getTextNodeAndRelativeOffset} from './util/element'
 
 /**
  * The Core module provides the Editable class that defines the Editable.JS
@@ -221,9 +222,21 @@ export default class Editable {
     return rangy.createRange()
   }
 
-  createCursor (element, range) {
+  createCursorWithRange ({element, range}) {
     const $host = $(element).closest(this.editableSelector)
     return new Cursor($host[0], range)
+  }
+
+  createCursorAtCharacterOffset ({element, offset}) {
+    const textNodes = textNodesUnder(element)
+    const {node, relativeOffset} = getTextNodeAndRelativeOffset({textNodes, absOffset: offset})
+    const newRange = this.createRangyRange()
+    newRange.setStart(node, relativeOffset)
+    newRange.setEnd(node, relativeOffset)
+    newRange.collapse()
+    const nextCursor = this.createCursorWithRange({element, range: newRange})
+    nextCursor.setVisibleSelection()
+    return nextCursor
   }
 
   createCursorAtBeginning (element) {
@@ -454,6 +467,58 @@ export default class Editable {
   unload () {
     this.dispatcher.unload()
     return this
+  }
+
+  findClosestCursorOffset (
+    {element, origCoordinates, requiredOnFirstLine = false, requiredOnLastLine = false}) {
+    const totalCharCount = getTotalCharCount(element)
+    if (totalCharCount === 0) return {wasFound: false}
+    let start = Math.floor(totalCharCount / 2)
+    let rightLimit = totalCharCount
+    let leftLimit = 0
+    const history = []
+    let found = false
+    const bluriness = 5
+    const goLeft = () => {
+      rightLimit = start
+      start = Math.floor((start - leftLimit) / 2)
+    }
+    const goRight = () => {
+      leftLimit = start
+      start = start + Math.floor((rightLimit - start) / 2)
+    }
+    const convergedOnWrong = () => {
+      const lastTwo = history.slice(-2)
+      if (lastTwo.length === 2 && lastTwo[0] === lastTwo[1]) return true
+      return false
+    }
+    // limit binary search depth to 30 partitions for performance
+    for (let i = 0; i < 30; i++) {
+      history.push(start)
+      if (convergedOnWrong()) break
+      const cursor = this.createCursorAtCharacterOffset({element, offset: start})
+      // up / down axis
+      if (requiredOnFirstLine && !cursor.isAtFirstLine()) {
+        goLeft()
+        continue
+      } else if (requiredOnLastLine && !cursor.isAtLastLine()) {
+        goRight()
+        continue
+      }
+      const coordinates = cursor.getCoordinates()
+      const distance = Math.abs(coordinates.left - origCoordinates.left)
+      if (distance <= bluriness) {
+        found = true
+        break
+      }
+      // left / right axis
+      if (coordinates.left < origCoordinates.left) {
+        goRight()
+      } else {
+        goLeft()
+      }
+    }
+    return {wasFound: found, offset: start}
   }
 }
 

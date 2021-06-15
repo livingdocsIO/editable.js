@@ -168,7 +168,7 @@ export default class Dispatcher {
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
     const cursor = this.selectionWatcher.getSelection()
     if (!cursor || cursor.isSelection) return
-    
+
     const totalCharCount = getTotalCharCount(element)
     if (direction === 'up' && (cursor.isAtFirstLine() || totalCharCount === 0)) {
       event.preventDefault()
