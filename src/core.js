@@ -13,6 +13,7 @@ import Highlighting from './highlighting'
 import createDefaultEvents from './create-default-events'
 import browser from 'bowser'
 import {getTotalCharCount, textNodesUnder, getTextNodeAndRelativeOffset} from './util/element'
+import {binaryCursorSearch} from './util/binary_search'
 
 /**
  * The Core module provides the Editable class that defines the Editable.JS
@@ -469,56 +470,84 @@ export default class Editable {
     return this
   }
 
+  /*
+    Takes coordinates and uses its left value to find out how to offset a character in a string to
+    closely match the coordinates.left value.
+    Takes conditions for the result being on the first line, used when navigating to a paragraph from
+    the above paragraph and being on the last line, used when navigating to a paragraph from the below
+    paragraph.
+
+    Internally this sets up the methods used for a binary cursor search and calls this.
+
+    @param {DomNode} element The DOM Node (usually editable elem) to which the cursor jumps
+    @param {Object} coordinates The bounding rect of the preceeding cursor to be matched
+    @param {Boolean} requiredOnFirstLine set to true if you want to require the cursor to be on the first line of the paragraph
+    @param {Boolean} requiredOnLastLine set to true if you want to require the cursor to be on the last line of the paragraph
+
+    @return {Object} object with boolean `wasFound` indicating if the binary search found an offset and `offset` to indicate the actual character offset
+    */
   findClosestCursorOffset (
     {element, origCoordinates, requiredOnFirstLine = false, requiredOnLastLine = false}) {
+    // early terminate on empty editables
     const totalCharCount = getTotalCharCount(element)
     if (totalCharCount === 0) return {wasFound: false}
-    let start = Math.floor(totalCharCount / 2)
-    let rightLimit = totalCharCount
-    let leftLimit = 0
-    const history = []
-    let found = false
-    const bluriness = 5
-    const goLeft = () => {
-      rightLimit = start
-      start = Math.floor((start - leftLimit) / 2)
+    // move left if the coordinates are to the left
+    const leftCondition = ({data, coordinates}) => {
+      if (coordinates.left >= data.origCoordinates.left) return true
+      return false
     }
-    const goRight = () => {
-      leftLimit = start
-      start = start + Math.floor((rightLimit - start) / 2)
+    // move up if cursor is required to be on first line but is currently not
+    const upCondition = ({data, cursor}) => {
+      if (data.requiredOnFirstLine && !cursor.isAtFirstLine()) return true
+      return false
     }
-    const convergedOnWrong = () => {
+    // move down if cursor is required to be on last line but is currently not
+    const downCondition = ({data, cursor}) => {
+      if (data.requiredOnLastLine && !cursor.isAtLastLine()) return true
+      return false
+    }
+    // move the binary search index in between the current position and the left limit
+    const moveLeft = (data) => {
+      data.rightLimit = data.currentOffset
+      data.currentOffset = Math.floor((data.currentOffset - data.leftLimit) / 2)
+    }
+    // move the binary search index in between the current position and the right limit
+    const moveRight = (data) => {
+      data.leftLimit = data.currentOffset
+      data.currentOffset = data.currentOffset + Math.floor((data.rightLimit - data.currentOffset) / 2)
+    }
+    // consider a small bluriness since character never exactly match coordinates
+    const foundChecker = ({distance, bluriness}) => {
+      return distance <= bluriness
+    }
+    // consider converged if 2 consecutive history entries are equal
+    const convergenceChecker = (history) => {
       const lastTwo = history.slice(-2)
       if (lastTwo.length === 2 && lastTwo[0] === lastTwo[1]) return true
       return false
     }
-    // limit binary search depth to 30 partitions for performance
-    for (let i = 0; i < 30; i++) {
-      history.push(start)
-      if (convergedOnWrong()) break
-      const cursor = this.createCursorAtCharacterOffset({element, offset: start})
-      // up / down axis
-      if (requiredOnFirstLine && !cursor.isAtFirstLine()) {
-        goLeft()
-        continue
-      } else if (requiredOnLastLine && !cursor.isAtLastLine()) {
-        goRight()
-        continue
-      }
-      const coordinates = cursor.getCoordinates()
-      const distance = Math.abs(coordinates.left - origCoordinates.left)
-      if (distance <= bluriness) {
-        found = true
-        break
-      }
-      // left / right axis
-      if (coordinates.left < origCoordinates.left) {
-        goRight()
-      } else {
-        goLeft()
-      }
+
+    const data = {
+      element,
+      currentOffset: Math.floor(totalCharCount / 2),
+      rightLimit: totalCharCount,
+      leftLimit: 0,
+      requiredOnFirstLine,
+      requiredOnLastLine,
+      origCoordinates
     }
-    return {wasFound: found, offset: start}
+
+    return binaryCursorSearch({
+      moveLeft,
+      moveRight,
+      leftCondition,
+      upCondition,
+      downCondition,
+      convergenceChecker,
+      foundChecker,
+      createCursorAtCharacterOffset: this.createCursorAtCharacterOffset.bind(this),
+      data
+    })
   }
 }
 

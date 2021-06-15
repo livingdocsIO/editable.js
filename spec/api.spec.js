@@ -153,7 +153,6 @@ Cursor 2:                                   |
           element: $div[0],
           origCoordinates: {top: 0, left: 130}
         })
-        console.log('offset', offset)
         expect(wasFound).toEqual(true)
         expect(offset).toEqual(19)
       })
