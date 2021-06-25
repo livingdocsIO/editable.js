@@ -1,56 +1,95 @@
-/*
-  This is a binary search algorithm implementation aimed at finding a character offset position
-  in a consecutive strings of characters over several lines.
-  Refer to this page in order to learn more about binary search: https://en.wikipedia.org/wiki/Binary_search_algorithm
+'use strict'
+import {getTotalCharCount, textNodesUnder, getTextNodeAndRelativeOffset} from './element'
 
-  The method takes a setup of methods to perform the partioning and returns an offset if one was found.
-  Due to maintain good performance in the Browser we limited the binary search partitions to 30. This should be enough for most cases
-  of paragraph content.
+/**
+ * This is a binary search algorithm implementation aimed at finding
+ * a character offset position in a consecutive strings of characters
+ * over several lines.
+ *
+ * Refer to this page in order to learn more about binary search:
+ * https://en.wikipedia.org/wiki/Binary_search_algorithm
+ *
+ * @returns {object}
+ *  - object with boolean `wasFound` indicating if the binary search found an offset and `offset` to indicate the actual character offset
+ */
+export function binaryCursorSearch ({
+  host,
+  requiredOnFirstLine,
+  requiredOnLastLine,
+  positionX // coordinates relative to viewport (e.g. from getBoundingClientRect())
+}) {
+  const hostRange = host.ownerDocument.createRange()
+  hostRange.selectNodeContents(host)
+  const hostCoords = hostRange.getBoundingClientRect()
+  const totalCharCount = getTotalCharCount(host)
+  const textNodes = textNodesUnder(host)
 
-  @param {Function} moveLeft control how a left movement in binary search works
-  @param {Function} leftCondition control when a left movement in binary search should be performed
-  @param {Function} moveRight control how a right movement in binary search works
-  @param {Function} upCondition control when the binary searc should move up one line (internally left movement)
-  @param {Function} downCondition control when the binary search should move down one line (internally right movement)
-  @param {Function} convergenceChecker returns true if the binary search converged on a value (considered a break condition)
-  @param {Function} foundChecker returns true if the target position has been found with binary search (considered a break condition)
-  @param {Funciton} createCursorAtCharacterOffset method that can apply the binary search offset to a real cursor (returns coordinates)
-  @param {Function} data data that is passed with the different methods
+  // early terminate on empty editables
+  if (totalCharCount === 0) return {wasFound: false}
 
-  @return {Object} object with boolean `wasFound` indicating if the binary search found an offset and `offset` to indicate the actual character offset
-*/
-function binaryCursorSearch ({moveLeft, leftCondition, moveRight, upCondition, downCondition, convergenceChecker, foundChecker, createCursorAtCharacterOffset, data}) {
-  const history = []
-  const bluriness = 5
-  let found = false
-  for (let i = 0; i < 30; i++) {
-    history.push(data.currentOffset)
-    if (convergenceChecker(history)) break
-    const cursor = createCursorAtCharacterOffset({element: data.element, offset: data.currentOffset})
+  const data = {
+    currentOffset: Math.floor(totalCharCount / 2),
+    leftLimit: 0,
+    rightLimit: totalCharCount
+  }
+
+  let offset = data.currentOffset
+  let distance
+  let safety = 20
+  while (data.leftLimit < data.rightLimit && safety > 0) {
+    safety = safety -= 1
+    offset = data.currentOffset
+    const range = createRangeAtCharacterOffset({textNodes, offset: data.currentOffset})
+    const coords = range.getBoundingClientRect()
+    distance = Math.abs(coords.left - positionX)
+
     // up / down axis
-    if (upCondition({data, cursor})) {
+    if (requiredOnFirstLine && hostCoords.top !== coords.top) {
       moveLeft(data)
       continue
-    } else if (downCondition({data, cursor})) {
+    } else if (requiredOnLastLine && hostCoords.bottom !== coords.bottom) {
       moveRight(data)
       continue
     }
 
-    const coordinates = cursor.getCoordinates()
-    const distance = Math.abs(coordinates.left - data.origCoordinates.left)
-    if (foundChecker({distance, bluriness})) {
-      found = true
-      break
-    }
     // left / right axis
-    if (leftCondition({data, coordinates})) {
+    if (positionX < coords.left) {
       moveLeft(data)
     } else {
       moveRight(data)
     }
   }
 
-  return {wasFound: found, offset: data.currentOffset}
+  const range = createRangeAtCharacterOffset({textNodes, offset: data.currentOffset})
+  const coords = range.getBoundingClientRect()
+  const finalDistance = Math.abs(coords.left - positionX)
+
+  // Decide if last or second last offset is closest
+  if (finalDistance < distance) {
+    distance = finalDistance
+    offset = data.currentOffset
+  }
+
+  return {distance, offset, wasFound: true}
 }
 
-module.exports = {binaryCursorSearch}
+// move the binary search index in between the current position and the left limit
+function moveLeft (data) {
+  data.rightLimit = data.currentOffset
+  data.currentOffset = Math.floor((data.currentOffset + data.leftLimit) / 2)
+}
+// move the binary search index in between the current position and the right limit
+function moveRight (data) {
+  data.leftLimit = data.currentOffset
+  data.currentOffset = Math.ceil((data.currentOffset + data.rightLimit) / 2)
+}
+
+function createRangeAtCharacterOffset ({textNodes, offset}) {
+  const {node, relativeOffset} = getTextNodeAndRelativeOffset({textNodes, absOffset: offset})
+
+  const newRange = node.ownerDocument.createRange()
+  newRange.setStart(node, relativeOffset)
+  newRange.collapse(true)
+
+  return newRange
+}

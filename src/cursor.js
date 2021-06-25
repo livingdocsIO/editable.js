@@ -5,9 +5,11 @@ import * as viewport from './util/viewport'
 import * as content from './content'
 import * as parser from './parser'
 import * as string from './util/string'
-import * as nodeType from './node-type'
+import {elementNode, documentFragmentNode} from './node-type'
 import error from './util/error'
 import * as rangeSaveRestore from './range-save-restore'
+// import printRange from './util/print_range'
+import NodeIterator from './node-iterator'
 
 /**
  * The Cursor module provides a cross-browser abstraction layer for cursor.
@@ -17,6 +19,12 @@ import * as rangeSaveRestore from './range-save-restore'
  */
 
 export default class Cursor {
+
+  static findHost (elem, selector) {
+    if (!elem.closest) elem = elem.parentNode
+    return elem.closest(selector)
+  }
+
   /**
   * Class for the Cursor module.
   *
@@ -46,21 +54,61 @@ export default class Cursor {
   }
 
   isAtLastLine () {
-    const range = rangy.createRange()
-    range.selectNodeContents(this.host)
+    const hostRange = this.win.document.createRange()
+    hostRange.selectNodeContents(this.host)
+    const hostCoords = hostRange.getBoundingClientRect()
 
-    const hostCoords = range.nativeRange.getBoundingClientRect()
-    const cursorCoords = this.range.nativeRange.getBoundingClientRect()
+    let cursorCoords
+    if (this.range.nativeRange.startContainer.nodeType === elementNode) {
+      const container = this.range.nativeRange.startContainer
+      if ((container.children.length - 1) >= this.range.nativeRange.startOffset) {
+        const elem = container.children[this.range.nativeRange.startOffset]
+        const iterator = new NodeIterator(elem)
+        const textNode = iterator.getNextTextNode()
+        if (textNode) {
+          const cursorRange = this.win.document.createRange()
+          cursorRange.setStart(textNode, 0)
+          cursorRange.collapse(true)
+          cursorCoords = cursorRange.getBoundingClientRect()
+        } else {
+          cursorCoords = hostCoords
+        }
+      } else {
+        cursorCoords = hostCoords
+      }
+    } else {
+      cursorCoords = this.getBoundingClientRect()
+    }
 
     return hostCoords.bottom === cursorCoords.bottom
   }
 
   isAtFirstLine () {
-    const range = rangy.createRange()
-    range.selectNodeContents(this.host)
+    const hostRange = this.win.document.createRange()
+    hostRange.selectNodeContents(this.host)
+    const hostCoords = hostRange.getBoundingClientRect()
 
-    const hostCoords = range.nativeRange.getBoundingClientRect()
-    const cursorCoords = this.range.nativeRange.getBoundingClientRect()
+    let cursorCoords
+    if (this.range.nativeRange.startContainer.nodeType === elementNode) {
+      const container = this.range.nativeRange.startContainer
+      if ((container.children.length - 1) >= this.range.nativeRange.startOffset) {
+        const elem = container.children[this.range.nativeRange.startOffset]
+        const iterator = new NodeIterator(elem)
+        const textNode = iterator.getPreviousTextNode()
+        if (textNode) {
+          const cursorRange = this.win.document.createRange()
+          cursorRange.setStart(textNode, 0)
+          cursorRange.collapse(true)
+          cursorCoords = cursorRange.getBoundingClientRect()
+        } else {
+          cursorCoords = hostCoords
+        }
+      } else {
+        cursorCoords = hostCoords
+      }
+    } else {
+      cursorCoords = this.range.nativeRange.getBoundingClientRect()
+    }
 
     return hostCoords.top === cursorCoords.top
   }
@@ -83,7 +131,7 @@ export default class Cursor {
     element = this.adoptElement(element)
 
     let preceedingElement = element
-    if (element.nodeType === nodeType.documentFragmentNode) {
+    if (element.nodeType === documentFragmentNode) {
       const lastIndex = element.childNodes.length - 1
       preceedingElement = element.childNodes[lastIndex]
     }
@@ -167,6 +215,10 @@ export default class Cursor {
   // Same as after() but returns a string.
   afterHtml () {
     return content.getInnerHtmlOfFragment(this.after())
+  }
+
+  getBoundingClientRect () {
+    return this.range.nativeRange.getBoundingClientRect()
   }
 
   // Get the BoundingClientRect of the cursor.

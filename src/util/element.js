@@ -1,19 +1,14 @@
 'use strict'
-function textNodesUnder (node) {
-  let all = []
-  for (node = node.firstChild; node; node = node.nextSibling) {
-    if (node.nodeType === 3) {
-      all.push(node)
-    } else {
-      all = all.concat(textNodesUnder(node))
-    }
-  }
-  return all
+import NodeIterator from '../node-iterator'
+
+export function textNodesUnder (node) {
+  const iterator = new NodeIterator(node, 'getNextTextNode')
+  return [...iterator]
 }
 
 // NOTE: if there is only one text node, then just that node and
 // the abs offset are returned
-function getTextNodeAndRelativeOffset ({textNodes, absOffset}) {
+export function getTextNodeAndRelativeOffset ({textNodes, absOffset}) {
   let cumulativeOffset = 0
   let relativeOffset = 0
   let targetNode
@@ -29,10 +24,8 @@ function getTextNodeAndRelativeOffset ({textNodes, absOffset}) {
   return {node: targetNode, relativeOffset}
 }
 
-function getTotalCharCount (element) {
+export function getTotalCharCount (element) {
   const textNodes = textNodesUnder(element)
   const reducer = (acc, node) => acc + node.textContent.length
   return textNodes.reduce(reducer, 0)
 }
-
-module.exports = {getTotalCharCount, textNodesUnder, getTextNodeAndRelativeOffset}
