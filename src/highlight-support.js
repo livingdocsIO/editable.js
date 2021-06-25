@@ -4,11 +4,9 @@ import * as content from './content'
 import highlightText from './highlight-text'
 import TextHighlighting from './plugins/highlighting/text-highlighting'
 
-function isInHost (el, host) {
-  if (!el.closest) {
-    el = el.parentNode
-  }
-  return el.closest('[data-editable]:not([data-word-id])') === host
+function isInHost (elem, host) {
+  if (!elem.closest) elem = elem.parentNode
+  return elem.closest('[data-editable]:not([data-word-id])') === host
 }
 
 const highlightSupport = {

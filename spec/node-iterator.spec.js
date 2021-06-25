@@ -22,7 +22,8 @@ describe('NodeIterator', function () {
     it('sets its properties', function () {
       expect(this.iterator.root).toEqual(this.element)
       expect(this.iterator.current).toEqual(this.element)
-      expect(this.iterator.next).toEqual(this.element)
+      expect(this.iterator.nextNode).toEqual(this.element)
+      expect(this.iterator.previous).toEqual(this.element)
     })
   })
 
@@ -63,7 +64,7 @@ describe('NodeIterator', function () {
 
       this.iterator.replaceCurrent(replacement)
       expect(this.iterator.current).toEqual(replacement)
-      expect(this.iterator.next).toEqual(null)
+      expect(this.iterator.nextNode).toEqual(null)
     })
 
     it('replaces the first character of longer a text node', function () {

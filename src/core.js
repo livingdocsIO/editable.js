@@ -12,7 +12,7 @@ import highlightSupport from './highlight-support'
 import Highlighting from './highlighting'
 import createDefaultEvents from './create-default-events'
 import browser from 'bowser'
-import {getTotalCharCount, textNodesUnder, getTextNodeAndRelativeOffset} from './util/element'
+import {textNodesUnder, getTextNodeAndRelativeOffset} from './util/element'
 import {binaryCursorSearch} from './util/binary_search'
 
 /**
@@ -195,16 +195,15 @@ export default class Editable {
    */
 
   createCursor (element, position = 'beginning') {
-    const $host = $(element).closest(this.editableSelector)
-
-    if (!$host.length) return undefined
+    const host = Cursor.findHost(element, this.editableSelector)
+    if (!host) return undefined
 
     const range = rangy.createRange()
 
     if (position === 'beginning' || position === 'end') {
       range.selectNodeContents(element)
       range.collapse(position === 'beginning')
-    } else if (element !== $host[0]) {
+    } else if (element !== host) {
       if (position === 'before') {
         range.setStartBefore(element)
         range.setEndBefore(element)
@@ -216,26 +215,19 @@ export default class Editable {
       error('EditableJS: cannot create cursor outside of an editable block.')
     }
 
-    return new Cursor($host[0], range)
-  }
-
-  createRangyRange () {
-    return rangy.createRange()
-  }
-
-  createCursorWithRange ({element, range}) {
-    const $host = $(element).closest(this.editableSelector)
-    return new Cursor($host[0], range)
+    return new Cursor(host, range)
   }
 
   createCursorAtCharacterOffset ({element, offset}) {
     const textNodes = textNodesUnder(element)
     const {node, relativeOffset} = getTextNodeAndRelativeOffset({textNodes, absOffset: offset})
-    const newRange = this.createRangyRange()
+    const newRange = rangy.createRange()
     newRange.setStart(node, relativeOffset)
-    newRange.setEnd(node, relativeOffset)
-    newRange.collapse()
-    const nextCursor = this.createCursorWithRange({element, range: newRange})
+    newRange.collapse(true)
+
+    const host = Cursor.findHost(element, this.editableSelector)
+    const nextCursor = new Cursor(host, newRange)
+
     nextCursor.setVisibleSelection()
     return nextCursor
   }
@@ -470,83 +462,42 @@ export default class Editable {
     return this
   }
 
-  /*
-    Takes coordinates and uses its left value to find out how to offset a character in a string to
-    closely match the coordinates.left value.
-    Takes conditions for the result being on the first line, used when navigating to a paragraph from
-    the above paragraph and being on the last line, used when navigating to a paragraph from the below
-    paragraph.
-
-    Internally this sets up the methods used for a binary cursor search and calls this.
-
-    @param {DomNode} element The DOM Node (usually editable elem) to which the cursor jumps
-    @param {Object} coordinates The bounding rect of the preceeding cursor to be matched
-    @param {Boolean} requiredOnFirstLine set to true if you want to require the cursor to be on the first line of the paragraph
-    @param {Boolean} requiredOnLastLine set to true if you want to require the cursor to be on the last line of the paragraph
-
-    @return {Object} object with boolean `wasFound` indicating if the binary search found an offset and `offset` to indicate the actual character offset
-    */
-  findClosestCursorOffset (
-    {element, origCoordinates, requiredOnFirstLine = false, requiredOnLastLine = false}) {
-    // early terminate on empty editables
-    const totalCharCount = getTotalCharCount(element)
-    if (totalCharCount === 0) return {wasFound: false}
-    // move left if the coordinates are to the left
-    const leftCondition = ({data, coordinates}) => {
-      if (coordinates.left >= data.origCoordinates.left) return true
-      return false
-    }
-    // move up if cursor is required to be on first line but is currently not
-    const upCondition = ({data, cursor}) => {
-      if (data.requiredOnFirstLine && !cursor.isAtFirstLine()) return true
-      return false
-    }
-    // move down if cursor is required to be on last line but is currently not
-    const downCondition = ({data, cursor}) => {
-      if (data.requiredOnLastLine && !cursor.isAtLastLine()) return true
-      return false
-    }
-    // move the binary search index in between the current position and the left limit
-    const moveLeft = (data) => {
-      data.rightLimit = data.currentOffset
-      data.currentOffset = Math.floor((data.currentOffset - data.leftLimit) / 2)
-    }
-    // move the binary search index in between the current position and the right limit
-    const moveRight = (data) => {
-      data.leftLimit = data.currentOffset
-      data.currentOffset = data.currentOffset + Math.floor((data.rightLimit - data.currentOffset) / 2)
-    }
-    // consider a small bluriness since character never exactly match coordinates
-    const foundChecker = ({distance, bluriness}) => {
-      return distance <= bluriness
-    }
-    // consider converged if 2 consecutive history entries are equal
-    const convergenceChecker = (history) => {
-      const lastTwo = history.slice(-2)
-      if (lastTwo.length === 2 && lastTwo[0] === lastTwo[1]) return true
-      return false
-    }
-
-    const data = {
-      element,
-      currentOffset: Math.floor(totalCharCount / 2),
-      rightLimit: totalCharCount,
-      leftLimit: 0,
-      requiredOnFirstLine,
-      requiredOnLastLine,
-      origCoordinates
-    }
+  /**
+   * Takes coordinates and uses its left value to find out how to offset a character in a string to
+   * closely match the coordinates.left value.
+   * Takes conditions for the result being on the first line, used when navigating to a paragraph from
+   * the above paragraph and being on the last line, used when navigating to a paragraph from the below
+   * paragraph.
+   *
+   * Internally this sets up the methods used for a binary cursor search and calls this.
+   *
+   * @param {DomNode} element
+   *  - the editable hostDOM Node to which the cursor jumps
+   * @param {object} coordinates
+   *  - The bounding rect of the preceeding cursor to be matched
+   * @param {boolean} requiredOnFirstLine
+   *  - set to true if you want to require the cursor to be on the first line of the paragraph
+   * @param {boolean} requiredOnLastLine
+   *  - set to true if you want to require the cursor to be on the last line of the paragraph
+   *
+   * @return {Object}
+   *  - object with boolean `wasFound` indicating if the binary search found an offset and `offset` to indicate the actual character offset
+   */
+  findClosestCursorOffset ({
+    element,
+    origCoordinates,
+    requiredOnFirstLine = false,
+    requiredOnLastLine = false
+  }) {
+    const positionX = this.dispatcher.switchContext
+      ? this.dispatcher.switchContext.positionX
+      : origCoordinates.left
 
     return binaryCursorSearch({
-      moveLeft,
-      moveRight,
-      leftCondition,
-      upCondition,
-      downCondition,
-      convergenceChecker,
-      foundChecker,
-      createCursorAtCharacterOffset: this.createCursorAtCharacterOffset.bind(this),
-      data
+      host: element,
+      requiredOnFirstLine,
+      requiredOnLastLine,
+      positionX
     })
   }
 }

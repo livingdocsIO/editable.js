@@ -126,11 +126,11 @@ describe('Editable', function () {
 
     describe('findClosestCursorOffset:', function () {
     /*
-Cursor1:                     | (left: 130)
-Comp 1:   Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt.
-Comp 2:   Der Spieler blieb bei fünf Champions-League-Titeln stehen.
-Cursor 2:                    | (offset: 19 chars)
-    */
+     * Cursor1:                     | (left: 130)
+     * Comp 1:   Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt.
+     * Comp 2:   Der Spieler blieb bei fünf Champions-League-Titeln stehen.
+     * Cursor 2:                    | (offset: 19 chars)
+     */
       it('finds the index in a text node', function () {
         $div.html('Der Spieler blieb bei fünf Champions-League-Titeln stehen.')
         const {wasFound, offset} = editable.findClosestCursorOffset({
@@ -142,11 +142,11 @@ Cursor 2:                    | (offset: 19 chars)
       })
 
       /*
-Cursor1:                      | (left: 130)
-Comp 1:   Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt.
-Comp 2:   <p>Der <em>Spieler</em> blieb bei fünf <span>Champions-League-Titeln</span> stehen.</p>
-Cursor 2:                                   |
-    */
+       * Cursor1:                      | (left: 130)
+       * Comp 1:   Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt.
+       * Comp 2:   <p>Der <em>Spieler</em> blieb bei fünf <span>Champions-League-Titeln</span> stehen.</p>
+       * Cursor 2:                                   |
+       */
       it('finds the index in a nested html tag structure', function () {
         $div.html('<p>Der <em>Spieler</em> blieb bei fünf <span>Champions-League-Titeln</span> stehen.</p>')
         const {wasFound, offset} = editable.findClosestCursorOffset({
@@ -167,18 +167,19 @@ Cursor 2:                                   |
       })
 
       /*
-Cursor1:                                                   |
-Comp 1:   Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt.
-Comp 2:   Foo
-Cursor 2: not found
-    */
+       * Cursor1:                                                   |
+       * Comp 1:   Cristiano Ronaldo wurde 2018 mit grossem Tamtam nach Turin geholt.
+       * Comp 2:   Foo
+       * Cursor 2: not found
+       */
       it('returns not found for coordinates that are out of the text area', function () {
         $div.html('Foo')
-        const {wasFound} = editable.findClosestCursorOffset({
+        const {wasFound, offset} = editable.findClosestCursorOffset({
           element: $div[0],
           origCoordinates: {top: 0, left: 130}
         })
-        expect(wasFound).toEqual(false)
+        expect(wasFound).toEqual(true)
+        expect(offset).toEqual(3)
       })
     })
   })
