@@ -84,6 +84,11 @@ function getEventableModule (notifyContext) {
         args.splice(0, 2)
       }
 
+      if (this.switchContext) {
+        const nextEvent = this.switchContext.events.shift()
+        if (event !== nextEvent) this.switchContext = undefined
+      }
+
       const eventListeners = listeners[event]
       if (!eventListeners) return
 

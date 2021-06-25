@@ -168,15 +168,27 @@ export default class Dispatcher {
     const cursor = this.selectionWatcher.getFreshSelection()
     if (!cursor || cursor.isSelection) return
 
+    // store position
+    if (!this.switchContext) {
+      this.switchContext = {
+        positionX: cursor.getBoundingClientRect().left,
+        events: ['cursor']
+      }
+    } else {
+      this.switchContext.events = ['cursor']
+    }
+
     if (direction === 'up' && cursor.isAtFirstLine()) {
       event.preventDefault()
       event.stopPropagation()
+      this.switchContext.events = ['switch', 'blur', 'focus', 'cursor']
       this.notify('switch', element, direction, cursor)
     }
 
     if (direction === 'down' && cursor.isAtLastLine()) {
       event.preventDefault()
       event.stopPropagation()
+      this.switchContext.events = ['switch', 'blur', 'focus', 'cursor']
       this.notify('switch', element, direction, cursor)
     }
   }
