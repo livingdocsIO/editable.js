@@ -357,6 +357,29 @@ article {
 }
 
 /* ==========================================================================
+   Styling
+   ========================================================================== */
+
+.example-style-default {
+}
+.example-style-default:focus {
+}
+
+.example-style-dark {
+    padding: 0.5em;
+    color: white;
+    background-color: darkgrey;
+    border: 1px solid darkgrey;
+    border-radius: 4px;
+    caret-color: yellow;
+}
+.example-style-dark:focus {
+    outline: none;
+    background-color: dimgrey;
+    box-shadow: 0px 0px 8px black;
+}
+
+/* ==========================================================================
    iFrame
    ========================================================================== */
 
