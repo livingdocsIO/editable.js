@@ -34,7 +34,7 @@ $(() => {
   $('select[name="editable-styles"]').on('change', function () {
     $('.styling-example p')
       .removeClass('example-style-default example-style-dark')
-      .addClass('example-style-' + $(this).val())
+      .addClass(`example-style-${$(this).val()}`)
   })
 
   // IFrame
