@@ -13,7 +13,7 @@ import createDefaultEvents from './create-default-events'
 import browser from 'bowser'
 import {textNodesUnder, getTextNodeAndRelativeOffset} from './util/element'
 import {binaryCursorSearch} from './util/binary_search'
-import { domArray, domSelector } from './util/dom'
+import {domArray} from './util/dom'
 
 /**
  * The Core module provides the Editable class that defines the Editable.JS
@@ -96,8 +96,7 @@ export default class Editable {
    * @chainable
    */
   add (target) {
-    const document = this.win.document
-    const targets = domArray(target, document)
+    const targets = domArray(target, this.win.document)
 
     this.enable(targets)
     // TODO check css whitespace settings
@@ -115,8 +114,7 @@ export default class Editable {
    * @chainable
    */
   remove (target) {
-    const document = this.win.document
-    const targets = domArray(target, document)
+    const targets = domArray(target, this.win.document)
 
     this.disable(targets)
 
@@ -137,10 +135,9 @@ export default class Editable {
   * @chainable
   */
   disable (target) {
-    const document = this.win.document
+    const targets = domArray(target || `.${config.editableClass}`, this.win.document)
 
-    target = target ? [target] : document.querySelectorAll(`.${config.editableClass}`)
-    for (const element of target) {
+    for (const element of targets) {
       block.disable(element)
     }
 
@@ -156,11 +153,10 @@ export default class Editable {
   * @chainable
   */
   enable (target, normalize) {
-    const document = this.win.document
     const shouldSpellcheck = this.config.browserSpellcheck
+    const targets = domArray(target || `.${config.editableDisabledClass}`, this.win.document)
 
-    target = target ? [target] : document.querySelectorAll(`.${config.editableDisabledClass}`)
-    for (const element of target) {
+    for (const element of targets) {
       block.init(element, {normalize, shouldSpellcheck})
       this.dispatcher.notify('init', element)
     }
@@ -177,10 +173,9 @@ export default class Editable {
   * @param { HTMLElement | undefined } target
   */
   suspend (target) {
-    const document = this.win.document
+    const targets = domArray(target || `.${config.editableClass}`, this.win.document)
 
-    target = target ? [target] : document.querySelectorAll(`.${config.editableClass}`)
-    for (const element of target) {
+    for (const element of targets) {
       element.removeAttribute('contenteditable')
     }
 
@@ -195,10 +190,9 @@ export default class Editable {
   * @param { HTMLElement | undefined } target
   */
   continue (target) {
-    const document = this.win.document
+    const targets = domArray(target || `.${config.editableClass}`, this.win.document)
 
-    target = target ? [target] : document.querySelectorAll(`.${config.editableClass}`)
-    for (const element of target) {
+    for (const element of targets) {
       element.setAttribute('contenteditable', true)
     }
 
@@ -209,7 +203,7 @@ export default class Editable {
    * Set the cursor inside of an editable block.
    *
    * @method createCursor
-   * @param { HTMLElement | String } target
+   * @param { HTMLElement } element
    * @param { 'beginning' | 'end' | 'before' | 'after' } position
    */
 
