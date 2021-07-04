@@ -21,6 +21,11 @@ steps:
   commands: ["npm audit"]
   depends_on: [install]
 
+- name: build
+  image: cypress/browsers:node14.15.0-chrome86-ff82
+  commands: ["npm run build -s"]
+  depends_on: [install]
+
 - name: test
   image: cypress/browsers:node14.15.0-chrome86-ff82
   commands: ["npm run test:ci -s"]
@@ -46,12 +51,12 @@ steps:
       from_secret: GH_TOKEN
   when:
     event: [tag]
-  depends_on: [test]
+  depends_on: [build]
 
 trigger:
   event: [push, tag, pr]
 ---
 kind: signature
-hmac: 91b814119239e91c7ab7b3ecf810c1f2f79f977cf40013233c8e4e4cbb574d5a
+hmac: 532e9d992aa9ec0ec33cda50fddb65fc1d3656232a1ae556d45860a26f4be1d3
 
 ...

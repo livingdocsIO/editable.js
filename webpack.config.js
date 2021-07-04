@@ -81,13 +81,16 @@ module.exports = {
   ...(!production
     ? {
       devServer: {
-        contentBase: './',
+        static: {
+          directory: './'
+        },
         port: 9050,
         historyApiFallback: true,
         liveReload: true,
         hot: true,
-        open: true,
-        openPage: 'examples'
+        open: {
+          target: '/examples'
+        }
       }
     }
     : {})
