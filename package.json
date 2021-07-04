@@ -75,7 +75,7 @@
     "build:lib": "babel src --out-dir lib",
     "prebuild:lib": "rimraf ./{lib,coverage}",
     "build": "npm run build:dist -s && npm run build:lib -s && npm run build:docs -s",
-    "test:ci": "npm run build -s && npm run test:karma -s",
+    "test:ci": "npm run test:karma -s",
     "test": "npm run build -s && npm run test:karma -s",
     "posttest": "npm run lint -s",
     "test:all": "npm run test:karma -s -- --browsers Chrome,Firefox,Safari",
