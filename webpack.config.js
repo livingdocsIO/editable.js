@@ -36,7 +36,7 @@ module.exports = {
             options: {
               plugins: [
                 '@babel/plugin-transform-runtime',
-                ...(test ? ['istanbul'] : [])
+                ...(test ? ['babel-plugin-istanbul'] : [])
               ],
               presets: [
                 '@babel/preset-env',
