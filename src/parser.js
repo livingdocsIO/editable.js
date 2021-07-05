@@ -1,5 +1,3 @@
-import $ from 'jquery'
-
 import * as string from './util/string'
 import * as nodeType from './node-type'
 import config from './config'
@@ -21,9 +19,9 @@ import config from './config'
  * @return {DOM Node}
  */
 export function getHost (node) {
-  const editableSelector = `.${config.editableClass}`
-  const hostNode = $(node).closest(editableSelector)
-  return hostNode[0]
+  node = (node.jquery ? node[0] : node)
+  if (!node.closest) node = node.parentNode
+  return node.closest(`.${config.editableClass}`)
 }
 
 /**

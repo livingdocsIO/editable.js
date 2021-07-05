@@ -1,4 +1,3 @@
-import $ from 'jquery'
 import rangy from 'rangy'
 import * as content from './content'
 import highlightText from './highlight-text'
@@ -59,49 +58,46 @@ const highlightSupport = {
   updateHighlight (editableHost, highlightId, addCssClass, removeCssClass) {
     if (!document.documentElement.classList) return
 
-    $(editableHost).find(`[data-word-id="${highlightId}"]`)
-      .each((index, elem) => {
-        if (removeCssClass) elem.classList.remove(removeCssClass)
-        if (addCssClass) elem.classList.add(addCssClass)
-      })
+    const elems = editableHost.querySelectorAll(`[data-word-id="${highlightId}"]`)
+    for (const elem of elems) {
+      if (removeCssClass) elem.classList.remove(removeCssClass)
+      if (addCssClass) elem.classList.add(addCssClass)
+    }
   },
 
   removeHighlight (editableHost, highlightId, dispatcher) {
-    $(editableHost).find(`[data-word-id="${highlightId}"]`)
-      .each((index, elem) => {
-        content.unwrap(elem)
-        if (dispatcher) {
-          dispatcher.notify('change', editableHost)
-        }
-      })
+    const elems = editableHost.querySelectorAll(`[data-word-id="${highlightId}"]`)
+    for (const elem of elems) {
+      content.unwrap(elem)
+      if (dispatcher) dispatcher.notify('change', editableHost)
+    }
   },
 
   hasHighlight (editableHost, highlightId) {
-    const matches = $(editableHost).find(`[data-word-id="${highlightId}"]`)
+    const matches = editableHost.querySelectorAll(`[data-word-id="${highlightId}"]`)
     return !!matches.length
   },
 
   extractHighlightedRanges (editableHost, type) {
     let findMarkersQuery = '[data-word-id]'
     if (type) findMarkersQuery += `[data-highlight="${type}"]`
-    const markers = $(editableHost).find(findMarkersQuery)
-    if (!markers.length) {
-      return
-    }
+    const markers = editableHost.querySelectorAll(findMarkersQuery)
+    if (!markers.length) return
+
     const groups = {}
-    markers.each((_, marker) => {
-      const highlightId = $(marker).data('word-id')
+    for (const marker of markers) {
+      const highlightId = marker.getAttribute('data-word-id')
       if (!groups[highlightId]) {
-        groups[highlightId] = $(editableHost).find(`[data-word-id="${highlightId}"]`)
+        groups[highlightId] = editableHost.querySelectorAll(`[data-word-id="${highlightId}"]`)
       }
-    })
+
+    }
+
     const res = {}
-    Object.keys(groups).forEach(highlightId => {
+    for (const highlightId in groups) {
       const position = this.extractMarkerNodePosition(editableHost, groups[highlightId])
-      if (position) {
-        res[highlightId] = position
-      }
-    })
+      if (position) res[highlightId] = position
+    }
 
     return res
   },
@@ -109,11 +105,12 @@ const highlightSupport = {
   extractMarkerNodePosition (editableHost, markers) {
     const range = rangy.createRange()
     if (markers.length > 1) {
-      range.setStartBefore(markers.first()[0])
-      range.setEndAfter(markers.last()[0])
+      range.setStartBefore(markers[0])
+      range.setEndAfter(markers[markers.length - 1])
     } else {
       range.selectNode(markers[0])
     }
+
     const textRange = range.toCharacterRange(editableHost)
     return {
       start: textRange.start,
@@ -123,21 +120,19 @@ const highlightSupport = {
   },
 
   cleanupStaleMarkerNodes (editableHost, highlightType) {
-    editableHost.querySelectorAll(`span[data-highlight="${highlightType}"]`)
-      .forEach(node => {
-        if (!node.textContent.length) {
-          node.remove()
-        }
-      })
+    const nodes = editableHost.querySelectorAll(`span[data-highlight="${highlightType}"]`)
+    for (const node of nodes) {
+      if (!node.textContent.length) {
+        node.remove()
+      }
+    }
   },
 
   createMarkerNode (markerMarkup, highlightType, win) {
-    let marker = $(markerMarkup)[0]
+    const wrapper = (win ? win.document : document).createElement('div')
+    wrapper.innerHTML = markerMarkup
 
-    if (win) {
-      marker = content.adoptElement(marker, win.document)
-    }
-
+    const marker = wrapper.firstElementChild
     marker.setAttribute('data-editable', 'ui-unwrap')
     marker.setAttribute('data-highlight', highlightType)
     return marker

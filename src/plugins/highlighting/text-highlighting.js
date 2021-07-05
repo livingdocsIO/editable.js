@@ -1,5 +1,3 @@
-import $ from 'jquery'
-
 export default class WordHighlighting {
 
   // @param markerNode {DOM Node}
@@ -54,7 +52,7 @@ export default class WordHighlighting {
 }
 
 function createHighlightRegex (words) {
-  const escapedWords = $.map(words, (word) => escapeRegEx(word))
+  const escapedWords = (words || []).map((word) => escapeRegEx(word))
 
   const regex = `(${escapedWords.join('|')})`
   return new RegExp(regex, 'g')
@@ -79,7 +77,7 @@ function createHighlightRegex (words) {
 const letterChars = '\\u0041-\\u005A\\u0061-\\u007A\\u0030-\\u0039\\u00AA\\u00B5\\u00BA\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u00FF\\u0100-\\u017F\\u0180-\\u024F'
 
 function createWordRegex (words) {
-  const escapedWords = $.map(words, (word) => escapeRegEx(word))
+  const escapedWords = (words || []).map((word) => escapeRegEx(word))
 
   // (notLetter|^)(words)(?=notLetter|$)
   const regex = `([^${letterChars}]|^)` +

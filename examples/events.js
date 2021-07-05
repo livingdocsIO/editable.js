@@ -1,4 +1,3 @@
-import $ from 'jquery'
 import React, {Component} from 'react'
 import {PropTypes} from 'prop-types'
 import ReactDOM from 'react-dom'
@@ -98,7 +97,7 @@ function draw () {
 }
 
 function isFromFirstExample (elem) {
-  return !!$(elem).closest('.paragraph-example').length
+  return !!elem.closest('.paragraph-example')
 }
 
 export default function (editable) {
@@ -121,8 +120,8 @@ export default function (editable) {
     .on('cursor', (elem, cursor) => {
       if (!isFromFirstExample(elem)) return
       if (!cursor) return
-      let before = $(cursor.before()).text()
-      let after = $(cursor.after()).text()
+      let before = cursor.before().textContent
+      let after = cursor.after().textContent
       const beforeMatch = /[^ ]{0,10}[ ]?$/.exec(before)
       const afterMatch = /^[ ]?[^ ]{0,10}/.exec(after)
       if (beforeMatch) before = beforeMatch[0]
