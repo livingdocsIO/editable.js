@@ -89,23 +89,20 @@ describe('Cursor', function () {
     describe('insertAfter()', function () {
 
       it('can deal with an empty documentFragment', function () {
-        function test () {
+        expect(() => {
           const frag = window.document.createDocumentFragment()
           this.cursor.insertAfter(frag)
-        }
-
-        expect($.proxy(test, this)).not.toThrow()
+        }).not.toThrow()
       })
     })
 
     describe('insertBefore()', function () {
 
       it('can deal with an empty documentFragment', function () {
-        function test () {
+        expect(() => {
           const frag = window.document.createDocumentFragment()
           this.cursor.insertBefore(frag)
-        }
-        expect($.proxy(test, this)).not.toThrow()
+        }).not.toThrow()
       })
     })
 

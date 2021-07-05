@@ -1,6 +1,4 @@
-import $ from 'jquery'
 import rangy from 'rangy'
-
 import * as nodeType from './node-type'
 import * as rangeSaveRestore from './range-save-restore'
 import * as parser from './parser'
@@ -103,12 +101,11 @@ export function getInnerHtmlOfFragment (documentFragment) {
 // Create a document fragment from an html string
 // @param {String} e.g. 'some html <span>text</span>.'
 export function createFragmentFromString (htmlString) {
+  const wrapper = document.createElement('div')
+  wrapper.innerHTML = htmlString
+
   const fragment = document.createDocumentFragment()
-
-  $('<div>').html(htmlString).contents().each((i, el) => {
-    fragment.appendChild(el)
-  })
-
+  while (wrapper.firstChild) fragment.appendChild(wrapper.firstChild)
   return fragment
 }
 
@@ -152,7 +149,7 @@ export function unwrapInternalNodes (sibling, keepUiElements) {
     if (sibling.firstChild) unwrapInternalNodes(sibling.firstChild, keepUiElements)
 
     if (attr === 'remove' || (attr === 'ui-remove' && !keepUiElements)) {
-      $(sibling).remove()
+      sibling.remove()
     } if (attr === 'unwrap' || (attr === 'ui-unwrap' && !keepUiElements)) {
       unwrap(sibling)
     }
@@ -236,7 +233,7 @@ export function isExactSelection (range, elem, visible) {
   if (!range.intersectsRange(elemRange)) return false
 
   let rangeText = range.toString()
-  let elemText = $(elem).text()
+  let elemText = (elem.jquery ? elem[0] : elem).innerText
 
   if (visible) {
     rangeText = string.trim(rangeText)
@@ -283,25 +280,25 @@ export function forceWrap (host, range, elem) {
 }
 
 export function wrap (range, elem) {
-  const el = string.isString(elem)
-    ? $(elem).get(0)
-    : elem
-
   if (!isWrappable(range)) {
     console.log('content.wrap(): can not surround range')
     return
   }
 
-  range.surroundContents(el)
+  if (typeof elem === 'string') {
+    const wrapper = document.createElement('div')
+    wrapper.innerHTML = elem
+    elem = wrapper.firstElementChild
+  }
+
+  range.surroundContents(elem)
 }
 
 export function unwrap (elem) {
-  const $elem = $(elem)
-  const contents = $elem.contents()
-
-  contents.length
-    ? contents.unwrap()
-    : $elem.remove()
+  elem = elem.jquery ? elem[0] : elem
+  const parent = elem.parentNode
+  while (elem.firstChild) parent.insertBefore(elem.firstChild, elem)
+  parent.removeChild(elem)
 }
 
 export function removeFormattingElem (host, range, elem) {

@@ -1,5 +1,4 @@
-import $ from 'jquery'
-
+import _merge from 'lodash.merge'
 import * as nodeType from './node-type'
 import * as content from './content'
 import highlightText from './highlight-text'
@@ -8,6 +7,7 @@ import WhitespaceHighlighting from './plugins/highlighting/whitespace-highlighti
 import WordHighlighting from './plugins/highlighting/text-highlighting'
 import MatchCollection from './plugins/highlighting/match-collection'
 import highlightSupport from './highlight-support'
+import {domArray, domSelector} from './util/dom'
 
 export default class Highlighting {
 
@@ -36,7 +36,7 @@ export default class Highlighting {
       }
     }
 
-    this.config = $.extend(true, defaultConfig, configuration)
+    this.config = _merge({}, defaultConfig, configuration)
 
     const spellcheckService = this.config.spellcheck.spellcheckService
     const spellcheckMarker = this.config.spellcheck.marker
@@ -58,14 +58,14 @@ export default class Highlighting {
 
   setupListeners () {
     if (this.config.checkOnFocus) {
-      this.editable.on('focus', $.proxy(this, 'onFocus'))
-      this.editable.on('blur', $.proxy(this, 'onBlur'))
+      this.editable.on('focus', (...args) => this.onFocus(...args))
+      this.editable.on('blur', (...args) => this.onBlur(...args))
     }
     if (this.config.checkOnChange || this.config.removeOnCorrection) {
-      this.editable.on('change', $.proxy(this, 'onChange'))
+      this.editable.on('change', (...args) => this.onChange(...args))
     }
     if (this.config.checkOnInit) {
-      this.editable.on('init', $.proxy(this, 'onInit'))
+      this.editable.on('init', (...args) => this.onInit(...args))
     }
   }
 
@@ -165,13 +165,14 @@ export default class Highlighting {
   }
 
   removeHighlights (editableHost) {
-    $(editableHost).find('[data-highlight="spellcheck"]')
-      .each((index, elem) => {
-        content.unwrap(elem)
-      })
+    editableHost = domSelector(editableHost, this.win.document)
+    for (const elem of domArray('[data-highlight="spellcheck"]', editableHost)) {
+      content.unwrap(elem)
+    }
   }
 
   removeHighlightsAtCursor (editableHost) {
+    editableHost = domSelector(editableHost, this.win.document)
     const selection = this.editable.getSelection(editableHost)
     if (selection && selection.isCursor) {
       let elementAtCursor = selection.range.startContainer
@@ -191,9 +192,9 @@ export default class Highlighting {
 
       if (wordId) {
         selection.retainVisibleSelection(() => {
-          $(editableHost).find(`[data-word-id=${wordId}]`).each((index, elem) => {
+          for (const elem of domArray(`[data-word-id="${wordId}"]`, editableHost)) {
             content.unwrap(elem)
-          })
+          }
         })
       }
     }

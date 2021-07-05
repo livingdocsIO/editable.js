@@ -1,6 +1,5 @@
 
 import 'rangy/lib/rangy-textrange'
-import $ from 'jquery'
 import Cursor from './cursor'
 import * as content from './content'
 import * as parser from './parser'
@@ -66,10 +65,10 @@ export default class Selection extends Cursor {
 
 
   link (href, attrs = {}) {
-    const $link = $(this.createElement(config.linkMarkup.name, config.linkMarkup.attribs))
     if (href) attrs.href = href
-    $link.attr(attrs)
-    this.forceWrap($link[0])
+    const link = this.createElement(config.linkMarkup.name, config.linkMarkup.attribs)
+    for (const key in attrs) link.setAttribute(key, attrs[key])
+    this.forceWrap(link)
   }
 
   unlink () {

@@ -1,5 +1,3 @@
-import $ from 'jquery'
-
 // Eventable Mixin.
 //
 // Simple mixin to add event emitter methods to an object (Publish/Subscribe).
@@ -29,7 +27,10 @@ import $ from 'jquery'
 // obj.off()
 
 export default function eventable (obj, notifyContext) {
-  $.extend(obj, getEventableModule(notifyContext))
+  const events = getEventableModule(notifyContext)
+  obj.on = events.on
+  obj.off = events.off
+  obj.notify = events.notify
 }
 
 function getEventableModule (notifyContext) {
