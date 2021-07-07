@@ -77,7 +77,7 @@ export default function createDefaultEvents (editable) {
     },
 
     /**
-     * The split event is triggered when a block should be splitted into two
+     * The split event is triggered when a block should be split into two
      * blocks. This happens when ENTER is pressed within a non-empty block.
      * The default behavior is to... TODO
      *
@@ -109,7 +109,7 @@ export default function createDefaultEvents (editable) {
     /**
      * The merge event is triggered when two needs to be merged. This happens
      * when BACKSPACE is pressed at the beginning of a block (should merge with
-     * the preceeding block) or DEL is pressed at the end of a block (should
+     * the preceding block) or DEL is pressed at the end of a block (should
      * merge with the following block).
      * The default behavior is to... TODO
      *

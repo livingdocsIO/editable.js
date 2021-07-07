@@ -75,7 +75,8 @@ export function cleanInternals (element) {
 // Does not touch or change the host. Just returns
 // the content and removes elements marked for removal by editable.
 //
-// @param {DOM node or document framgent} Element where to clean out the innerHTML. If you pass a document fragment it will be empty after this call.
+// @param {DOM node or document fragment} Element where to clean out the innerHTML.
+// If you pass a document fragment it will be empty after this call.
 // @param {Boolean} Flag whether to keep ui elements like spellchecking highlights.
 // @returns {String} The cleaned innerHTML of the passed element or document fragment.
 export function extractContent (element, keepUiElements) {
@@ -83,7 +84,7 @@ export function extractContent (element, keepUiElements) {
     ? getInnerHtmlOfFragment(element)
     : element.innerHTML
   )
-    .replace(zeroWidthNonBreakingSpace, '') // Used for forcing inline elments to have a height
+    .replace(zeroWidthNonBreakingSpace, '') // Used for forcing inline elements to have a height
     .replace(zeroWidthSpace, '<br>') // Used for cross-browser newlines
 
   const clone = document.createElement('div')
@@ -203,7 +204,7 @@ export function getInnerTags (range, filterFunc) {
   return range.getNodes([nodeType.elementNode], filterFunc)
 }
 
-// Transform an array of elements into a an array
+// Transform an array of elements into an array
 // of tagnames in uppercase
 //
 // @return example: ['STRONG', 'B']
@@ -338,7 +339,7 @@ export function nukeElem (host, range, node) {
   })
 }
 
-// Insert a single character (or string) before or after the
+// Insert a single character (or string) before or after
 // the range.
 export function insertCharacter (range, character, atStart) {
   const insertEl = document.createTextNode(character)

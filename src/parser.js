@@ -191,7 +191,7 @@ export function isSameNode (target, source) {
  *
  * @method  latestChild
  * @param  {HTMLElement} container The container to iterate on.
- * @return {HTMLElement}           THe deepest last child in the container.
+ * @return {HTMLElement}           The deepest last child in the container.
  */
 export function latestChild (container) {
   return container.lastChild

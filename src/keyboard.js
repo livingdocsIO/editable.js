@@ -60,7 +60,7 @@ export default class Keyboard {
         return
 
       default:
-        // Added here to avoid using fallthrough in the switch
+        // Added here to avoid using fall-through in the switch
         // when b or i are pressed without ctrlKey or metaKey
         if (event.keyCode === this.key.b && (event.ctrlKey || event.metaKey)) {
           return this.notify(target, 'bold', event)
@@ -92,7 +92,7 @@ export default class Keyboard {
     //      }
     //
     // 2. A selection starts with the first character of a styled node and ends
-    //    outside of that node, e.g: "big beautiful" is selected in the folloing
+    //    outside of that node, e.g: "big beautiful" is selected in the following
     //    html:
     //
     //      <p contenteditable="true">

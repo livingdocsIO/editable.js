@@ -199,7 +199,7 @@ export default class Selection extends Cursor {
     }
   }
 
-  // @param {String} tagName. E.g. 'a' to remove all links.
+  // @param {String} tagName. E.g. 'a' to remove all links; if undefined, remove all.
   removeFormatting (tagName) {
     this.range = content.removeFormatting(this.host, this.range, tagName)
     this.setSelection()
@@ -269,7 +269,7 @@ export default class Selection extends Cursor {
     return content.containsString(this.range, str)
   }
 
-  // Delete all occurences of the specified character from the
+  // Delete all occurrences of the specified character from the
   // selection.
   deleteCharacter (character) {
     this.range = content.deleteCharacter(this.host, this.range, character)

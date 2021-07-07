@@ -71,13 +71,13 @@ export default {
       'article', 'figure', 'header', 'footer', 'ul', 'ol', 'li', 'section', 'table', 'video'
     ],
 
-    // A list of elements that will get completly removed when pasted. Their tags
+    // A list of elements that will get completely removed when pasted. Their tags
     // and content (text content and child elements) will get removed.
     blacklistedElements: ['style', 'script'],
 
     keepInternalRelativeLinks: false,
 
-    // Replace quotes in a pasted content wiht quotes from config.
+    // Replace quotes in a pasted content with quotes from config.
     replaceQuotes: {
       // quotes: ['“', '”'],
       // singleQuotes: ['‘', '’'],
