@@ -40,7 +40,7 @@ export function setRangeBoundary (host, range, markerId, atStart) {
   const markerEl = getMarker(host, markerId)
   if (!markerEl) return console.log('Marker element has been removed. Cannot restore selection.')
   range[atStart ? 'setStartBefore' : 'setEndBefore'](markerEl)
-  markerEl.parentNode.removeChild(markerEl)
+  markerEl.remove()
 }
 
 export function save (range) {
@@ -87,11 +87,11 @@ export function restore (host, rangeInfo) {
 
       // Workaround for rangy issue 17
       if (previousNode && previousNode.nodeType === nodeType.textNode) {
-        markerEl.parentNode.removeChild(markerEl)
+        markerEl.remove()
         range.collapseToPoint(previousNode, previousNode.length)
       } else {
         range.collapseBefore(markerEl)
-        markerEl.parentNode.removeChild(markerEl)
+        markerEl.remove()
       }
     } else {
       console.log('Marker element has been removed. Cannot restore selection.')
