@@ -111,7 +111,7 @@ export default function createDefaultBehavior (editable) {
         : editable.prependTo(container, merger.innerHTML)
 
       // remove merged node
-      merger.parentNode.removeChild(merger)
+      merger.remove()
 
       cursor.save()
       content.tidyHtml(container)

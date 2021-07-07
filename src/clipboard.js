@@ -41,7 +41,7 @@ export function paste (element, cursor, callback) {
   // After that grab the pasted content, filter it and restore the focus.
   setTimeout(() => {
     const blocks = parseContent(pasteHolder)
-    pasteHolder.parentNode.removeChild(pasteHolder)
+    pasteHolder.remove()
     element.removeAttribute(config.pastingAttribute)
     cursor.restore()
     callback(blocks, cursor)

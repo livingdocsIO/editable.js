@@ -43,7 +43,7 @@ export function normalizeTags (element) {
           node.appendChild(siblingChild.cloneNode(true))
         })
 
-        sibling.parentNode.removeChild(sibling)
+        sibling.remove()
       }
 
       normalizeTags(node)

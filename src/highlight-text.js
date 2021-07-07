@@ -121,7 +121,7 @@ export default {
     if (node.nextSibling) {
       const next = node.nextSibling
       if (next.nodeType === nodeType.textNode && next.data === '') {
-        next.parentNode.removeChild(next)
+        next.remove()
       }
     }
 

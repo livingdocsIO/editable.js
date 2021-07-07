@@ -126,7 +126,7 @@ const highlightSupport = {
     editableHost.querySelectorAll(`span[data-highlight="${highlightType}"]`)
       .forEach(node => {
         if (!node.textContent.length) {
-          node.parentNode.removeChild(node)
+          node.remove()
         }
       })
   },

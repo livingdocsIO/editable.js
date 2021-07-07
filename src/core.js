@@ -96,9 +96,7 @@ export default class Editable {
    * @chainable
    */
   add (target) {
-    const targets = domArray(target, this.win.document)
-
-    this.enable(targets)
+    this.enable(target)
     // TODO check css whitespace settings
     return this
   }
@@ -118,7 +116,7 @@ export default class Editable {
 
     this.disable(targets)
 
-    for (const element of target) {
+    for (const element of targets) {
       element.classList.remove(config.editableDisabledClass)
     }
 
