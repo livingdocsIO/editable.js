@@ -326,7 +326,17 @@ export default class Dispatcher {
 
     // fires on mousemove (thats probably a bit too much)
     // catches changes like 'select all' from context menu
-    this.setupDocumentListener('selectionchange', function (evt) {
+    this.setupDocumentListener('selectionchange', (evt) => {
+      const cursor = this.selectionWatcher.getFreshSelection()
+
+      if (cursor.isSelection && cursor.isAtBeginning() && cursor.isAtEnd()) {
+        this.notify('selectToBoundary', cursor.host, evt, 'both', cursor)
+      } else if (cursor.isSelection && cursor.isAtBeginning()) {
+        this.notify('selectToBoundary', cursor.host, evt, 'start', cursor)
+      } else if (cursor.isSelection && cursor.isAtEnd()) {
+        this.notify('selectToBoundary', cursor.host, evt, 'end', cursor)
+      }
+
       if (suppressSelectionChanges) {
         selectionDirty = true
       } else {
