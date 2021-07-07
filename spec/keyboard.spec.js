@@ -14,7 +14,7 @@ describe('Keyboard', function () {
         getFreshRange: () => ({})
       }
       keyboard = new Keyboard(mockedSelectionWatcher)
-      event = $.Event('keydown')
+      event = new Event('keydown')
       called = 0
     })
 

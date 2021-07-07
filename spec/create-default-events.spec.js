@@ -1,4 +1,3 @@
-import $ from 'jquery'
 import rangy from 'rangy'
 
 import Cursor from '../src/cursor'
@@ -7,8 +6,8 @@ import Editable from '../src/core'
 describe('Default Events', function () {
 
   // create a Cursor object and set the selection to it
-  function createCursor ($elem, range) {
-    const cursor = new Cursor($elem[0], range)
+  function createCursor (elem, range) {
+    const cursor = new Cursor(elem, range)
     cursor.setSelection()
     return cursor
   }
@@ -47,28 +46,29 @@ describe('Default Events', function () {
     describe('on focus', function () {
 
       beforeEach(function () {
-        this.focus = $.Event('focus')
-        this.blur = $.Event('blur')
-        this.$elem = $('<div />')
-        $(document.body).append(this.$elem)
+        this.focus = new Event('focus')
+        this.blur = new Event('blur')
+        this.elem = document.createElement('div')
+        document.body.appendChild(this.elem)
         this.editable = new Editable()
-        this.editable.add(this.$elem)
-        this.$elem.focus()
+        this.editable.add(this.elem)
+        this.elem.focus()
       })
+
       afterEach(function () {
         off(this.editable)
         this.editable.dispatcher.off()
-        this.$elem.remove()
+        this.elem.remove()
       })
 
       it('always dispatches with virtual and native ranges in sync.', function () {
         // <div>foo\</div>
-        this.$elem.html('foo')
-        createCursor(this.$elem, createRangeAtEnd(this.$elem[0]))
+        this.elem.innerHTML = 'foo'
+        createCursor(this.elem, createRangeAtEnd(this.elem))
 
         const onFocus = on(this.editable, 'focus', (element, selection) => {
           if (!selection) return
-          expect(element).toEqual(this.$elem[0])
+          expect(element).toEqual(this.elem)
           const range = selection.range
           const nativeRange = range.nativeRange
           expect(range.startContainer).toEqual(nativeRange.startContainer)
@@ -77,9 +77,9 @@ describe('Default Events', function () {
           expect(range.endOffset).toEqual(nativeRange.endOffset)
         })
 
-        this.$elem.trigger(this.focus)
-        this.$elem.trigger(this.blur)
-        this.$elem.trigger(this.focus)
+        this.elem.dispatchEvent(this.focus)
+        this.elem.dispatchEvent(this.blur)
+        this.elem.dispatchEvent(this.focus)
         expect(onFocus.calls).toEqual(2)
       })
     })
