@@ -24,7 +24,7 @@ export default class SelectionWatcher {
 
   /**
    * Updates the internal selection pointer to the current rangy selection.
-   * Returns true if no exception occured.
+   * Returns true if no exception occurred.
    */
   syncSelection () {
     // it is possible that rangy has a problem with the nativeSelection
@@ -82,7 +82,7 @@ export default class SelectionWatcher {
 
   /**
   * Get the selection set by the last selectionChanged event.
-  * Sometimes the event does not fire fast enough and the seleciton
+  * Sometimes the event does not fire fast enough and the selection
   * you get is not the one the user sees.
   * In those cases use #getFreshSelection()
   *

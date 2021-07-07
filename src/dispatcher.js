@@ -133,7 +133,7 @@ export default class Dispatcher {
         } else {
           // Most likely the event was already handled manually by
           // triggerChangeEvent so the first time we just switch the
-          // isInputEventSupported flag without notifiying the change event.
+          // isInputEventSupported flag without notifying the change event.
           isInputEventSupported = true
         }
       })
@@ -153,7 +153,7 @@ export default class Dispatcher {
   * - paste
   * - copy and paste (not easily possible manually as far as I know)
   *
-  * Preferrably this is done using the input event. But the input event is not
+  * Preferably this is done using the input event. But the input event is not
   * supported on all browsers for contenteditable elements.
   * To make things worse it is not detectable either. So instead of detecting
   * we set 'isInputEventSupported' when the input event fires the first time.

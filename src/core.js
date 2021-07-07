@@ -97,7 +97,7 @@ export default class Editable {
    */
   add (target) {
     this.enable($(target))
-    // todo: check css whitespace settings
+    // TODO check css whitespace settings
     return this
   }
 
@@ -158,7 +158,7 @@ export default class Editable {
 
   /**
   * Temporarily disable an editable.
-  * Can be used to prevent text selction while dragging an element
+  * Can be used to prevent text selection while dragging an element
   * for example.
   *
   * @method suspend
@@ -267,7 +267,7 @@ export default class Editable {
     const element = content.adoptElement(inputElement, this.win.document)
 
     const cursor = this.createCursor(element, 'end')
-    // todo: create content in the right window
+    // TODO create content in the right window
     cursor.insertAfter(typeof contentToAppend === 'string'
       ? content.createFragmentFromString(contentToAppend)
       : contentToAppend
@@ -283,7 +283,7 @@ export default class Editable {
     const element = content.adoptElement(inputElement, this.win.document)
 
     const cursor = this.createCursor(element, 'beginning')
-    // todo: create content in the right window
+    // TODO create content in the right window
     cursor.insertBefore(typeof contentToPrepend === 'string'
       ? content.createFragmentFromString(contentToPrepend)
       : contentToPrepend
@@ -355,7 +355,7 @@ export default class Editable {
   /**
    * Highlight text within an editable.
    *
-   * By default highlights all occurences of `text`.
+   * By default highlights all occurrences of `text`.
    * Pass it a `textRange` object to highlight a
    * specific text portion.
    *
@@ -474,7 +474,7 @@ export default class Editable {
    * @param {DomNode} element
    *  - the editable hostDOM Node to which the cursor jumps
    * @param {object} coordinates
-   *  - The bounding rect of the preceeding cursor to be matched
+   *  - The bounding rect of the preceding cursor to be matched
    * @param {boolean} requiredOnFirstLine
    *  - set to true if you want to require the cursor to be on the first line of the paragraph
    * @param {boolean} requiredOnLastLine
