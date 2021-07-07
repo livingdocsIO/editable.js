@@ -132,6 +132,12 @@ export function isStartOffset (container, offset) {
 
   if (container.childNodes.length === 0) return true
 
+  if (
+    container.childNodes.length === 1 &&
+    container.firstChild.nodeType === nodeType.elementNode &&
+    container.firstChild.getAttribute('data-editable') === 'remove'
+  ) return true
+
   return container.childNodes[offset] === container.firstChild
 }
 
