@@ -5,9 +5,9 @@
 export const domArray = (target, document) => {
   if (typeof target === 'string') return Array.from(document.querySelectorAll(target))
   if (target.tagName) return [target]
-  if (target.jquery) return target.toArray()
   if (Array.isArray(target)) return target
-  return []
+  // Support NodeList and jQuery arrays
+  return Array.from(target)
 }
 
 /**
@@ -18,6 +18,7 @@ export const domArray = (target, document) => {
 export const domSelector = (target, document) => {
   if (typeof target === 'string') return document.querySelector(target)
   if (target.tagName) return target
-  if (target.jquery) return target[0]
+  // Support NodeList and jQuery arrays
+  if (target[0]) return target[0]
   return target
 }
