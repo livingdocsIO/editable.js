@@ -1,5 +1,3 @@
-import $ from 'jquery'
-
 import {selectionchange} from './feature-detection'
 import * as clipboard from './clipboard'
 import eventable from './eventable'
@@ -24,13 +22,21 @@ export default class Dispatcher {
     const win = editable.win
     eventable(this, editable)
     this.supportsInputEvent = false
-    this.$document = $(win.document)
+    this.document = win.document
     this.config = editable.config
     this.editable = editable
     this.editableSelector = editable.editableSelector
     this.selectionWatcher = new SelectionWatcher(this, win)
     this.keyboard = new Keyboard(this.selectionWatcher)
+    this.activeListeners = []
     this.setup()
+  }
+
+  setupDocumentListener (event, func) {
+    const listener = {event, listener: func.bind(this)}
+    this.activeListeners.push(listener)
+    this.document.addEventListener(event, listener.listener, true)
+    return this
   }
 
   /**
@@ -46,13 +52,15 @@ export default class Dispatcher {
 
   unload () {
     this.off()
-    this.$document.off('.editable')
+    for (const l of this.activeListeners) this.document.removeEventListener(l.event, l.listener)
+    this.activeListeners.length = 0
   }
 
   suspend () {
     if (this.suspended) return
     this.suspended = true
-    this.$document.off('.editable')
+    for (const l of this.activeListeners) this.document.removeEventListener(l.event, l.listener)
+    this.activeListeners.length = 0
   }
 
   continue () {
@@ -78,58 +86,54 @@ export default class Dispatcher {
   * @method setupElementListeners
   */
   setupElementListeners () {
-    const self = this
-    const selector = this.editableSelector
-
-    this.$document
-      .on('focus.editable', selector, function (event) {
-        if (this.getAttribute(config.pastingAttribute)) return
-        self.selectionWatcher.syncSelection()
-        self.notify('focus', this)
+    this
+      .setupDocumentListener('focus', function focusListener (evt) {
+        if (!evt.target.matches(this.editableSelector)) return
+        if (evt.target.getAttribute(config.pastingAttribute)) return
+        this.selectionWatcher.syncSelection()
+        this.notify('focus', evt.target)
       })
-
-      .on('blur.editable', selector, function (event) {
-        if (this.getAttribute(config.pastingAttribute)) return
-        self.notify('blur', this)
+      .setupDocumentListener('blur', function blurListener (evt) {
+        if (!evt.target.matches(this.editableSelector)) return
+        if (evt.target.getAttribute(config.pastingAttribute)) return
+        this.notify('blur', evt.target)
       })
-
-      .on('copy.editable', selector, function (event) {
-        const selection = self.selectionWatcher.getFreshSelection()
+      .setupDocumentListener('copy', function copyListener (evt) {
+        if (!evt.target.matches(this.editableSelector)) return
+        const selection = this.selectionWatcher.getFreshSelection()
         if (selection.isSelection) {
-          self.notify('clipboard', this, 'copy', selection)
+          this.notify('clipboard', evt.target, 'copy', selection)
         }
       })
-
-      .on('cut.editable', selector, function (event) {
-        const selection = self.selectionWatcher.getFreshSelection()
+      .setupDocumentListener('cut', function cutListener (evt) {
+        if (!evt.target.matches(this.editableSelector)) return
+        const selection = this.selectionWatcher.getFreshSelection()
         if (selection.isSelection) {
-          self.notify('clipboard', this, 'cut', selection)
-          self.triggerChangeEvent(this)
+          this.notify('clipboard', evt.target, 'cut', selection)
+          this.triggerChangeEvent(evt.target)
         }
       })
-
-      .on('paste.editable', selector, function (event) {
-        const element = this
-
-        function afterPaste (blocks, cursor) {
+      .setupDocumentListener('paste', function pasteListener (evt) {
+        if (!evt.target.matches(this.editableSelector)) return
+        const afterPaste = (blocks, cursor) => {
           if (blocks.length) {
-            self.notify('paste', element, blocks, cursor)
+            this.notify('paste', evt.target, blocks, cursor)
 
             // The input event does not fire when we process the content manually
             // and insert it via script
-            self.notify('change', element)
+            this.notify('change', evt.target)
           } else {
             cursor.setVisibleSelection()
           }
         }
 
-        const cursor = self.selectionWatcher.getFreshSelection()
-        clipboard.paste(this, cursor, afterPaste)
+        const cursor = this.selectionWatcher.getFreshSelection()
+        clipboard.paste(evt.target, cursor, afterPaste)
       })
-
-      .on('input.editable', selector, function (event) {
+      .setupDocumentListener('input', function inputListener (evt) {
+        if (!evt.target.matches(this.editableSelector)) return
         if (isInputEventSupported) {
-          self.notify('change', this)
+          this.notify('change', evt.target)
         } else {
           // Most likely the event was already handled manually by
           // triggerChangeEvent so the first time we just switch the
@@ -138,8 +142,9 @@ export default class Dispatcher {
         }
       })
 
-      .on('formatEditable.editable', selector, function (event) {
-        self.notify('change', this)
+      .setupDocumentListener('formatEditable', function formatEditableListener (evt) {
+        if (!evt.target.matches(this.editableSelector)) return
+        this.notify('change', evt.target)
       })
   }
 
@@ -200,11 +205,10 @@ export default class Dispatcher {
   * @method setupKeydownListener
   */
   setupKeydownListener () {
-    const self = this
-
-    this.$document.on('keydown.editable', this.editableSelector, function (event) {
+    this.setupDocumentListener('keydown', function (evt) {
+      if (!evt.target.matches(this.editableSelector)) return
       const notifyCharacterEvent = !isInputEventSupported
-      self.keyboard.dispatchKeyEvent(event, this, notifyCharacterEvent)
+      this.keyboard.dispatchKeyEvent(evt, evt.target, notifyCharacterEvent)
     })
   }
 
@@ -299,18 +303,15 @@ export default class Dispatcher {
   * Sets up events that are triggered on a selection change.
   *
   * @method setupSelectionChangeListeners
-  * @param {HTMLElement} $document: The document element.
-  * @param {Function} notifier: The callback to be triggered when the event is caught.
   */
   setupSelectionChangeListeners () {
     let selectionDirty = false
     let suppressSelectionChanges = false
-    const $document = this.$document
     const selectionWatcher = this.selectionWatcher
 
     // fires on mousemove (thats probably a bit too much)
     // catches changes like 'select all' from context menu
-    $document.on('selectionchange.editable', (event) => {
+    this.setupDocumentListener('selectionchange', function (evt) {
       if (suppressSelectionChanges) {
         selectionDirty = true
       } else {
@@ -321,7 +322,8 @@ export default class Dispatcher {
     // listen for selection changes by mouse so we can
     // suppress the selectionchange event and only fire the
     // change event on mouseup
-    $document.on('mousedown.editable', this.editableSelector, (event) => {
+    this.setupDocumentListener('mousedown', function (evt) {
+      if (!evt.target.matches(this.editableSelector)) return
       if (this.config.mouseMoveSelectionChanges === false) {
         suppressSelectionChanges = true
 
@@ -330,15 +332,17 @@ export default class Dispatcher {
         setTimeout(() => selectionWatcher.selectionChanged(), 0)
       }
 
-      $document.on('mouseup.editableSelection', (evt) => {
-        $document.off('.editableSelection')
+      const listener = () => {
+        this.document.removeEventListener('mouseup', listener)
         suppressSelectionChanges = false
 
         if (selectionDirty) {
           selectionDirty = false
           selectionWatcher.selectionChanged()
         }
-      })
+      }
+
+      this.document.addEventListener('mouseup', listener, true)
     })
   }
 
@@ -349,23 +353,21 @@ export default class Dispatcher {
   * @method setupSelectionChangeFallbackListeners
   */
   setupSelectionChangeFallbackListeners () {
-    const $document = this.$document
-    const selectionWatcher = this.selectionWatcher
-
     // listen for selection changes by mouse
-    $document.on('mouseup.editable', (event) => {
+    this.setupDocumentListener('mouseup', (evt) => {
       // In Opera when clicking outside of a block
       // it does not update the selection as it should
       // without the timeout
-      setTimeout(() => selectionWatcher.selectionChanged(), 0)
+      setTimeout(() => this.selectionWatcher.selectionChanged(), 0)
     })
 
     // listen for selection changes by keys
-    $document.on('keyup.editable', this.editableSelector, (event) => {
+    this.setupDocumentListener('keyup', (evt) => {
+      if (!evt.target.matches(this.editableSelector)) return
       // when pressing Command + Shift + Left for example the keyup is only triggered
       // after at least two keys are released. Strange. The culprit seems to be the
       // Command key. Do we need a workaround?
-      selectionWatcher.selectionChanged()
+      this.selectionWatcher.selectionChanged()
     })
   }
 }
