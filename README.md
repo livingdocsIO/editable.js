@@ -7,10 +7,12 @@
 
 [![NPM](https://nodei.co/npm/upfront-editable.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/upfront-editable/)
 
-
 ## What is it about?
 
 A JavaScript API that defines a friendly and browser-consistent content editable interface.
+
+Check out the [demo](https://livingdocsio.github.io/editable.js/).
+It features a formatting toolbar and the default insert, split and merge behavior that allow to add and remove content blocks like paragraphs easily.
 
 Editable is built for block level elements containing only phrasing content. This normally means `p`, `h1`-`h6`, `blockquote` etc. elements. This allows editable to be lean and mean since it is only concerned with formatting and not with layouting.
 
@@ -21,15 +23,10 @@ We made editable.js to support our vision of online document editing. Have a loo
 Via npm:
 
 ```shell
-npm install --save upfront-editable jquery
+npm install --save upfront-editable
 ```
 
-jQuery is a peerDependency, so you need to install it alongside editable.js. You can either `require('upfront-editable')` or find a prebuilt file in the npm bundle `dist/editable.js`. The required module will automatically pick up your `jQuery`, while the built version expects it as a global variable.
-
-## Plnkr Demo
-
-You can check out a [simple demo on the website](https://livingdocsio.github.io/editable.js/). It features a formatting toolbar and the default insert, split and merge behavior that allow to add and remove content blocks like paragraphs easily.
-
+You can either `require('upfront-editable')` or find a prebuilt file in the npm bundle `dist/editable.js`.
 
 ## Events Overview
 
@@ -64,7 +61,7 @@ You can check out a [simple demo on the website](https://livingdocsio.github.io/
 To make an element editable:
 
 ```javascript
-var editable = new Editable()
+const editable = new Editable()
 editable.add($elem)
 ```
 
