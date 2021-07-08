@@ -32,10 +32,11 @@ export default class Dispatcher {
     this.setup()
   }
 
-  setupDocumentListener (event, func) {
+  setupDocumentListener (event, func, capture = false) {
     const listener = {event, listener: func.bind(this)}
     this.activeListeners.push(listener)
-    this.document.addEventListener(event, listener.listener, true)
+
+    this.document.addEventListener(event, listener.listener, capture)
     return this
   }
 
@@ -92,12 +93,12 @@ export default class Dispatcher {
         if (evt.target.getAttribute(config.pastingAttribute)) return
         this.selectionWatcher.syncSelection()
         this.notify('focus', evt.target)
-      })
+      }, true)
       .setupDocumentListener('blur', function blurListener (evt) {
         if (!evt.target.matches(this.editableSelector)) return
         if (evt.target.getAttribute(config.pastingAttribute)) return
         this.notify('blur', evt.target)
-      })
+      }, true)
       .setupDocumentListener('copy', function copyListener (evt) {
         if (!evt.target.matches(this.editableSelector)) return
         const selection = this.selectionWatcher.getFreshSelection()
@@ -209,7 +210,7 @@ export default class Dispatcher {
       if (!evt.target.matches(this.editableSelector)) return
       const notifyCharacterEvent = !isInputEventSupported
       this.keyboard.dispatchKeyEvent(evt, evt.target, notifyCharacterEvent)
-    })
+    }, true)
   }
 
   /**
@@ -332,17 +333,17 @@ export default class Dispatcher {
         setTimeout(() => selectionWatcher.selectionChanged(), 0)
       }
 
-      const listener = () => {
-        this.document.removeEventListener('mouseup', listener)
+      this.document.addEventListener('mouseup', () => {
         suppressSelectionChanges = false
 
         if (selectionDirty) {
           selectionDirty = false
           selectionWatcher.selectionChanged()
         }
-      }
-
-      this.document.addEventListener('mouseup', listener, true)
+      }, {
+        capture: true,
+        once: true
+      })
     })
   }
 
@@ -354,7 +355,7 @@ export default class Dispatcher {
   */
   setupSelectionChangeFallbackListeners () {
     // listen for selection changes by mouse
-    this.setupDocumentListener('mouseup', (evt) => {
+    this.setupDocumentListener('mouseup', () => {
       // In Opera when clicking outside of a block
       // it does not update the selection as it should
       // without the timeout
