@@ -5,7 +5,7 @@
 [![devDependency Status](https://david-dm.org/livingdocsIO/editable.js/master/dev-status.svg)](https://david-dm.org/livingdocsIO/editable.js/master#info=devDependencies)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
-[![NPM](https://nodei.co/npm/upfront-editable.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/upfront-editable/)
+[![NPM](https://nodei.co/npm/editable.js.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/editable.js/)
 
 ## What is it about?
 
@@ -23,10 +23,10 @@ We made editable.js to support our vision of online document editing. Have a loo
 Via npm:
 
 ```shell
-npm install --save upfront-editable
+npm install --save editable.js
 ```
 
-You can either `require('upfront-editable')` or find a prebuilt file in the npm bundle `dist/editable.js`.
+You can either `require('editable.js')` or find a prebuilt file in the npm bundle `dist/editable.js`.
 
 ## Events Overview
 

@@ -1,5 +1,5 @@
 {
-  "name": "upfront-editable",
+  "name": "editable.js",
   "description": "Friendly contenteditable API",
   "version": "0.0.0-development",
   "dependencies": {
