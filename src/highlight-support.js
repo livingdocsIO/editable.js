@@ -2,6 +2,7 @@ import rangy from 'rangy'
 import * as content from './content'
 import highlightText from './highlight-text'
 import TextHighlighting from './plugins/highlighting/text-highlighting'
+import {createElement} from './util/dom'
 
 function isInHost (elem, host) {
   if (!elem.closest) elem = elem.parentNode
@@ -129,10 +130,7 @@ const highlightSupport = {
   },
 
   createMarkerNode (markerMarkup, highlightType, win) {
-    const wrapper = (win ? win.document : document).createElement('div')
-    wrapper.innerHTML = markerMarkup
-
-    const marker = wrapper.firstElementChild
+    const marker = createElement(markerMarkup, win)
     marker.setAttribute('data-editable', 'ui-unwrap')
     marker.setAttribute('data-highlight', highlightType)
     return marker

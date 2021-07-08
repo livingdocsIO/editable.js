@@ -3,6 +3,7 @@ import * as nodeType from './node-type'
 import * as rangeSaveRestore from './range-save-restore'
 import * as parser from './parser'
 import * as string from './util/string'
+import {createElement} from './util/dom'
 
 function restoreRange (host, range, func) {
   range = rangeSaveRestore.save(range)
@@ -28,18 +29,18 @@ export function tidyHtml (element) {
 export function normalizeTags (element) {
   const fragment = document.createDocumentFragment()
 
-  Array.prototype.forEach.call(element.childNodes, (node) => {
+  for (const node of element.childNodes) {
     // skip empty tags, so they'll get removed
-    if (node.nodeName !== 'BR' && !node.textContent) return
+    if (node.nodeName !== 'BR' && !node.textContent) continue
 
     if (node.nodeType === nodeType.elementNode && node.nodeName !== 'BR') {
       let sibling = node
       while ((sibling = sibling.nextSibling) !== null) {
         if (!parser.isSameNode(sibling, node)) break
 
-        Array.from(sibling.childNodes).forEach((siblingChild) => {
+        for (const siblingChild of sibling.childNodes) {
           node.appendChild(siblingChild.cloneNode(true))
-        })
+        }
 
         sibling.remove()
       }
@@ -48,7 +49,7 @@ export function normalizeTags (element) {
     }
 
     fragment.appendChild(node.cloneNode(true))
-  })
+  }
 
   while (element.firstChild) element.removeChild(element.firstChild)
 
@@ -285,12 +286,7 @@ export function wrap (range, elem) {
     return
   }
 
-  if (typeof elem === 'string') {
-    const wrapper = document.createElement('div')
-    wrapper.innerHTML = elem
-    elem = wrapper.firstElementChild
-  }
-
+  if (typeof elem === 'string') elem = createElement(elem)
   range.surroundContents(elem)
 }
 
