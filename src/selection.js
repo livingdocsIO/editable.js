@@ -55,6 +55,11 @@ export default class Selection extends Cursor {
     return this.range.toCharacterRange(this.host)
   }
 
+  // Return a plain string of the current selection content.
+  toString () {
+    return this.range.toString()
+  }
+
   // Get the ClientRects of this selection.
   // Use this if you want more precision than getBoundingClientRect can give.
   getRects () {
