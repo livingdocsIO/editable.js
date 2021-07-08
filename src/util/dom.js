@@ -22,3 +22,9 @@ export const domSelector = (target, document) => {
   if (target[0]) return target[0]
   return target
 }
+
+export const createElement = (html, win = window) => {
+  const el = win.document.createElement('div')
+  el.innerHTML = html
+  return el.firstElementChild
+}
