@@ -204,8 +204,10 @@ export default class Selection extends Cursor {
   }
 
   // @param {String} tagName. E.g. 'a' to remove all links; if undefined, remove all.
-  removeFormatting (tagName) {
-    this.range = content.removeFormatting(this.host, this.range, tagName)
+  // @param {String} className. E.g. 'foo' to remove all links 'a.foo'; if undefined,
+  //                            disregard the className.
+  removeFormatting (tagName, className) {
+    this.range = content.removeFormatting(this.host, this.range, tagName, className)
     this.setSelection()
   }
 
