@@ -1,5 +1,5 @@
 {
-  "name": "editable.js",
+  "name": "@livingdocs/editable.js",
   "description": "Friendly contenteditable API",
   "version": "0.0.0-development",
   "dependencies": {
