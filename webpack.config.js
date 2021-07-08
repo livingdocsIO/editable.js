@@ -6,16 +6,21 @@ const test = process.env.BUILD_TEST === 'true'
 
 const production = dist || docs || test
 
+const entry = {}
+if (dist) {
+  entry['dist/editable'] = './src/core.js'
+}
+
+if (docs) {
+  entry['examples/dist/bundle'] = './examples/index.js'
+  entry['examples/dist/styles'] = './examples/index.css'
+}
+
 module.exports = {
   mode: production ? 'production' : 'development',
   devtool: 'source-map',
   target: 'web',
-  entry: dist ? {
-    'dist/editable': './src/core.js'
-  } : {
-    'examples/dist/bundle': './examples/index.js',
-    'examples/dist/styles': './examples/index.css'
-  },
+  entry,
   output: {
     library: dist ? 'Editable' : undefined,
     libraryTarget: 'umd',
