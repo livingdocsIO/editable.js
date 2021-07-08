@@ -486,6 +486,26 @@ describe('Content', function () {
       expect(exact).toEqual(true)
     })
 
+    it('is true if the selection is a text node', function () {
+      // <div>|b|<em>b</em></div>
+      const host = createElement('<div>b<em>b</em></div>')
+      this.range.setStart(host.firstChild, 0)
+      this.range.setEnd(host.firstChild, 1)
+
+      const exact = content.isExactSelection(this.range, host.firstChild)
+      expect(exact).toEqual(true)
+    })
+
+    it('is true if the selection contains an invisible node', function () {
+      // <div>|b<script>console.log("foo")</script>|</div>
+      const host = createElement('<div>hello<script>console.log("foo")</script> world</div>')
+      this.range.setStart(host, 0)
+      this.range.setEnd(host, 3)
+
+      const exact = content.isExactSelection(this.range, host)
+      expect(exact).toEqual(true)
+    })
+
     it('is false if the selection goes beyond the tag', function () {
       // <div>|a<em>b</em>|</div>
       const host = createElement('<div>a<em>b</em></div>')
@@ -499,7 +519,7 @@ describe('Content', function () {
     it('is false if the selection is only partial', function () {
       // <div><em>a|b|</em></div>
       const host = createElement('<div><em>ab</em></div>')
-      this.range.setEnd(host.querySelector('em').firstChild, 1)
+      this.range.setStart(host.querySelector('em').firstChild, 1)
       this.range.setEnd(host.querySelector('em').firstChild, 2)
 
       const exact = content.isExactSelection(this.range, host.querySelector('em'))
@@ -509,7 +529,7 @@ describe('Content', function () {
     it('is false for a collapsed this.range', function () {
       // <div><em>a|b</em></div>
       const host = createElement('<div><em>ab</em></div>')
-      this.range.setEnd(host.querySelector('em').firstChild, 1)
+      this.range.setStart(host.querySelector('em').firstChild, 1)
       this.range.setEnd(host.querySelector('em').firstChild, 1)
 
       const exact = content.isExactSelection(this.range, host.querySelector('em'))
@@ -519,17 +539,17 @@ describe('Content', function () {
     it('is false for a collapsed this.range in an empty tag', function () {
       // <div><em>|</em></div>
       const host = createElement('<div><em></em></div>')
-      this.range.setEnd(host.querySelector('em'), 0)
+      this.range.setStart(host.querySelector('em'), 0)
       this.range.setEnd(host.querySelector('em'), 0)
 
       const exact = content.isExactSelection(this.range, host.querySelector('em'))
       expect(exact).toEqual(false)
     })
 
-    it('is false if this.range and elem do not overlap but have the same content', function () {
+    it('is false if selection and elem do not overlap but have the same content', function () {
       // <div>|b|<em>b</em></div>
       const host = createElement('<div>b<em>b</em></div>')
-      this.range.setEnd(host.firstChild, 0)
+      this.range.setStart(host.firstChild, 0)
       this.range.setEnd(host.firstChild, 1)
 
       const exact = content.isExactSelection(this.range, host.querySelector('em'))

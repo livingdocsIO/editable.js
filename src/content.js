@@ -234,7 +234,7 @@ export function isExactSelection (range, elem, visible) {
   if (!range.intersectsRange(elemRange)) return false
 
   let rangeText = range.toString()
-  let elemText = (elem.jquery ? elem[0] : elem).innerText
+  let elemText = (elem.jquery ? elem[0] : elem).textContent
 
   if (visible) {
     rangeText = string.trim(rangeText)
