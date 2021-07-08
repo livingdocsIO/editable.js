@@ -19,7 +19,6 @@ describe('Default Events', function () {
     return range
   }
 
-  let onListener
   // register one listener per test
   function on (editable, eventName, func) {
     // off() // make sure the last listener is unregistered
@@ -28,17 +27,8 @@ describe('Default Events', function () {
       obj.calls += 1
       func.apply(this, arguments)
     }
-    onListener = {event: eventName, listener: proxy}
     editable.on(eventName, proxy)
     return obj
-  }
-
-  // unregister the event listener registered with 'on'
-  function off (editable) {
-    if (onListener) {
-      editable.unload()
-      onListener = undefined
-    }
   }
 
   describe('for editable', function () {
@@ -56,8 +46,7 @@ describe('Default Events', function () {
       })
 
       afterEach(function () {
-        off(this.editable)
-        this.editable.dispatcher.off()
+        this.editable.unload()
         this.elem.remove()
       })
 

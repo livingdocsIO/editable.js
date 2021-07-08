@@ -6,10 +6,9 @@ describe('Editable', function () {
   let editable, $div
 
   afterEach(function () {
-    if (editable) {
-      editable.off()
-      editable = undefined
-    }
+    if (!editable) return
+    editable.unload()
+    editable = undefined
   })
 
   describe('global variable', function () {

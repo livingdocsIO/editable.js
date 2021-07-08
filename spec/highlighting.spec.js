@@ -9,6 +9,7 @@ import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
 function setupHighlightEnv (context, text) {
   context.text = text
   context.$div = $(`<div>${context.text}</div>`).appendTo(document.body)
+  if (context.editable) context.editable.unload()
   context.editable = new Editable()
   context.editable.add(context.$div)
   context.highlightRange = (highlightId, start, end, dispatcher, type) => {
@@ -45,16 +46,22 @@ function setupHighlightEnv (context, text) {
 
 function teardownHighlightEnv (context) {
   context.$div.remove()
-  context.editable.off()
-  context.editable = undefined
   context.highlightRange = undefined
   context.assertUniqueSpan = undefined
+
+  if (!context.editable) return
+  context.editable.unload()
+  context.editable = undefined
 }
 
 describe('Highlighting', function () {
 
   beforeEach(function () {
     this.editable = new Editable()
+  })
+
+  afterEach(function () {
+    this.editable && this.editable.unload()
   })
 
   describe('new Highlighting()', function () {
