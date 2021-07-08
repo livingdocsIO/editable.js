@@ -1,11 +1,4 @@
-# editable.js
-[![Build Status](https://travis-ci.org/livingdocsIO/editable.js.svg?branch=master)](https://travis-ci.org/livingdocsIO/editable.js)
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com)
-[![Dependency Status](https://david-dm.org/livingdocsIO/editable.js/master.svg)](https://david-dm.org/livingdocsIO/editable.js/master)
-[![devDependency Status](https://david-dm.org/livingdocsIO/editable.js/master/dev-status.svg)](https://david-dm.org/livingdocsIO/editable.js/master#info=devDependencies)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-
-[![NPM](https://nodei.co/npm/@livingdocs/editable.js.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/@livingdocs/editable.js/)
+# editable.js [![Build Status](https://drone.livingdocs.io/api/badges/livingdocsIO/editable.js/status.svg)](https://drone.livingdocs.io/livingdocsIO/editable.js)
 
 ## What is it about?
 
