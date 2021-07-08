@@ -301,7 +301,7 @@ export default class Cursor {
 
   // Move the cursor after the last visible character of the host.
   moveAtTextEnd (element) {
-    return this.moveAtEnd(parser.latestChild(element))
+    return this.moveAtEnd(parser.lastChild(element))
   }
 
   setHost (element) {
