@@ -193,14 +193,22 @@ export function isSameNode (target, source) {
 /**
  * Return the deepest last child of a node.
  *
- * @method  latestChild
+ * @method  lastChild
  * @param  {HTMLElement} container The container to iterate on.
  * @return {HTMLElement}           The deepest last child in the container.
  */
-export function latestChild (container) {
+export function lastChild (container) {
   return container.lastChild
-    ? latestChild(container.lastChild)
+    ? lastChild(container.lastChild)
     : container
+}
+
+/**
+ * Obsolete version of {{#crossLink "lastChild"}}{{/crossLink}}.
+ */
+export function latestChild (container) {
+  console.warn("Editable.js: Using obsolete function parser.latestCild(), use lastChild() instead")
+  return lastChild(container)
 }
 
 /**

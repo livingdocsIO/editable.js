@@ -345,12 +345,12 @@ describe('Parser', function () {
     })
   })
 
-  describe('latestChild()', function () {
+  describe('lastChild()', function () {
 
     it('returns the deepest last child', function () {
       const source = linkWithSpan
       const target = document.createTextNode('bar')
-      expect(parser.latestChild(source).isEqualNode(target)).toEqual(true)
+      expect(parser.lastChild(source).isEqualNode(target)).toEqual(true)
     })
   })
 
