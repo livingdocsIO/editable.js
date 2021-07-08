@@ -1,19 +1,16 @@
-import $ from 'jquery'
 import rangy from 'rangy'
 import sinon from 'sinon'
 
 import Cursor from '../src/cursor'
 import highlightText from '../src/highlight-text'
 import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
+import {createElement} from '../src/util/dom'
 
 describe('highlightText', function () {
 
-  function createParagraphWithTextNodes (parts) {
+  function createParagraphWithTextNodes (...parts) {
     const elem = document.createElement('p')
-    Array.from(arguments).forEach((part) => {
-      const textNode = document.createTextNode(part)
-      elem.appendChild(textNode)
-    })
+    for (const part of parts) elem.appendChild(document.createTextNode(part))
 
     // Note: Without appending the elem to the body rangy throws
     // a range exception (probably a bug as it can be prevented
@@ -25,7 +22,7 @@ describe('highlightText', function () {
   }
 
   function highlight (elem, words) {
-    const stencil = $('<span spellcheck="true">')[0]
+    const stencil = createElement('<span spellcheck="true">')
     const highlighter = new WordHighlighter(stencil)
 
     const text = highlightText.extractText(elem)
@@ -46,17 +43,17 @@ describe('highlightText', function () {
   // But this is not of interest in many tests,
   // and this is where this helper comes in.
   function removeWordId (elem) {
-    $(elem).find('[data-word-id]').removeAttr('data-word-id')
+    for (const el of elem.querySelectorAll('[data-word-id]')) el.removeAttribute('data-word-id')
   }
 
   function removeSpellcheckAttr (elem) {
-    $(elem).find('[spellcheck]').removeAttr('spellcheck')
+    for (const el of elem.querySelectorAll('[spellcheck]')) el.removeAttribute('spellcheck')
   }
 
   describe('extractText()', function () {
 
     beforeEach(function () {
-      this.element = $('<div></div>')[0]
+      this.element = document.createElement('div')
     })
 
     it('extracts the text', function () {
@@ -84,7 +81,7 @@ describe('highlightText', function () {
     })
 
     it('skips stored cursor positions', function () {
-      this.element = $('<div>ab</div>')[0]
+      this.element = createElement('<div>ab</div>')
       const cursor = createCursor(this.element, this.element.firstChild, 1)
       cursor.save()
       const text = highlightText.extractText(this.element)
@@ -92,7 +89,7 @@ describe('highlightText', function () {
     })
 
     it('extracts text with a <br> properly', function () {
-      this.element = $('<div>a<br>b</div>')[0]
+      this.element = createElement('<div>a<br>b</div>')
       const text = highlightText.extractText(this.element)
       expect(text).toEqual('a b')
     })
@@ -189,7 +186,7 @@ describe('highlightText', function () {
   describe('wrapMatch()', function () {
 
     it('wraps a word in a single text node', function () {
-      const elem = $('<div>Some juice.</div>')[0]
+      const elem = createElement('<div>Some juice.</div>')
       highlight(elem, ['juice'])
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -197,7 +194,7 @@ describe('highlightText', function () {
     })
 
     it('wraps a word with a partial <em> element', function () {
-      const elem = $('<div>Some jui<em>ce.</em></div>')[0]
+      const elem = createElement('<div>Some jui<em>ce.</em></div>')
       highlight(elem, ['juice'])
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -205,7 +202,7 @@ describe('highlightText', function () {
     })
 
     it('wraps two words in the same text node', function () {
-      const elem = $('<div>a or b</div>')[0]
+      const elem = createElement('<div>a or b</div>')
       highlight(elem, ['a', 'b'])
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -213,7 +210,7 @@ describe('highlightText', function () {
     })
 
     it('wraps a word in a <em> element', function () {
-      const elem = $('<div><em>word</em></div>')[0]
+      const elem = createElement('<div><em>word</em></div>')
       highlight(elem, ['word'])
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -221,7 +218,7 @@ describe('highlightText', function () {
     })
 
     it('can handle a non-match', function () {
-      const elem = $('<div><em>word</em></div>')[0]
+      const elem = createElement('<div><em>word</em></div>')
       highlight(elem, ['xxx'])
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -229,7 +226,7 @@ describe('highlightText', function () {
     })
 
     it('works with a more complex regex', function () {
-      const elem = $('<div><em>a</em> or b</div>')[0]
+      const elem = createElement('<div><em>a</em> or b</div>')
       highlight(elem, ['b', 'a'])
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -237,7 +234,7 @@ describe('highlightText', function () {
     })
 
     it('wraps two words with a tag in between', function () {
-      const elem = $('<div>A word <em>is</em> not necessary</div>')[0]
+      const elem = createElement('<div>A word <em>is</em> not necessary</div>')
       highlight(elem, ['word', 'not'])
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -245,7 +242,7 @@ describe('highlightText', function () {
     })
 
     it('wraps two characters in the same textnode, when the first match has an offset', function () {
-      const elem = $('<div>a, b or c, d</div>')[0]
+      const elem = createElement('<div>a, b or c, d</div>')
       highlight(elem, ['b', 'c'])
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -253,7 +250,7 @@ describe('highlightText', function () {
     })
 
     it('wraps a character after a <br>', function () {
-      const elem = $('<div>a<br>b</div>')[0]
+      const elem = createElement('<div>a<br>b</div>')
       highlight(elem, ['b'])
       removeWordId(elem)
       expect(elem.outerHTML)
@@ -261,7 +258,7 @@ describe('highlightText', function () {
     })
 
     it('stores data-word-id on a highlight', function () {
-      const elem = $('<div>a</div>')[0]
+      const elem = createElement('<div>a</div>')
       highlight(elem, ['a'])
       removeSpellcheckAttr(elem)
       expect(elem.outerHTML)
@@ -269,7 +266,7 @@ describe('highlightText', function () {
     })
 
     it('stores data-word-id on different matches', function () {
-      const elem = $('<div>a b</div>')[0]
+      const elem = createElement('<div>a b</div>')
       highlight(elem, ['a', 'b'])
       removeSpellcheckAttr(elem)
       expect(elem.outerHTML)
@@ -277,7 +274,7 @@ describe('highlightText', function () {
     })
 
     it('stores same data-word-id on multiple highlights for the same match', function () {
-      const elem = $('<div>a<i>b</i></div>')[0]
+      const elem = createElement('<div>a<i>b</i></div>')
       highlight(elem, ['ab'])
       removeSpellcheckAttr(elem)
       expect(elem.outerHTML)

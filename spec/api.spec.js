@@ -1,9 +1,7 @@
-import $ from 'jquery'
-
 import Editable from '../src/core'
 
 describe('Editable', function () {
-  let editable, $div
+  let editable, div
 
   afterEach(function () {
     if (!editable) return
@@ -31,19 +29,20 @@ describe('Editable', function () {
   describe('with an element added', function () {
 
     beforeEach(function () {
-      $div = $('<div>').appendTo(document.body)
+      div = document.createElement('div')
+      document.body.appendChild(div)
       editable = new Editable()
-      editable.add($div)
+      editable.add(div)
     })
 
     afterEach(function () {
-      $div.remove()
+      div.remove()
     })
 
     describe('getContent()', function () {
       it('getContent() returns its content', function () {
-        $div.html('a')
-        const content = editable.getContent($div[0])
+        div.innerHTML = 'a'
+        const content = editable.getContent(div)
 
         // escape to show invisible characters
         expect(escape(content)).toEqual('a')
@@ -53,28 +52,28 @@ describe('Editable', function () {
     describe('appendTo()', function () {
 
       it('appends a document fragment', function () {
-        $div.html('a')
+        div.innerHTML = 'a'
         const frag = document.createDocumentFragment()
         frag.appendChild(document.createTextNode('b'))
-        editable.appendTo($div[0], frag)
-        expect($div[0].innerHTML).toEqual('ab')
+        editable.appendTo(div, frag)
+        expect(div.innerHTML).toEqual('ab')
       })
 
       it('appends text from a string', function () {
-        $div.html('a')
-        editable.appendTo($div[0], 'b')
-        expect($div[0].innerHTML).toEqual('ab')
+        div.innerHTML = 'a'
+        editable.appendTo(div, 'b')
+        expect(div.innerHTML).toEqual('ab')
       })
 
       it('appends html from a string', function () {
-        $div.html('a')
-        editable.appendTo($div[0], '<span>b</span>c')
-        expect($div[0].innerHTML).toEqual('a<span>b</span>c')
+        div.innerHTML = 'a'
+        editable.appendTo(div, '<span>b</span>c')
+        expect(div.innerHTML).toEqual('a<span>b</span>c')
       })
 
       it('returns a curosr a the right position', function () {
-        $div.html('a')
-        const cursor = editable.appendTo($div[0], 'b')
+        div.innerHTML = 'a'
+        const cursor = editable.appendTo(div, 'b')
         expect(cursor.beforeHtml()).toEqual('a')
         expect(cursor.afterHtml()).toEqual('b')
       })
@@ -85,26 +84,26 @@ describe('Editable', function () {
       it('prepends a document fragment', function () {
         const frag = document.createDocumentFragment()
         frag.appendChild(document.createTextNode('b'))
-        $div.html('a')
-        editable.prependTo($div[0], frag)
-        expect($div[0].innerHTML).toEqual('ba')
+        div.innerHTML = 'a'
+        editable.prependTo(div, frag)
+        expect(div.innerHTML).toEqual('ba')
       })
 
       it('prepends text from a string', function () {
-        $div.html('a')
-        editable.prependTo($div[0], 'b')
-        expect($div[0].innerHTML).toEqual('ba')
+        div.innerHTML = 'a'
+        editable.prependTo(div, 'b')
+        expect(div.innerHTML).toEqual('ba')
       })
 
       it('prepends html from a string', function () {
-        $div.html('A sentence.')
-        editable.prependTo($div[0], '<span>So</span> be it. ')
-        expect($div[0].innerHTML).toEqual('<span>So</span> be it. A sentence.')
+        div.innerHTML = 'A sentence.'
+        editable.prependTo(div, '<span>So</span> be it. ')
+        expect(div.innerHTML).toEqual('<span>So</span> be it. A sentence.')
       })
 
       it('returns a curosr a the right position', function () {
-        $div.html('a')
-        const cursor = editable.prependTo($div[0], 'b')
+        div.innerHTML = 'a'
+        const cursor = editable.prependTo(div, 'b')
         expect(cursor.beforeHtml()).toEqual('b')
         expect(cursor.afterHtml()).toEqual('a')
       })
@@ -114,11 +113,11 @@ describe('Editable', function () {
 
       it('gets triggered after format change', (done) => {
         editable.change((element) => {
-          expect(element).toEqual($div[0])
+          expect(element).toEqual(div)
           done()
         })
 
-        const cursor = editable.createCursorAtBeginning($div[0])
+        const cursor = editable.createCursorAtBeginning(div)
         cursor.triggerChange()
       })
     })
@@ -131,9 +130,9 @@ describe('Editable', function () {
      * Cursor 2:                    | (offset: 19 chars)
      */
       it('finds the index in a text node', function () {
-        $div.html('Der Spieler blieb bei fünf Champions-League-Titeln stehen.')
+        div.innerHTML = 'Der Spieler blieb bei fünf Champions-League-Titeln stehen.'
         const {wasFound, offset} = editable.findClosestCursorOffset({
-          element: $div[0],
+          element: div,
           origCoordinates: {top: 0, left: 130}
         })
         expect(wasFound).toEqual(true)
@@ -147,9 +146,9 @@ describe('Editable', function () {
        * Cursor 2:                                   |
        */
       it('finds the index in a nested html tag structure', function () {
-        $div.html('<p>Der <em>Spieler</em> blieb bei fünf <span>Champions-League-Titeln</span> stehen.</p>')
+        div.innerHTML = '<p>Der <em>Spieler</em> blieb bei fünf <span>Champions-League-Titeln</span> stehen.</p>'
         const {wasFound, offset} = editable.findClosestCursorOffset({
-          element: $div[0],
+          element: div,
           origCoordinates: {top: 0, left: 130}
         })
         expect(wasFound).toEqual(true)
@@ -157,9 +156,9 @@ describe('Editable', function () {
       })
 
       it('returns not found for empty nodes', function () {
-        $div.html('')
+        div.innerHTML = ''
         const {wasFound} = editable.findClosestCursorOffset({
-          element: $div[0],
+          element: div,
           origCoordinates: {top: 0, left: 130}
         })
         expect(wasFound).toEqual(false)
@@ -172,9 +171,9 @@ describe('Editable', function () {
        * Cursor 2: not found
        */
       it('returns not found for coordinates that are out of the text area', function () {
-        $div.html('Foo')
+        div.innerHTML = 'Foo'
         const {wasFound, offset} = editable.findClosestCursorOffset({
-          element: $div[0],
+          element: div,
           origCoordinates: {top: 0, left: 130}
         })
         expect(wasFound).toEqual(true)

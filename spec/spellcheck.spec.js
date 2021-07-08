@@ -1,10 +1,10 @@
-import $ from 'jquery'
 import rangy from 'rangy'
 import sinon from 'sinon'
 
 import Editable from '../src/core'
 import Highlighting from '../src/highlighting'
 import Cursor from '../src/cursor'
+import {createElement} from '../src/util/dom'
 
 // import Spellcheck from '../src/plugins/highlighting/spellcheck'
 
@@ -32,7 +32,7 @@ describe('Spellcheck:', function () {
   describe('with a simple sentence', function () {
 
     beforeEach(function () {
-      this.p = $('<p>A simple sentence.</p>')[0]
+      this.p = createElement('<p>A simple sentence.</p>')
       this.errors = ['simple']
       this.highlighting = new Highlighting(this.editable, {
         spellcheck: {
@@ -54,7 +54,7 @@ describe('Spellcheck:', function () {
 
       it('highlights a match with the given marker node', function () {
         this.highlighting.highlight(this.p)
-        expect($(this.p).find('.misspelled-word').length).toEqual(1)
+        expect(this.p.querySelectorAll('.misspelled-word').length).toEqual(1)
       })
 
       it('notify spellcheckUpdated on add highlight through spellcheck', function () {
@@ -66,23 +66,23 @@ describe('Spellcheck:', function () {
 
       it('removes a corrected highlighted match.', function () {
         this.highlighting.highlight(this.p)
-        let $misspelledWord = $(this.p).find('.misspelled-word')
-        expect($misspelledWord.length).toEqual(1)
+        let misspelledWord = this.p.querySelectorAll('.misspelled-word')
+        expect(misspelledWord.length).toEqual(1)
 
         // correct the error
-        $misspelledWord.html('simpler')
+        misspelledWord.innerHTML = 'simpler'
         this.errors = []
 
         this.highlighting.highlight(this.p)
 
-        $misspelledWord = $(this.p).find('.misspelled-word')
-        expect($misspelledWord.length).toEqual(0)
+        misspelledWord = this.p.querySelectorAll('.misspelled-word')
+        expect(misspelledWord.length).toEqual(0)
       })
 
       it('match highlights are marked with "ui-unwrap"', function () {
         this.highlighting.highlight(this.p)
-        const $spellcheck = $(this.p).find('.misspelled-word').first()
-        const dataEditable = $spellcheck.attr('data-editable')
+        const spellcheck = this.p.querySelector('.misspelled-word')
+        const dataEditable = spellcheck.getAttribute('data-editable')
         expect(dataEditable).toEqual('ui-unwrap')
       })
 
@@ -109,9 +109,9 @@ describe('Spellcheck:', function () {
 
       it('removes the highlights', function () {
         this.highlighting.highlight(this.p)
-        expect($(this.p).find('.misspelled-word').length).toEqual(1)
+        expect(this.p.querySelectorAll('.misspelled-word').length).toEqual(1)
         this.highlighting.removeHighlights(this.p)
-        expect($(this.p).find('.misspelled-word').length).toEqual(0)
+        expect(this.p.querySelectorAll('.misspelled-word').length).toEqual(0)
       })
     })
 
@@ -119,7 +119,7 @@ describe('Spellcheck:', function () {
 
       beforeEach(function () {
         this.highlighting.highlight(this.p)
-        this.highlight = $(this.p).find('.misspelled-word')[0]
+        this.highlight = this.p.querySelector('.misspelled-word')
       })
 
       afterEach(function () {
@@ -130,7 +130,7 @@ describe('Spellcheck:', function () {
         sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.highlight, 0))
 
         this.highlighting.removeHighlightsAtCursor(this.p)
-        expect($(this.p).find('.misspelled-word').length).toEqual(0)
+        expect(this.p.querySelectorAll('.misspelled-word').length).toEqual(0)
       })
 
       it('does not remove the highlights config.removeOnCorrection is set to false', function () {
@@ -138,22 +138,22 @@ describe('Spellcheck:', function () {
         sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.highlight, 0))
 
         this.highlighting.onChange(this.p)
-        expect($(this.p).find('.misspelled-word').length).toEqual(1)
+        expect(this.p.querySelectorAll('.misspelled-word').length).toEqual(1)
       })
 
       it('does not remove the highlights if cursor is within a match of highlight type != spellcheck', function () {
-        $(this.p).find('.misspelled-word').attr('data-highlight', 'comment')
+        this.p.querySelector('.misspelled-word').setAttribute('data-highlight', 'comment')
         sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.highlight, 0))
 
         this.highlighting.removeHighlightsAtCursor(this.p)
-        expect($(this.p).find('.misspelled-word').length).toEqual(1)
+        expect(this.p.querySelectorAll('.misspelled-word').length).toEqual(1)
       })
 
       it('does not remove the highlights if cursor is outside a match', function () {
         sinon.stub(this.editable, 'getSelection').callsFake(() => createCursor(this.p, this.p.firstChild, 0))
 
         this.highlighting.removeHighlightsAtCursor(this.p)
-        expect($(this.p).find('.misspelled-word').length).toEqual(1)
+        expect(this.p.querySelectorAll('.misspelled-word').length).toEqual(1)
       })
     })
 
@@ -174,7 +174,7 @@ describe('Spellcheck:', function () {
 
         // The storing of the cursor position will have split up the text node,
         // so now we have two markers in the editable.
-        expect($(this.p).find('.misspelled-word').length).toEqual(2)
+        expect(this.p.querySelectorAll('.misspelled-word').length).toEqual(2)
       })
     })
   })
