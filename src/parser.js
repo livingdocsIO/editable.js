@@ -45,15 +45,15 @@ export function getNodeIndex (node) {
  * @param {HTMLElement}
  */
 export function isVoid (node) {
-  return Array.from(node.childNodes).every((child) => {
+  for (const child of node.childNodes) {
     if (child.nodeType === nodeType.textNode && !isVoidTextNode(child)) {
       return false
     }
     if (child.nodeType === nodeType.elementNode) {
       return false
     }
-    return true
-  })
+  }
+  return true
 }
 
 /**
