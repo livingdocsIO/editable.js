@@ -54,9 +54,9 @@ steps:
   depends_on: [build]
 
 trigger:
-  event: [push, tag, pr]
+  event: [push, tag, pull_request]
 ---
 kind: signature
-hmac: 532e9d992aa9ec0ec33cda50fddb65fc1d3656232a1ae556d45860a26f4be1d3
+hmac: 4b3c11615737ee65e16514e907cdf809318d7db5c1e6ef47b3ce05feeb0a4785
 
 ...
