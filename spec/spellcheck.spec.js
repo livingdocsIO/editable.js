@@ -25,6 +25,10 @@ describe('Spellcheck:', function () {
     this.editable = new Editable()
   })
 
+  afterEach(function () {
+    this.editable.unload()
+  })
+
   describe('with a simple sentence', function () {
 
     beforeEach(function () {

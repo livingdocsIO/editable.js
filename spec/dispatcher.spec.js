@@ -43,7 +43,6 @@ describe('Dispatcher', function () {
     return range
   }
 
-  let onListener
   // register one listener per test
   function on (eventName, func) {
     // off() // make sure the last listener is unregistered
@@ -52,17 +51,8 @@ describe('Dispatcher', function () {
       obj.calls += 1
       func.apply(this, arguments)
     }
-    onListener = {event: eventName, listener: proxy}
     editable.on(eventName, proxy)
     return obj
-  }
-
-  // unregister the event listener registered with 'on'
-  function off () {
-    if (onListener) {
-      editable.unload()
-      onListener = undefined
-    }
   }
 
   describe('for editable', function () {
@@ -77,9 +67,8 @@ describe('Dispatcher', function () {
     })
 
     afterEach(function () {
-      off()
-      editable.dispatcher.off()
       elem.remove()
+      editable.unload()
     })
 
     describe('on Enter', function () {
