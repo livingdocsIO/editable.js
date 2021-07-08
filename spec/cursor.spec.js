@@ -1,9 +1,9 @@
-import $ from 'jquery'
 import rangy from 'rangy'
 
 import * as content from '../src/content'
 import Cursor from '../src/cursor'
 import config from '../src/config'
+import {createElement} from '../src/util/dom'
 
 describe('Cursor', function () {
 
@@ -15,12 +15,12 @@ describe('Cursor', function () {
 
     beforeEach(function () {
       const range = rangy.createRange()
-      this.$elem = $('<div>')
-      this.cursor = new Cursor(this.$elem, range)
+      this.elem = document.createElement('div')
+      this.cursor = new Cursor(this.elem, range)
     })
 
     it('creates an instance from a jQuery element', function () {
-      expect(this.cursor.host).toEqual(this.$elem[0])
+      expect(this.cursor.host).toEqual(this.elem)
     })
 
     it('sets a reference to window', function () {
@@ -31,7 +31,7 @@ describe('Cursor', function () {
   describe('with a collapsed range at the end', function () {
 
     beforeEach(function () {
-      this.oneWord = $(`<div class="${config.editableClass}">foobar</div>`)[0]
+      this.oneWord = createElement(`<div class="${config.editableClass}">foobar</div>`)
       this.range = rangy.createRange()
       this.range.selectNodeContents(this.oneWord)
       this.range.collapse(false)

@@ -1,20 +1,20 @@
-import $ from 'jquery'
 import rangy from 'rangy'
 import Editable from '../src/core'
 import Highlighting from '../src/highlighting'
 import highlightSupport from '../src/highlight-support'
 import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
-
+import {createElement} from '../src/util/dom'
 
 function setupHighlightEnv (context, text) {
   context.text = text
-  context.$div = $(`<div>${context.text}</div>`).appendTo(document.body)
+  context.div = createElement(`<div>${context.text}</div>`)
+  document.body.appendChild(context.div)
   if (context.editable) context.editable.unload()
   context.editable = new Editable()
-  context.editable.add(context.$div)
+  context.editable.add(context.div)
   context.highlightRange = (highlightId, start, end, dispatcher, type) => {
     return highlightSupport.highlightRange(
-      context.$div[0],
+      context.div,
       highlightId,
       start,
       end,
@@ -25,27 +25,27 @@ function setupHighlightEnv (context, text) {
 
   context.removeHighlight = (highlightId, dispatcher) => {
     return highlightSupport.removeHighlight(
-      context.$div[0],
+      context.div,
       highlightId,
       dispatcher
     )
   }
 
   context.extract = function (type) {
-    return context.editable.getHighlightPositions({editableHost: context.$div[0], type})
+    return context.editable.getHighlightPositions({editableHost: context.div, type})
   }
 
   context.getHtml = function () {
-    return context.$div[0].innerHTML
+    return context.div.innerHTML
   }
 
   context.formatHtml = (string) => {
-    return $(`<div>${string.replace(/\n/gm, '')}</div>`)[0].innerHTML
+    return createElement(`<div>${string.replace(/\n/gm, '')}</div>`).innerHTML
   }
 }
 
 function teardownHighlightEnv (context) {
-  context.$div.remove()
+  context.div.remove()
   context.highlightRange = undefined
   context.assertUniqueSpan = undefined
 
@@ -73,7 +73,7 @@ describe('Highlighting', function () {
 
   describe('WordHighlighter', function () {
     beforeEach(function () {
-      const markerNode = $('<span class="highlight"></span>')[0]
+      const markerNode = createElement('<span class="highlight"></span>')
       this.highlighter = new WordHighlighter(markerNode)
     })
 
@@ -357,8 +357,8 @@ o Round</span>`)
       expect(extractedHtml).toEqual(expectedHtml)
 
 
-      const content = this.editable.getContent(this.$div[0])
-      this.$div.html(content)
+      const content = this.editable.getContent(this.div)
+      this.div.innerHTML = content
       expect(content).toEqual(this.text)
       const ids = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
       ids.forEach(highlightId => {
@@ -375,33 +375,33 @@ o Round</span>`)
 
     it('skips and warns if an invalid range object was passed', function () {
       this.editable.highlight({
-        editableHost: this.$div[0],
+        editableHost: this.div,
         highlightId: 'myId',
         textRange: {foo: 3, bar: 7}
       })
-      const highlightSpan = this.$div.find('[data-word-id="myId"]')
+      const highlightSpan = this.div.querySelectorAll('[data-word-id="myId"]')
       expect(highlightSpan.length).toEqual(0)
     })
 
     it('skips if the range exceeds the content length', function () {
       const result = this.editable.highlight({
-        editableHost: this.$div[0],
+        editableHost: this.div,
         highlightId: 'myId',
         textRange: {foo: 3, bar: 32}
       })
-      const highlightSpan = this.$div.find('[data-word-id="myId"]')
+      const highlightSpan = this.div.querySelectorAll('[data-word-id="myId"]')
       expect(highlightSpan.length).toEqual(0)
       expect(result).toEqual(-1)
     })
 
     it('skips and warns if the range object represents a cursor', function () {
       this.editable.highlight({
-        editableHost: this.$div[0],
+        editableHost: this.div,
         highlightId: 'myId',
         textRange: {start: 3, end: 3}
       })
 
-      const highlightSpan = this.$div.find('[data-word-id="myId"]')
+      const highlightSpan = this.div.querySelectorAll('[data-word-id="myId"]')
       expect(highlightSpan.length).toEqual(0)
     })
 
@@ -441,9 +441,9 @@ Make The <br> W<span class="highlight-comment" data-word-id="spellcheckId" data-
       characters.forEach(([char, expectedLength, expectedText]) => {
         setupHighlightEnv(this, char)
         const range = rangy.createRange()
-        const node = this.$div[0]
+        const node = this.div
         range.selectNode(node.firstChild)
-        const {start, end} = range.toCharacterRange(this.$div[0])
+        const {start, end} = range.toCharacterRange(this.div)
         this.highlightRange('char', start, end)
         if (expectedLength === 0) {
           expect(this.extract()).toEqual(undefined)
@@ -496,10 +496,10 @@ Make The <br> W<span class="highlight-comment" data-word-id="spellcheckId" data-
 
     it('maps selection offsets to ranges containing multibyte symbols consistently', function () {
       const range = rangy.createRange()
-      const node = this.$div[0]
+      const node = this.div
       range.setStart(node.firstChild, 0)
       range.setEnd(node.firstChild, 2)
-      const {start, end} = range.toCharacterRange(this.$div[0])
+      const {start, end} = range.toCharacterRange(this.div)
 
       this.highlightRange('first', start, end)
       const expectedRanges = {

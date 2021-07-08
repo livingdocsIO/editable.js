@@ -1,8 +1,8 @@
-import $ from 'jquery'
 import rangy from 'rangy'
 
 import * as parser from '../src/parser'
 import config from '../src/config'
+import {createElement} from '../src/util/dom'
 
 describe('Parser', function () {
   // helper methods
@@ -21,45 +21,45 @@ describe('Parser', function () {
   }
 
   // test elements
-  const empty = $('<div></div>')[0]
-  const linebreak = $('<div><br></div>')[0]
-  const emptyWithWhitespace = $('<div> </div>')[0]
-  const singleCharacter = $('<div>a</div>')[0]
-  const oneWord = $('<div>foobar</div>')[0]
-  const oneWordWithWhitespace = $('<div> foobar </div>')[0]
-  const oneWordWithNbsp = $('<div>&nbsp;foobar&nbsp;</div>')[0]
+  const empty = createElement('<div></div>')
+  const linebreak = createElement('<div><br></div>')
+  const emptyWithWhitespace = createElement('<div> </div>')
+  const singleCharacter = createElement('<div>a</div>')
+  const oneWord = createElement('<div>foobar</div>')
+  const oneWordWithWhitespace = createElement('<div> foobar </div>')
+  const oneWordWithNbsp = createElement('<div>&nbsp;foobar&nbsp;</div>')
   const textNode = oneWord.firstChild
-  const text = $('<div>foo bar.</div>')[0]
-  const textWithLink = $('<div>foo <a href="#">bar</a>.</div>')[0]
-  const linkWithWhitespace = $('<div><a href="#">bar</a> </div>')[0]
-  const link = $('<div><a href="#">foo bar</a></div>')[0]
-  const linkWithSpan = $('<div><a href="#">foo <span class="important">bar</span></a></div>')[0]
+  const text = createElement('<div>foo bar.</div>')
+  const textWithLink = createElement('<div>foo <a href="#">bar</a>.</div>')
+  const linkWithWhitespace = createElement('<div><a href="#">bar</a> </div>')
+  const link = createElement('<div><a href="#">foo bar</a></div>')
+  const linkWithSpan = createElement('<div><a href="#">foo <span class="important">bar</span></a></div>')
 
   describe('getHost()', function () {
 
     beforeEach(function () {
-      this.$host = $(`<div class="${config.editableClass}""></div>`)
+      this.host = createElement(`<div class="${config.editableClass}""></div>`)
     })
 
     it('works if host is passed', function () {
-      expect(parser.getHost(this.$host[0])).toBe(this.$host[0])
+      expect(parser.getHost(this.host)).toBe(this.host)
     })
 
     it('works if a child of host is passed', function () {
-      this.$host.html('a<em>b</em>')
-      expect(parser.getHost(this.$host.find('em')[0])).toBe(this.$host[0])
+      this.host.innerHTML = 'a<em>b</em>'
+      expect(parser.getHost(this.host.querySelector('em'))).toBe(this.host)
     })
 
     it('works if a text node is passed', function () {
-      this.$host.html('a<em>b</em>')
-      expect(parser.getHost(this.$host[0].firstChild)).toBe(this.$host[0])
+      this.host.innerHTML = 'a<em>b</em>'
+      expect(parser.getHost(this.host.firstChild)).toBe(this.host)
     })
   })
 
   describe('getNodeIndex()', function () {
 
     it('gets element index of link in text', function () {
-      const linkNode = $(textWithLink).find('a').first()[0]
+      const linkNode = textWithLink.querySelector('a')
       expect(parser.getNodeIndex(linkNode)).toBe(1)
     })
   })
@@ -275,7 +275,7 @@ describe('Parser', function () {
   describe('isEndOfHost()', function () {
 
     it('works with text node in nested content', function () {
-      const endContainer = $(linkWithSpan).find('span')[0].firstChild
+      const endContainer = linkWithSpan.querySelector('span').firstChild
       // <div><a href='#'>foo <span class='important'>bar|</span></a></div>
       expect(parser.isEndOfHost(linkWithSpan, endContainer, 3)).toEqual(true)
 
@@ -285,7 +285,7 @@ describe('Parser', function () {
 
     it('works with link node in nested content', function () {
       // <div><a href='#'>foo <span class='important'>bar</span>|</a></div>
-      const endContainer = $(linkWithSpan).find('a')[0]
+      const endContainer = linkWithSpan.querySelector('a')
       const range = createRangyCursorAtEnd(endContainer)
       expect(range.endOffset).toEqual(2)
       expect(parser.isEndOfHost(linkWithSpan, endContainer, 2)).toEqual(true)
@@ -305,7 +305,7 @@ describe('Parser', function () {
   describe('isBeginningOfHost()', function () {
 
     it('works with link node in nested content', function () {
-      const endContainer = $(linkWithSpan).find('a')[0]
+      const endContainer = linkWithSpan.querySelector('a')
       // <div><a href='#'>|foo <span class='important'>bar</span></a></div>
       expect(parser.isBeginningOfHost(linkWithSpan, endContainer, 0)).toEqual(true)
 
@@ -355,31 +355,30 @@ describe('Parser', function () {
   })
 
   describe('isInlineElement()', function () {
-    let $elem
+    let elem
 
     afterEach(function () {
-      if ($elem) {
-        $elem.remove()
-        $elem = undefined
-      }
+      if (!elem) return
+      elem.remove()
+      elem = undefined
     })
 
     it('returns false for a div', function () {
-      $elem = $('<div>')
-      $(document.body).append($elem)
-      expect(parser.isInlineElement(window, $elem[0])).toEqual(false)
+      elem = createElement('<div>')
+      document.body.appendChild(elem)
+      expect(parser.isInlineElement(window, elem)).toEqual(false)
     })
 
     it('returns true for a span', function () {
-      $elem = $('<span>')
-      $(document.body).append($elem)
-      expect(parser.isInlineElement(window, $elem[0])).toEqual(true)
+      elem = createElement('<span>')
+      document.body.appendChild(elem)
+      expect(parser.isInlineElement(window, elem)).toEqual(true)
     })
 
     it('returns true for a div with display set to "inline-block"', function () {
-      $elem = $('<div style="display:inline-block;">')
-      $(document.body).append($elem)
-      expect(parser.isInlineElement(window, $elem[0])).toEqual(true)
+      elem = createElement('<div style="display:inline-block;">')
+      document.body.appendChild(elem)
+      expect(parser.isInlineElement(window, elem)).toEqual(true)
     })
   })
 })
@@ -404,7 +403,7 @@ describe('isDocumentFragmentWithoutChildren()', function () {
   })
 
   it('returns falsy for an element node', function () {
-    const node = $('<div>')[0]
+    const node = createElement('<div>')
     expect(parser.isDocumentFragmentWithoutChildren(node)).toBeFalsy()
   })
 })
