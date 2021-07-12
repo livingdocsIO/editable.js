@@ -329,11 +329,11 @@ export default class Dispatcher {
     this.setupDocumentListener('selectionchange', (evt) => {
       const cursor = this.selectionWatcher.getFreshSelection()
 
-      if (cursor.isSelection && cursor.isAtBeginning() && cursor.isAtEnd()) {
+      if (cursor && cursor.isSelection && cursor.isAtBeginning() && cursor.isAtEnd()) {
         this.notify('selectToBoundary', cursor.host, evt, 'both', cursor)
-      } else if (cursor.isSelection && cursor.isAtBeginning()) {
+      } else if (cursor && cursor.isSelection && cursor.isAtBeginning()) {
         this.notify('selectToBoundary', cursor.host, evt, 'start', cursor)
-      } else if (cursor.isSelection && cursor.isAtEnd()) {
+      } else if (cursor && cursor.isSelection && cursor.isAtEnd()) {
         this.notify('selectToBoundary', cursor.host, evt, 'end', cursor)
       }
 
