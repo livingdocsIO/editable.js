@@ -70,6 +70,7 @@ const highlightSupport = {
     $(editableHost).find(`[data-word-id="${highlightId}"]`)
       .each((index, elem) => {
         content.unwrap(elem)
+        editableHost.normalize()
         if (dispatcher) {
           dispatcher.notify('change', editableHost)
         }
