@@ -1,13 +1,15 @@
 const webpack = require('webpack')
 
+const dev = process.env.WEBPACK_DEV === 'true'
+const production = !dev
+
 const dist = process.env.BUILD_DIST === 'true'
 const docs = process.env.BUILD_DOCS === 'true'
 const test = process.env.BUILD_TEST === 'true'
 
-const production = dist || docs || test
 
 module.exports = {
-  mode: production ? 'production' : 'development',
+  mode: dev ? 'development' : 'production',
   devtool: 'source-map',
   target: 'web',
   entry: {
@@ -62,7 +64,7 @@ module.exports = {
     ]
   },
   optimization: {
-    nodeEnv: dist || docs ? 'production' : false
+    nodeEnv: production ? 'production' : false
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -76,7 +78,7 @@ module.exports = {
       }
     }
   } : {}),
-  ...(!production ? {
+  ...(dev ? {
     devServer: {
       static: {
         directory: './'
