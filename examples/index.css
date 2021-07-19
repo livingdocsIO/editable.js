@@ -34,12 +34,16 @@ body {
  */
 
 ::-moz-selection {
-    background: #b3d4fc;
+    background: rgba(132, 187, 255, 0.5);
     text-shadow: none;
 }
 
 ::selection {
-    background: #b3d4fc;
+    /*
+    * We use a transparent color as chrome has a "bug" where
+    * the underline is not visible when the text is selected. Safari behaves different
+    */
+    background: rgba(132, 187, 255, 0.5);
     text-shadow: none;
 }
 
@@ -120,7 +124,6 @@ html {
     color: rgba(255, 255, 255, .5);
     color: rgba(0, 0, 0, 0.6);
 }
-
 
 /* ==========================================================================
    Sections
