@@ -293,7 +293,7 @@ editable.on('cursor', (elem, cursor) => {
     // no cursor anymore in that editable block
   } else {
     // example if you wanted to insert an element right before the cursor
-    cursor.insertBefore($('<span>')[0])
+    cursor.insertBefore(document.createElement('span'))
   }
 })
 </code></pre>

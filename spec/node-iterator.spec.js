@@ -1,5 +1,4 @@
-import $ from 'jquery'
-
+import {createElement} from '../src/util/dom'
 import NodeIterator from '../src/node-iterator'
 import highlightText from '../src/highlight-text'
 
@@ -15,7 +14,7 @@ describe('NodeIterator', function () {
 
   describe('constructor method', function () {
     beforeEach(function () {
-      this.element = $('<div>a</div>')[0]
+      this.element = createElement('<div>a</div>')
       this.iterator = new NodeIterator(this.element)
     })
 
@@ -30,7 +29,7 @@ describe('NodeIterator', function () {
   describe('getNext()', function () {
 
     beforeEach(function () {
-      this.element = $('<div>a</div>')[0]
+      this.element = createElement('<div>a</div>')
       this.iterator = new NodeIterator(this.element)
     })
 
@@ -53,14 +52,14 @@ describe('NodeIterator', function () {
   describe('replaceCurrent() after using highlightText.wrapPortion()', function () {
 
     it('replaces the text node', function () {
-      this.element = $('<div>a</div>')[0]
+      this.element = createElement('<div>a</div>')
       this.iterator = new NodeIterator(this.element)
       const current = callnTimes(this.iterator, 'getNext', 2)
       const replacement = highlightText.wrapPortion({
         element: current,
         offset: 0,
         length: 1
-      }, $('<span>')[0])
+      }, createElement('<span>'))
 
       this.iterator.replaceCurrent(replacement)
       expect(this.iterator.current).toEqual(replacement)
@@ -68,14 +67,14 @@ describe('NodeIterator', function () {
     })
 
     it('replaces the first character of longer a text node', function () {
-      this.element = $('<div>word</div>')[0]
+      this.element = createElement('<div>word</div>')
       this.iterator = new NodeIterator(this.element)
       let current = callnTimes(this.iterator, 'getNext', 2)
       const replacement = highlightText.wrapPortion({
         element: current,
         offset: 0,
         length: 1
-      }, $('<span>')[0])
+      }, createElement('<span>'))
 
       this.iterator.replaceCurrent(replacement)
       current = this.iterator.getNext()
