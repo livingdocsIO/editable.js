@@ -64,7 +64,7 @@
     "url": "https://github.com/livingdocsIO/editable.js.git"
   },
   "scripts": {
-    "start": "webpack serve",
+    "start": "WEBPACK_DEV=true BUILD_DOCS=true webpack serve",
     "build:dist": "rimraf ./coverage && BUILD_DIST=true webpack",
     "build:docs": "rimraf ./examples/dist && BUILD_DOCS=true webpack",
     "build:lib": "rimraf ./{lib,coverage} && babel src --out-dir lib",
