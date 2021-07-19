@@ -207,7 +207,7 @@ export function lastChild (container) {
  * Obsolete version of {{#crossLink "lastChild"}}{{/crossLink}}.
  */
 export function latestChild (container) {
-  console.warn("Editable.js: Using obsolete function parser.latestCild(), use lastChild() instead")
+  console.warn('Editable.js: Using obsolete function parser.latestCild(), use lastChild() instead')
   return lastChild(container)
 }
 
