@@ -53,14 +53,14 @@ describe('Cursor', function () {
     describe('isAtTextEnd()', function () {
 
       it('returns true when at text end', function () {
-        expect(this.cursor.isAtEnd()).toBe(true)
+        expect(this.cursor.isAtTextEnd()).toBe(true)
       })
     })
 
     describe('isAtEnd()', function () {
 
       it('is true', function () {
-        expect(this.cursor.isAtTextEnd()).toBe(true)
+        expect(this.cursor.isAtEnd()).toBe(true)
       })
     })
 
