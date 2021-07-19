@@ -1,9 +1,9 @@
-import $ from 'jquery'
 import rangy from 'rangy'
 
 import Selection from '../src/selection'
 import Cursor from '../src/cursor'
 import config from '../src/config'
+import {createElement} from '../src/util/dom'
 
 describe('Selection', function () {
 
@@ -14,7 +14,7 @@ describe('Selection', function () {
   describe('insertCharacter()', function () {
 
     beforeEach(function () {
-      this.div = $('<div>f</div>')[0]
+      this.div = createElement('<div>f</div>')
       const range = rangy.createRange()
       range.selectNodeContents(this.div)
       this.selection = new Selection(this.div, range)
@@ -44,7 +44,7 @@ describe('Selection', function () {
   describe('removeChars()', function () {
 
     it('removes multiple characters', function () {
-      this.div = $('<div>«Foo "bar" foo»</div>')[0]
+      this.div = createElement('<div>«Foo "bar" foo»</div>')
       const range = rangy.createRange()
       range.selectNodeContents(this.div)
       this.selection = new Selection(this.div, range)
@@ -58,7 +58,7 @@ describe('Selection', function () {
 
     beforeEach(function () {
       // <div>a|b|c</div>
-      const host = $('<div>abc</div>')[0]
+      const host = createElement('<div>abc</div>')
       const range = rangy.createRange()
       range.setStart(host.firstChild, 1)
       range.setEnd(host.firstChild, 2)
@@ -80,7 +80,7 @@ describe('Selection', function () {
   describe('with a range', function () {
 
     beforeEach(function () {
-      this.oneWord = $('<div>foobar</div>')[0]
+      this.oneWord = createElement('<div>foobar</div>')
       const range = rangy.createRange()
       range.selectNodeContents(this.oneWord)
       this.selection = new Selection(this.oneWord, range)

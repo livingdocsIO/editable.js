@@ -1,6 +1,6 @@
-import $ from 'jquery'
 import rangy from 'rangy'
 
+import {createElement} from '../src/util/dom'
 import RangeContainer from '../src/range-container'
 
 describe('RangeContainer', function () {
@@ -40,10 +40,10 @@ describe('RangeContainer', function () {
   describe('with a selection', function () {
 
     beforeEach(function () {
-      const elem = $('<div>Text</div>')
+      const elem = createElement('<div>Text</div>')
       let range = rangy.createRange()
-      range.selectNodeContents(elem[0])
-      range = new RangeContainer(elem[0], range)
+      range.selectNodeContents(elem)
+      range = new RangeContainer(elem, range)
       this.range = range
     })
 
@@ -72,9 +72,9 @@ describe('RangeContainer', function () {
   describe('with a cursor', function () {
 
     beforeEach(function () {
-      const elem = $('<div>Text</div>')
+      const elem = createElement('<div>Text</div>')
       let range = rangy.createRange()
-      range.selectNodeContents(elem[0])
+      range.selectNodeContents(elem)
       range.collapse(true)
       range = new RangeContainer(elem, range)
       this.range = range
