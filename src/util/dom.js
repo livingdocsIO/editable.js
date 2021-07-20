@@ -28,3 +28,17 @@ export const createElement = (html, win = window) => {
   el.innerHTML = html
   return el.firstElementChild
 }
+
+/**
+* Get the closest dom element matching a selector
+* @description
+*   - If a textNode is passed, it will still find the correct element
+*   - If a document is passed, it will return undefined
+* @param {Node} elem
+* @param {String} selector
+* @returns {HTMLElement|undefined}
+*/
+export const closest = (elem, selector) => {
+  if (!elem.closest) elem = elem.parentNode
+  if (elem && elem.closest) return elem.closest(selector)
+}

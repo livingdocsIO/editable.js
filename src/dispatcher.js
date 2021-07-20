@@ -4,6 +4,7 @@ import eventable from './eventable'
 import SelectionWatcher from './selection-watcher'
 import config from './config'
 import Keyboard from './keyboard'
+import {closest} from './util/dom'
 
 // This will be set to true once we detect the input event is working.
 // Input event description on MDN:
@@ -30,6 +31,7 @@ export default class Dispatcher {
     this.keyboard = new Keyboard(this.selectionWatcher)
     this.activeListeners = []
     this.setup()
+    this.getEditableBlockByEvent = (evt) => closest(evt.target, editable.editableSelector)
   }
 
   setupDocumentListener (event, func, capture = false) {
@@ -79,10 +81,6 @@ export default class Dispatcher {
     } else {
       this.setupSelectionChangeFallbackListeners()
     }
-  }
-
-  getEditableBlockByEvent (evt) {
-    return evt.target.closest(this.editableSelector)
   }
 
   /**

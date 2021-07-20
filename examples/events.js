@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {PropTypes} from 'prop-types'
 import ReactDOM from 'react-dom'
 import {CSSTransition, TransitionGroup} from 'react-transition-group'
+import {closest} from '../src/util/dom'
 
 class Events extends Component {
   render () {
@@ -97,7 +98,7 @@ function draw () {
 }
 
 function isFromFirstExample (elem) {
-  return !!elem.closest('.paragraph-example')
+  return !!closest(elem, '.paragraph-example')
 }
 
 export default function (editable) {

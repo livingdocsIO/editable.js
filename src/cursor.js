@@ -9,6 +9,7 @@ import error from './util/error'
 import * as rangeSaveRestore from './range-save-restore'
 // import printRange from './util/print_range'
 import NodeIterator from './node-iterator'
+import {closest} from './util/dom'
 
 /**
  * The Cursor module provides a cross-browser abstraction layer for cursor.
@@ -20,8 +21,7 @@ import NodeIterator from './node-iterator'
 export default class Cursor {
 
   static findHost (elem, selector) {
-    if (!elem.closest) elem = elem.parentNode
-    return elem.closest(selector)
+    return closest(elem, selector)
   }
 
   /**
