@@ -1,6 +1,7 @@
 import * as string from './util/string'
 import * as nodeType from './node-type'
 import config from './config'
+import {closest} from './util/dom'
 
 /**
  * The parser module provides helper methods to parse html-chunks
@@ -20,8 +21,7 @@ import config from './config'
  */
 export function getHost (node) {
   node = (node.jquery ? node[0] : node)
-  if (!node.closest) node = node.parentNode
-  return node.closest(`.${config.editableClass}`)
+  return closest(node, `.${config.editableClass}`)
 }
 
 /**

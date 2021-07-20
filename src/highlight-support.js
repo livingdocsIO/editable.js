@@ -2,11 +2,10 @@ import rangy from 'rangy'
 import * as content from './content'
 import highlightText from './highlight-text'
 import TextHighlighting from './plugins/highlighting/text-highlighting'
-import {createElement} from './util/dom'
+import {closest, createElement} from './util/dom'
 
 function isInHost (elem, host) {
-  if (!elem.closest) elem = elem.parentNode
-  return elem.closest('[data-editable]:not([data-word-id])') === host
+  return closest(elem, '[data-editable]:not([data-word-id])') === host
 }
 
 const highlightSupport = {
