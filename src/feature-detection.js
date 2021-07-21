@@ -16,13 +16,11 @@ const browserEngine = parser.getEngineName()
 const webKit = browserEngine === 'WebKit'
 
 /**
- * Check selectionchange event (currently supported in IE, Chrome and Safari)
- *
- * To handle selectionchange in firefox see CKEditor selection object
- * https://github.com/ckeditor/ckeditor-dev/blob/master/core/selection.js#L388
+ * Check selectionchange event (currently supported in IE, Chrome, Firefox and Safari)
+ * Firefox supports it since version 52 (2017) so pretty sure this is fine.
  */
 // not exactly feature detection... is it?
-export const selectionchange = !(browserEngine === 'Gecko' || browserName === 'Opera')
+export const selectionchange = !(browserName === 'Opera')
 
 // See Keyboard.prototype.preventContenteditableBug for more information.
 export const contenteditableSpanBug = !!webKit
