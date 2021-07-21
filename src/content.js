@@ -168,7 +168,7 @@ export function getTags (host, range, filterFunc) {
 
 // Get all ancestor tags that start or end inside the range
 export function getAncestorTags (host, range, filterFunc) {
-  let tags = []
+  const tags = []
   let node = range.commonAncestorContainer
   while (node !== host) {
     if (!filterFunc || filterFunc(node)) tags.push(node)
