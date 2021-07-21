@@ -151,5 +151,19 @@ describe('Cursor', function () {
         expect(this.cursor.afterHtml()).toEqual('')
       })
     })
+
+    describe('getInnerTags', function () {
+
+      it('gets the inner tags covered by the cursor', function () {
+        expect(this.cursor.getInnerTags()).toEqual([])
+      })
+    })
+
+    describe('getAncestorTags', function () {
+
+      it('gets all ancestor tags of the cursor', function () {
+        expect(this.cursor.getAncestorTags()).toEqual([])
+      })
+    })
   })
 })
