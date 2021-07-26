@@ -1,62 +1,60 @@
-import $ from 'jquery'
 import Prism from 'prismjs'
 
 import Editable from '../src/core'
 import eventList from './events.js'
 
 // Paragraph Example
-const editable = new Editable({
-  browserSpellcheck: false
-})
+const editable = new Editable({browserSpellcheck: false})
 
 // Paragraph
 // ---------
+editable.add('.paragraph-example p')
+eventList(editable)
 
-$(() => {
-  editable.add('.paragraph-example p')
-  eventList(editable)
+editable.add('.formatting-example p')
+setupTooltip()
 
-  editable.add('.formatting-example p')
-  setupTooltip()
+editable.add('.styling-example p')
 
-  editable.add('.styling-example p')
+const secondExample = document.querySelector('.formatting-example p')
+updateCode(secondExample)
 
-  const secondExample = document.querySelector('.formatting-example p')
-  updateCode(secondExample)
+editable.on('change', (elem) => {
+  if (elem === secondExample) updateCode(elem)
+})
 
-  editable.on('change', (elem) => {
-    if (elem === secondExample) updateCode(elem)
+// Styling
+// -------
+document.querySelector('select[name="editable-styles"]')
+  .addEventListener('change', (evt) => {
+    console.log(evt.target.value)
+    for (const el of document.querySelectorAll('.styling-example p')) {
+      el.classList.remove('example-style-default', 'example-style-dark')
+      el.classList.add(`example-style-${evt.target.value}`)
+    }
   })
 
-  // Styling
-  // -------
 
-  $('select[name="editable-styles"]').on('change', function () {
-    $('.styling-example p')
-      .removeClass('example-style-default example-style-dark')
-      .addClass(`example-style-${$(this).val()}`)
-  })
-
-  // IFrame
-  // ------
-
-  $('.iframe-example').on('load', function () {
+// IFrame
+// ------
+document.querySelector('.iframe-example')
+  .addEventListener('load', function () {
     const iframeWindow = this.contentWindow
     const iframeEditable = new Editable({
       window: iframeWindow
     })
 
     const iframeBody = this.contentDocument.body
-    iframeEditable.add($('.is-editable', iframeBody))
+    iframeEditable.add(iframeBody.querySelectorAll('.is-editable'))
   })
-})
 
 // Text Formatting
 // ---------------
 
 let currentSelection
 function setupTooltip () {
-  const tooltip = $('<div class="selection-tip" style="display:none;">' +
+  const tooltipWrapper = document.createElement('div')
+  tooltipWrapper.innerHTML = '<div class="selection-tip" style="display:none;">' +
     '<button class="js-format js-format-bold"><i class="fa fa-bold"></i></button>' +
     '<button class="js-format js-format-italic"><i class="fa fa-italic"></i></button>' +
     '<button class="js-format js-format-underline"><i class="fa fa-underline"></i></button>' +
@@ -65,95 +63,111 @@ function setupTooltip () {
     '<button class="js-format js-format-emoji"><i class="fa fa-smile-o"></i></button>' +
     '<button class="js-format js-format-whitespace"><i class="fa fa-arrows-h"></i></button>' +
     '<button class="js-format js-format-clear"><i class="fa fa-eraser"></i></button>' +
-    '</div>')
-  $(document.body).append(tooltip)
+    '</div>'
 
-  editable.selection((el, selection) => {
-    currentSelection = selection
-    if (!selection) return tooltip.hide()
+  const tooltip = tooltipWrapper.firstElementChild
+  document.body.appendChild(tooltip)
 
-    const coords = selection.getCoordinates()
+  editable
+    .selection((el, selection) => {
+      currentSelection = selection
+      if (!selection) {
+        tooltip.style.display = 'none'
+        return
+      }
 
-    // position tooltip
-    const top = coords.top - tooltip.outerHeight() - 15
-    // eslint-disable-next-line
-    const left = coords.left + (coords.width / 2) - (tooltip.outerWidth() / 2)
-    tooltip.css({top, left}).show()
-  })
-    .blur(() => tooltip.hide())
+      const coords = selection.getCoordinates()
+      tooltip.style.display = 'block'
 
-  setupTooltipListeners()
+      // position tooltip
+      const top = coords.top - tooltip.offsetHeight - 15
+      // eslint-disable-next-line
+      const left = coords.left + (coords.width / 2) - (tooltip.offsetWidth / 2)
+      tooltip.style.top = `${top}px`
+      tooltip.style.left = `${left}px`
+    })
+    .blur(() => {
+      tooltip.style.display = 'none'
+    })
+
+  setupTooltipListeners(tooltip)
 }
 
-function setupTooltipListeners () {
+function setupTooltipListeners (tooltip) {
   // prevent editable from loosing focus
-  $(document)
+  // document
+  //   .addEventListener('mousedown', (evt) => {})
+  const on = (type, selector, func) => {
+    for (const el of tooltip.querySelectorAll(selector)) {
+      el.addEventListener(type, func)
+    }
+  }
 
-    .on('mousedown', '.js-format', (event) => event.preventDefault())
+  on('mousedown', '.js-format', (event) => event.preventDefault())
 
-    .on('click', '.js-format-bold', (event) => {
-      if (currentSelection.isSelection) {
-        currentSelection.toggleBold()
-        currentSelection.triggerChange()
-      }
-    })
+  on('click', '.js-format-bold', (event) => {
+    if (!currentSelection.isSelection) return
 
-    .on('click', '.js-format-italic', (event) => {
-      if (currentSelection.isSelection) {
-        currentSelection.toggleEmphasis()
-        currentSelection.triggerChange()
-      }
-    })
+    currentSelection.toggleBold()
+    currentSelection.triggerChange()
+  })
 
-    .on('click', '.js-format-underline', (event) => {
-      if (currentSelection.isSelection) {
-        currentSelection.toggleUnderline()
-        currentSelection.triggerChange()
-      }
-    })
+  on('click', '.js-format-italic', (event) => {
+    if (!currentSelection.isSelection) return
 
-    .on('click', '.js-format-link', (event) => {
-      if (currentSelection.isSelection) {
-        currentSelection.toggleLink('www.upfront.io')
-        currentSelection.triggerChange()
-      }
-    })
+    currentSelection.toggleEmphasis()
+    currentSelection.triggerChange()
+  })
 
-    .on('click', '.js-format-quote', (event) => {
-      if (currentSelection.isSelection) {
-        currentSelection.toggleSurround('«', '»')
-        currentSelection.triggerChange()
-      }
-    })
+  on('click', '.js-format-underline', (event) => {
+    if (!currentSelection.isSelection) return
 
-    .on('click', '.js-format-emoji', (event) => {
-      if (currentSelection.isSelection) {
-        currentSelection.insertCharacter('😍')
-        currentSelection.triggerChange()
-      }
-    })
+    currentSelection.toggleUnderline()
+    currentSelection.triggerChange()
+  })
 
-    .on('click', '.js-format-whitespace', (event) => {
-      if (currentSelection.isSelection) {
-      // insert a special whitespace 'em-space'
-        currentSelection.insertCharacter(' ')
-        currentSelection.triggerChange()
-      }
-    })
+  on('click', '.js-format-link', (event) => {
+    if (!currentSelection.isSelection) return
 
-    .on('click', '.js-format-clear', (event) => {
-      if (currentSelection.isSelection) {
-        currentSelection.removeFormatting()
-        currentSelection.triggerChange()
-      }
-    })
+    currentSelection.toggleLink('www.livingdocs.io')
+    currentSelection.triggerChange()
+  })
+
+  on('click', '.js-format-quote', (event) => {
+    if (!currentSelection.isSelection) return
+
+    currentSelection.toggleSurround('«', '»')
+    currentSelection.triggerChange()
+  })
+
+  on('click', '.js-format-emoji', (event) => {
+    if (!currentSelection.isSelection) return
+
+    currentSelection.insertCharacter('😍')
+    currentSelection.triggerChange()
+  })
+
+  on('click', '.js-format-whitespace', (event) => {
+    if (!currentSelection.isSelection) return
+
+    // insert a special whitespace 'em-space'
+    currentSelection.insertCharacter(' ')
+    currentSelection.triggerChange()
+  })
+
+  on('click', '.js-format-clear', (event) => {
+    if (!currentSelection.isSelection) return
+
+    currentSelection.removeFormatting()
+    currentSelection.triggerChange()
+  })
 }
 
 function updateCode (elem) {
   const content = editable.getContent(elem)
-  const $codeBlock = $('.formatting-code-js')
-  $codeBlock.text(content.trim())
-  Prism.highlightElement($codeBlock[0])
+  const codeBlock = document.querySelector('.formatting-code-js')
+  codeBlock.textContent = content.trim()
+  Prism.highlightElement(codeBlock)
 }
 
 // Highlighting
@@ -175,15 +189,15 @@ editable.setupHighlighting({
   }
 })
 
-const $highlightExample = $('.highlighting-example p')
-editable.add($highlightExample)
+const highlightExample = document.querySelector('.highlighting-example p')
+editable.add(highlightExample)
 
 
 // Whitespace Highlighting
 // -----------------------
 
-const $highlightExample2 = $('.whitespace-highlighting-example p')
-editable.add($highlightExample2)
+const highlightExample2 = document.querySelector('.whitespace-highlighting-example p')
+editable.add(highlightExample2)
 
 
 // Pasting
