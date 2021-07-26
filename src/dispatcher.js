@@ -35,7 +35,7 @@ export default class Dispatcher {
   }
 
   setupDocumentListener (event, func, capture = false) {
-    const listener = {event, listener: func.bind(this)}
+    const listener = {event, listener: func.bind(this), capture}
     this.activeListeners.push(listener)
 
     this.document.addEventListener(event, listener.listener, capture)
@@ -55,14 +55,18 @@ export default class Dispatcher {
 
   unload () {
     this.off()
-    for (const l of this.activeListeners) this.document.removeEventListener(l.event, l.listener)
+    for (const l of this.activeListeners) {
+      this.document.removeEventListener(l.event, l.listener, l.capture)
+    }
     this.activeListeners.length = 0
   }
 
   suspend () {
     if (this.suspended) return
     this.suspended = true
-    for (const l of this.activeListeners) this.document.removeEventListener(l.event, l.listener)
+    for (const l of this.activeListeners) {
+      this.document.removeEventListener(l.event, l.listener, l.capture)
+    }
     this.activeListeners.length = 0
   }
 
