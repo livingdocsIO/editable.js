@@ -111,7 +111,7 @@ export default class Dispatcher {
         const block = this.getEditableBlockByEvent(evt)
         if (!block) return
         const selection = this.selectionWatcher.getFreshSelection()
-        if (selection.isSelection) {
+        if (selection && selection.isSelection) {
           this.notify('clipboard', block, 'copy', selection)
         }
       })
@@ -119,7 +119,7 @@ export default class Dispatcher {
         const block = this.getEditableBlockByEvent(evt)
         if (!block) return
         const selection = this.selectionWatcher.getFreshSelection()
-        if (selection.isSelection) {
+        if (selection && selection.isSelection) {
           this.notify('clipboard', block, 'cut', selection)
           this.triggerChangeEvent(block)
         }
