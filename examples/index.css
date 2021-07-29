@@ -48,6 +48,13 @@ body {
 }
 
 /*
+* Chrome has issues displaying the cursor because the outline is too thick
+*/
+[contenteditable]:focus {
+    outline-offset: 1px;
+}
+
+/*
  * A better looking default horizontal rule
  */
 
