@@ -28,7 +28,7 @@ const highlightSupport = {
     }
   },
 
-  highlightRange (editableHost, highlightId, startIndex, endIndex, dispatcher, type) {
+  highlightRange (editableHost, highlightId, startIndex, endIndex, dispatcher, type = 'comment') {
     if (this.hasHighlight(editableHost, highlightId)) {
       this.removeHighlight(editableHost, highlightId)
     }

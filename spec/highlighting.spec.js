@@ -417,7 +417,7 @@ o Round</span>`)
       }
       const expectedHtml = this.formatHtml(`Peo
 <span class="highlight-comment" data-word-id="myId" data-editable="ui-unwrap" data-highlight="comment">ple </span>
-Make The <br> W<span class="highlight-comment" data-word-id="spellcheckId" data-editable="ui-unwrap" data-highlight="spellcheck">orld</span> Go Round`)
+Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" data-editable="ui-unwrap" data-highlight="spellcheck">orld</span> Go Round`)
       expect(this.getHtml()).toEqual(expectedHtml)
       expect(this.extract('comment')).toEqual(expectedRanges)
       expect(startIndex).toEqual(3)
