@@ -558,96 +558,99 @@ describe('Content', function () {
   })
 
   describe('extractContent()', function () {
-    let host
-
-    beforeEach(function () {
-      host = createElement('<div></div>')
-    })
-
     it('extracts the content', function () {
-      host.innerHTML = 'a'
-      const result = content.extractContent(host)
+      const element = createElement('<div>a</div>')
+      const result = content.extractContent(element)
       // escape to show invisible characters
       expect(escape(result)).toEqual('a')
     })
 
     it('extracts the content from a document fragment', function () {
-      host.innerHTML = 'a<span>b</span>c'
-      const element = host
+      const element = createElement('<div>a<span>b</span>c</div>')
       const fragment = document.createDocumentFragment()
-      Array.from(element.childNodes).forEach((child) => {
-        fragment.appendChild(child.cloneNode(true))
-      })
+      for (const child of element.childNodes) fragment.appendChild(child.cloneNode(true))
       expect(content.extractContent(fragment)).toEqual('a<span>b</span>c')
     })
 
     it('replaces a zeroWidthSpace with a <br> tag', function () {
-      host.innerHTML = 'a\u200B'
-      const result = content.extractContent(host)
-      expect(result).toEqual('a<br>')
+      const element = createElement('<div>a\u200Bb</div>')
+      const result = content.extractContent(element)
+      expect(result).toEqual('a<br>b')
+    })
+
+    it('removes text nodes and line breaks at the end', function () {
+      const element = createElement('<div>a\u200B</div>')
+      const result = content.extractContent(element)
+      expect(result).toEqual('a')
+
+      const element2 = createElement('<div>b<br></div>')
+      const result2 = content.extractContent(element2)
+      expect(result2).toEqual('b')
     })
 
     it('removes zeroWidthNonBreakingSpaces', function () {
-      host.innerHTML = 'a\uFEFF'
-      const result = content.extractContent(host)
+      const element = createElement('<div>a\uFEFFb</div>')
+      const result = content.extractContent(element)
       // escape to show invisible characters
-      expect(escape(result)).toEqual('a')
+      expect(escape(result)).toEqual('ab')
     })
 
     it('removes a marked linebreak', function () {
-      host.innerHTML = '<br data-editable="remove">'
-      const result = content.extractContent(host)
-      expect(result).toEqual('')
+      const element = createElement('<div>Foo <br data-editable="remove">Bar</div>')
+      const result = content.extractContent(element)
+      expect(result).toEqual('Foo Bar')
     })
 
     it('removes two nested marked spans', function () {
-      host.innerHTML = '<span data-editable="unwrap"><span data-editable="unwrap">a</span></span>'
-      const result = content.extractContent(host)
+      const element = createElement('<div><span data-editable="unwrap"><span data-editable="unwrap">a</span></span></div>')
+      const result = content.extractContent(element)
       expect(result).toEqual('a')
     })
 
     it('removes two adjacent marked spans', function () {
-      host.innerHTML = '<span data-editable="remove"></span><span data-editable="remove"></span>'
-      const result = content.extractContent(host)
+      const element = createElement('<div><span data-editable="remove"></span><span data-editable="remove"></span></div>')
+      const result = content.extractContent(element)
       expect(result).toEqual('')
     })
 
     it('unwraps two marked spans around text', function () {
-      host.innerHTML = '|<span data-editable="unwrap">a</span>|<span data-editable="unwrap">b</span>|'
-      const result = content.extractContent(host)
+      const element = createElement('<div>|<span data-editable="unwrap">a</span>|<span data-editable="unwrap">b</span>|</div>')
+      const result = content.extractContent(element)
       expect(result).toEqual('|a|b|')
     })
 
     it('unwraps a "ui-unwrap" span', function () {
-      host.innerHTML = 'a<span data-editable="ui-unwrap">b</span>c'
-      const result = content.extractContent(host)
+      const element = createElement('<div>a<span data-editable="ui-unwrap">b</span>c</div>')
+      const result = content.extractContent(element)
       expect(result).toEqual('abc')
     })
 
     it('removes a "ui-remove" span', function () {
-      host.innerHTML = 'a<span data-editable="ui-remove">b</span>c'
-      const result = content.extractContent(host)
+      const element = createElement('<div>a<span data-editable="ui-remove">b</span>c</div>')
+      const result = content.extractContent(element)
       expect(result).toEqual('ac')
     })
 
     describe('called with keepUiElements', function () {
 
       it('does not unwrap a "ui-unwrap" span', function () {
-        host.innerHTML = 'a<span data-editable="ui-unwrap">b</span>c'
-        const result = content.extractContent(host, true)
+        const element = createElement('<div>a<span data-editable="ui-unwrap">b</span>c</div>')
+        const result = content.extractContent(element, true)
         expect(result).toEqual('a<span data-editable="ui-unwrap">b</span>c')
       })
 
       it('does not remove a "ui-remove" span', function () {
-        host.innerHTML = 'a<span data-editable="ui-remove">b</span>c'
-        const result = content.extractContent(host, true)
+        const element = createElement('<div>a<span data-editable="ui-remove">b</span>c</div>')
+        const result = content.extractContent(element, true)
         expect(result).toEqual('a<span data-editable="ui-remove">b</span>c')
       })
     })
 
     describe('with ranges', function () {
+      let host
 
       beforeEach(function () {
+        host = createElement('<div></div>')
         document.body.appendChild(host)
         this.range = rangy.createRange()
       })

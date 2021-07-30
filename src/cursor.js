@@ -8,7 +8,6 @@ import {elementNode, documentFragmentNode} from './node-type'
 import error from './util/error'
 import * as rangeSaveRestore from './range-save-restore'
 // import printRange from './util/print_range'
-import NodeIterator from './node-iterator'
 import {closest} from './util/dom'
 
 /**
@@ -95,28 +94,7 @@ export default class Cursor {
     const hostRange = this.win.document.createRange()
     hostRange.selectNodeContents(this.host)
     const hostCoords = hostRange.getBoundingClientRect()
-
-    let cursorCoords
-    if (this.range.nativeRange.startContainer.nodeType === elementNode) {
-      const container = this.range.nativeRange.startContainer
-      if ((container.children.length - 1) >= this.range.nativeRange.startOffset) {
-        const elem = container.children[this.range.nativeRange.startOffset]
-        const iterator = new NodeIterator(elem)
-        const textNode = iterator.getNextTextNode()
-        if (textNode) {
-          const cursorRange = this.win.document.createRange()
-          cursorRange.setStart(textNode, 0)
-          cursorRange.collapse(true)
-          cursorCoords = cursorRange.getBoundingClientRect()
-        } else {
-          cursorCoords = hostCoords
-        }
-      } else {
-        cursorCoords = hostCoords
-      }
-    } else {
-      cursorCoords = this.getBoundingClientRect()
-    }
+    const cursorCoords = getCursorBoundingClientRect(this.range.nativeRange, this.win)
 
     return hostCoords.bottom === cursorCoords.bottom
   }
@@ -125,29 +103,7 @@ export default class Cursor {
     const hostRange = this.win.document.createRange()
     hostRange.selectNodeContents(this.host)
     const hostCoords = hostRange.getBoundingClientRect()
-
-    let cursorCoords
-    if (this.range.nativeRange.startContainer.nodeType === elementNode) {
-      const container = this.range.nativeRange.startContainer
-      if ((container.children.length - 1) >= this.range.nativeRange.startOffset) {
-        const elem = container.children[this.range.nativeRange.startOffset]
-        const iterator = new NodeIterator(elem)
-        const textNode = iterator.getPreviousTextNode()
-        if (textNode) {
-          const cursorRange = this.win.document.createRange()
-          cursorRange.setStart(textNode, 0)
-          cursorRange.collapse(true)
-          cursorCoords = cursorRange.getBoundingClientRect()
-        } else {
-          cursorCoords = hostCoords
-        }
-      } else {
-        cursorCoords = hostCoords
-      }
-    } else {
-      cursorCoords = this.range.nativeRange.getBoundingClientRect()
-    }
-
+    const cursorCoords = getCursorBoundingClientRect(this.range.nativeRange, this.win)
     return hostCoords.top === cursorCoords.top
   }
 
@@ -387,4 +343,14 @@ export default class Cursor {
     event.initEvent('formatEditable', true, false)
     this.host.dispatchEvent(event)
   }
+}
+
+function getCursorBoundingClientRect (range, win) {
+  if (range.startContainer.nodeType !== elementNode) return range.getBoundingClientRect()
+  const el = win.document.createElement('span')
+  el.setAttribute('doc-editable', 'remove')
+  range.insertNode(el)
+  const coords = el.getBoundingClientRect()
+  el.remove()
+  return coords
 }
