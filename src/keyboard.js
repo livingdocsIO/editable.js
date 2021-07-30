@@ -3,6 +3,7 @@ import rangy from 'rangy'
 import {contenteditableSpanBug} from './feature-detection'
 import * as nodeType from './node-type'
 import eventable from './eventable'
+import {unwrapInternalNodes} from './content'
 
 /**
  * The Keyboard module defines an event API for key events.
@@ -36,14 +37,17 @@ export default class Keyboard {
         return this.notify(target, 'esc', event)
 
       case this.key.backspace:
+        unwrapInternalNodes(target, true)
         this.preventContenteditableBug(target, event)
         return this.notify(target, 'backspace', event)
 
       case this.key.delete:
+        unwrapInternalNodes(target, true)
         this.preventContenteditableBug(target, event)
         return this.notify(target, 'delete', event)
 
       case this.key.enter:
+        unwrapInternalNodes(target, true)
         if (event.shiftKey) return this.notify(target, 'shiftEnter', event)
         return this.notify(target, 'enter', event)
 

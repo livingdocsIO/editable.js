@@ -92,6 +92,12 @@ export function extractContent (element, keepUiElements) {
   clone.innerHTML = innerHtml
   unwrapInternalNodes(clone, keepUiElements)
 
+  // Remove line breaks at the beginning of a content block
+  removeWhitespaces(clone, 'firstChild')
+
+  // Remove line breaks at the end of a content block
+  removeWhitespaces(clone, 'lastChild')
+
   return clone.innerHTML
 }
 
@@ -130,6 +136,21 @@ export function cloneRangeContents (range) {
   const fragment = document.createDocumentFragment()
   while (parent.childNodes.length) fragment.appendChild(parent.childNodes[0])
   return fragment
+}
+
+function removeWhitespaces (node, type) {
+  let elem
+  while ((elem = node[type])) {
+    if (elem.nodeType === nodeType.textNode) {
+      if (/^\s+$/.test(elem.textContent)) node.removeChild(elem)
+      else break
+    } else if (elem.nodeName === 'BR') {
+      elem.remove()
+    } else {
+      if (elem[type]) removeWhitespaces(elem, type)
+      break
+    }
+  }
 }
 
 // Remove elements that were inserted for internal or user interface purposes
