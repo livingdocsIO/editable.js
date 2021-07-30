@@ -35,7 +35,7 @@ import {domArray} from './util/dom'
  *
  * @class Editable
  */
-export default class Editable {
+export class Editable {
 
   constructor (instanceConfig) {
     const defaultInstanceConfig = {

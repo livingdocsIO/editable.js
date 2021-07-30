@@ -1,6 +1,6 @@
 import cloneDeep from 'lodash.clonedeep'
 import config from '../src/config'
-import Editable from '../src/core'
+import {Editable} from '../src/core'
 
 describe('Editable configuration', function () {
 

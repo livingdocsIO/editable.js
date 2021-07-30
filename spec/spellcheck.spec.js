@@ -1,7 +1,7 @@
 import rangy from 'rangy'
 import sinon from 'sinon'
 
-import Editable from '../src/core'
+import {Editable} from '../src/core'
 import Highlighting from '../src/highlighting'
 import Cursor from '../src/cursor'
 import {createElement} from '../src/util/dom'

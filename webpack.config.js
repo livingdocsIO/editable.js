@@ -24,7 +24,7 @@ module.exports = {
   output: {
     library: dist ? 'Editable' : undefined,
     libraryTarget: 'umd',
-    libraryExport: 'default',
+    libraryExport: 'Editable',
     path: __dirname,
     filename: '[name].js'
   },
