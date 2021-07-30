@@ -24,13 +24,11 @@ export default function createDefaultBehavior (editable) {
 
   return {
     focus (element) {
-      // Add a <br> element if the editable is empty to force it to have height
-      // E.g. Firefox does not render empty block elements and most browsers do
-      // not render  empty inline elements.
+      // Add an empty text node if the editable is empty to force it to have height
+      // E.g. Firefox does not render empty block elements
+      //   and most browsers do not render empty inline elements.
       if (!parser.isVoid(element)) return
-      const br = document.createElement('br')
-      br.setAttribute('data-editable', 'remove')
-      element.appendChild(br)
+      element.appendChild(document.createTextNode('\u0000'))
     },
 
     blur (element) {
