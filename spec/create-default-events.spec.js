@@ -1,7 +1,7 @@
 import rangy from 'rangy'
 
 import Cursor from '../src/cursor'
-import Editable from '../src/core'
+import {Editable} from '../src/core'
 
 describe('Default Events', function () {
 

@@ -1,6 +1,6 @@
 import Prism from 'prismjs'
 
-import Editable from '../src/core'
+import {Editable} from '../src/core'
 import eventList from './events.js'
 
 // Paragraph Example

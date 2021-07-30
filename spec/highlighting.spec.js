@@ -1,5 +1,5 @@
 import rangy from 'rangy'
-import Editable from '../src/core'
+import {Editable} from '../src/core'
 import Highlighting from '../src/highlighting'
 import highlightSupport from '../src/highlight-support'
 import WordHighlighter from '../src/plugins/highlighting/text-highlighting'

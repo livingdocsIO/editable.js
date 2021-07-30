@@ -58,7 +58,7 @@
     "editable"
   ],
   "license": "MIT",
-  "main": "lib/core.js",
+  "module": "src/core.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/livingdocsIO/editable.js.git"
@@ -67,8 +67,7 @@
     "start": "WEBPACK_DEV=true BUILD_DOCS=true webpack serve",
     "build:dist": "rimraf ./coverage && BUILD_DIST=true webpack",
     "build:docs": "rimraf ./examples/dist && BUILD_DOCS=true webpack",
-    "build:lib": "rimraf ./{lib,coverage} && babel src --out-dir lib",
-    "build": "npm run build:dist -s && npm run build:lib -s && npm run build:docs -s",
+    "build": "npm run build:dist -s && npm run build:docs -s",
     "test:ci": "npm run test:karma -s",
     "test": "npm run build -s && npm run test:karma -s",
     "posttest": "npm run lint -s",

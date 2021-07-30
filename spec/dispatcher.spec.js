@@ -3,7 +3,7 @@ import rangy from 'rangy'
 import * as content from '../src/content'
 import Cursor from '../src/cursor'
 import Keyboard from '../src/keyboard'
-import Editable from '../src/core'
+import {Editable} from '../src/core'
 import Selection from '../src/selection'
 const {key} = Keyboard
 

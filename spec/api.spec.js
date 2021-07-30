@@ -1,4 +1,4 @@
-import Editable from '../src/core'
+import {Editable} from '../src/core'
 
 describe('Editable', function () {
   let editable, div
