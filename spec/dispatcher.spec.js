@@ -71,7 +71,39 @@ describe('Dispatcher', function () {
       editable.unload()
     })
 
-    describe('on Enter', function () {
+    describe('on focus', function () {
+      it('should trigger the focus event', function () {
+        elem.blur()
+        const focus = on('focus', function (element) {
+          expect(element).toEqual(elem)
+        })
+        elem.focus()
+        expect(focus.calls).toBe(1)
+      })
+
+      it('should contain an empty textnode', function () {
+        elem.blur()
+        expect(elem.textContent).toEqual('')
+        elem.focus()
+        expect(elem.textContent).toEqual('\u0000')
+      })
+
+      it('should not add an empty text node if there is content', function () {
+        elem.blur()
+        elem.appendChild(document.createTextNode('Hello'))
+        elem.focus()
+        expect(elem.textContent).toEqual('Hello')
+      })
+
+      it('removes the empty text node again on blur', function () {
+        elem.focus()
+        expect(elem.textContent).toEqual('\u0000')
+        elem.blur()
+        expect(elem.textContent).toEqual('')
+      })
+    })
+
+    describe('on enter', function () {
 
       beforeEach(function () {
         event = new Event('keydown')
