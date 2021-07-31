@@ -276,10 +276,13 @@ export default class Dispatcher {
         const cursor = range.forceCursor()
 
         if (cursor.isAtTextEnd()) {
+          console.log('at end', event.target)
           self.notify('insert', this, 'after', cursor)
         } else if (cursor.isAtBeginning()) {
+          console.log('at beginning', event.target)
           self.notify('insert', this, 'before', cursor)
         } else {
+          console.log('in split', event.target)
           self.notify('split', this, cursor.before(), cursor.after(), cursor)
         }
       })
@@ -330,11 +333,11 @@ export default class Dispatcher {
       const cursor = this.selectionWatcher.getFreshSelection()
 
       if (cursor && cursor.isSelection && cursor.isAtBeginning() && cursor.isAtEnd()) {
-        this.notify('selectToBoundary', cursor.host, evt, 'both', cursor)
+        this.notify('selectToBoundary', cursor.host, evt, 'both')
       } else if (cursor && cursor.isSelection && cursor.isAtBeginning()) {
-        this.notify('selectToBoundary', cursor.host, evt, 'start', cursor)
+        this.notify('selectToBoundary', cursor.host, evt, 'start')
       } else if (cursor && cursor.isSelection && cursor.isAtEnd()) {
-        this.notify('selectToBoundary', cursor.host, evt, 'end', cursor)
+        this.notify('selectToBoundary', cursor.host, evt, 'end')
       }
 
       if (suppressSelectionChanges) {
