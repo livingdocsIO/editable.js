@@ -100,7 +100,7 @@ describe('Selection', function () {
         expect(this.selection.isAllSelected()).toEqual(true)
       })
 
-      it('returns true if all is selected', function () {
+      it('returns false if not all is selected', function () {
         const textNode = this.oneWord.firstChild
         let range = rangy.createRange()
         range.setStartBefore(textNode)

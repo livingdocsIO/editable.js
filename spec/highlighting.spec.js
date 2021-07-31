@@ -1,3 +1,4 @@
+import sinon from 'sinon'
 import rangy from 'rangy'
 import {Editable} from '../src/core'
 import Highlighting from '../src/highlighting'
@@ -421,6 +422,17 @@ Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" da
       expect(this.getHtml()).toEqual(expectedHtml)
       expect(this.extract('comment')).toEqual(expectedRanges)
       expect(startIndex).toEqual(3)
+    })
+
+    it('normalizes a simple text node after removing a highlight', function () {
+      setupHighlightEnv(self, 'People Make The World Go Round')
+      self.highlightRange('myId', 3, 7)
+      const normalizeSpy = sinon.spy(self.div, 'normalize')
+      self.removeHighlight('myId')
+      // There is no way to see the actual error in a test since it only happens in (non-headless)
+      // Chome environments. We just check if the normalize method has been called here.
+      expect(normalizeSpy.callCount).toEqual(1)
+      normalizeSpy.restore()
     })
   })
 

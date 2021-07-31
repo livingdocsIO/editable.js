@@ -69,6 +69,7 @@ const highlightSupport = {
     const elems = editableHost.querySelectorAll(`[data-word-id="${highlightId}"]`)
     for (const elem of elems) {
       content.unwrap(elem)
+      // in Chrome browsers the unwrap method leaves the host node split into 2 (lastChild !== firstChild)
       editableHost.normalize()
       if (dispatcher) dispatcher.notify('change', editableHost)
     }

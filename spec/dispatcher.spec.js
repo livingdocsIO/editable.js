@@ -140,24 +140,27 @@ describe('Dispatcher', function () {
         expect(insert.calls).toEqual(1)
       })
 
-      it('fires merge if cursor is in the middle', function () {
-        // <div>fo|o</div>
-        elem.innerHTML = 'foo'
+      it('fires "split" if cursor is in the middle', function () {
+        console.log('HERE................')
+        // <div>ba|r</div>
+        elem.innerHTML = 'bar'
         const range = rangy.createRange()
         range.setStart(elem.firstChild, 2)
         range.setEnd(elem.firstChild, 2)
+        range.collapse()
         createCursor(range)
 
         const insert = on('split', (element, before, after, cursor) => {
           expect(element).toEqual(elem)
-          expect(content.getInnerHtmlOfFragment(before)).toEqual('fo')
-          expect(content.getInnerHtmlOfFragment(after)).toEqual('o')
+          expect(content.getInnerHtmlOfFragment(before)).toEqual('ba')
+          expect(content.getInnerHtmlOfFragment(after)).toEqual('r')
           expect(cursor.isCursor).toEqual(true)
         })
 
         const evt = new KeyboardEvent('keydown', {keyCode: key.enter})
         elem.dispatchEvent(evt)
         expect(insert.calls).toEqual(1)
+        console.log('END...........')
       })
     })
 
@@ -302,6 +305,62 @@ describe('Dispatcher', function () {
 
         const evt = new KeyboardEvent('keydown', {ctrlKey: true, keyCode: key.i})
         elem.dispatchEvent(evt)
+      })
+    })
+
+    describe('selectToBoundary event:', function () {
+
+      it('fires "both" if all is selected', function () {
+        elem.innerHTML = 'People Make The World Go Round'
+        // select all
+        const range = rangy.createRange()
+        range.selectNodeContents(elem)
+        createCursor(range)
+        // listen for event
+        let position
+        editable.selectToBoundary(function (element, evt, pos) {
+          position = pos
+        })
+        // trigger selectionchange event
+        const selectionEvent = new Event('selectionchange', {bubbles: true})
+        elem.dispatchEvent(selectionEvent)
+        expect(position).toEqual('both')
+      })
+
+      it('fires "start" if selection is at beginning but not end', function () {
+        elem.innerHTML = 'People Make The World Go Round'
+        // select "People"
+        const range = rangy.createRange()
+        range.setStart(elem.firstChild, 0)
+        range.setEnd(elem.firstChild, 5)
+        createCursor(range)
+        // listen for event
+        let position
+        editable.selectToBoundary(function (element, evt, pos) {
+          position = pos
+        })
+        // trigger selectionchange event
+        const selectionEvent = new Event('selectionchange', {bubbles: true})
+        elem.dispatchEvent(selectionEvent)
+        expect(position).toEqual('start')
+      })
+
+      it('fires "end" if selection is at end but not beginning', function () {
+        elem.innerHTML = 'People Make The World Go Round'
+        // select "Round"
+        const range = rangy.createRange()
+        range.setStart(elem.firstChild, 25)
+        range.setEnd(elem.firstChild, 30)
+        createCursor(range)
+        // listen for event
+        let position
+        editable.selectToBoundary(function (element, evt, pos) {
+          position = pos
+        })
+        // trigger selectionchange event
+        const selectionEvent = new Event('selectionchange', {bubbles: true})
+        elem.dispatchEvent(selectionEvent)
+        expect(position).toEqual('end')
       })
     })
   })
