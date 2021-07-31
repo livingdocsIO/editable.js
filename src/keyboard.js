@@ -37,16 +37,22 @@ export default class Keyboard {
         return this.notify(target, 'esc', event)
 
       case this.key.backspace:
+        // As a newline element gets wrapped in a span when at the end of a block,
+        // we'll need to unwrap that before to simulate correct delete behavior and not skip lines
         unwrapInternalNodes(target, true)
         this.preventContenteditableBug(target, event)
         return this.notify(target, 'backspace', event)
 
       case this.key.delete:
+        // As a newline element gets wrapped in a span when at the end of a block,
+        // we'll need to unwrap that before to simulate correct delete behavior and not skip lines
         unwrapInternalNodes(target, true)
         this.preventContenteditableBug(target, event)
         return this.notify(target, 'delete', event)
 
       case this.key.enter:
+        // As a newline element gets wrapped in a span when at the end of a block,
+        // we'll need to unwrap that before to simulate correct delete behavior and not skip lines
         unwrapInternalNodes(target, true)
         if (event.shiftKey) return this.notify(target, 'shiftEnter', event)
         return this.notify(target, 'enter', event)
@@ -169,15 +175,15 @@ export default class Keyboard {
       if (firstContentNode !== selectionRange.startContainer) return
     }
 
-    // Now we know, that we have to return at lease the startNodeElement for
+    // Now we know, that we have to return at least the startNodeElement for
     // removal. But it could be, that we also need to remove its parent, e.g.
     // we need to remove <strong> in the following example:
     // <strong><em>|foo</em>bar</strong>baz|
-    const rangeStatingBeforeCurrentElement = selectionRange.cloneRange()
-    rangeStatingBeforeCurrentElement.setStartBefore(startNodeElement)
+    const rangeStartingBeforeCurrentElement = selectionRange.cloneRange()
+    rangeStartingBeforeCurrentElement.setStartBefore(startNodeElement)
 
     return Keyboard.getNodeToRemove(
-      rangeStatingBeforeCurrentElement,
+      rangeStartingBeforeCurrentElement,
       target
     ) || startNodeElement
   }
