@@ -93,17 +93,19 @@ export default class Cursor {
   isAtLastLine () {
     const hostRange = this.win.document.createRange()
     hostRange.selectNodeContents(this.host)
-    const hostCoords = hostRange.getBoundingClientRect()
-    const cursorCoords = getCursorBoundingClientRect(this.range.nativeRange, this.win)
-
+    hostRange.collapse(false)
+    const hostCoords = getRangeBoundingClientRect(hostRange, this.win)
+    const cursorCoords = getRangeBoundingClientRect(this.range.nativeRange, this.win)
     return hostCoords.bottom === cursorCoords.bottom
   }
 
   isAtFirstLine () {
     const hostRange = this.win.document.createRange()
     hostRange.selectNodeContents(this.host)
-    const hostCoords = hostRange.getBoundingClientRect()
-    const cursorCoords = getCursorBoundingClientRect(this.range.nativeRange, this.win)
+    hostRange.collapse(true)
+    const hostCoords = getRangeBoundingClientRect(hostRange, this.win)
+    const cursorCoords = getRangeBoundingClientRect(this.range.nativeRange, this.win)
+    console.log(hostCoords.top, cursorCoords.top)
     return hostCoords.top === cursorCoords.top
   }
 
@@ -345,10 +347,23 @@ export default class Cursor {
   }
 }
 
-function getCursorBoundingClientRect (range, win) {
+
+/**
+* Get position of the range or cursor
+*
+* Can be used to reliably get the boundingClientRect without
+* some any of the drawbacks that the native range has.
+*
+* With the native range.getClientBoundingRect(), newlines are
+* not considered when calculating the position
+*
+* @param {Range} range
+* @param {Window} win
+*/
+function getRangeBoundingClientRect (range, win) {
   if (range.startContainer.nodeType !== elementNode) return range.getBoundingClientRect()
   const el = win.document.createElement('span')
-  el.setAttribute('doc-editable', 'remove')
+  el.setAttribute('doc-editable', 'unwrap')
   range.insertNode(el)
   const coords = el.getBoundingClientRect()
   el.remove()
