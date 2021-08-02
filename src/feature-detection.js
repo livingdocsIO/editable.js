@@ -11,16 +11,30 @@ import browser from 'bowser'
 export const contenteditable = typeof document.documentElement.contentEditable !== 'undefined'
 
 const parser = browser.getParser(window.navigator.userAgent)
-const browserName = parser.getBrowser()
 const browserEngine = parser.getEngineName()
 const webKit = browserEngine === 'WebKit'
 
 /**
- * Check selectionchange event (currently supported in IE, Chrome, Firefox and Safari)
- * Firefox supports it since version 52 (2017) so pretty sure this is fine.
+ * Check selectionchange event (supported in IE, Chrome, Firefox and Safari)
+ * Firefox supports it since version 52 (2017).
+ * Opera has no support as of 2021.
  */
-// not exactly feature detection... is it?
-export const selectionchange = !(browserName === 'Opera')
+const hasNativeSelectionchangeSupport = (document) => {
+  const doc = document
+  const osc = doc.onselectionchange
+  if (osc !== undefined) {
+    try {
+      doc.onselectionchange = 0
+      return doc.onselectionchange === null
+    } catch (e) {
+    } finally {
+      doc.onselectionchange = osc
+    }
+  }
+  return false
+}
+
+export const selectionchange = hasNativeSelectionchangeSupport(document)
 
 // See Keyboard.prototype.preventContenteditableBug for more information.
 export const contenteditableSpanBug = !!webKit
