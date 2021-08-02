@@ -141,7 +141,6 @@ describe('Dispatcher', function () {
       })
 
       it('fires "split" if cursor is in the middle', function () {
-        console.log('HERE................')
         // <div>ba|r</div>
         elem.innerHTML = 'bar'
         const range = rangy.createRange()
@@ -160,7 +159,6 @@ describe('Dispatcher', function () {
         const evt = new KeyboardEvent('keydown', {keyCode: key.enter})
         elem.dispatchEvent(evt)
         expect(insert.calls).toEqual(1)
-        console.log('END...........')
       })
     })
 
