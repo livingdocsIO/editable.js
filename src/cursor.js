@@ -105,7 +105,6 @@ export default class Cursor {
     hostRange.collapse(true)
     const hostCoords = getRangeBoundingClientRect(hostRange, this.win)
     const cursorCoords = getRangeBoundingClientRect(this.range.nativeRange, this.win)
-    console.log(hostCoords.top, cursorCoords.top)
     return hostCoords.top === cursorCoords.top
   }
 

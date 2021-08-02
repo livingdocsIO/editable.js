@@ -219,7 +219,7 @@ describe('Dispatcher', function () {
       })
     })
 
-    fdescribe('on newline', function () {
+    describe('on newline', function () {
 
       function typeKeys (element, chars) {
         const selection = window.getSelection()
