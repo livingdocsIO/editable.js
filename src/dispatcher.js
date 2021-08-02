@@ -276,13 +276,10 @@ export default class Dispatcher {
         const cursor = range.forceCursor()
 
         if (cursor.isAtTextEnd()) {
-          console.log('at end', event.target)
           self.notify('insert', this, 'after', cursor)
         } else if (cursor.isAtBeginning()) {
-          console.log('at beginning', event.target)
           self.notify('insert', this, 'before', cursor)
         } else {
-          console.log('in split', event.target)
           self.notify('split', this, cursor.before(), cursor.after(), cursor)
         }
       })
