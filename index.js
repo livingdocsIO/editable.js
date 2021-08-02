@@ -27,7 +27,6 @@ editable.on('change', (elem) => {
 // -------
 document.querySelector('select[name="editable-styles"]')
   .addEventListener('change', (evt) => {
-    console.log(evt.target.value)
     for (const el of document.querySelectorAll('.styling-example p')) {
       el.classList.remove('example-style-default', 'example-style-dark')
       el.classList.add(`example-style-${evt.target.value}`)
