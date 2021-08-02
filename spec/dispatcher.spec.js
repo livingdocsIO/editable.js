@@ -8,7 +8,7 @@ import Selection from '../src/selection'
 const {key} = Keyboard
 
 describe('Dispatcher', function () {
-  let editable, event, elem
+  let editable, elem
 
   // create a Cursor object and set the selection to it
   function createCursor (range) {
@@ -105,11 +105,6 @@ describe('Dispatcher', function () {
 
     describe('on enter', function () {
 
-      beforeEach(function () {
-        event = new Event('keydown')
-        event.keyCode = key.enter
-      })
-
       it('fires insert "after" if cursor is at the end', function () {
         // <div>foo\</div>
         elem.innerHTML = 'foo'
@@ -121,7 +116,8 @@ describe('Dispatcher', function () {
           expect(cursor.isCursor).toEqual(true)
         })
 
-        elem.dispatchEvent(event)
+        const evt = new KeyboardEvent('keydown', {keyCode: key.enter})
+        elem.dispatchEvent(evt)
         expect(insert.calls).toEqual(1)
       })
 
@@ -139,7 +135,8 @@ describe('Dispatcher', function () {
           expect(cursor.isCursor).toEqual(true)
         })
 
-        elem.dispatchEvent(event)
+        const evt = new KeyboardEvent('keydown', {keyCode: key.enter})
+        elem.dispatchEvent(evt)
         expect(insert.calls).toEqual(1)
       })
 
@@ -158,17 +155,13 @@ describe('Dispatcher', function () {
           expect(cursor.isCursor).toEqual(true)
         })
 
-        elem.dispatchEvent(event)
+        const evt = new KeyboardEvent('keydown', {keyCode: key.enter})
+        elem.dispatchEvent(evt)
         expect(insert.calls).toEqual(1)
       })
     })
 
     describe('on backspace', function () {
-
-      beforeEach(function () {
-        event = new Event('keydown')
-        event.keyCode = key.backspace
-      })
 
       it('fires "merge" if cursor is at the beginning', function (done) {
         elem.innerHTML = 'foo'
@@ -179,7 +172,7 @@ describe('Dispatcher', function () {
           done()
         })
 
-        elem.dispatchEvent(event)
+        elem.dispatchEvent(new KeyboardEvent('keydown', {keyCode: key.backspace}))
       })
 
       it('fires "change" if cursor is not at the beginning', (done) => {
@@ -191,16 +184,11 @@ describe('Dispatcher', function () {
           done()
         })
 
-        elem.dispatchEvent(event)
+        elem.dispatchEvent(new KeyboardEvent('keydown', {keyCode: key.backspace}))
       })
     })
 
     describe('on delete', function () {
-
-      beforeEach(function () {
-        event = new Event('keydown')
-        event.keyCode = key['delete']
-      })
 
       it('fires "merge" if cursor is at the end', (done) => {
         elem.innerHTML = 'foo'
@@ -211,51 +199,81 @@ describe('Dispatcher', function () {
           done()
         })
 
-        elem.dispatchEvent(event)
+        elem.dispatchEvent(new KeyboardEvent('keydown', {keyCode: key.delete}))
       })
 
       it('fires "change" if cursor is at the beginning', (done) => {
         elem.innerHTML = 'foo'
         createCursor(createRangeAtBeginning(elem))
         on('change', done)
-        elem.dispatchEvent(event)
+        elem.dispatchEvent(new KeyboardEvent('keydown', {keyCode: key.delete}))
       })
     })
 
     describe('on keydown', function () {
 
-      beforeEach(function () {
-        event = new Event('keydown')
-      })
-
       it('fires change when a character is pressed', (done) => {
-        event.keyCode = 'e'.charCodeAt(0)
+        const evt = new KeyboardEvent('keydown', {keyCode: 'e'.charCodeAt(0)})
         on('change', done)
-        elem.dispatchEvent(event)
+        elem.dispatchEvent(evt)
       })
     })
 
-    describe('on newline', function () {
+    fdescribe('on newline', function () {
 
-      beforeEach(function () {
-        event = new Event('keydown')
-        event.shiftKey = true
-        event.keyCode = 13
-      })
+      function typeKeys (element, chars) {
+        const selection = window.getSelection()
+        const range = selection.getRangeAt(0)
+        range.selectNodeContents(element)
+        range.collapse(false)
+        range.insertNode(document.createTextNode(chars))
+        range.selectNodeContents(element)
+        range.collapse(false)
+      }
+
+      function shiftReturn (element) {
+        element.dispatchEvent(new KeyboardEvent('keydown', {
+          shiftKey: true,
+          keyCode: 13
+        }))
+      }
 
       it('fires newline when shift + enter is pressed', (done) => {
         on('newline', done)
-        elem.dispatchEvent(event)
+        shiftReturn(elem)
+        expect(elem.innerHTML).toEqual('<br>\u0000')
+      })
+
+      it('creates a nested br element with a data-editable="unwrap" attribute', () => {
+        typeKeys(elem, 'foobar')
+        shiftReturn(elem)
+        expect(elem.innerHTML).toEqual(
+          `\u0000` +
+          `foobar` +
+          `<span data-editable="unwrap">` +
+            `<br><span data-editable="remove" contenteditable="false">\u0000</span>` +
+          `</span>`
+        )
+      })
+
+      it('removes the nested br element when adding a newline afterwards', () => {
+        typeKeys(elem, 'foobar')
+        shiftReturn(elem)
+        shiftReturn(elem)
+        expect(elem.innerHTML).toEqual(
+          `\u0000` +
+          `foobar` +
+          // this is the nested br element that got unwrapped
+          `<br>` +
+          // This is the new nested newline of the second shift + return
+          `<span data-editable="unwrap">` +
+            `<br><span data-editable="remove" contenteditable="false">\u0000</span>` +
+          `</span>`
+        )
       })
     })
 
     describe('on bold', function () {
-
-      beforeEach(function () {
-        event = new Event('keydown')
-        event.ctrlKey = true
-        event.keyCode = key.b
-      })
 
       it('fires toggleBold when ctrl + b is pressed', (done) => {
         elem.innerHTML = 'foo'
@@ -266,17 +284,12 @@ describe('Dispatcher', function () {
           done()
         })
 
-        elem.dispatchEvent(event)
+        const evt = new KeyboardEvent('keydown', {ctrlKey: true, keyCode: key.b})
+        elem.dispatchEvent(evt)
       })
     })
 
     describe('on italic', function () {
-
-      beforeEach(function () {
-        event = new Event('keydown')
-        event.ctrlKey = true
-        event.keyCode = key.i
-      })
 
       it('fires toggleEmphasis when ctrl + i is pressed', (done) => {
         elem.innerHTML = 'foo'
@@ -287,7 +300,8 @@ describe('Dispatcher', function () {
           done()
         })
 
-        elem.dispatchEvent(event)
+        const evt = new KeyboardEvent('keydown', {ctrlKey: true, keyCode: key.i})
+        elem.dispatchEvent(evt)
       })
     })
   })
