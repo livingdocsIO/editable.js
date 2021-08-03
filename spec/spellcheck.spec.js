@@ -70,7 +70,7 @@ describe('Spellcheck:', function () {
         expect(misspelledWord.length).toEqual(1)
 
         // correct the error
-        misspelledWord.innerHTML = 'simpler'
+        misspelledWord[0].innerHTML = 'simpler'
         this.errors = []
 
         this.highlighting.highlight(this.p)
