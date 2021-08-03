@@ -22,10 +22,8 @@ export default {
   // - matches
   //   Array of positions in the string to highlight:
   //   e.g [{startIndex: 0, endIndex: 1, match: 'The'}]
-  highlightMatches (element, matches) {
-    if (!matches || matches.length === 0) {
-      return
-    }
+  highlightMatches (element, matches, action) {
+    if (!action) action = this.wrapMatch
 
     const iterator = new NodeIterator(element)
     let currentMatchIndex = 0
@@ -85,8 +83,8 @@ export default {
         portions.push(portion)
 
         if (isLastPortion) {
-          const lastNode = this.wrapMatch(portions, currentMatch.marker, currentMatch.title)
-          iterator.replaceCurrent(lastNode)
+          const lastNode = action.apply(this, [portions, currentMatch.marker, currentMatch.title])
+          if (lastNode) iterator.replaceCurrent(lastNode)
 
           // recalculate nodeEndOffset if we have to replace the current node.
           nodeEndOffset = totalOffset + portion.length + portion.offset

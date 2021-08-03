@@ -1,6 +1,7 @@
 import rangy from 'rangy'
 import * as content from './content'
 import highlightText from './highlight-text'
+import * as nodeType from './node-type'
 import TextHighlighting from './plugins/highlighting/text-highlighting'
 import {closest, createElement} from './util/dom'
 
@@ -9,6 +10,40 @@ function isInHost (elem, host) {
 }
 
 const highlightSupport = {
+
+  getRangeOfText ({editableHost, text}) {
+    const blockText = highlightText.extractText(editableHost)
+
+    // todo get rid of this
+    const marker = `<span class="highlight-selection"></span>`
+    const markerNode = highlightSupport.createMarkerNode(marker, 'selection', this.win)
+
+    const textSearch = new TextHighlighting(markerNode, 'text')
+    const matches = textSearch.findMatches(blockText, [text])
+    if (!matches || matches.length === 0) return
+
+    let nodeMatches
+    highlightText.highlightMatches(editableHost, matches, function (portions) {
+      nodeMatches = portions
+    })
+    if (!nodeMatches || nodeMatches.length === 0) {
+      return
+    } else if (nodeMatches.length === 1) {
+      return {
+        startNode: nodeMatches[0].element,
+        endNode: nodeMatches[0].element,
+        startOffset: matches[0].startIndex,
+        endOffset: matches[0].endIndex
+      }
+    } else {
+      return {
+        startNode: nodeMatches[0].element,
+        startOffset: nodeMatches[0].offset,
+        endNode: nodeMatches[nodeMatches.length - 1].element,
+        endOffset: nodeMatches[nodeMatches.length - 1].offset
+      }
+    }
+  },
 
   highlightText (editableHost, text, highlightId, type) {
     if (this.hasHighlight(editableHost, highlightId)) return
