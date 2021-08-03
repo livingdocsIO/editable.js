@@ -7,6 +7,7 @@ import * as content from './content'
 import * as clipboard from './clipboard'
 import Dispatcher from './dispatcher'
 import Cursor from './cursor'
+import RangeContainer from './range-container'
 import highlightSupport from './highlight-support'
 import Highlighting from './highlighting'
 import createDefaultEvents from './create-default-events'
@@ -326,6 +327,18 @@ export class Editable {
       selection = undefined
     }
 
+    return selection
+  }
+
+  getSelectionAroundText ({editableHost, text}) {
+    const res = highlightSupport.getRangeOfText({editableHost, text})
+    if (!res) return
+    const range = rangy.createRange()
+    range.setStart(res.startNode, res.startOffset)
+    range.setEnd(res.endNode, res.endOffset)
+
+    const rangeContainer = new RangeContainer(editableHost, range)
+    const selection = rangeContainer.getSelection(this.win)
     return selection
   }
 
