@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 import rangy from 'rangy'
 
 import * as content from '../src/content'
@@ -75,31 +76,31 @@ describe('Dispatcher', function () {
       it('should trigger the focus event', function () {
         elem.blur()
         const focus = on('focus', function (element) {
-          expect(element).toEqual(elem)
+          expect(element).to.equal(elem)
         })
         elem.focus()
-        expect(focus.calls).toBe(1)
+        expect(focus.calls).to.equal(1)
       })
 
       it('should contain an empty textnode', function () {
         elem.blur()
-        expect(elem.textContent).toEqual('')
+        expect(elem.textContent).to.equal('')
         elem.focus()
-        expect(elem.textContent).toEqual('\u0000')
+        expect(elem.textContent).to.equal('\u0000')
       })
 
       it('should not add an empty text node if there is content', function () {
         elem.blur()
         elem.appendChild(document.createTextNode('Hello'))
         elem.focus()
-        expect(elem.textContent).toEqual('Hello')
+        expect(elem.textContent).to.equal('Hello')
       })
 
       it('removes the empty text node again on blur', function () {
         elem.focus()
-        expect(elem.textContent).toEqual('\u0000')
+        expect(elem.textContent).to.equal('\u0000')
         elem.blur()
-        expect(elem.textContent).toEqual('')
+        expect(elem.textContent).to.equal('')
       })
     })
 
@@ -111,14 +112,14 @@ describe('Dispatcher', function () {
         createCursor(createRangeAtEnd(elem))
 
         const insert = on('insert', (element, direction, cursor) => {
-          expect(element).toEqual(elem)
-          expect(direction).toEqual('after')
-          expect(cursor.isCursor).toEqual(true)
+          expect(element).to.equal(elem)
+          expect(direction).to.equal('after')
+          expect(cursor.isCursor).to.equal(true)
         })
 
         const evt = new KeyboardEvent('keydown', {keyCode: key.enter})
         elem.dispatchEvent(evt)
-        expect(insert.calls).toEqual(1)
+        expect(insert.calls).to.equal(1)
       })
 
       it('fires insert "before" if cursor is at the beginning', function () {
@@ -130,14 +131,14 @@ describe('Dispatcher', function () {
         createCursor(range)
 
         const insert = on('insert', (element, direction, cursor) => {
-          expect(element).toEqual(elem)
-          expect(direction).toEqual('before')
-          expect(cursor.isCursor).toEqual(true)
+          expect(element).to.equal(elem)
+          expect(direction).to.equal('before')
+          expect(cursor.isCursor).to.equal(true)
         })
 
         const evt = new KeyboardEvent('keydown', {keyCode: key.enter})
         elem.dispatchEvent(evt)
-        expect(insert.calls).toEqual(1)
+        expect(insert.calls).to.equal(1)
       })
 
       it('fires merge if cursor is in the middle', function () {
@@ -149,15 +150,15 @@ describe('Dispatcher', function () {
         createCursor(range)
 
         const insert = on('split', (element, before, after, cursor) => {
-          expect(element).toEqual(elem)
-          expect(content.getInnerHtmlOfFragment(before)).toEqual('fo')
-          expect(content.getInnerHtmlOfFragment(after)).toEqual('o')
-          expect(cursor.isCursor).toEqual(true)
+          expect(element).to.equal(elem)
+          expect(content.getInnerHtmlOfFragment(before)).to.equal('fo')
+          expect(content.getInnerHtmlOfFragment(after)).to.equal('o')
+          expect(cursor.isCursor).to.equal(true)
         })
 
         const evt = new KeyboardEvent('keydown', {keyCode: key.enter})
         elem.dispatchEvent(evt)
-        expect(insert.calls).toEqual(1)
+        expect(insert.calls).to.equal(1)
       })
     })
 
@@ -168,7 +169,7 @@ describe('Dispatcher', function () {
         createCursor(createRangeAtBeginning(elem))
 
         on('merge', (element) => {
-          expect(element).toEqual(elem)
+          expect(element).to.equal(elem)
           done()
         })
 
@@ -180,7 +181,7 @@ describe('Dispatcher', function () {
         createCursor(createRangeAtEnd(elem))
 
         on('change', (element) => {
-          expect(element).toEqual(elem)
+          expect(element).to.equal(elem)
           done()
         })
 
@@ -195,7 +196,7 @@ describe('Dispatcher', function () {
         createCursor(createRangeAtEnd(elem))
 
         on('merge', (element) => {
-          expect(element).toEqual(elem)
+          expect(element).to.equal(elem)
           done()
         })
 
@@ -205,7 +206,7 @@ describe('Dispatcher', function () {
       it('fires "change" if cursor is at the beginning', (done) => {
         elem.innerHTML = 'foo'
         createCursor(createRangeAtBeginning(elem))
-        on('change', done)
+        on('change', () => done())
         elem.dispatchEvent(new KeyboardEvent('keydown', {keyCode: key.delete}))
       })
     })
@@ -214,7 +215,7 @@ describe('Dispatcher', function () {
 
       it('fires change when a character is pressed', (done) => {
         const evt = new KeyboardEvent('keydown', {keyCode: 'e'.charCodeAt(0)})
-        on('change', done)
+        on('change', () => done())
         elem.dispatchEvent(evt)
       })
     })
@@ -239,15 +240,15 @@ describe('Dispatcher', function () {
       }
 
       it('fires newline when shift + enter is pressed', (done) => {
-        on('newline', done)
+        on('newline', () => done())
         shiftReturn(elem)
-        expect(elem.innerHTML).toEqual('<br>\u0000')
+        expect(elem.innerHTML).to.equal('<br>\u0000')
       })
 
       it('creates a nested br element with a data-editable="unwrap" attribute', () => {
         typeKeys(elem, 'foobar')
         shiftReturn(elem)
-        expect(elem.innerHTML).toEqual(
+        expect(elem.innerHTML).to.equal(
           `\u0000` +
           `foobar` +
           `<span data-editable="unwrap">` +
@@ -260,7 +261,7 @@ describe('Dispatcher', function () {
         typeKeys(elem, 'foobar')
         shiftReturn(elem)
         shiftReturn(elem)
-        expect(elem.innerHTML).toEqual(
+        expect(elem.innerHTML).to.equal(
           `\u0000` +
           `foobar` +
           // this is the nested br element that got unwrapped
@@ -277,10 +278,11 @@ describe('Dispatcher', function () {
 
       it('fires toggleBold when ctrl + b is pressed', (done) => {
         elem.innerHTML = 'foo'
-        const elemSelection = createSelection(createFullRange(elem))
+        const range = createFullRange(elem)
+        createSelection(range)
 
         on('toggleBold', (selection) => {
-          expect(selection).toEqual(elemSelection)
+          expect(selection.range.equals(range)).to.equal(true)
           done()
         })
 
@@ -293,10 +295,11 @@ describe('Dispatcher', function () {
 
       it('fires toggleEmphasis when ctrl + i is pressed', (done) => {
         elem.innerHTML = 'foo'
-        const elemSelection = createSelection(createFullRange(elem))
+        const range = createFullRange(elem)
+        createSelection(range)
 
         on('toggleEmphasis', (selection) => {
-          expect(selection).toEqual(elemSelection)
+          expect(selection.range.equals(range)).to.equal(true)
           done()
         })
 

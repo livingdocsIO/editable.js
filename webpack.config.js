@@ -74,7 +74,8 @@ module.exports = {
   ...(test ? {
     resolve: {
       alias: {
-        sinon: 'sinon/pkg/sinon.js'
+        sinon: 'sinon/pkg/sinon.js',
+        chai: '@esm-bundle/chai'
       }
     }
   } : {}),

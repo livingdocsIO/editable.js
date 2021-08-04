@@ -1,4 +1,5 @@
-import cloneDeep from 'lodash.clonedeep'
+import {expect} from 'chai'
+import cloneDeep from 'lodash-es/cloneDeep'
 import config from '../src/config'
 import {Editable} from '../src/core'
 
@@ -15,26 +16,26 @@ describe('Editable configuration', function () {
 
     it('has default values', function () {
       editable = new Editable()
-      expect(editable.config.defaultBehavior).toEqual(true)
+      expect(editable.config.defaultBehavior).to.equal(true)
     })
 
     it('does not include the global configuration', function () {
       editable = new Editable()
-      expect(editable.config.editableClass).toEqual(undefined)
+      expect(editable.config.editableClass).to.equal(undefined)
     })
 
     it('overrides the default values', function () {
       editable = new Editable({
         defaultBehavior: false
       })
-      expect(editable.config.defaultBehavior).toEqual(false)
+      expect(editable.config.defaultBehavior).to.equal(false)
     })
   })
 
   describe('globalConfig()', function () {
     const originalConfig = cloneDeep(config)
 
-    beforeAll(function () {
+    beforeEach(function () {
       Editable.globalConfig(originalConfig)
     })
 
@@ -43,26 +44,26 @@ describe('Editable configuration', function () {
     })
 
     it('retreives the config', function () {
-      expect(originalConfig).toEqual(Editable.getGlobalConfig())
+      expect(originalConfig).to.deep.equal(Editable.getGlobalConfig())
     })
 
     it('retrieves the current state of the config', function () {
       Editable.globalConfig({editableClass: 'editable-instance'})
-      expect(originalConfig).not.toEqual(Editable.getGlobalConfig())
+      expect(originalConfig).not.to.equal(Editable.getGlobalConfig())
     })
 
     it('has a default value for "editableClass"', function () {
-      expect(Editable.getGlobalConfig().editableClass).toEqual('js-editable')
+      expect(Editable.getGlobalConfig().editableClass).to.equal('js-editable')
     })
 
     it('overrides "editableClass"', function () {
       Editable.globalConfig({editableClass: 'editable-instance'})
-      expect(Editable.getGlobalConfig().editableClass).toEqual('editable-instance')
+      expect(Editable.getGlobalConfig().editableClass).to.equal('editable-instance')
     })
 
     // Safety check for the test setup
     it('resets the default after each spec', function () {
-      expect(Editable.getGlobalConfig().editableClass).toEqual('js-editable')
+      expect(Editable.getGlobalConfig().editableClass).to.equal('js-editable')
     })
   })
 })

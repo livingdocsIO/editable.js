@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 import {createElement} from '../src/util/dom'
 import NodeIterator from '../src/node-iterator'
 import highlightText from '../src/highlight-text'
@@ -19,10 +20,10 @@ describe('NodeIterator', function () {
     })
 
     it('sets its properties', function () {
-      expect(this.iterator.root).toEqual(this.element)
-      expect(this.iterator.current).toEqual(this.element)
-      expect(this.iterator.nextNode).toEqual(this.element)
-      expect(this.iterator.previous).toEqual(this.element)
+      expect(this.iterator.root).to.equal(this.element)
+      expect(this.iterator.current).to.equal(this.element)
+      expect(this.iterator.nextNode).to.equal(this.element)
+      expect(this.iterator.previous).to.equal(this.element)
     })
   })
 
@@ -35,17 +36,17 @@ describe('NodeIterator', function () {
 
     it('returns the root on the first call', function () {
       const current = this.iterator.getNext()
-      expect(current).toEqual(this.element)
+      expect(current).to.equal(this.element)
     })
 
     it('returns the the first child on the second call', function () {
       const current = callnTimes(this.iterator, 'getNext', 2)
-      expect(current).toEqual(this.element.firstChild)
+      expect(current).to.equal(this.element.firstChild)
     })
 
     it('returns undefined on the third call', function () {
       const current = callnTimes(this.iterator, 'getNext', 3)
-      expect(current).toEqual(null)
+      expect(current).to.equal(null)
     })
   })
 
@@ -62,8 +63,8 @@ describe('NodeIterator', function () {
       }, createElement('<span>'))
 
       this.iterator.replaceCurrent(replacement)
-      expect(this.iterator.current).toEqual(replacement)
-      expect(this.iterator.nextNode).toEqual(null)
+      expect(this.iterator.current).to.equal(replacement)
+      expect(this.iterator.nextNode).to.equal(null)
     })
 
     it('replaces the first character of longer a text node', function () {
@@ -78,7 +79,7 @@ describe('NodeIterator', function () {
 
       this.iterator.replaceCurrent(replacement)
       current = this.iterator.getNext()
-      expect(current.data).toEqual('ord')
+      expect(current.data).to.equal('ord')
     })
   })
 })

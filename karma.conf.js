@@ -11,12 +11,12 @@ module.exports = function (config) {
   config.set({
     basePath: './',
 
-    frameworks: ['jasmine', 'webpack'],
+    frameworks: ['mocha', 'webpack'],
 
     plugins: [
       'karma-chrome-launcher',
       'karma-coverage',
-      'karma-jasmine',
+      'karma-mocha',
       'karma-sourcemap-loader',
       'karma-webpack'
     ],

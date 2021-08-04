@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 import rangy from 'rangy'
 
 import {createElement} from '../src/util/dom'
@@ -11,28 +12,28 @@ describe('RangeContainer', function () {
     })
 
     it('has nothing selected', function () {
-      expect(this.range.isAnythingSelected).toBe(false)
+      expect(this.range.isAnythingSelected).to.equal(false)
     })
 
     it('is no Cursor', function () {
-      expect(this.range.isCursor).toBe(false)
+      expect(this.range.isCursor).to.equal(false)
     })
 
     it('is no Selection', function () {
-      expect(this.range.isSelection).toBe(false)
+      expect(this.range.isSelection).to.equal(false)
     })
 
     describe('getCursor()', function () {
 
       it('returns undefined', function () {
-        expect(this.range.getCursor()).toBe(undefined)
+        expect(this.range.getCursor()).to.equal(undefined)
       })
     })
 
     describe('getSelection()', function () {
 
       it('returns undefined', function () {
-        expect(this.range.getSelection()).toBe(undefined)
+        expect(this.range.getSelection()).to.equal(undefined)
       })
     })
   })
@@ -48,24 +49,24 @@ describe('RangeContainer', function () {
     })
 
     it('has something selected', function () {
-      expect(this.range.isAnythingSelected).toBe(true)
+      expect(this.range.isAnythingSelected).to.equal(true)
     })
 
     it('is no Cursor', function () {
-      expect(this.range.isCursor).toBe(false)
+      expect(this.range.isCursor).to.equal(false)
     })
 
     it('is a Selection', function () {
-      expect(this.range.isSelection).toBe(true)
+      expect(this.range.isSelection).to.equal(true)
     })
 
     it('can force a cursor', function () {
-      expect(this.range.host.innerHTML).toEqual('Text')
+      expect(this.range.host.innerHTML).to.equal('Text')
 
       const cursor = this.range.forceCursor()
 
-      expect(cursor.isCursor).toBe(true)
-      expect(this.range.host.innerHTML).toEqual('')
+      expect(cursor.isCursor).to.equal(true)
+      expect(this.range.host.innerHTML).to.equal('')
     })
   })
 
@@ -81,15 +82,15 @@ describe('RangeContainer', function () {
     })
 
     it('has something selected', function () {
-      expect(this.range.isAnythingSelected).toBe(true)
+      expect(this.range.isAnythingSelected).to.equal(true)
     })
 
     it('is a Cursor', function () {
-      expect(this.range.isCursor).toBe(true)
+      expect(this.range.isCursor).to.equal(true)
     })
 
     it('is no Selection', function () {
-      expect(this.range.isSelection).toBe(false)
+      expect(this.range.isSelection).to.equal(false)
     })
   })
 })

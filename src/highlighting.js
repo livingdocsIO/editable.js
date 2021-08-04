@@ -1,4 +1,4 @@
-import _merge from 'lodash.merge'
+import _merge from 'lodash-es/merge'
 import * as nodeType from './node-type'
 import * as content from './content'
 import highlightText from './highlight-text'

@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 import MatchCollection from '../src/plugins/highlighting/match-collection'
 
 
@@ -7,7 +8,7 @@ describe('MatchCollection', function () {
 
     it('creates an instance', function () {
       const matches = new MatchCollection()
-      expect(matches).toBeDefined()
+      expect(matches).to.be.an.instanceof(MatchCollection)
     })
 
   })
@@ -25,7 +26,7 @@ describe('MatchCollection', function () {
         endIndex: 1
       }])
 
-      expect(this.collection.matches).toEqual([{
+      expect(this.collection.matches).to.deep.equal([{
         startIndex: 0,
         endIndex: 1
       }])
@@ -42,7 +43,7 @@ describe('MatchCollection', function () {
         endIndex: 2
       }])
 
-      expect(this.collection.matches).toEqual([{
+      expect(this.collection.matches).to.deep.equal([{
         startIndex: 0,
         endIndex: 1
       }, {
@@ -63,7 +64,7 @@ describe('MatchCollection', function () {
         endIndex: 2
       }])
 
-      expect(this.collection.matches).toEqual([{
+      expect(this.collection.matches).to.deep.equal([{
         startIndex: 0,
         endIndex: 2
       }])
