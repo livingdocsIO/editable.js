@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 import rangy from 'rangy'
 
 import {createElement} from '../src/util/dom'
@@ -23,7 +24,7 @@ describe('Keyboard', function () {
 
       event.keyCode = Keyboard.key.left
       keyboard.dispatchKeyEvent(event, {})
-      expect(called).toEqual(1)
+      expect(called).to.equal(1)
     })
 
     describe('notify "character" event', function () {
@@ -33,7 +34,7 @@ describe('Keyboard', function () {
 
         event.keyCode = Keyboard.key.left
         keyboard.dispatchKeyEvent(event, {}, true)
-        expect(called).toEqual(0)
+        expect(called).to.equal(0)
       })
 
       it('does not fire the event for a "ctrl" key', function () {
@@ -41,7 +42,7 @@ describe('Keyboard', function () {
 
         event.keyCode = Keyboard.key.ctrl
         keyboard.dispatchKeyEvent(event, {}, true)
-        expect(called).toEqual(0)
+        expect(called).to.equal(0)
       })
 
       it('does fire the event for a "e" key', function () {
@@ -49,7 +50,7 @@ describe('Keyboard', function () {
 
         event.keyCode = 'e'.charCodeAt(0)
         keyboard.dispatchKeyEvent(event, {}, true)
-        expect(called).toEqual(1)
+        expect(called).to.equal(1)
       })
 
       it('does not fire the event for a "e" key without the notifyCharacterEvent param', function () {
@@ -57,7 +58,7 @@ describe('Keyboard', function () {
 
         event.keyCode = 'e'.charCodeAt(0)
         keyboard.dispatchKeyEvent(event, {}, false)
-        expect(called).toEqual(0)
+        expect(called).to.equal(0)
       })
 
       it('does fire the event for a "b" key', function () {
@@ -65,7 +66,7 @@ describe('Keyboard', function () {
 
         event.keyCode = Keyboard.key.b
         keyboard.dispatchKeyEvent(event, {}, true)
-        expect(called).toEqual(1)
+        expect(called).to.equal(1)
       })
 
       it('does fire the event for an "i" key', function () {
@@ -73,7 +74,7 @@ describe('Keyboard', function () {
 
         event.keyCode = Keyboard.key.i
         keyboard.dispatchKeyEvent(event, {}, true)
-        expect(called).toEqual(1)
+        expect(called).to.equal(1)
       })
     })
 
@@ -84,7 +85,7 @@ describe('Keyboard', function () {
 
         event.keyCode = Keyboard.key.b
         keyboard.dispatchKeyEvent(event, {}, true)
-        expect(called).toEqual(0)
+        expect(called).to.equal(0)
       })
 
       it('does fire the event for a "b" key with "ctrl" key', function () {
@@ -93,7 +94,7 @@ describe('Keyboard', function () {
         event.keyCode = Keyboard.key.b
         event.ctrlKey = true
         keyboard.dispatchKeyEvent(event, {}, true)
-        expect(called).toEqual(1)
+        expect(called).to.equal(1)
       })
 
       it('does fire the event for a "b" key with "meta" key', function () {
@@ -102,7 +103,7 @@ describe('Keyboard', function () {
         event.keyCode = Keyboard.key.b
         event.metaKey = true
         keyboard.dispatchKeyEvent(event, {}, true)
-        expect(called).toEqual(1)
+        expect(called).to.equal(1)
       })
     })
 
@@ -113,7 +114,7 @@ describe('Keyboard', function () {
 
         event.keyCode = Keyboard.key.i
         keyboard.dispatchKeyEvent(event, {}, true)
-        expect(called).toEqual(0)
+        expect(called).to.equal(0)
       })
 
       it('does fire the event for a "i" key with "ctrl" key', function () {
@@ -122,7 +123,7 @@ describe('Keyboard', function () {
         event.keyCode = Keyboard.key.i
         event.ctrlKey = true
         keyboard.dispatchKeyEvent(event, {}, true)
-        expect(called).toEqual(1)
+        expect(called).to.equal(1)
       })
 
       it('does fire the event for a "i" key with "meta" key', function () {
@@ -131,7 +132,7 @@ describe('Keyboard', function () {
         event.keyCode = Keyboard.key.i
         event.metaKey = true
         keyboard.dispatchKeyEvent(event, {}, true)
-        expect(called).toEqual(1)
+        expect(called).to.equal(1)
       })
     })
   })
@@ -147,43 +148,43 @@ describe('Keyboard', function () {
     it('returns undefined for a ranga within a node', function () {
       this.range.setStart(this.nodeText2, 0)
       this.range.setEnd(this.nodeText2, 2)
-      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).toEqual(undefined)
+      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).to.equal(undefined)
     })
 
     it('returns the parent node of the start node when the start node is a text node with offset is 0 and end node is outside of the parent node', function () {
       this.range.setStart(this.nodeText2, 0)
       this.range.setEnd(this.nodeText3, 2)
-      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).toEqual(this.nodeB)
+      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).to.equal(this.nodeB)
     })
 
     it('returns the parent node of the start node when the start node is a text node with offset is 0 and end node is within a sibling of the parent node', function () {
       this.range.setStart(this.nodeText2, 0)
       this.range.setEnd(this.nodeText4, 2)
-      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).toEqual(this.nodeB)
+      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).to.equal(this.nodeB)
     })
 
     it('returns the parent node of the start node when the start node is a text node with offset is 0 and end node is after a sibling of the parent node', function () {
       this.range.setStart(this.nodeText2, 0)
       this.range.setEnd(this.nodeText5, 2)
-      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).toEqual(this.nodeB)
+      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).to.equal(this.nodeB)
     })
 
     it('recursively returns the parent if needed', function () {
       this.range.setStart(this.nodeText2, 0)
       this.range.setEnd(this.nodeText6, 2)
-      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).toEqual(this.nodeA)
+      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).to.equal(this.nodeA)
     })
 
     it('returns undefined for a range that starts with an offset of 1', function () {
       this.range.setStart(this.nodeText2, 1)
       this.range.setEnd(this.nodeText6, 2)
-      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).toEqual(undefined)
+      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).to.equal(undefined)
     })
 
     it('returns undefined for a range that starts with an offset of 1', function () {
       this.range.setStart(this.nodeText3, 0)
       this.range.setEnd(this.nodeText6, 2)
-      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).toEqual(undefined)
+      expect(Keyboard.getNodeToRemove(this.range, this.contenteditable)).to.equal(undefined)
     })
   })
 })

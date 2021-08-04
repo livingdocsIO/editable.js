@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 import {Editable} from '../src/core'
 
 describe('Editable', function () {
@@ -12,17 +13,17 @@ describe('Editable', function () {
   describe('global variable', function () {
 
     it('is not defined', function () {
-      expect(window.Editable).toBeUndefined()
+      expect(window.Editable).to.equal(undefined)
     })
 
     it('creates a new Editable instance', function () {
       editable = new Editable()
-      expect(editable.on).toBeDefined()
+      expect(editable.on).to.be.a('function')
     })
 
     // Test no variables are leaking into global namespace
     it('does not define dispatcher globally', function () {
-      expect(window.dispatcher).not.toBeDefined()
+      expect(window.dispatcher).to.equal(undefined)
     })
   })
 
@@ -45,7 +46,7 @@ describe('Editable', function () {
         const content = editable.getContent(div)
 
         // escape to show invisible characters
-        expect(escape(content)).toEqual('a')
+        expect(escape(content)).to.equal('a')
       })
     })
 
@@ -56,26 +57,26 @@ describe('Editable', function () {
         const frag = document.createDocumentFragment()
         frag.appendChild(document.createTextNode('b'))
         editable.appendTo(div, frag)
-        expect(div.innerHTML).toEqual('ab')
+        expect(div.innerHTML).to.equal('ab')
       })
 
       it('appends text from a string', function () {
         div.innerHTML = 'a'
         editable.appendTo(div, 'b')
-        expect(div.innerHTML).toEqual('ab')
+        expect(div.innerHTML).to.equal('ab')
       })
 
       it('appends html from a string', function () {
         div.innerHTML = 'a'
         editable.appendTo(div, '<span>b</span>c')
-        expect(div.innerHTML).toEqual('a<span>b</span>c')
+        expect(div.innerHTML).to.equal('a<span>b</span>c')
       })
 
       it('returns a curosr a the right position', function () {
         div.innerHTML = 'a'
         const cursor = editable.appendTo(div, 'b')
-        expect(cursor.beforeHtml()).toEqual('a')
-        expect(cursor.afterHtml()).toEqual('b')
+        expect(cursor.beforeHtml()).to.equal('a')
+        expect(cursor.afterHtml()).to.equal('b')
       })
     })
 
@@ -86,26 +87,26 @@ describe('Editable', function () {
         frag.appendChild(document.createTextNode('b'))
         div.innerHTML = 'a'
         editable.prependTo(div, frag)
-        expect(div.innerHTML).toEqual('ba')
+        expect(div.innerHTML).to.equal('ba')
       })
 
       it('prepends text from a string', function () {
         div.innerHTML = 'a'
         editable.prependTo(div, 'b')
-        expect(div.innerHTML).toEqual('ba')
+        expect(div.innerHTML).to.equal('ba')
       })
 
       it('prepends html from a string', function () {
         div.innerHTML = 'A sentence.'
         editable.prependTo(div, '<span>So</span> be it. ')
-        expect(div.innerHTML).toEqual('<span>So</span> be it. A sentence.')
+        expect(div.innerHTML).to.equal('<span>So</span> be it. A sentence.')
       })
 
       it('returns a curosr a the right position', function () {
         div.innerHTML = 'a'
         const cursor = editable.prependTo(div, 'b')
-        expect(cursor.beforeHtml()).toEqual('b')
-        expect(cursor.afterHtml()).toEqual('a')
+        expect(cursor.beforeHtml()).to.equal('b')
+        expect(cursor.afterHtml()).to.equal('a')
       })
     })
 
@@ -113,7 +114,7 @@ describe('Editable', function () {
 
       it('gets triggered after format change', (done) => {
         editable.change((element) => {
-          expect(element).toEqual(div)
+          expect(element).to.equal(div)
           done()
         })
 
@@ -135,8 +136,8 @@ describe('Editable', function () {
           element: div,
           origCoordinates: {top: 0, left: 130}
         })
-        expect(wasFound).toEqual(true)
-        expect(offset).toEqual(19)
+        expect(wasFound).to.equal(true)
+        expect(offset).to.equal(19)
       })
 
       /*
@@ -151,8 +152,8 @@ describe('Editable', function () {
           element: div,
           origCoordinates: {top: 0, left: 130}
         })
-        expect(wasFound).toEqual(true)
-        expect(offset).toEqual(19)
+        expect(wasFound).to.equal(true)
+        expect(offset).to.equal(19)
       })
 
       it('returns not found for empty nodes', function () {
@@ -161,7 +162,7 @@ describe('Editable', function () {
           element: div,
           origCoordinates: {top: 0, left: 130}
         })
-        expect(wasFound).toEqual(false)
+        expect(wasFound).to.equal(false)
       })
 
       /*
@@ -176,8 +177,8 @@ describe('Editable', function () {
           element: div,
           origCoordinates: {top: 0, left: 130}
         })
-        expect(wasFound).toEqual(true)
-        expect(offset).toEqual(3)
+        expect(wasFound).to.equal(true)
+        expect(offset).to.equal(3)
       })
     })
   })

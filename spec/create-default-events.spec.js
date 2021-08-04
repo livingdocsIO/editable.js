@@ -1,4 +1,5 @@
-import rangy from 'rangy'
+import {expect} from 'chai'
+import {createRange} from 'rangy'
 
 import Cursor from '../src/cursor'
 import {Editable} from '../src/core'
@@ -8,12 +9,12 @@ describe('Default Events', function () {
   // create a Cursor object and set the selection to it
   function createCursor (elem, range) {
     const cursor = new Cursor(elem, range)
-    cursor.setSelection()
+    cursor.setVisibleSelection()
     return cursor
   }
 
   function createRangeAtEnd (node) {
-    const range = rangy.createRange()
+    const range = createRange()
     range.selectNodeContents(node)
     range.collapse(false)
     return range
@@ -57,19 +58,19 @@ describe('Default Events', function () {
 
         const onFocus = on(this.editable, 'focus', (element, selection) => {
           if (!selection) return
-          expect(element).toEqual(this.elem)
+          expect(element).to.equal(this.elem)
           const range = selection.range
           const nativeRange = range.nativeRange
-          expect(range.startContainer).toEqual(nativeRange.startContainer)
-          expect(range.endContainer).toEqual(nativeRange.endContainer)
-          expect(range.startOffset).toEqual(nativeRange.startOffset)
-          expect(range.endOffset).toEqual(nativeRange.endOffset)
+          expect(range.startContainer).to.equal(nativeRange.startContainer)
+          expect(range.endContainer).to.equal(nativeRange.endContainer)
+          expect(range.startOffset).to.equal(nativeRange.startOffset)
+          expect(range.endOffset).to.equal(nativeRange.endOffset)
         })
 
         this.elem.dispatchEvent(this.focus)
         this.elem.dispatchEvent(this.blur)
         this.elem.dispatchEvent(this.focus)
-        expect(onFocus.calls).toEqual(2)
+        expect(onFocus.calls).to.equal(2)
       })
     })
   })

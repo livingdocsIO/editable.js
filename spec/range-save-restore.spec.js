@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 import rangy from 'rangy'
 
 import {createElement} from '../src/util/dom'
@@ -15,10 +16,10 @@ describe('RangeSaveRestore', function () {
     this.range.setStart(host.firstChild, 0)
     this.range.setEnd(host.firstChild, 1)
     rangeSaveRestore.save(this.range)
-    expect(this.range.toHtml()).toEqual('a')
-    expect(host.firstChild.childNodes[0].nodeName).toEqual('SPAN')
-    expect(host.firstChild.childNodes[1].nodeValue).toEqual('a')
-    expect(host.firstChild.childNodes[2].nodeName).toEqual('SPAN')
+    expect(this.range.toHtml()).to.equal('a')
+    expect(host.firstChild.childNodes[0].nodeName).to.equal('SPAN')
+    expect(host.firstChild.childNodes[1].nodeValue).to.equal('a')
+    expect(host.firstChild.childNodes[2].nodeName).to.equal('SPAN')
   })
 
   it('restores a range', function () {
@@ -28,7 +29,7 @@ describe('RangeSaveRestore', function () {
     this.range.setEnd(host.firstChild, 1)
     const savedRange = rangeSaveRestore.save(this.range)
     const recoveredRange = rangeSaveRestore.restore(host.firstChild, savedRange)
-    expect(host.firstChild.innerHTML).toEqual('a')
-    expect(recoveredRange.toHtml()).toEqual('a')
+    expect(host.firstChild.innerHTML).to.equal('a')
+    expect(recoveredRange.toHtml()).to.equal('a')
   })
 })

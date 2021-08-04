@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 import rangy from 'rangy'
 
 import Selection from '../src/selection'
@@ -8,7 +9,7 @@ import {createElement} from '../src/util/dom'
 describe('Selection', function () {
 
   it('should be defined', function () {
-    expect(Selection).toBeDefined()
+    expect(Selection).to.be.a('function')
   })
 
   describe('insertCharacter()', function () {
@@ -22,22 +23,22 @@ describe('Selection', function () {
 
     it('returns a cursor', function () {
       const cursor = this.selection.insertCharacter('x')
-      expect(cursor.isCursor).toEqual(true)
+      expect(cursor.isCursor).to.equal(true)
     })
 
     it('replaces the selection with the character', function () {
       this.selection.insertCharacter('x')
-      expect(this.div.innerHTML).toEqual('x')
+      expect(this.div.innerHTML).to.equal('x')
     })
 
     it('inserts the text before the cursor', function () {
       const cursor = this.selection.insertCharacter('x')
-      expect(cursor.beforeHtml()).toEqual('x')
+      expect(cursor.beforeHtml()).to.equal('x')
     })
 
     it('inserts an emoji', function () {
       this.selection.insertCharacter('😘')
-      expect(this.div.innerHTML).toEqual('😘')
+      expect(this.div.innerHTML).to.equal('😘')
     })
   })
 
@@ -50,7 +51,7 @@ describe('Selection', function () {
       this.selection = new Selection(this.div, range)
 
       this.selection.removeChars(['«', '»', '"'])
-      expect(this.div.innerHTML).toEqual('Foo bar foo')
+      expect(this.div.innerHTML).to.equal('Foo bar foo')
     })
   })
 
@@ -68,12 +69,12 @@ describe('Selection', function () {
 
     it('returns the text before', function () {
       const textBefore = this.selection.textBefore()
-      expect(textBefore).toEqual('a')
+      expect(textBefore).to.equal('a')
     })
 
     it('returns the text after', function () {
       const textAfter = this.selection.textAfter()
-      expect(textAfter).toEqual('c')
+      expect(textAfter).to.equal('c')
     })
   })
 
@@ -87,17 +88,17 @@ describe('Selection', function () {
     })
 
     it('sets a reference to window', function () {
-      expect(this.selection.win).toEqual(window)
+      expect(this.selection.win).to.equal(window)
     })
 
     it('sets #isSelection to true', function () {
-      expect(this.selection.isSelection).toBe(true)
+      expect(this.selection.isSelection).to.equal(true)
     })
 
     describe('isAllSelected()', function () {
 
       it('returns true if all is selected', function () {
-        expect(this.selection.isAllSelected()).toEqual(true)
+        expect(this.selection.isAllSelected()).to.equal(true)
       })
 
       it('returns true if all is selected', function () {
@@ -106,13 +107,13 @@ describe('Selection', function () {
         range.setStartBefore(textNode)
         range.setEnd(textNode, 6)
         let selection = new Selection(this.oneWord, range)
-        expect(selection.isAllSelected()).toEqual(true)
+        expect(selection.isAllSelected()).to.equal(true)
 
         range = rangy.createRange()
         range.setStartBefore(textNode)
         range.setEnd(textNode, 5)
         selection = new Selection(this.oneWord, range)
-        expect(selection.isAllSelected()).toEqual(false)
+        expect(selection.isAllSelected()).to.equal(false)
       })
     })
 
@@ -126,14 +127,14 @@ describe('Selection', function () {
         this.selection.makeCustom(this.customElement)
         const customTags = this.selection.getTagsByName(this.customElement.tagName)
         const html = getHtml(customTags[0])
-        expect(html).toEqual('<span class="foo">foobar</span>')
+        expect(html).to.equal('<span class="foo">foobar</span>')
       })
 
       it('toggles the custom selection', function () {
         this.selection.makeCustom(this.customElement)
         this.selection.toggleCustom(this.customElement)
         const customTags = this.selection.getTagsByName(this.customElement.tagName)
-        expect(customTags.length).toEqual(0)
+        expect(customTags.length).to.equal(0)
       })
     })
 
@@ -158,14 +159,14 @@ describe('Selection', function () {
         this.selection.makeBold()
         const boldTags = this.selection.getTagsByName('strong')
         const html = getHtml(boldTags[0])
-        expect(html).toEqual('<strong class="foo">foobar</strong>')
+        expect(html).to.equal('<strong class="foo">foobar</strong>')
       })
 
       it('toggles the bold selection', function () {
         this.selection.makeBold()
         this.selection.toggleBold()
         const boldTags = this.selection.getTagsByName('strong')
-        expect(boldTags.length).toEqual(0)
+        expect(boldTags.length).to.equal(0)
       })
     })
 
@@ -189,14 +190,14 @@ describe('Selection', function () {
         this.selection.giveEmphasis()
         const emphasisTags = this.selection.getTagsByName('em')
         const html = getHtml(emphasisTags[0])
-        expect(html).toEqual('<em class="bar">foobar</em>')
+        expect(html).to.equal('<em class="bar">foobar</em>')
       })
 
       it('toggles the italic selection', function () {
         this.selection.giveEmphasis()
         this.selection.toggleEmphasis()
         const emphasisTags = this.selection.getTagsByName('em')
-        expect(emphasisTags.length).toEqual(0)
+        expect(emphasisTags.length).to.equal(0)
       })
     })
 
@@ -221,14 +222,14 @@ describe('Selection', function () {
         this.selection.makeUnderline()
         const underlineTags = this.selection.getTagsByName('u')
         const html = getHtml(underlineTags[0])
-        expect(html).toEqual('<u class="bar">foobar</u>')
+        expect(html).to.equal('<u class="bar">foobar</u>')
       })
 
       it('toggles the underline selection', function () {
         this.selection.makeUnderline()
         this.selection.toggleUnderline()
         const underlineTags = this.selection.getTagsByName('u')
-        expect(underlineTags.length).toEqual(0)
+        expect(underlineTags.length).to.equal(0)
       })
     })
 
@@ -252,21 +253,21 @@ describe('Selection', function () {
         this.selection.link('https://livingdocs.io')
         const linkTags = this.selection.getTagsByName('a')
         const html = getHtml(linkTags[0])
-        expect(html).toEqual('<a class="foo bar" href="https://livingdocs.io">foobar</a>')
+        expect(html).to.equal('<a class="foo bar" href="https://livingdocs.io">foobar</a>')
       })
 
       it('toggles a link', function () {
         this.selection.link('https://livingdocs.io')
         this.selection.toggleLink()
         const linkTags = this.selection.getTagsByName('a')
-        expect(linkTags.length).toEqual(0)
+        expect(linkTags.length).to.equal(0)
       })
 
       it('removes a link', function () {
         this.selection.link('https://livingdocs.io')
         this.selection.unlink()
         const linkTags = this.selection.getTagsByName('a')
-        expect(linkTags.length).toEqual(0)
+        expect(linkTags.length).to.equal(0)
       })
     })
 
@@ -275,9 +276,9 @@ describe('Selection', function () {
   describe('inherits form Cursor', function () {
 
     it('has isAtEnd() method from Cursor in its protoype chain', function () {
-      expect(Selection.prototype.hasOwnProperty('isAtEnd')).toEqual(false)
-      expect(Cursor.prototype.hasOwnProperty('isAtEnd')).toEqual(true)
-      expect('isAtEnd' in Selection.prototype).toEqual(true)
+      expect(Selection.prototype.hasOwnProperty('isAtEnd')).to.equal(false)
+      expect(Cursor.prototype.hasOwnProperty('isAtEnd')).to.equal(true)
+      expect('isAtEnd' in Selection.prototype).to.equal(true)
     })
   })
 })

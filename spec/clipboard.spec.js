@@ -1,5 +1,6 @@
+import {expect} from 'chai'
 import {parseContent, updateConfig} from '../src/clipboard'
-import cloneDeep from 'lodash.clonedeep'
+import cloneDeep from 'lodash-es/cloneDeep'
 import config from '../src/config'
 
 describe('Clipboard', function () {
@@ -24,19 +25,19 @@ describe('Clipboard', function () {
     // -------------
 
     it('gets a plain text', function () {
-      expect(extractSingleBlock('a')).toEqual('a')
+      expect(extractSingleBlock('a')).to.equal('a')
     })
 
     it('trims text', function () {
-      expect(extractSingleBlock(' a ')).toEqual('a')
+      expect(extractSingleBlock(' a ')).to.equal('a')
     })
 
     it('keeps a <a> element with an href attribute with an absolute link', function () {
-      expect(extractSingleBlock('<a href="http://link.com">a</a>')).toEqual('<a href="http://link.com">a</a>')
+      expect(extractSingleBlock('<a href="http://link.com">a</a>')).to.equal('<a href="http://link.com">a</a>')
     })
 
     it('keeps a <a> element with an href attribute with an relative link', function () {
-      expect(extractSingleBlock('<a href="/link/1337">a</a>')).toEqual('<a href="/link/1337">a</a>')
+      expect(extractSingleBlock('<a href="/link/1337">a</a>')).to.equal('<a href="/link/1337">a</a>')
     })
 
     it('keeps a <a> element with an a list of whitelisted-attributes', function () {
@@ -48,7 +49,7 @@ describe('Clipboard', function () {
         extractSingleBlock(
           '<a target="_blank" rel="nofollow" href="/link/1337">a</a>'
         )
-      ).toEqual('<a target="_blank" rel="nofollow" href="/link/1337">a</a>')
+      ).to.equal('<a target="_blank" rel="nofollow" href="/link/1337">a</a>')
     })
 
     it('removes attributes that arent whitelisted for an <a> element ', function () {
@@ -59,19 +60,19 @@ describe('Clipboard', function () {
         extractSingleBlock(
           '<a target="_blank" rel="nofollow" href="/link/1337">a</a>'
         )
-      ).toEqual('<a href="/link/1337">a</a>')
+      ).to.equal('<a href="/link/1337">a</a>')
     })
 
     it('keeps a <strong> element', function () {
-      expect(extractSingleBlock('<strong>a</strong>')).toEqual('<strong>a</strong>')
+      expect(extractSingleBlock('<strong>a</strong>')).to.equal('<strong>a</strong>')
     })
 
     it('keeps an <em> element', function () {
-      expect(extractSingleBlock('<em>a</em>')).toEqual('<em>a</em>')
+      expect(extractSingleBlock('<em>a</em>')).to.equal('<em>a</em>')
     })
 
     it('keeps a <br> element', function () {
-      expect(extractSingleBlock('a<br>b')).toEqual('a<br>b')
+      expect(extractSingleBlock('a<br>b')).to.equal('a<br>b')
     })
 
     // Split Blocks
@@ -79,21 +80,21 @@ describe('Clipboard', function () {
 
     it('creates two blocks from two paragraphs', function () {
       const blocks = extract('<p>a</p><p>b</p>')
-      expect(blocks[0]).toEqual('a')
-      expect(blocks[1]).toEqual('b')
+      expect(blocks[0]).to.equal('a')
+      expect(blocks[1]).to.equal('b')
     })
 
     it('creates two blocks from an <h1> followed by an <h2>', function () {
       const blocks = extract('<h1>a</h1><h2>b</h2>')
-      expect(blocks[0]).toEqual('a')
-      expect(blocks[1]).toEqual('b')
+      expect(blocks[0]).to.equal('a')
+      expect(blocks[1]).to.equal('b')
     })
 
     // Clean Whitespace
     // ----------------
 
     function checkWhitespace (a, b) {
-      expect(escape(extractSingleBlock(a))).toEqual(escape(b))
+      expect(escape(extractSingleBlock(a))).to.equal(escape(b))
     }
 
     it('replaces a single &nbsp; character', function () {
@@ -120,50 +121,50 @@ describe('Clipboard', function () {
     // ---------------
 
     it('removes a <span> element', function () {
-      expect(extractSingleBlock('<span>a</span>')).toEqual('a')
+      expect(extractSingleBlock('<span>a</span>')).to.equal('a')
     })
 
     it('removes an <a> element without an href attribute', function () {
-      expect(extractSingleBlock('<a>a</a>')).toEqual('a')
+      expect(extractSingleBlock('<a>a</a>')).to.equal('a')
     })
 
 
     it('removes an <a> element with an empty href attribute', function () {
-      expect(extractSingleBlock('<a href>a</a>')).toEqual('a')
+      expect(extractSingleBlock('<a href>a</a>')).to.equal('a')
     })
 
     it('removes an <a> element with an empty href attribute', function () {
-      expect(extractSingleBlock('<a href="">a</a>')).toEqual('a')
+      expect(extractSingleBlock('<a href="">a</a>')).to.equal('a')
     })
 
     it('removes an empty <strong> element', function () {
-      expect(extractSingleBlock('<strong></strong>')).toEqual(undefined)
+      expect(extractSingleBlock('<strong></strong>')).to.equal(undefined)
     })
 
     it('removes a <strong> element with only whitespace', function () {
-      expect(extractSingleBlock('<strong> </strong>')).toEqual(undefined)
+      expect(extractSingleBlock('<strong> </strong>')).to.equal(undefined)
     })
 
     it('removes an empty <strong> element but keeps its whitespace', function () {
-      expect(extractSingleBlock('a<strong> </strong>b')).toEqual('a b')
+      expect(extractSingleBlock('a<strong> </strong>b')).to.equal('a b')
     })
 
     it('removes an attribute from an <em> element', function () {
-      expect(extractSingleBlock('<em data-something="x">a</em>')).toEqual('<em>a</em>')
+      expect(extractSingleBlock('<em data-something="x">a</em>')).to.equal('<em>a</em>')
     })
 
     // Transform Elements
     // ------------------
 
     it('transforms a <b> into a <strong>', function () {
-      expect(extractSingleBlock('<b>a</b>')).toEqual('<strong>a</strong>')
+      expect(extractSingleBlock('<b>a</b>')).to.equal('<strong>a</strong>')
     })
 
     it('changes absolute links to relative ones with the keepInternalRelativeLinks flag set to true', function () {
       const updatedConfig = cloneDeep(config)
       updatedConfig.pastedHtmlRules.keepInternalRelativeLinks = true
       updateConfig(updatedConfig)
-      expect(extractSingleBlock(`<a href="${window.location.origin}/test123">a</a>`)).toEqual('<a href="/test123">a</a>')
+      expect(extractSingleBlock(`<a href="${window.location.origin}/test123">a</a>`)).to.equal('<a href="/test123">a</a>')
     })
 
     // Escape Content
@@ -174,7 +175,7 @@ describe('Clipboard', function () {
       const div = document.createElement('div')
       div.appendChild(document.createTextNode('<b>a</b>'))
 
-      expect(parseContent(div)[0]).toEqual('&lt;b&gt;a&lt;/b&gt;')
+      expect(parseContent(div)[0]).to.equal('&lt;b&gt;a&lt;/b&gt;')
     })
 
     it('removes blacklisted HTML elements (e.g. <style>)', function () {
@@ -187,7 +188,7 @@ describe('Clipboard', function () {
           bar
         </p>`
 
-      expect(parseContent(div)[0]).toEqual('bar')
+      expect(parseContent(div)[0]).to.equal('bar')
     })
 
     // Replace quotation marks
@@ -212,7 +213,7 @@ describe('Clipboard', function () {
 
         updateConfig(updatedConfig)
         const block = extractSingleBlock('text outside "text inside"')
-        expect(block).toEqual('text outside "text inside"')
+        expect(block).to.equal('text outside "text inside"')
       })
 
       it('does replace only quotes when apostrophe is undefined', function () {
@@ -225,7 +226,7 @@ describe('Clipboard', function () {
 
         updateConfig(updatedConfig)
         const block = extractSingleBlock(`someone: "it's the economy, stupid!"`)
-        expect(block).toEqual(`someone: “it's the economy, stupid!”`)
+        expect(block).to.equal(`someone: “it's the economy, stupid!”`)
       })
 
       it('does replace only apostrophe when quotes are undefined', function () {
@@ -238,7 +239,7 @@ describe('Clipboard', function () {
 
         updateConfig(updatedConfig)
         const block = extractSingleBlock(`someone: "it's the economy, stupid!"`)
-        expect(block).toEqual(`someone: "it’s the economy, stupid!"`)
+        expect(block).to.equal(`someone: "it’s the economy, stupid!"`)
       })
 
       it('does nothing when replaceQuotes is undefined', function () {
@@ -247,72 +248,72 @@ describe('Clipboard', function () {
 
         updateConfig(updatedConfig)
         const block = extractSingleBlock(`"it's a 'wonder'"`)
-        expect(block).toEqual(`"it's a 'wonder'"`)
+        expect(block).to.equal(`"it's a 'wonder'"`)
       })
 
       it('replaces quotation marks', function () {
         const block = extractSingleBlock('text outside "text inside"')
-        expect(block).toEqual('text outside “text inside”')
+        expect(block).to.equal('text outside “text inside”')
       })
 
       it('replaces empty quotation marks', function () {
         const block = extractSingleBlock('empty "" quotes')
-        expect(block).toEqual('empty “” quotes')
+        expect(block).to.equal('empty “” quotes')
       })
 
       it('replaces empty nested quotation marks', function () {
         const block = extractSingleBlock(`"''"`)
-        expect(block).toEqual('“‘’”')
+        expect(block).to.equal('“‘’”')
       })
 
       it('replaces nested double quotation marks', function () {
         const block = extractSingleBlock('text outside "text «inside» text"')
-        expect(block).toEqual('text outside “text “inside” text”')
+        expect(block).to.equal('text outside “text “inside” text”')
       })
 
       it('replaces multiple nested quotation marks', function () {
         const block = extractSingleBlock('text outside "text «inside „double nested“» text"')
-        expect(block).toEqual('text outside “text “inside “double nested”” text”')
+        expect(block).to.equal('text outside “text “inside “double nested”” text”')
       })
 
       it('replaces quotation marks and ignore not closing marks', function () {
         const block = extractSingleBlock('text outside "text «inside „double nested» text"')
-        expect(block).toEqual('text outside “text “inside „double nested” text”')
+        expect(block).to.equal('text outside “text “inside „double nested” text”')
       })
 
       it('replaces nested quotes with multiple quotes inside nested', function () {
         const block = extractSingleBlock('text outside "text «inside» „second inside text“"')
-        expect(block).toEqual('text outside “text “inside” “second inside text””')
+        expect(block).to.equal('text outside “text “inside” “second inside text””')
       })
 
       it('replaces nested quotes with multiple quotes inside nested and not closing marks', function () {
         const block = extractSingleBlock('text outside "text «inside» „second «inside» text"')
-        expect(block).toEqual('text outside “text “inside” „second “inside” text”')
+        expect(block).to.equal('text outside “text “inside” „second “inside” text”')
       })
 
       it('replaces apostrophe', function () {
         const block = extractSingleBlock(`don't`)
-        expect(block).toEqual('don’t')
+        expect(block).to.equal('don’t')
       })
 
       it('replaces apostrophe inside quotes', function () {
         const block = extractSingleBlock(`outside "don't"`)
-        expect(block).toEqual('outside “don’t”')
+        expect(block).to.equal('outside “don’t”')
       })
 
       it('replaces single quotation marks', function () {
         const block = extractSingleBlock(`text outside 'text inside'`)
-        expect(block).toEqual('text outside ‘text inside’')
+        expect(block).to.equal('text outside ‘text inside’')
       })
 
       it('replaces nested quotes with single quotes inside nested', function () {
         const block = extractSingleBlock(`text outside "text 'inside' „second inside text“"`)
-        expect(block).toEqual('text outside “text ‘inside’ “second inside text””')
+        expect(block).to.equal('text outside “text ‘inside’ “second inside text””')
       })
 
       it('does not replace two apostrophe with quotes', function () {
         const block = extractSingleBlock(`It's a cat's world.`)
-        expect(block).toEqual(`It’s a cat’s world.`)
+        expect(block).to.equal(`It’s a cat’s world.`)
       })
 
       it('does not replace two apostrophe with quotes inside quotes', function () {
@@ -325,7 +326,7 @@ describe('Clipboard', function () {
 
         updateConfig(updatedConfig)
         const block = extractSingleBlock(`'It's a cat's world.'`)
-        expect(block).toEqual(`‹It’s a cat’s world.›`)
+        expect(block).to.equal(`‹It’s a cat’s world.›`)
       })
 
       it('does not replace apostrophe at the beginning or end with quotes', function () {
@@ -338,42 +339,42 @@ describe('Clipboard', function () {
 
         updateConfig(updatedConfig)
         const block = extractSingleBlock(`Can I ask you somethin'? “'Twas the night before Christmas,” he said.`)
-        expect(block).toEqual(`Can I ask you somethin’? «’Twas the night before Christmas,» he said.`)
+        expect(block).to.equal(`Can I ask you somethin’? «’Twas the night before Christmas,» he said.`)
       })
 
       it('does not replace apostrophe at the beginning or end with quotes', function () {
         const block = extractSingleBlock(`Gehen S' 'nauf!`)
-        expect(block).toEqual(`Gehen S’ ’nauf!`)
+        expect(block).to.equal(`Gehen S’ ’nauf!`)
       })
 
       it('replaces quotes with punctuation after the closing quote', function () {
         const block = extractSingleBlock(`Beginning of the sentence "inside quote".`)
-        expect(block).toEqual(`Beginning of the sentence “inside quote”.`)
+        expect(block).to.equal(`Beginning of the sentence “inside quote”.`)
       })
 
       it('replaces nested quotes with single quotes inside nested', function () {
         const block = extractSingleBlock(`text outside "text 'inside „second inside text“'"`)
-        expect(block).toEqual('text outside “text ‘inside “second inside text”’”')
+        expect(block).to.equal('text outside “text ‘inside “second inside text”’”')
       })
 
       it('replaces quotation marks around elements', function () {
         const block = extractSingleBlock('text outside "<b>text inside</b>"')
-        expect(block).toEqual('text outside “<strong>text inside</strong>”')
+        expect(block).to.equal('text outside “<strong>text inside</strong>”')
       })
 
       it('replaces quotation marks inside elements', function () {
         const block = extractSingleBlock('text outside <b>"text inside"</b>')
-        expect(block).toEqual('text outside <strong>“text inside”</strong>')
+        expect(block).to.equal('text outside <strong>“text inside”</strong>')
       })
 
       it('does not replace quotation marks inside tag attributes', function () {
         const block = extractSingleBlock('text outside "<a href="https://livingdocs.io">text inside</a>"')
-        expect(block).toEqual('text outside “<a href="https://livingdocs.io">text inside</a>”')
+        expect(block).to.equal('text outside “<a href="https://livingdocs.io">text inside</a>”')
       })
 
       it('replaces quotation marks around elements with attributes', function () {
         const block = extractSingleBlock('text outside "<a href="https://livingdocs.io">text inside</a>"')
-        expect(block).toEqual('text outside “<a href="https://livingdocs.io">text inside</a>”')
+        expect(block).to.equal('text outside “<a href="https://livingdocs.io">text inside</a>”')
       })
     })
   })

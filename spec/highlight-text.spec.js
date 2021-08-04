@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 import rangy from 'rangy'
 import sinon from 'sinon'
 
@@ -59,25 +60,25 @@ describe('highlightText', function () {
     it('extracts the text', function () {
       this.element.innerHTML = 'a'
       const text = highlightText.extractText(this.element)
-      expect(text).toEqual('a')
+      expect(text).to.equal('a')
     })
 
     it('extracts the text with nested elements', function () {
       this.element.innerHTML = 'a<span>b</span><span></span>c'
       const text = highlightText.extractText(this.element)
-      expect(text).toEqual('abc')
+      expect(text).to.equal('abc')
     })
 
     it('extracts a &nbsp; entity', function () {
       this.element.innerHTML = '&nbsp;'
       const text = highlightText.extractText(this.element)
-      expect(text).toEqual('\u00A0') // \u00A0 is utf8 for the '&nbsp;' html entity
+      expect(text).to.equal('\u00A0') // \u00A0 is utf8 for the '&nbsp;' html entity
     })
 
     it('extracts a zero width no-break space', function () {
       this.element.innerHTML = '\ufeff'
       const text = highlightText.extractText(this.element)
-      expect(text).toEqual('\ufeff')
+      expect(text).to.equal('\ufeff')
     })
 
     it('skips stored cursor positions', function () {
@@ -85,13 +86,13 @@ describe('highlightText', function () {
       const cursor = createCursor(this.element, this.element.firstChild, 1)
       cursor.save()
       const text = highlightText.extractText(this.element)
-      expect(text).toEqual('ab')
+      expect(text).to.equal('ab')
     })
 
     it('extracts text with a <br> properly', function () {
       this.element = createElement('<div>a<br>b</div>')
       const text = highlightText.extractText(this.element)
-      expect(text).toEqual('a b')
+      expect(text).to.equal('a b')
     })
   })
 
@@ -110,11 +111,11 @@ describe('highlightText', function () {
       highlight(elem, ['b'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).toEqual(1)
-      expect(portions[0].text).toEqual('b')
-      expect(portions[0].offset).toEqual(0)
-      expect(portions[0].length).toEqual(1)
-      expect(portions[0].isLastPortion).toEqual(true)
+      expect(portions.length).to.equal(1)
+      expect(portions[0].text).to.equal('b')
+      expect(portions[0].offset).to.equal(0)
+      expect(portions[0].length).to.equal(1)
+      expect(portions[0].isLastPortion).to.equal(true)
     })
 
     it('finds a word that is in a text node with a character before', function () {
@@ -122,11 +123,11 @@ describe('highlightText', function () {
       highlight(elem, ['b'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).toEqual(1)
-      expect(portions[0].text).toEqual('b')
-      expect(portions[0].offset).toEqual(1)
-      expect(portions[0].length).toEqual(1)
-      expect(portions[0].isLastPortion).toEqual(true)
+      expect(portions.length).to.equal(1)
+      expect(portions[0].text).to.equal('b')
+      expect(portions[0].offset).to.equal(1)
+      expect(portions[0].length).to.equal(1)
+      expect(portions[0].isLastPortion).to.equal(true)
     })
 
     it('finds a word that is in a text node with a charcter after', function () {
@@ -134,11 +135,11 @@ describe('highlightText', function () {
       highlight(elem, ['b'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).toEqual(1)
-      expect(portions[0].text).toEqual('b')
-      expect(portions[0].offset).toEqual(0)
-      expect(portions[0].length).toEqual(1)
-      expect(portions[0].isLastPortion).toEqual(true)
+      expect(portions.length).to.equal(1)
+      expect(portions[0].text).to.equal('b')
+      expect(portions[0].offset).to.equal(0)
+      expect(portions[0].length).to.equal(1)
+      expect(portions[0].isLastPortion).to.equal(true)
     })
 
     it('finds a word that span over two text nodes', function () {
@@ -146,12 +147,12 @@ describe('highlightText', function () {
       highlight(elem, ['bc'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).toEqual(2)
-      expect(portions[0].text).toEqual('b')
-      expect(portions[0].isLastPortion).toEqual(false)
+      expect(portions.length).to.equal(2)
+      expect(portions[0].text).to.equal('b')
+      expect(portions[0].isLastPortion).to.equal(false)
 
-      expect(portions[1].text).toEqual('c')
-      expect(portions[1].isLastPortion).toEqual(true)
+      expect(portions[1].text).to.equal('c')
+      expect(portions[1].isLastPortion).to.equal(true)
     })
 
     it('finds a word that spans over three text nodes', function () {
@@ -159,10 +160,10 @@ describe('highlightText', function () {
       highlight(elem, ['abc'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).toEqual(3)
-      expect(portions[0].text).toEqual('a')
-      expect(portions[1].text).toEqual('b')
-      expect(portions[2].text).toEqual('c')
+      expect(portions.length).to.equal(3)
+      expect(portions[0].text).to.equal('a')
+      expect(portions[1].text).to.equal('b')
+      expect(portions[2].text).to.equal('c')
     })
 
     it('finds a word that is partially contained in two text nodes', function () {
@@ -170,16 +171,16 @@ describe('highlightText', function () {
       highlight(elem, ['xxxx'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).toEqual(2)
-      expect(portions[0].text).toEqual('xx')
-      expect(portions[0].offset).toEqual(1)
-      expect(portions[0].length).toEqual(2)
-      expect(portions[0].isLastPortion).toEqual(false)
+      expect(portions.length).to.equal(2)
+      expect(portions[0].text).to.equal('xx')
+      expect(portions[0].offset).to.equal(1)
+      expect(portions[0].length).to.equal(2)
+      expect(portions[0].isLastPortion).to.equal(false)
 
-      expect(portions[1].text).toEqual('xx')
-      expect(portions[1].offset).toEqual(0)
-      expect(portions[1].length).toEqual(2)
-      expect(portions[1].isLastPortion).toEqual(true)
+      expect(portions[1].text).to.equal('xx')
+      expect(portions[1].offset).to.equal(0)
+      expect(portions[1].length).to.equal(2)
+      expect(portions[1].isLastPortion).to.equal(true)
     })
   })
 
@@ -190,7 +191,7 @@ describe('highlightText', function () {
       highlight(elem, ['juice'])
       removeWordId(elem)
       expect(elem.outerHTML)
-        .toEqual('<div>Some <span spellcheck="true">juice</span>.</div>')
+        .to.equal('<div>Some <span spellcheck="true">juice</span>.</div>')
     })
 
     it('wraps a word with a partial <em> element', function () {
@@ -198,7 +199,7 @@ describe('highlightText', function () {
       highlight(elem, ['juice'])
       removeWordId(elem)
       expect(elem.outerHTML)
-        .toEqual('<div>Some <span spellcheck="true">jui</span><em><span spellcheck="true">ce</span>.</em></div>')
+        .to.equal('<div>Some <span spellcheck="true">jui</span><em><span spellcheck="true">ce</span>.</em></div>')
     })
 
     it('wraps two words in the same text node', function () {
@@ -206,7 +207,7 @@ describe('highlightText', function () {
       highlight(elem, ['a', 'b'])
       removeWordId(elem)
       expect(elem.outerHTML)
-        .toEqual('<div><span spellcheck="true">a</span> or <span spellcheck="true">b</span></div>')
+        .to.equal('<div><span spellcheck="true">a</span> or <span spellcheck="true">b</span></div>')
     })
 
     it('wraps a word in a <em> element', function () {
@@ -214,7 +215,7 @@ describe('highlightText', function () {
       highlight(elem, ['word'])
       removeWordId(elem)
       expect(elem.outerHTML)
-        .toEqual('<div><em><span spellcheck="true">word</span></em></div>')
+        .to.equal('<div><em><span spellcheck="true">word</span></em></div>')
     })
 
     it('can handle a non-match', function () {
@@ -222,7 +223,7 @@ describe('highlightText', function () {
       highlight(elem, ['xxx'])
       removeWordId(elem)
       expect(elem.outerHTML)
-        .toEqual('<div><em>word</em></div>')
+        .to.equal('<div><em>word</em></div>')
     })
 
     it('works with a more complex regex', function () {
@@ -230,7 +231,7 @@ describe('highlightText', function () {
       highlight(elem, ['b', 'a'])
       removeWordId(elem)
       expect(elem.outerHTML)
-        .toEqual('<div><em><span spellcheck="true">a</span></em> or <span spellcheck="true">b</span></div>')
+        .to.equal('<div><em><span spellcheck="true">a</span></em> or <span spellcheck="true">b</span></div>')
     })
 
     it('wraps two words with a tag in between', function () {
@@ -238,7 +239,7 @@ describe('highlightText', function () {
       highlight(elem, ['word', 'not'])
       removeWordId(elem)
       expect(elem.outerHTML)
-        .toEqual('<div>A <span spellcheck="true">word</span> <em>is</em> <span spellcheck="true">not</span> necessary</div>')
+        .to.equal('<div>A <span spellcheck="true">word</span> <em>is</em> <span spellcheck="true">not</span> necessary</div>')
     })
 
     it('wraps two characters in the same textnode, when the first match has an offset', function () {
@@ -246,7 +247,7 @@ describe('highlightText', function () {
       highlight(elem, ['b', 'c'])
       removeWordId(elem)
       expect(elem.outerHTML)
-        .toEqual('<div>a, <span spellcheck="true">b</span> or <span spellcheck="true">c</span>, d</div>')
+        .to.equal('<div>a, <span spellcheck="true">b</span> or <span spellcheck="true">c</span>, d</div>')
     })
 
     it('wraps a character after a <br>', function () {
@@ -254,7 +255,7 @@ describe('highlightText', function () {
       highlight(elem, ['b'])
       removeWordId(elem)
       expect(elem.outerHTML)
-        .toEqual('<div>a<br><span spellcheck="true">b</span></div>')
+        .to.equal('<div>a<br><span spellcheck="true">b</span></div>')
     })
 
     it('stores data-word-id on a highlight', function () {
@@ -262,7 +263,7 @@ describe('highlightText', function () {
       highlight(elem, ['a'])
       removeSpellcheckAttr(elem)
       expect(elem.outerHTML)
-        .toEqual('<div><span data-word-id="0">a</span></div>')
+        .to.equal('<div><span data-word-id="0">a</span></div>')
     })
 
     it('stores data-word-id on different matches', function () {
@@ -270,7 +271,7 @@ describe('highlightText', function () {
       highlight(elem, ['a', 'b'])
       removeSpellcheckAttr(elem)
       expect(elem.outerHTML)
-        .toEqual('<div><span data-word-id="0">a</span> <span data-word-id="2">b</span></div>')
+        .to.equal('<div><span data-word-id="0">a</span> <span data-word-id="2">b</span></div>')
     })
 
     it('stores same data-word-id on multiple highlights for the same match', function () {
@@ -278,7 +279,7 @@ describe('highlightText', function () {
       highlight(elem, ['ab'])
       removeSpellcheckAttr(elem)
       expect(elem.outerHTML)
-        .toEqual('<div><span data-word-id="0">a</span><i><span data-word-id="0">b</span></i></div>')
+        .to.equal('<div><span data-word-id="0">a</span><i><span data-word-id="0">b</span></i></div>')
     })
   })
 })

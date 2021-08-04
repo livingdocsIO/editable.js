@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 import eventable from '../src/eventable'
 
 describe('eventable', function () {
@@ -13,22 +14,22 @@ describe('eventable', function () {
       let called = 0
       this.obj.on('publish', function (argA, argB) {
         called++
-        expect(argA).toEqual('A')
-        expect(argB).toEqual('B')
+        expect(argA).to.equal('A')
+        expect(argB).to.equal('B')
       })
 
       this.obj.notify(undefined, 'publish', 'A', 'B')
-      expect(called).toEqual(1)
+      expect(called).to.equal(1)
     })
 
     it('sets the proper context', function () {
       let called = 0
       this.obj.on('publish', function (arg) {
         called++
-        expect(this.test).toEqual('A')
+        expect(this.test).to.equal('A')
       })
       this.obj.notify({test: 'A'}, 'publish')
-      expect(called).toEqual(1)
+      expect(called).to.equal(1)
     })
   })
 
@@ -40,36 +41,36 @@ describe('eventable', function () {
     })
 
     it('attaches an "on" method', function () {
-      expect(this.obj.on).toBeDefined()
+      expect(this.obj.on).not.to.equal(undefined)
     })
 
     it('attaches an "off" method', function () {
-      expect(this.obj.off).toBeDefined()
+      expect(this.obj.off).not.to.equal(undefined)
     })
 
     it('attaches a "notify" method', function () {
-      expect(this.obj.notify).toBeDefined()
+      expect(this.obj.notify).not.to.equal(undefined)
     })
 
     it('passes the arguments right', function () {
       let called = 0
       this.obj.on('publish', (argA, argB) => {
         called++
-        expect(argA).toEqual('A')
-        expect(argB).toEqual('B')
+        expect(argA).to.equal('A')
+        expect(argB).to.equal('B')
       })
       this.obj.notify('publish', 'A', 'B')
-      expect(called).toEqual(1)
+      expect(called).to.equal(1)
     })
 
     it('sets the context', function () {
       let called = 0
       this.obj.on('publish', function () {
         called++
-        expect(this.test).toEqual('context')
+        expect(this.test).to.equal('context')
       })
       this.obj.notify('publish')
-      expect(called).toEqual(1)
+      expect(called).to.equal(1)
     })
 
     describe('on()', function () {
@@ -81,7 +82,7 @@ describe('eventable', function () {
         })
 
         this.obj.notify('publish', 'success')
-        expect(called).toEqual(1)
+        expect(called).to.equal(1)
       })
 
       it('accepts multiple whitespace separated event names', function () {
@@ -93,7 +94,7 @@ describe('eventable', function () {
         this.obj.notify('publish')
         this.obj.notify('unpublish')
         this.obj.notify('foo') // should do nothing
-        expect(called).toEqual(2)
+        expect(called).to.equal(2)
       })
 
       it('accepts an object to register multiple events', function () {
@@ -107,8 +108,8 @@ describe('eventable', function () {
 
         this.obj.notify('publish')
         this.obj.notify('unpublish')
-        expect(published).toEqual(1)
-        expect(unpublished).toEqual(1)
+        expect(published).to.equal(1)
+        expect(unpublished).to.equal(1)
       })
 
       it('accepts multiple event names in object form', function () {
@@ -120,7 +121,7 @@ describe('eventable', function () {
 
         this.obj.notify('publish')
         this.obj.notify('unpublish')
-        expect(called).toEqual(2)
+        expect(called).to.equal(2)
       })
     })
 
@@ -140,35 +141,35 @@ describe('eventable', function () {
       it('can cope with undefined', function () {
         this.obj.off('publish', undefined)
         this.obj.notify('publish', 'success')
-        expect(calledA).toEqual(1)
-        expect(calledB).toEqual(1)
-        expect(calledC).toEqual(0)
+        expect(calledA).to.equal(1)
+        expect(calledB).to.equal(1)
+        expect(calledC).to.equal(0)
       })
 
       it('removes a single listener', function () {
         this.obj.off('publish', listenerA)
         this.obj.notify('publish', 'success')
-        expect(calledA).toEqual(0)
-        expect(calledB).toEqual(1)
-        expect(calledC).toEqual(0)
+        expect(calledA).to.equal(0)
+        expect(calledB).to.equal(1)
+        expect(calledC).to.equal(0)
       })
 
       it('removes all listeners for one event type', function () {
         this.obj.off('publish')
         this.obj.notify('publish', 'success')
         this.obj.notify('awesome', 'success')
-        expect(calledA).toEqual(0)
-        expect(calledB).toEqual(0)
-        expect(calledC).toEqual(1)
+        expect(calledA).to.equal(0)
+        expect(calledB).to.equal(0)
+        expect(calledC).to.equal(1)
       })
 
       it('removes all listeners', function () {
         this.obj.off()
         this.obj.notify('publish', 'success')
         this.obj.notify('awesome', 'success')
-        expect(calledA).toEqual(0)
-        expect(calledB).toEqual(0)
-        expect(calledC).toEqual(0)
+        expect(calledA).to.equal(0)
+        expect(calledB).to.equal(0)
+        expect(calledC).to.equal(0)
       })
     })
   })
@@ -189,14 +190,14 @@ describe('eventable', function () {
     it('executes newest listeners first', function () {
       obj.notify({}, 'foo')
 
-      expect(results).toEqual([1, 2])
+      expect(results).to.deep.equal([1, 2])
     })
 
     it('executes newest listeners first on repeated calls', function () {
       obj.notify({}, 'foo')
       obj.notify({}, 'foo')
 
-      expect(results).toEqual([1, 2, 1, 2])
+      expect(results).to.deep.equal([1, 2, 1, 2])
     })
   })
 })
