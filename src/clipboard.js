@@ -25,46 +25,20 @@ export function updateConfig (conf) {
   rules.splitIntoBlocks.forEach((name) => { splitIntoBlocks[name] = true })
 }
 
-export function paste (element, cursor, callback) {
+export function paste (element, cursor, clipboardContent, callback) {
   const document = element.ownerDocument
   element.setAttribute(config.pastingAttribute, true)
 
   if (cursor.isSelection) cursor = cursor.deleteContent()
 
-  // Create a placeholder and set the focus to the pasteholder
-  // to redirect the browser pasting into the pasteholder.
-  cursor.save()
-  const pasteHolder = injectPasteholder(document)
-  pasteHolder.focus()
-
-  // Use a timeout to give the browser some time to paste the content.
-  // After that grab the pasted content, filter it and restore the focus.
-  setTimeout(() => {
-    const blocks = parseContent(pasteHolder)
-    pasteHolder.remove()
-    element.removeAttribute(config.pastingAttribute)
-    cursor.restore()
-    callback(blocks, cursor)
-  }, 0)
-}
-
-/**
- * @param { Document } document
- */
-export function injectPasteholder (document) {
+  // Create a placeholder to help parse HTML
   const pasteHolder = document.createElement('div')
-  pasteHolder.setAttribute('contenteditable', true)
-  pasteHolder.style.position = 'fixed'
-  pasteHolder.style.right = '5px'
-  pasteHolder.style.top = '50%'
-  pasteHolder.style.width = '1px'
-  pasteHolder.style.height = '1px'
-  pasteHolder.style.overflow = 'hidden'
-  pasteHolder.style.outline = 'none'
+  pasteHolder.innerHTML = clipboardContent
 
-  document.body.appendChild(pasteHolder)
+  const blocks = parseContent(pasteHolder)
 
-  return pasteHolder
+  element.removeAttribute(config.pastingAttribute)
+  callback(blocks, cursor)
 }
 
 /**

@@ -128,6 +128,7 @@ export default class Dispatcher {
         const block = this.getEditableBlockByEvent(evt)
         if (!block) return
         const afterPaste = (blocks, cursor) => {
+          evt.preventDefault()
           if (blocks.length) {
             this.notify('paste', block, blocks, cursor)
 
@@ -140,7 +141,8 @@ export default class Dispatcher {
         }
 
         const cursor = this.selectionWatcher.getFreshSelection()
-        clipboard.paste(block, cursor, afterPaste)
+        const clipboardContent = evt.clipboardData.getData('text/html')
+        clipboard.paste(block, cursor, clipboardContent, afterPaste)
       })
       .setupDocumentListener('input', function inputListener (evt) {
         const block = this.getEditableBlockByEvent(evt)

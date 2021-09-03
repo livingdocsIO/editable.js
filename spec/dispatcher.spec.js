@@ -353,5 +353,20 @@ describe('Dispatcher', function () {
         expect(position).to.equal('end')
       })
     })
+
+    describe('on paste', function () {
+
+      it('inserts clipboard content', (done) => {
+        on('paste', (block, blocks) => {
+          expect(blocks).to.deep.equal(['a <strong>bold</strong> test'])
+          done()
+        })
+
+        const clipboardData = new DataTransfer()
+        clipboardData.setData('text/html', 'a <strong>bold</strong> test')
+        const evt = new ClipboardEvent('paste', {clipboardData, bubbles: true})
+        elem.dispatchEvent(evt)
+      })
+    })
   })
 })
