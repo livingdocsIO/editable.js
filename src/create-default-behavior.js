@@ -2,6 +2,7 @@ import * as parser from './parser'
 import * as content from './content'
 import log from './util/log'
 import * as block from './block'
+import * as nodeType from './node-type'
 
 /**
  * The Behavior module defines the behavior triggered in response to the Editable.JS
@@ -49,26 +50,17 @@ export default function createDefaultBehavior (editable) {
       // When the cursor is at the text end, we'll need to add an empty text node
       // after the br tag to ensure that the cursor shows up on the next line
       if (cursor.isAtTextEnd()) {
-        // We need to wrap the newline, so it can get deleted
-        // together with the null escape character
-        const spanWithTextNode = document.createElement('span')
-        spanWithTextNode.setAttribute('data-editable', 'unwrap')
+        const br = document.createElement('br')
+        cursor.insertBefore(br)
 
-        // The null escape character gets wrapped in another span,
-        // so it gets removed automatically.
-        // contenteditable=false prevents a focus of the span
-        // and therefore also prevents content from getting written into it.
-        // If this attribute is defined on the parent wrapper element,
-        // the cursor positioning behaves weird with deletion of the newline
-        const spacer = document.createElement('span')
-        spacer.setAttribute('data-editable', 'remove')
-        spacer.setAttribute('contenteditable', 'false')
-        spacer.appendChild(document.createTextNode('\uFEFF'))
-
-        spanWithTextNode.appendChild(document.createElement('br'))
-        spanWithTextNode.appendChild(spacer)
-
-        cursor.insertBefore(spanWithTextNode)
+        // Only append a zero width space if there's none after the br tag
+        // We don't need to remove them as they get cleaned up on blur
+        if (
+          br.nextSibling?.nodeType !== nodeType.textNode ||
+          br.nextSibling.textContent[0] !== '\uFEFF'
+        ) {
+          cursor.insertAfter(document.createTextNode('\uFEFF'))
+        }
       } else {
         cursor.insertBefore(document.createElement('br'))
       }
