@@ -14,7 +14,6 @@ function restoreRange (host, range, func) {
 const zeroWidthSpace = /\u200B/g
 const zeroWidthNonBreakingSpace = /\uFEFF/g
 const whitespaceExceptSpace = /[^\S ]/g
-const nullEscapeCharacter = /\u0000/g // eslint-disable-line no-control-regex
 
 // Clean up the Html.
 export function tidyHtml (element) {
@@ -84,7 +83,6 @@ export function extractContent (element, keepUiElements) {
     ? getInnerHtmlOfFragment(element)
     : element.innerHTML
   )
-    .replace(nullEscapeCharacter, '') // Used to generate empty text nodes on focus event.
     .replace(zeroWidthNonBreakingSpace, '') // Used for forcing inline elements to have a height
     .replace(zeroWidthSpace, '<br>') // Used for cross-browser newlines
 
