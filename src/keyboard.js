@@ -3,7 +3,6 @@ import rangy from 'rangy'
 import {contenteditableSpanBug} from './feature-detection'
 import * as nodeType from './node-type'
 import eventable from './eventable'
-import {unwrapInternalNodes} from './content'
 
 /**
  * The Keyboard module defines an event API for key events.
@@ -37,23 +36,14 @@ export default class Keyboard {
         return this.notify(target, 'esc', event)
 
       case this.key.backspace:
-        // As a newline element gets wrapped in a span when at the end of a block,
-        // we'll need to unwrap that before to simulate correct delete behavior and not skip lines
-        unwrapInternalNodes(target, true)
         this.preventContenteditableBug(target, event)
         return this.notify(target, 'backspace', event)
 
       case this.key.delete:
-        // As a newline element gets wrapped in a span when at the end of a block,
-        // we'll need to unwrap that before to simulate correct delete behavior and not skip lines
-        unwrapInternalNodes(target, true)
         this.preventContenteditableBug(target, event)
         return this.notify(target, 'delete', event)
 
       case this.key.enter:
-        // As a newline element gets wrapped in a span when at the end of a block,
-        // we'll need to unwrap that before to simulate correct delete behavior and not skip lines
-        unwrapInternalNodes(target, true)
         if (event.shiftKey) return this.notify(target, 'shiftEnter', event)
         return this.notify(target, 'enter', event)
 

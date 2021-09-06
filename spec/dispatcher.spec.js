@@ -245,31 +245,20 @@ describe('Dispatcher', function () {
         expect(elem.innerHTML).to.equal('<br>\uFEFF')
       })
 
-      it('creates a nested br element with a data-editable="unwrap" attribute', () => {
+      it('appends a zero-width space after the br tag to force a line break', () => {
         typeKeys(elem, 'foobar')
         shiftReturn(elem)
         expect(elem.innerHTML).to.equal(
-          `\uFEFF` +
-          `foobar` +
-          `<span data-editable="unwrap">` +
-            `<br><span data-editable="remove" contenteditable="false">\uFEFF</span>` +
-          `</span>`
+          `\uFEFFfoobar<br>\uFEFF`
         )
       })
 
-      it('removes the nested br element when adding a newline afterwards', () => {
+      it('does not append another zero-width space when one is present already', () => {
         typeKeys(elem, 'foobar')
         shiftReturn(elem)
         shiftReturn(elem)
         expect(elem.innerHTML).to.equal(
-          `\uFEFF` +
-          `foobar` +
-          // this is the nested br element that got unwrapped
-          `<br>` +
-          // This is the new nested newline of the second shift + return
-          `<span data-editable="unwrap">` +
-            `<br><span data-editable="remove" contenteditable="false">\uFEFF</span>` +
-          `</span>`
+          `\uFEFFfoobar<br><br>\uFEFF`
         )
       })
     })
