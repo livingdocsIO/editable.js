@@ -23,12 +23,14 @@ export default function createDefaultBehavior (editable) {
   */
 
   return {
+    /** @param {HTMLElement} element */
     focus (element) {
-      // Add an empty text node if the editable is empty to force it to have height
+      if (!parser.isVoid(element)) return
+
+      // Add an zero width space if the editable is empty to force it to have a height
       // E.g. Firefox does not render empty block elements
       //   and most browsers do not render empty inline elements.
-      if (!parser.isVoid(element)) return
-      element.appendChild(document.createTextNode('\u0000'))
+      element.appendChild(document.createTextNode('\uFEFF'))
     },
 
     blur (element) {
@@ -61,7 +63,7 @@ export default function createDefaultBehavior (editable) {
         const spacer = document.createElement('span')
         spacer.setAttribute('data-editable', 'remove')
         spacer.setAttribute('contenteditable', 'false')
-        spacer.appendChild(document.createTextNode('\u0000'))
+        spacer.appendChild(document.createTextNode('\uFEFF'))
 
         spanWithTextNode.appendChild(document.createElement('br'))
         spanWithTextNode.appendChild(spacer)

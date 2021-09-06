@@ -86,7 +86,7 @@ describe('Dispatcher', function () {
         elem.blur()
         expect(elem.textContent).to.equal('')
         elem.focus()
-        expect(elem.textContent).to.equal('\u0000')
+        expect(elem.textContent).to.equal('\uFEFF')
       })
 
       it('should not add an empty text node if there is content', function () {
@@ -98,7 +98,7 @@ describe('Dispatcher', function () {
 
       it('removes the empty text node again on blur', function () {
         elem.focus()
-        expect(elem.textContent).to.equal('\u0000')
+        expect(elem.textContent).to.equal('\uFEFF')
         elem.blur()
         expect(elem.textContent).to.equal('')
       })
@@ -242,17 +242,17 @@ describe('Dispatcher', function () {
       it('fires newline when shift + enter is pressed', (done) => {
         on('newline', () => done())
         shiftReturn(elem)
-        expect(elem.innerHTML).to.equal('<br>\u0000')
+        expect(elem.innerHTML).to.equal('<br>\uFEFF')
       })
 
       it('creates a nested br element with a data-editable="unwrap" attribute', () => {
         typeKeys(elem, 'foobar')
         shiftReturn(elem)
         expect(elem.innerHTML).to.equal(
-          `\u0000` +
+          `\uFEFF` +
           `foobar` +
           `<span data-editable="unwrap">` +
-            `<br><span data-editable="remove" contenteditable="false">\u0000</span>` +
+            `<br><span data-editable="remove" contenteditable="false">\uFEFF</span>` +
           `</span>`
         )
       })
@@ -262,13 +262,13 @@ describe('Dispatcher', function () {
         shiftReturn(elem)
         shiftReturn(elem)
         expect(elem.innerHTML).to.equal(
-          `\u0000` +
+          `\uFEFF` +
           `foobar` +
           // this is the nested br element that got unwrapped
           `<br>` +
           // This is the new nested newline of the second shift + return
           `<span data-editable="unwrap">` +
-            `<br><span data-editable="remove" contenteditable="false">\u0000</span>` +
+            `<br><span data-editable="remove" contenteditable="false">\uFEFF</span>` +
           `</span>`
         )
       })
