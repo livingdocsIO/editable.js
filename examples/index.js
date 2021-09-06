@@ -11,11 +11,11 @@ const editable = new Editable({browserSpellcheck: false})
 editable.add('.paragraph-example p')
 eventList(editable)
 
+// Text formatting toolbar
 editable.add('.formatting-example p')
 setupTooltip()
 
 editable.add('.styling-example p')
-
 const secondExample = document.querySelector('.formatting-example p')
 updateCode(secondExample)
 
@@ -33,6 +33,8 @@ document.querySelector('select[name="editable-styles"]')
     }
   })
 
+// Inline element
+editable.add('.inline-example span')
 
 // IFrame
 // ------

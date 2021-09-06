@@ -153,8 +153,6 @@ section {
    Example Blocks
    ========================================================================== */
 
-
-
 .example-title {
     font-size: 2rem;
     color: rgba(0, 0, 0, 0.9);
@@ -166,10 +164,6 @@ section {
     font-size: 1.5rem;
     border: 1px solid #eee;
     background-color: #fff;
-}
-
-.block-outline {
-
 }
 
 .code-example {
