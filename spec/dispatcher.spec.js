@@ -356,7 +356,19 @@ describe('Dispatcher', function () {
 
     describe('on paste', function () {
 
-      it('inserts clipboard content', (done) => {
+      it('inserts plain text clipboard content', (done) => {
+        on('paste', (block, blocks) => {
+          expect(blocks).to.deep.equal(['a plain test'])
+          done()
+        })
+
+        const clipboardData = new DataTransfer()
+        clipboardData.setData('text/plain', 'a plain test')
+        const evt = new ClipboardEvent('paste', {clipboardData, bubbles: true})
+        elem.dispatchEvent(evt)
+      })
+
+      it('inserts formatted clipboard content', (done) => {
         on('paste', (block, blocks) => {
           expect(blocks).to.deep.equal(['a <strong>bold</strong> test'])
           done()
