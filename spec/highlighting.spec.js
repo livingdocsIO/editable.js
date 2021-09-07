@@ -432,7 +432,7 @@ Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" da
       this.removeHighlight('myId')
       // There is no way to see the actual error in a test since it only happens in (non-headless)
       // Chome environments. We just check if the normalize method has been called here.
-      expect(normalizeSpy.callCount).toEqual(1)
+      expect(normalizeSpy.callCount).to.equal(1)
       normalizeSpy.restore()
     })
   })

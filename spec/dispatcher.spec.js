@@ -314,7 +314,7 @@ describe('Dispatcher', function () {
         // trigger selectionchange event
         const selectionEvent = new Event('selectionchange', {bubbles: true})
         elem.dispatchEvent(selectionEvent)
-        expect(position).toEqual('both')
+        expect(position).to.equal('both')
       })
 
       it('fires "start" if selection is at beginning but not end', function () {
@@ -332,7 +332,7 @@ describe('Dispatcher', function () {
         // trigger selectionchange event
         const selectionEvent = new Event('selectionchange', {bubbles: true})
         elem.dispatchEvent(selectionEvent)
-        expect(position).toEqual('start')
+        expect(position).to.equal('start')
       })
 
       it('fires "end" if selection is at end but not beginning', function () {
@@ -350,7 +350,7 @@ describe('Dispatcher', function () {
         // trigger selectionchange event
         const selectionEvent = new Event('selectionchange', {bubbles: true})
         elem.dispatchEvent(selectionEvent)
-        expect(position).toEqual('end')
+        expect(position).to.equal('end')
       })
     })
   })
