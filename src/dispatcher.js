@@ -127,22 +127,21 @@ export default class Dispatcher {
       .setupDocumentListener('paste', function pasteListener (evt) {
         const block = this.getEditableBlockByEvent(evt)
         if (!block) return
-        const afterPaste = (blocks, cursor) => {
-          evt.preventDefault()
-          if (blocks.length) {
-            this.notify('paste', block, blocks, cursor)
 
-            // The input event does not fire when we process the content manually
-            // and insert it via script
-            this.notify('change', block)
-          } else {
-            cursor.setVisibleSelection()
-          }
+        evt.preventDefault()
+        const selection = this.selectionWatcher.getFreshSelection()
+        const clipboardContent = evt.clipboardData.getData('text/html') || evt.clipboardData.getData('text/plain')
+
+        const {blocks, cursor} = clipboard.paste(block, selection, clipboardContent)
+        if (blocks.length) {
+          this.notify('paste', block, blocks, cursor)
+
+          // The input event does not fire when we process the content manually
+          // and insert it via script
+          this.notify('change', block)
+        } else {
+          cursor.setVisibleSelection()
         }
-
-        const cursor = this.selectionWatcher.getFreshSelection()
-        const clipboardContent = evt.clipboardData.getData('text/html')
-        clipboard.paste(block, cursor, clipboardContent, afterPaste)
       })
       .setupDocumentListener('input', function inputListener (evt) {
         const block = this.getEditableBlockByEvent(evt)

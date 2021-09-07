@@ -25,7 +25,7 @@ export function updateConfig (conf) {
   rules.splitIntoBlocks.forEach((name) => { splitIntoBlocks[name] = true })
 }
 
-export function paste (element, cursor, clipboardContent, callback) {
+export function paste (element, cursor, clipboardContent) {
   const document = element.ownerDocument
   element.setAttribute(config.pastingAttribute, true)
 
@@ -38,7 +38,7 @@ export function paste (element, cursor, clipboardContent, callback) {
   const blocks = parseContent(pasteHolder)
 
   element.removeAttribute(config.pastingAttribute)
-  callback(blocks, cursor)
+  return {blocks, cursor}
 }
 
 /**
