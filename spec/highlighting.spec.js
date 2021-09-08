@@ -103,6 +103,14 @@ describe('Highlighting', function () {
       expect(firstMatch.startIndex).to.equal(5)
       expect(firstMatch.endIndex).to.equal(10)
     })
+
+    it('does not go into an endless loop without a marker node', function () {
+      const blockText = 'Mehr als 90 Prozent der Fälle in Grossbritannien in den letzten vier Wochen gehen auf die Delta-Variante zurück. Anders als bei vorangegangenen Wellen scheinen sich jedoch die Fallzahlen von den Todesfällen und Hospitalisierungen zu entkoppeln.'
+      const text = ''
+      const textSearch = new WordHighlighter(null, 'text')
+      const matches = textSearch.findMatches(blockText, [text])
+      expect(matches).to.equal(undefined)
+    })
   })
 
   describe('highlightSupport', function () {
