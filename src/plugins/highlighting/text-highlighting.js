@@ -7,8 +7,22 @@ export default class WordHighlighting {
     this.matchMode = matchMode
   }
 
+  isElement (obj) {
+    try {
+      // Using W3 DOM2 (works for FF, Opera and Chrome)
+      return obj instanceof HTMLElement
+    } catch (e) {
+      // Browsers not supporting W3 DOM2 don't have HTMLElement and
+      // an exception is thrown and we end up here. Testing some
+      // properties that all elements have (works on IE7)
+      return (typeof obj === 'object') &&
+        (obj.nodeType === 1) && (typeof obj.style === 'object') &&
+        (typeof obj.ownerDocument === 'object')
+    }
+  }
+
   findMatches (text, highlights) {
-    if (!text) return
+    if (!text || text === '' || !this.isElement(this.marker)) return
 
     if (highlights && highlights.length > 0) {
       return this.searchMatches(text, highlights)
@@ -21,11 +35,7 @@ export default class WordHighlighting {
       : createHighlightRegex
 
     const regex = createRegex(highlights)
-    const matches = []
-    let match
-    while ((match = regex.exec(text))) {
-      matches.push(match)
-    }
+    const matches = [...text.matchAll(regex)]
 
     return matches.map((entry) => this.prepareMatch(entry))
   }
