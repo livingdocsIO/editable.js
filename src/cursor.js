@@ -96,7 +96,7 @@ export default class Cursor {
     hostRange.collapse(false)
     const hostCoords = getRangeBoundingClientRect(hostRange, this.win)
     const cursorCoords = getRangeBoundingClientRect(this.range.nativeRange, this.win)
-    return hostCoords.bottom === cursorCoords.bottom
+    return isCloseTo(hostCoords.bottom, cursorCoords.bottom)
   }
 
   isAtFirstLine () {
@@ -105,7 +105,7 @@ export default class Cursor {
     hostRange.collapse(true)
     const hostCoords = getRangeBoundingClientRect(hostRange, this.win)
     const cursorCoords = getRangeBoundingClientRect(this.range.nativeRange, this.win)
-    return hostCoords.top === cursorCoords.top
+    return isCloseTo(hostCoords.top, cursorCoords.top)
   }
 
   isAtBeginning () {
@@ -367,4 +367,10 @@ function getRangeBoundingClientRect (range, win) {
   const coords = el.getBoundingClientRect()
   el.remove()
   return coords
+}
+
+function isCloseTo (a, b) {
+  if (a === b) return true
+  if (Math.abs(a - b) <= 2) return true
+  return false
 }
