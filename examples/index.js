@@ -8,14 +8,14 @@ const editable = new Editable({browserSpellcheck: false})
 
 // Paragraph
 // ---------
-editable.add('.paragraph-example p')
+editable.enable('.paragraph-example p', true)
 eventList(editable)
 
 // Text formatting toolbar
-editable.add('.formatting-example p')
+editable.enable('.formatting-example p', true)
 setupTooltip()
 
-editable.add('.styling-example p')
+editable.enable('.styling-example p', true)
 const secondExample = document.querySelector('.formatting-example p')
 updateCode(secondExample)
 

@@ -29,6 +29,12 @@ export function tidyHtml (element) {
 export function normalizeTags (element) {
   const fragment = document.createDocumentFragment()
 
+  // Remove line breaks at the beginning of a content block
+  removeWhitespaces(element, 'firstChild')
+
+  // Remove line breaks at the end of a content block
+  removeWhitespaces(element, 'lastChild')
+
   for (const node of element.childNodes) {
     // skip empty tags, so they'll get removed
     if (node.nodeName !== 'BR' && !node.textContent) continue
@@ -136,7 +142,7 @@ export function cloneRangeContents (range) {
   return fragment
 }
 
-function removeWhitespaces (node, type) {
+function removeWhitespaces (node, type, firstCall = true) {
   let elem
   while ((elem = node[type])) {
     if (elem.nodeType === nodeType.textNode) {
@@ -145,10 +151,17 @@ function removeWhitespaces (node, type) {
     } else if (elem.nodeName === 'BR') {
       elem.remove()
     } else {
-      if (elem[type]) removeWhitespaces(elem, type)
+      if (elem[type]) removeWhitespaces(elem, type, false)
       break
     }
   }
+
+  if (!firstCall) return
+  elem = node[type]
+  if (elem?.nodeType !== nodeType.textNode) return
+  // Remove whitespaces at the end or start of a block with content
+  //   e.g. '  Hello world' > 'Hello World'
+  elem.textContent = elem.textContent.replace(type.startsWith('last') ? /\s+$/ : /^\s+/, '')
 }
 
 // Remove elements that were inserted for internal or user interface purposes
