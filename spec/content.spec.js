@@ -58,6 +58,12 @@ describe('Content', function () {
       content.normalizeTags(actual)
       expect(actual.innerHTML).to.equal(expected.innerHTML)
     })
+
+    it('removes whitespaces at the start and end', function () {
+      const elem = createElement('<div> Hello <strong>world</strong>&nbsp; &nbsp;</div>')
+      content.normalizeTags(elem)
+      expect(elem.innerHTML).to.equal('Hello <strong>world</strong>')
+    })
   })
 
   describe('normalizeWhitespace()', function () {
