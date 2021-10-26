@@ -78,7 +78,15 @@ export default class Selection extends Cursor {
   link (href, attrs = {}) {
     if (href) attrs.href = href
     const link = this.createElement(config.linkMarkup.name, config.linkMarkup.attribs)
-    for (const key in attrs) link.setAttribute(key, attrs[key])
+    for (const key in attrs) {
+      const value = attrs[key]
+      if (value === undefined) continue
+      if (value === null) {
+        link.removeAttribute(key)
+      } else {
+        link.setAttribute(key, value)
+      }
+    }
     this.forceWrap(link)
   }
 
