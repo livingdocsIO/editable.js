@@ -269,6 +269,27 @@ describe('Selection', function () {
         const linkTags = this.selection.getTagsByName('a')
         expect(linkTags.length).to.equal(0)
       })
+
+      it('sets class attribute', function () {
+        this.selection.link('https://livingdocs.io', {class: 'baz'})
+        const linkTags = this.selection.getTagsByName('a')
+        const html = getHtml(linkTags[0])
+        expect(html).to.equal('<a class="baz" href="https://livingdocs.io">foobar</a>')
+      })
+
+      it('removes class attribute when set to null', function () {
+        this.selection.link('https://livingdocs.io', {class: null})
+        const linkTags = this.selection.getTagsByName('a')
+        const html = getHtml(linkTags[0])
+        expect(html).to.equal('<a href="https://livingdocs.io">foobar</a>')
+      })
+
+      it('does not modify class attribute when set to undefined', function () {
+        this.selection.link('https://livingdocs.io', {class: undefined})
+        const linkTags = this.selection.getTagsByName('a')
+        const html = getHtml(linkTags[0])
+        expect(html).to.equal('<a class="foo bar" href="https://livingdocs.io">foobar</a>')
+      })
     })
 
   })
