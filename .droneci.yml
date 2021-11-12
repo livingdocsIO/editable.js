@@ -32,7 +32,7 @@ steps:
   depends_on: [install]
 
 - name: release
-  image: livingdocs/semantic-release:v1.0.0
+  image: livingdocs/semantic-release:v1.2.2
   environment:
     GH_TOKEN:
       from_secret: GH_TOKEN
@@ -57,6 +57,6 @@ trigger:
   event: [push, tag, pull_request]
 ---
 kind: signature
-hmac: 4b3c11615737ee65e16514e907cdf809318d7db5c1e6ef47b3ce05feeb0a4785
+hmac: c5a6d2c9669086f354e20b72929b5f42bb05e8b0b58d5a25243c64ff60542b47
 
 ...
