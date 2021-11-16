@@ -111,6 +111,25 @@ describe('Highlighting', function () {
       const matches = textSearch.findMatches(blockText, [text])
       expect(matches).to.equal(undefined)
     })
+
+    it('does not go into an endless loop without a html marker node', function () {
+      const blockText = 'Mehr als 90 Prozent der Fälle in Grossbritannien in den letzten vier Wochen gehen auf die Delta-Variante zurück. Anders als bei vorangegangenen Wellen scheinen sich jedoch die Fallzahlen von den Todesfällen und Hospitalisierungen zu entkoppeln.'
+      const text = ''
+      const textSearch = new WordHighlighter('something', 'text')
+      const matches = textSearch.findMatches(blockText, [text])
+      expect(matches).to.equal(undefined)
+    })
+
+    it('handle the marker with other ownerdocument correctly', function () {
+      const blockText = 'Mehr als 90 Prozent'
+      const text = 'Mehr als 90 Prozent'
+      const ifrm = window.document.createElement('iframe')
+      window.document.body.append(ifrm)
+      const markerNode = createElement('<span class="highlight"></span>', ifrm.contentWindow)
+      const textSearch = new WordHighlighter(markerNode, 'text')
+      const matches = textSearch.findMatches(blockText, [text])
+      expect(matches[0].match).to.equal(text)
+    })
   })
 
   describe('highlightSupport', function () {
