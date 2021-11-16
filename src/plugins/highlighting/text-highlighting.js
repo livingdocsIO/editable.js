@@ -9,8 +9,8 @@ export default class WordHighlighting {
 
   isElement (obj) {
     try {
-      // Using W3 DOM2 (works for FF, Opera and Chrome)
-      return obj instanceof HTMLElement
+      if (!obj) return false
+      return obj instanceof obj.ownerDocument?.defaultView.HTMLElement
     } catch (e) {
       // Browsers not supporting W3 DOM2 don't have HTMLElement and
       // an exception is thrown and we end up here. Testing some
