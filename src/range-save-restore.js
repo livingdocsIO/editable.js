@@ -11,16 +11,36 @@ let boundaryMarkerId = 0
 // (U+FEFF) zero width no-break space
 const markerTextChar = '\ufeff'
 
+function isChildOf (parent, possibleChild) {
+  for (let i = 0; i < parent.children.length; i++) {
+    if (parent.children[i] === possibleChild) return true
+  }
+  return false
+}
+
+function isChildAtBeginning (parent, possibleChild) {
+  const isChild = isChildOf(parent, possibleChild)
+  return isChild && parent.childNodes[0] === possibleChild
+}
+
+function isChildAtEnd (parent, possibleChild) {
+  const isChild = isChildOf(parent, possibleChild)
+  return isChild && parent.childNodes[parent.children.length - 1] === possibleChild
+}
+
 export function insertRangeBoundaryMarker (range, atStart) {
   const container = range.commonAncestorContainer
+  let trailsStart = false
+  let trailsEnd = false
+  if (isChildAtEnd(range.startContainer.parentElement, range.endContainer.parentElement)) {
+    trailsEnd = true
+  } else if (isChildAtBeginning(range.endContainer.parentElement, range.startContainer.parentElement)) {
+    trailsStart = true
+  }
   // If ownerDocument is null the commonAncestorContainer is window.document
   if (container.ownerDocument === null || container.ownerDocument === undefined) {
     error('Cannot save range: range is emtpy')
   }
-
-  // Clone the Range and collapse to the appropriate boundary point
-  const boundaryRange = range.cloneRange()
-  boundaryRange.collapse(atStart)
 
   // Create the marker element containing a single
   // invisible character using DOM methods and insert it
@@ -32,7 +52,19 @@ export function insertRangeBoundaryMarker (range, atStart) {
   markerEl.style.display = 'none'
   markerEl.appendChild(doc.createTextNode(markerTextChar))
 
-  boundaryRange.insertNode(markerEl)
+  // if another tag is trailing exactly at the start or end, prepend
+  // or append the marker element directly on the parent.
+  if (trailsStart && atStart) {
+    range.endContainer.parentElement.prepend(markerEl)
+  } else if (trailsEnd && !atStart) {
+    range.startContainer.parentElement.append(markerEl)
+  } else {
+    // Clone the Range and collapse to the appropriate boundary point
+    const boundaryRange = range.cloneRange()
+    boundaryRange.collapse(atStart)
+    boundaryRange.insertNode(markerEl)
+  }
+
   return markerEl
 }
 
