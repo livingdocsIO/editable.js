@@ -19,13 +19,11 @@ function isChildOf (parent, possibleChild) {
 }
 
 function isChildAtBeginning (parent, possibleChild) {
-  const isChild = isChildOf(parent, possibleChild)
-  return isChild && parent.childNodes[0] === possibleChild
+  return isChildOf(parent, possibleChild)
 }
 
 function isChildAtEnd (parent, possibleChild) {
-  const isChild = isChildOf(parent, possibleChild)
-  return isChild && parent.childNodes[parent.children.length - 1] === possibleChild
+  return isChildOf(parent, possibleChild)
 }
 
 export function insertRangeBoundaryMarker (range, atStart) {
@@ -55,9 +53,10 @@ export function insertRangeBoundaryMarker (range, atStart) {
   // if another tag is trailing exactly at the start or end, prepend
   // or append the marker element directly on the parent.
   if (trailsStart && atStart) {
-    range.endContainer.parentElement.prepend(markerEl)
+    range.endContainer.parentElement.insertBefore(markerEl, range.startContainer.parentElement)
   } else if (trailsEnd && !atStart) {
-    range.startContainer.parentElement.append(markerEl)
+    // emulating insertAfter with nextSibling
+    range.startContainer.parentElement.insertBefore(markerEl, range.endContainer.parentElement.nextSibling)
   } else {
     // Clone the Range and collapse to the appropriate boundary point
     const boundaryRange = range.cloneRange()
