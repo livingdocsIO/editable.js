@@ -18,23 +18,23 @@ function isChildOf (parent, possibleChild) {
   return false
 }
 
-function isChildAtBeginning (parent, possibleChild) {
+function startContainerIsChild (range) {
+  const parent = range.endContainer.parentElement
+  const possibleChild = range.startContainer.parentElement
   return isChildOf(parent, possibleChild)
 }
 
-function isChildAtEnd (parent, possibleChild) {
+function endContainerIsChild (range) {
+  const parent = range.startContainer.parentElement
+  const possibleChild = range.endContainer.parentElement
   return isChildOf(parent, possibleChild)
 }
 
 export function insertRangeBoundaryMarker (range, atStart) {
   const container = range.commonAncestorContainer
-  let trailsStart = false
-  let trailsEnd = false
-  if (isChildAtEnd(range.startContainer.parentElement, range.endContainer.parentElement)) {
-    trailsEnd = true
-  } else if (isChildAtBeginning(range.endContainer.parentElement, range.startContainer.parentElement)) {
-    trailsStart = true
-  }
+  const directlyBeforeFormatTag = startContainerIsChild(range) && atStart
+  const directlyAfterFormatTag = endContainerIsChild(range) && !atStart
+
   // If ownerDocument is null the commonAncestorContainer is window.document
   if (container.ownerDocument === null || container.ownerDocument === undefined) {
     error('Cannot save range: range is emtpy')
@@ -51,12 +51,13 @@ export function insertRangeBoundaryMarker (range, atStart) {
   markerEl.appendChild(doc.createTextNode(markerTextChar))
 
   // if another tag is trailing exactly at the start or end, prepend
-  // or append the marker element directly on the parent.
-  if (trailsStart && atStart) {
+  // or append the marker element directly on the parent in order to prevent breaking HTML markup.
+  if (directlyBeforeFormatTag) {
     range.endContainer.parentElement.insertBefore(markerEl, range.startContainer.parentElement)
-  } else if (trailsEnd && !atStart) {
+  } else if (directlyAfterFormatTag) {
     // emulating insertAfter with nextSibling
-    range.startContainer.parentElement.insertBefore(markerEl, range.endContainer.parentElement.nextSibling)
+    range.startContainer.parentElement.insertBefore(markerEl,
+      range.endContainer.parentElement.nextSibling)
   } else {
     // Clone the Range and collapse to the appropriate boundary point
     const boundaryRange = range.cloneRange()
