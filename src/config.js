@@ -13,22 +13,26 @@ export default {
   boldMarkup: {
     type: 'tag',
     name: 'strong',
-    attribs: {}
+    attribs: {},
+    trim: true
   },
   italicMarkup: {
     type: 'tag',
     name: 'em',
-    attribs: {}
+    attribs: {},
+    trim: true
   },
   underlineMarkup: {
     type: 'tag',
     name: 'u',
-    attribs: {}
+    attribs: {},
+    trim: false
   },
   linkMarkup: {
     type: 'tag',
     name: 'a',
-    attribs: {}
+    attribs: {},
+    trim: true
   },
 
   // Rules that are applied when filtering pasted content

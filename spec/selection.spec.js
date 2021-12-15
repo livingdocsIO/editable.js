@@ -359,6 +359,55 @@ describe('Selection', function () {
 
   })
 
+  describe('triming:', function () {
+    beforeEach(function () {
+      this.wordWithWhitespace = createElement('<div> foobar </div>')
+      const range = rangy.createRange()
+      range.selectNodeContents(this.wordWithWhitespace.firstChild)
+      this.selection = new Selection(this.wordWithWhitespace, range)
+
+      this.oldLinkMarkup = config.italicMarkup
+      config.linkMarkup = {
+        type: 'tag',
+        name: 'a',
+        attribs: {
+          'class': 'foo bar'
+        },
+        trim: true
+      }
+
+      this.oldUnderlineMarkup = config.underlineMarkup
+      config.underlineMarkup = {
+        type: 'tag',
+        name: 'u',
+        attribs: {
+          'class': 'bar'
+        },
+        trim: false
+      }
+    })
+
+    afterEach(function () {
+      config.linkMarkup = this.oldLinkMarkup
+      config.underlineMarkup = this.oldUnderlineMarkup
+    })
+
+    it('trims whitespaces from range when linking', function () {
+      this.selection.link('https://livingdocs.io')
+      console.log('tag', this.wordWithWhitespace)
+      const linkTags = this.selection.getTagsByName('a')
+      const html = getHtml(linkTags[0])
+      expect(html).to.equal('<a class="foo bar" href="https://livingdocs.io">foobar</a>')
+    })
+
+    it('does not trim whitespaces from range when underlining', function () {
+      this.selection.makeUnderline()
+      const underlineTags = this.selection.getTagsByName('u')
+      const html = getHtml(underlineTags[0])
+      expect(html).to.equal('<u class="bar"> foobar </u>')
+    })
+  })
+
   describe('inherits form Cursor', function () {
 
     it('has isAtEnd() method from Cursor in its protoype chain', function () {

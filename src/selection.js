@@ -87,7 +87,18 @@ export default class Selection extends Cursor {
         link.setAttribute(key, value)
       }
     }
+    if (config.linkMarkup.trim) this.trimRangeWhitespaces()
+
     this.forceWrap(link)
+  }
+
+  // trims whitespaces on the left and right of a selection, i.e. what you want in case of links
+  trimRangeWhitespaces () {
+    const textToLink = this.range.toString()
+    const whitespacesOnTheLeft = textToLink.search(/\S|$/)
+    const whitespacesOnTheRight = textToLink.length - whitespacesOnTheLeft - textToLink.trim().length
+    this.range.setStart(this.range.startContainer, this.range.startOffset + whitespacesOnTheLeft)
+    this.range.setEnd(this.range.endContainer, this.range.endOffset - whitespacesOnTheRight)
   }
 
   unlink () {
@@ -149,31 +160,37 @@ export default class Selection extends Cursor {
 
   makeBold () {
     const bold = this.createElement(config.boldMarkup.name, config.boldMarkup.attribs)
+    if (config.boldMarkup.trim) this.trimRangeWhitespaces()
     this.forceWrap(bold)
   }
 
   toggleBold () {
     const bold = this.createElement(config.boldMarkup.name, config.boldMarkup.attribs)
+    if (config.boldMarkup.trim) this.trimRangeWhitespaces()
     this.toggle(bold)
   }
 
   giveEmphasis () {
     const em = this.createElement(config.italicMarkup.name, config.italicMarkup.attribs)
+    if (config.italicMarkup.trim) this.trimRangeWhitespaces()
     this.forceWrap(em)
   }
 
   toggleEmphasis () {
     const em = this.createElement(config.italicMarkup.name, config.italicMarkup.attribs)
+    if (config.italicMarkup.trim) this.trimRangeWhitespaces()
     this.toggle(em)
   }
 
   makeUnderline () {
     const u = this.createElement(config.underlineMarkup.name, config.underlineMarkup.attribs)
+    if (config.underlineMarkup.trim) this.trimRangeWhitespaces()
     this.forceWrap(u)
   }
 
   toggleUnderline () {
     const u = this.createElement(config.underlineMarkup.name, config.underlineMarkup.attribs)
+    if (config.underlineMarkup.trim) this.trimRangeWhitespaces()
     this.toggle(u)
   }
 
