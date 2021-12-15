@@ -293,7 +293,7 @@ describe('Content', function () {
     it('works with a partially selected tag', function () {
       // <div>|a<em>b|b</em></div>
       const host = createElement('<div>a<em>bb</em></div>')
-      this.range.setStart(host.firstChild, 0)
+      this.range.setStart(host.querySelector('em').firstChild, 0)
       this.range.setEnd(host.querySelector('em').firstChild, 1)
 
       this.range = content.deleteCharacter(host, this.range, 'b')

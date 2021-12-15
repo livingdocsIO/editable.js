@@ -290,6 +290,71 @@ describe('Selection', function () {
         const html = getHtml(linkTags[0])
         expect(html).to.equal('<a class="foo bar" href="https://livingdocs.io">foobar</a>')
       })
+
+      describe('with bold:', function () {
+        beforeEach(function () {
+          this.oldBoldMarkup = config.boldMarkup
+          config.boldMarkup = {
+            type: 'tag',
+            name: 'strong',
+            attribs: {
+              'class': 'foo'
+            }
+          }
+        })
+
+        afterEach(function () {
+          config.boldMarkup = this.oldBoldMarkup
+        })
+
+        it('toggles a link bold', function () {
+          this.selection.link('https://livingdocs.io')
+          this.selection.makeBold()
+          const boldTags = this.selection.getTagsByName('strong')
+          const html = getHtml(boldTags[0])
+          expect(html).to.equal('<strong class="foo"><a class="foo bar" href="https://livingdocs.io">foobar</a></strong>')
+        })
+
+        it('toggles a link bold in a selection with text after', function () {
+          // set foo in <div>|foo|bar</div> as the selection
+          let range = rangy.createRange()
+          range.setStart(this.oneWord.firstChild, 0)
+          range.setEnd(this.oneWord.firstChild, 3)
+          let selection = new Selection(this.oneWord, range)
+          // link foo
+          selection.link('https://livingdocs.io')
+          // select 1 char more to the right (b)
+          range = rangy.createRange()
+          // Note: we need to use firstChild twice to get the textNode inside the a tag which is
+          // also what the normal browser select behavior does
+          range.setStart(this.oneWord.firstChild.firstChild, 0)
+          range.setEnd(this.oneWord.lastChild, 1)
+          selection = new Selection(this.oneWord, range)
+          // make link + b char bold
+          selection.toggleBold()
+          const html = getHtml(this.oneWord)
+          expect(html).to.equal('<div><strong class="foo"><a class="foo bar" href="https://livingdocs.io">foo</a>b</strong>ar</div>')
+        })
+
+        it('toggles a link bold in a selection with text before', function () {
+          // set bar in <div>foo|bar|</div> as the selection
+          let range = rangy.createRange()
+          range.setStart(this.oneWord.firstChild, 3)
+          range.setEnd(this.oneWord.firstChild, 6)
+          let selection = new Selection(this.oneWord, range)
+          // link bar
+          selection.link('https://livingdocs.io')
+          // select 1 char more to the left (o)
+          range = rangy.createRange()
+          range.setStart(this.oneWord.firstChild, 2)
+          range.setEnd(this.oneWord.lastChild.firstChild, 3)
+          selection = new Selection(this.oneWord, range)
+          // make o char + link bold
+          selection.toggleBold()
+          const html = getHtml(this.oneWord)
+          expect(html).to.equal('<div>fo<strong class="foo">o<a class="foo bar" href="https://livingdocs.io">bar</a></strong></div>')
+        })
+      })
     })
 
   })
