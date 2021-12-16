@@ -406,6 +406,17 @@ describe('Selection', function () {
       const html = getHtml(underlineTags[0])
       expect(html).to.equal('<u class="bar"> foobar </u>')
     })
+
+    it('trims a range with special whitespaces', function () {
+      // at the beginning we have U+2002, U+2005 and U+2006 in the end a normal whitespace
+      const wordWithSpecialWhitespaces = createElement('<div>   bar </div>')
+      const range = rangy.createRange()
+      range.selectNodeContents(wordWithSpecialWhitespaces.firstChild)
+      const selection = new Selection(wordWithSpecialWhitespaces, range)
+      selection.trimRange()
+      expect(selection.range.startOffset).to.equal(3)
+      expect(selection.range.endOffset).to.equal(6)
+    })
   })
 
   describe('inherits form Cursor', function () {

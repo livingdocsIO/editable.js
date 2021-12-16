@@ -87,16 +87,17 @@ export default class Selection extends Cursor {
         link.setAttribute(key, value)
       }
     }
-    if (config.linkMarkup.trim) this.trimRangeWhitespaces()
+    if (config.linkMarkup.trim) this.trimRange()
 
     this.forceWrap(link)
   }
 
   // trims whitespaces on the left and right of a selection, i.e. what you want in case of links
-  trimRangeWhitespaces () {
+  trimRange () {
     const textToLink = this.range.toString()
     const whitespacesOnTheLeft = textToLink.search(/\S|$/)
-    const whitespacesOnTheRight = textToLink.length - whitespacesOnTheLeft - textToLink.trim().length
+    const lastNonWhitespace = textToLink.search(/\S[\s]+$/)
+    const whitespacesOnTheRight = lastNonWhitespace === -1 ? 0 : textToLink.length - (lastNonWhitespace + 1)
     this.range.setStart(this.range.startContainer, this.range.startOffset + whitespacesOnTheLeft)
     this.range.setEnd(this.range.endContainer, this.range.endOffset - whitespacesOnTheRight)
   }
@@ -160,37 +161,37 @@ export default class Selection extends Cursor {
 
   makeBold () {
     const bold = this.createElement(config.boldMarkup.name, config.boldMarkup.attribs)
-    if (config.boldMarkup.trim) this.trimRangeWhitespaces()
+    if (config.boldMarkup.trim) this.trimRange()
     this.forceWrap(bold)
   }
 
   toggleBold () {
     const bold = this.createElement(config.boldMarkup.name, config.boldMarkup.attribs)
-    if (config.boldMarkup.trim) this.trimRangeWhitespaces()
+    if (config.boldMarkup.trim) this.trimRange()
     this.toggle(bold)
   }
 
   giveEmphasis () {
     const em = this.createElement(config.italicMarkup.name, config.italicMarkup.attribs)
-    if (config.italicMarkup.trim) this.trimRangeWhitespaces()
+    if (config.italicMarkup.trim) this.trimRange()
     this.forceWrap(em)
   }
 
   toggleEmphasis () {
     const em = this.createElement(config.italicMarkup.name, config.italicMarkup.attribs)
-    if (config.italicMarkup.trim) this.trimRangeWhitespaces()
+    if (config.italicMarkup.trim) this.trimRange()
     this.toggle(em)
   }
 
   makeUnderline () {
     const u = this.createElement(config.underlineMarkup.name, config.underlineMarkup.attribs)
-    if (config.underlineMarkup.trim) this.trimRangeWhitespaces()
+    if (config.underlineMarkup.trim) this.trimRange()
     this.forceWrap(u)
   }
 
   toggleUnderline () {
     const u = this.createElement(config.underlineMarkup.name, config.underlineMarkup.attribs)
-    if (config.underlineMarkup.trim) this.trimRangeWhitespaces()
+    if (config.underlineMarkup.trim) this.trimRange()
     this.toggle(u)
   }
 
