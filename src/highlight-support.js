@@ -117,7 +117,8 @@ const highlightSupport = {
     return {
       start: textRange.start,
       end: textRange.end,
-      text: range.text()
+      text: range.text(),
+      nativeRange: range.nativeRange
     }
   },
 
