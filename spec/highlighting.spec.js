@@ -33,6 +33,20 @@ function setupHighlightEnv (context, text) {
     )
   }
 
+  // we don't want to compare the native range in our tests since this is a native JS object
+  context.extractWithoutNativeRange = function (type) {
+    const positions = context.editable.getHighlightPositions({editableHost: context.div, type})
+    if (!positions) return undefined
+    const extracted = {}
+    for (const id in positions) {
+      const val = positions[id]
+      // eslint-disable-next-line
+      const {nativeRange, ...withoutNativeRange} = val
+      extracted[id] = withoutNativeRange
+    }
+    return extracted
+  }
+
   context.extract = function (type) {
     return context.editable.getHighlightPositions({editableHost: context.div, type})
   }
@@ -155,8 +169,14 @@ describe('Highlighting', function () {
 Make The <br> World Go Round`)
 
       expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
       expect(startIndex).to.equal(3)
+    })
+
+    it('has the native range', function () {
+      this.highlightRange('myId', 3, 7)
+      const extracted = this.extract()
+      expect(extracted.myId.nativeRange.constructor.name).to.equal('Range')
     })
 
     it('can handle adjaccent highlights', function () {
@@ -194,7 +214,7 @@ Make The <br> World Go Round`)
 le Make The <br> World Go Round`)
 
       expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
 
     })
 
@@ -232,7 +252,7 @@ le Make The <br> World Go Round`)
 </span>
  Make The <br> World Go Round`)
       expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
     })
 
     it('can handle intersecting highlights', function () {
@@ -261,7 +281,7 @@ le Make The <br> World Go Round`)
 <span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">o</span>p
 <span class="highlight-comment" data-word-id="third" data-editable="ui-unwrap" data-highlight="comment">le</span> </span>Make The <br> World Go Round`)
       expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
     })
 
     it('can handle highlights containing break tags', function () {
@@ -277,7 +297,7 @@ le Make The <br> World Go Round`)
 <span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"> The <br> World</span>
  Go Round`)
 
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
       expect(this.getHtml()).to.equal(expectedHtml)
 
     })
@@ -305,7 +325,7 @@ le Make The <br> World Go Round`)
 
 
       expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
 
     })
 
@@ -323,7 +343,7 @@ le Make The <br> World Go Round`)
 <span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">a</span>
 ke The <br> World Go Round`)
 
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
       expect(this.getHtml()).to.equal(expectedHtml)
     })
 
@@ -380,7 +400,7 @@ e Mak</span>e The<span class="highlight-comment" data-word-id="sixth" data-edita
 o Round</span>`)
 
       const extractedHtml = this.getHtml()
-      const extractedRanges = this.extract()
+      const extractedRanges = this.extractWithoutNativeRange()
 
       expect(extractedRanges).to.deep.equal(expectedRanges)
       expect(extractedHtml).to.equal(expectedHtml)
@@ -398,7 +418,7 @@ o Round</span>`)
         )
       })
 
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
       expect(this.getHtml()).to.equal(expectedHtml)
     })
 
@@ -448,7 +468,7 @@ o Round</span>`)
 <span class="highlight-comment" data-word-id="myId" data-editable="ui-unwrap" data-highlight="comment">ple </span>
 Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" data-editable="ui-unwrap" data-highlight="spellcheck">orld</span> Go Round`)
       expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extract('comment')).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange('comment')).to.deep.equal(expectedRanges)
       expect(startIndex).to.equal(3)
     })
 
@@ -486,9 +506,9 @@ Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" da
         const {start, end} = range.toCharacterRange(this.div)
         this.highlightRange('char', start, end)
         if (expectedLength === 0) {
-          expect(this.extract()).to.equal(undefined)
+          expect(this.extractWithoutNativeRange()).to.equal(undefined)
         } else {
-          expect(this.extract()).to.deep.equal({
+          expect(this.extractWithoutNativeRange()).to.deep.equal({
             char: {
               start: 0,
               end: expectedLength,
@@ -505,7 +525,7 @@ Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" da
     it('can handle highlights surrounding <span> tags', function () {
       setupHighlightEnv(this, 'a<span>b</span>cd')
       this.highlightRange('first', 1, 3)
-      const extract = this.extract()
+      const extract = this.extractWithoutNativeRange()
 
       expect(extract.first.text).to.equal('bc')
 
@@ -516,7 +536,7 @@ Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" da
     it('can handle highlights intersecting <span> tags', function () {
       setupHighlightEnv(this, 'a<span data-word-id="x">bc</span>d')
       this.highlightRange('first', 0, 2)
-      const extract = this.extract()
+      const extract = this.extractWithoutNativeRange()
 
       expect(extract.first.text).to.equal('ab')
 
@@ -552,7 +572,7 @@ Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" da
 
       const expectedHtml = '<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">😐</span> Make&nbsp;The \n 🌍 Go \n🔄'
 
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
       expect(this.getHtml()).to.equal(expectedHtml)
     })
 
@@ -567,7 +587,7 @@ Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" da
       }
       const expectedHtml = '😐<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"> Make&nbsp;T</span>he \n 🌍 Go \n🔄'
       expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
 
 
     })
@@ -584,7 +604,7 @@ Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" da
 
       const expectedHtml = '😐 Make&nbsp;<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">The \n 🌍 </span>Go \n🔄'
       expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
 
     })
 
@@ -599,7 +619,7 @@ Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" da
       }
       const expectedHtml = '😐 Make&nbsp;The \n 🌍 <span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">Go \n🔄</span>'
       expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
     })
 
     it('extracts a readable text', function () {
@@ -613,7 +633,7 @@ Make The <br> W<span class="highlight-spellcheck" data-word-id="spellcheckId" da
       }
       const expectedHtml = '<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">😐 Make&nbsp;The \n 🌍 Go \n🔄</span>'
       expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extract()).to.deep.equal(expectedRanges)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
     })
 
     it('notify change on add highlight when dispatcher is given', function () {
