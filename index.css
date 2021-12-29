@@ -28,6 +28,13 @@ body {
 }
 
 /*
+    Make trailing whitespaces visible since they can be quite confusing.
+*/
+[data-editable] {
+    white-space: pre-wrap;
+  }
+
+/*
  * Remove text-shadow in selection highlight: h5bp.com/i
  * These selection declarations have to be separate.
  * Customize the background color to match your design.
