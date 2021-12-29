@@ -19,13 +19,15 @@ function isChildOf (parent, possibleChild) {
 }
 
 function startContainerIsChild (range) {
-  const parent = range.endContainer.parentElement
+  const parent = range.commonAncestorContainer
+  if (parent.nodeType === 3) return false // if we are on the text node it can't be a parent
   const possibleChild = range.startContainer.parentElement
   return isChildOf(parent, possibleChild)
 }
 
 function endContainerIsChild (range) {
-  const parent = range.startContainer.parentElement
+  const parent = range.commonAncestorContainer
+  if (parent.nodeType === 3) return false // if we are on the text node it can't be a parent
   const possibleChild = range.endContainer.parentElement
   return isChildOf(parent, possibleChild)
 }
