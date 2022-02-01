@@ -71,14 +71,6 @@ module.exports = {
       'process.env.NODE_ENV': JSON.stringify('production')
     })
   ],
-  ...(test ? {
-    resolve: {
-      alias: {
-        sinon: 'sinon/pkg/sinon.js',
-        chai: '@esm-bundle/chai'
-      }
-    }
-  } : {}),
   ...(dev ? {
     devServer: {
       static: {
