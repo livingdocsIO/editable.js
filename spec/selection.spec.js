@@ -394,7 +394,6 @@ describe('Selection', function () {
 
     it('trims whitespaces from range when linking', function () {
       this.selection.link('https://livingdocs.io')
-      console.log('tag', this.wordWithWhitespace)
       const linkTags = this.selection.getTagsByName('a')
       const html = getHtml(linkTags[0])
       expect(html).to.equal('<a class="foo bar" href="https://livingdocs.io">foobar</a>')
@@ -416,6 +415,22 @@ describe('Selection', function () {
       selection.trimRange()
       expect(selection.range.startOffset).to.equal(3)
       expect(selection.range.endOffset).to.equal(6)
+    })
+
+    it('does trim if only a whitespace is selected', function () {
+      const whitespaceOnly = createElement('<div> </div>')
+      const range = rangy.createRange()
+      range.selectNodeContents(whitespaceOnly.firstChild)
+      const selection = new Selection(whitespaceOnly, range)
+      selection.trimRange()
+      expect(selection.toString()).to.equal('')
+    })
+
+    it('trims a custom element if the param is given', function () {
+      this.selection.toggleCustom({tagName: 'span', attributes: {class: 'foo'}, trim: true})
+      const spanTags = this.selection.getTagsByName('span')
+      const html = getHtml(spanTags[0])
+      expect(html).to.equal('<span class="foo">foobar</span>')
     })
   })
 

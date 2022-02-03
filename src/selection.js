@@ -149,13 +149,15 @@ export default class Selection extends Cursor {
     this.setSelection()
   }
 
-  toggleCustom ({tagName, attributes}) {
+  toggleCustom ({tagName, attributes, trim = false}) {
     const customElem = this.createElement(tagName, attributes)
+    if (trim) this.trimRange()
     this.toggle(customElem)
   }
 
-  makeCustom ({tagName, attributes}) {
+  makeCustom ({tagName, attributes, trim = false}) {
     const customElem = this.createElement(tagName, attributes)
+    if (trim) this.trimRange()
     this.forceWrap(customElem)
   }
 
