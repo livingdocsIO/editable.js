@@ -94,10 +94,10 @@ export default class Selection extends Cursor {
 
   // trims whitespaces on the left and right of a selection, i.e. what you want in case of links
   trimRange () {
-    const textToLink = this.range.toString()
-    const whitespacesOnTheLeft = textToLink.search(/\S|$/)
-    const lastNonWhitespace = textToLink.search(/\S[\s]+$/)
-    const whitespacesOnTheRight = lastNonWhitespace === -1 ? 0 : textToLink.length - (lastNonWhitespace + 1)
+    const textToTrim = this.range.toString()
+    const whitespacesOnTheLeft = textToTrim.search(/\S|$/)
+    const lastNonWhitespace = textToTrim.search(/\S[\s]+$/)
+    const whitespacesOnTheRight = lastNonWhitespace === -1 ? 0 : textToTrim.length - (lastNonWhitespace + 1)
     this.range.setStart(this.range.startContainer, this.range.startOffset + whitespacesOnTheLeft)
     this.range.setEnd(this.range.endContainer, this.range.endOffset - whitespacesOnTheRight)
   }
