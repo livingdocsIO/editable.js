@@ -134,7 +134,7 @@ export default {
 // This has two notable behaviours:
 // - It uses a NodeIterator which will skip elements
 //   with data-editable="remove"
-// - It returns a space for <br> elements
+// - It returns a \n for <br> elements
 //   (The only block level element allowed inside of editables)
 function getText (element, callback) {
   const iterator = new NodeIterator(element)
@@ -143,7 +143,7 @@ function getText (element, callback) {
     if (next.nodeType === nodeType.textNode && next.data !== '') {
       callback(next.data)
     } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
-      callback(' ')
+      callback('\n')
     }
   }
 }
