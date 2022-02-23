@@ -92,7 +92,7 @@ describe('highlightText', function () {
     it('extracts text with a <br> properly', function () {
       this.element = createElement('<div>a<br>b</div>')
       const text = highlightText.extractText(this.element)
-      expect(text).to.equal('a b')
+      expect(text).to.equal('a\nb')
     })
   })
 
