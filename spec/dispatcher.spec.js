@@ -379,6 +379,33 @@ describe('Dispatcher', function () {
         const evt = new ClipboardEvent('paste', {clipboardData, bubbles: true})
         elem.dispatchEvent(evt)
       })
+
+      it(`replaces the last '&nbsp' with ' ' if text ends with a single '&nbsp'`, (done) => {
+        on('paste', (block, blocks) => {
+          expect(block.innerHTML).to
+            .equal('some text that ends with a single a non breaking space ')
+          done()
+        })
+        elem.innerHTML = 'some text that ends with a single a non breaking space&nbsp;'
+        const clipboardData = new DataTransfer()
+        clipboardData.setData('text/html', 'copied text')
+        const evt = new ClipboardEvent('paste', {clipboardData, bubbles: true})
+        elem.dispatchEvent(evt)
+      })
+
+      it(`doesn't replaces the last '&nbsp' with ' ' if text ends with more than one '&nbsp'`,
+        (done) => {
+          on('paste', (block, blocks) => {
+            expect(block.innerHTML).to
+              .equal('some text that ends with more than one non breaking space&nbsp; &nbsp;')
+            done()
+          })
+          elem.innerHTML = 'some text that ends with more than one non breaking space&nbsp; &nbsp;'
+          const clipboardData = new DataTransfer()
+          clipboardData.setData('text/html', 'copied text')
+          const evt = new ClipboardEvent('paste', {clipboardData, bubbles: true})
+          elem.dispatchEvent(evt)
+        })
     })
   })
 })

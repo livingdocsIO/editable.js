@@ -61,3 +61,21 @@ export function browserEscapeHtml (str) {
   div.appendChild(document.createTextNode(str))
   return div.innerHTML
 }
+
+export function replaceLast (text, searchValue, replaceValue) {
+  if (!text) return ''
+  text = `${text}`
+  if (!searchValue || replaceValue == null) return text
+  const lastOccurrenceIndex = text.lastIndexOf(searchValue)
+  return `${
+    text.slice(0, lastOccurrenceIndex)
+  }${
+    replaceValue
+  }${
+    text.slice(lastOccurrenceIndex + searchValue.length)
+  }`
+}
+
+export function endsWithSingleSpace (text) {
+  return /\S+\s{1}$/.test(text)
+}

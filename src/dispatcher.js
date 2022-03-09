@@ -5,6 +5,7 @@ import SelectionWatcher from './selection-watcher'
 import config from './config'
 import Keyboard from './keyboard'
 import {closest} from './util/dom'
+import {replaceLast, endsWithSingleSpace} from './util/string'
 
 // This will be set to true once we detect the input event is working.
 // Input event description on MDN:
@@ -134,7 +135,12 @@ export default class Dispatcher {
 
         const {blocks, cursor} = clipboard.paste(block, selection, clipboardContent)
         if (blocks.length) {
-          this.notify('paste', block, blocks, cursor)
+          if (endsWithSingleSpace(evt.target.innerText)) {
+            block.innerHTML = replaceLast(block.innerHTML, '&nbsp;', ' ')
+            this.notify('paste', block, blocks, this.editable.createCursorAtEnd(block))
+          } else {
+            this.notify('paste', block, blocks, cursor)
+          }
 
           // The input event does not fire when we process the content manually
           // and insert it via script
