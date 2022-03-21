@@ -10,6 +10,7 @@ export default {
   editableClass: 'js-editable',
   editableDisabledClass: 'js-editable-disabled',
   pastingAttribute: 'data-editable-is-pasting',
+  trimLeadingAndTrailingWhitespaces: true,
   boldMarkup: {
     type: 'tag',
     name: 'strong',

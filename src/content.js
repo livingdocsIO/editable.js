@@ -4,6 +4,7 @@ import * as rangeSaveRestore from './range-save-restore'
 import * as parser from './parser'
 import * as string from './util/string'
 import {createElement} from './util/dom'
+import config from './config'
 
 function restoreRange (host, range, func) {
   range = rangeSaveRestore.save(range)
@@ -161,7 +162,9 @@ function removeWhitespaces (node, type, firstCall = true) {
   if (elem?.nodeType !== nodeType.textNode) return
   // Remove whitespaces at the end or start of a block with content
   //   e.g. '  Hello world' > 'Hello World'
-  elem.textContent = elem.textContent.replace(type.startsWith('last') ? /\s+$/ : /^\s+/, '')
+  if (config.trimLeadingAndTrailingWhitespaces) {
+    elem.textContent = elem.textContent.replace(type.startsWith('last') ? / +$/ : /^ +/, '')
+  }
 }
 
 // Remove elements that were inserted for internal or user interface purposes
