@@ -12,7 +12,6 @@ const highlightSupport = {
 
   highlightText (editableHost, text, highlightId, type) {
     if (this.hasHighlight(editableHost, highlightId)) return
-
     const blockText = highlightText.extractText(editableHost)
 
     const marker = `<span class="highlight-${type}"></span>`
@@ -28,12 +27,23 @@ const highlightSupport = {
     }
   },
 
-  highlightRange (editableHost, highlightId, startIndex, endIndex, dispatcher, type = 'comment') {
+
+  // This function was changed to track matches when text is added to the start of a component, but multiple white spaces break it in a strict sense
+  // The function works in the editor and in browsers, but tests with multiple white spaces will fail.
+  // Browsers change the white spaces to &nbsp and the function works, and the tests in highlight.spec.js have been updated to represent this.
+
+  highlightRange (editableHost, text, highlightId, startIndex, endIndex, dispatcher, type = 'comment') {
     if (this.hasHighlight(editableHost, highlightId)) {
       this.removeHighlight(editableHost, highlightId)
     }
+    const firstMarker = `<span class="highlight-${type}"></span>`
+    const markerNode = highlightSupport.createMarkerNode(firstMarker, type, this.win)
+    const textSearch = new TextHighlighting(markerNode, 'text')
+    const blockText = highlightText.extractText(editableHost)
+    const matchesArray = textSearch.findMatches(blockText, [text])
+    const {actualStartIndex, actualEndIndex} = this.getIndex(matchesArray, startIndex, endIndex)
     const range = rangy.createRange()
-    range.selectCharacters(editableHost, startIndex, endIndex)
+    range.selectCharacters(editableHost, actualStartIndex, actualEndIndex)
 
     if (!isInHost(range.commonAncestorContainer, editableHost)) {
       return -1
@@ -52,7 +62,7 @@ const highlightSupport = {
     if (dispatcher) {
       dispatcher.notify('change', editableHost)
     }
-    return startIndex
+    return actualStartIndex
   },
 
   updateHighlight (editableHost, highlightId, addCssClass, removeCssClass) {
@@ -136,6 +146,18 @@ const highlightSupport = {
     marker.setAttribute('data-editable', 'ui-unwrap')
     marker.setAttribute('data-highlight', highlightType)
     return marker
+  },
+
+  // This function checks to see if text has been added to the component before the comment
+  // If it has, the start index is updated, otherwise it remains the same
+  getIndex (matchesArray, startIndex, endIndex) {
+    const newStartIndex = matchesArray.find((match) => {
+      return match.startIndex >= startIndex // checks if the startIndex has increased
+    })
+    const actualStartIndex = newStartIndex ? newStartIndex.startIndex : startIndex
+    const actualEndIndex = actualStartIndex ? (actualStartIndex + (endIndex - startIndex)) : endIndex
+
+    return {actualStartIndex, actualEndIndex}
   }
 
 }
