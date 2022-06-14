@@ -67,6 +67,7 @@ export function replaceLast (text, searchValue, replaceValue) {
   text = `${text}`
   if (!searchValue || replaceValue == null) return text
   const lastOccurrenceIndex = text.lastIndexOf(searchValue)
+  if (lastOccurrenceIndex === -1) return text
   return `${
     text.slice(0, lastOccurrenceIndex)
   }${

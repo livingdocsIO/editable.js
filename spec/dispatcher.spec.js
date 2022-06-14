@@ -383,7 +383,9 @@ describe('Dispatcher', function () {
       it(`replaces the last '&nbsp' with ' ' if text ends with a single '&nbsp'`, (done) => {
         on('paste', (block, blocks) => {
           expect(block.innerHTML).to
-            .equal('some text that ends with a single a non breaking space ')
+            .equal('some text that ends with a single a non breaking space ') // space has been removed
+          expect(blocks.length).to.equal(1)
+          expect(blocks[0]).to.equal('copied text') // copied text is still in the paste event
           done()
         })
         elem.innerHTML = 'some text that ends with a single a non breaking space&nbsp;'
