@@ -136,12 +136,11 @@ export default class Dispatcher {
         const {blocks, cursor} = clipboard.paste(block, selection, clipboardContent)
         if (blocks.length) {
           if (endsWithSingleSpace(evt.target.innerText)) {
-            block.innerHTML = replaceLast(block.innerHTML, '&nbsp;', ' ')
-            this.notify('paste', block, blocks, this.editable.createCursorAtEnd(block))
-          } else {
-            this.notify('paste', block, blocks, cursor)
+            cursor.retainVisibleSelection(() => {
+              block.innerHTML = replaceLast(block.innerHTML, '&nbsp;', ' ')
+            })
           }
-
+          this.notify('paste', block, blocks, cursor)
           // The input event does not fire when we process the content manually
           // and insert it via script
           this.notify('change', block)
