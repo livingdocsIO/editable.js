@@ -245,11 +245,25 @@ export default class Selection extends Cursor {
     this.setSelection()
   }
 
-  // Delete the contents inside the range. After that the selection will be a
-  // cursor.
+  // Delete the farest ancestor that is an exact selection
+  deleteExactSurroundingMarkups () {
+    const markupTags = this.getAncestorTags(
+      (elem) => ['STRONG', 'EM'].includes(elem.nodeName)
+    ).reverse()
+    for (const markupTag of markupTags) {
+      if (this.isExactSelection(markupTag)) {
+        markupTag.remove()
+        break
+      }
+    }
+  }
+
+  // Delete the contents inside the range and exact surrounding markups.
+  // After that the selection will be a cursor.
   //
   // @return Cursor instance
   deleteContent () {
+    this.deleteExactSurroundingMarkups()
     this.range.deleteContents()
     return new Cursor(this.host, this.range)
   }
