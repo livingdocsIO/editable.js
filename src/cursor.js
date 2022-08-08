@@ -69,6 +69,11 @@ export default class Cursor {
     return content.getInnerTags(this.range, filterFunc)
   }
 
+  // Get all tags whose text is completely within the current selection.
+  getContainedTags (filterFunc) {
+    return content.getContainedTags(this.range, filterFunc)
+  }
+
   // Get all tags that surround the current selection.
   getAncestorTags (filterFunc) {
     return content.getAncestorTags(this.host, this.range, filterFunc)

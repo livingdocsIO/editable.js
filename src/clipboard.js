@@ -29,7 +29,11 @@ export function paste (element, cursor, clipboardContent) {
   const document = element.ownerDocument
   element.setAttribute(config.pastingAttribute, true)
 
-  if (cursor.isSelection) cursor = cursor.deleteContent()
+  if (cursor.isSelection) {
+    cursor = cursor.deleteExactSurroundingMarkups()
+      .deleteContainedMarkupTags()
+      .deleteContent()
+  }
 
   // Create a placeholder to help parse HTML
   const pasteHolder = document.createElement('div')

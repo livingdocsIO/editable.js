@@ -244,6 +244,12 @@ export function getInnerTags (range, filterFunc) {
   return range.getNodes([nodeType.elementNode], filterFunc)
 }
 
+// Get all tags whose text is completely within the current selection.
+export function getContainedTags (range, filterFunc) {
+  return range.getNodes([nodeType.elementNode], filterFunc)
+    .filter(elem => range.containsNodeText(elem))
+}
+
 // Transform an array of elements into an array
 // of tagnames in uppercase
 //
