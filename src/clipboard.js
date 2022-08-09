@@ -30,8 +30,8 @@ export function paste (element, cursor, clipboardContent) {
   element.setAttribute(config.pastingAttribute, true)
 
   if (cursor.isSelection) {
-    cursor = cursor.deleteExactSurroundingMarkups()
-      .deleteContainedMarkupTags()
+    cursor = cursor.deleteExactSurroundingTags()
+      .deleteContainedTags()
       .deleteContent()
   }
 
