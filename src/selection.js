@@ -248,27 +248,23 @@ export default class Selection extends Cursor {
   // Delete the farest ancestor that is an exact selection
   //
   // @return Selection instance
-  deleteExactSurroundingMarkups () {
-    const ancestorMarkupTags = this.getAncestorTags(
-      (elem) => ['STRONG', 'EM'].includes(elem.nodeName)
-    ).reverse()
-    for (const ancestorMarkupTag of ancestorMarkupTags) {
-      if (this.isExactSelection(ancestorMarkupTag)) {
-        ancestorMarkupTag.remove()
+  deleteExactSurroundingTags () {
+    const ancestorTags = this.getAncestorTags().reverse()
+    for (const ancestorTag of ancestorTags) {
+      if (this.isExactSelection(ancestorTag)) {
+        ancestorTag.remove()
         break
       }
     }
     return new Selection(this.host, this.range)
   }
 
-  // Delete all the markups whose text is completely within the current selection.
+  // Delete all the tags whose text is completely within the current selection.
   //
   // @return Selection instance
-  deleteContainedMarkupTags () {
-    const containedMarkupTags = this.getContainedTags(
-      (elem) => ['STRONG', 'EM'].includes(elem.nodeName)
-    )
-    containedMarkupTags.forEach(containedMarkupTag => containedMarkupTag.remove())
+  deleteContainedTags () {
+    const containedTags = this.getContainedTags()
+    containedTags.forEach(containedTag => containedTag.remove())
     return new Selection(this.host, this.range)
   }
 

@@ -78,6 +78,31 @@ describe('Selection', function () {
     })
   })
 
+  describe('deleteExactSurroundingTags:', function () {
+    it('deletes the farest ancestor that exactly surrounds the selection', function () {
+      const content = createElement('<p>text <strong><em>italic</em></strong> text</p>')
+      const em = content.getElementsByTagName('em')[0]
+      const range = rangy.createRange()
+      range.setStart(em, 0)
+      range.setEnd(em, 1)
+      let selection = new Selection(content, range)
+      selection = selection.deleteExactSurroundingTags()
+      expect(selection.host.innerHTML).to.equal('text  text')
+    })
+  })
+
+  describe('deleteContainedTags:', function () {
+    it('deletes all the tags whose content is completely within the current selection: ', function () {
+      const content = createElement('<p>text <strong>bold</strong> text')
+      const range = rangy.createRange()
+      range.setStart(content, 1)
+      range.setEnd(content, 3)
+      let selection = new Selection(content, range)
+      selection = selection.deleteContainedTags()
+      expect(selection.host.innerHTML).to.equal('text  text')
+    })
+  })
+
   describe('with a range', function () {
 
     beforeEach(function () {
