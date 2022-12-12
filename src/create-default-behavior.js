@@ -35,6 +35,13 @@ export default function createDefaultBehavior (editable) {
     },
 
     blur (element) {
+      // Note: there is a special case when the tab is changed where
+      // we can get a blur event even if the cursor is still in the editable.
+      // This blur would cause us to loose the cursor position (cause of cleanInternals()).
+      // To prevent this we check if the activeElement is still the editable.
+      // (Note: document.getSelection() did not work reliably in this case.)
+      if (document.activeElement === element) return
+
       content.cleanInternals(element)
     },
 
