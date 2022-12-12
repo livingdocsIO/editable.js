@@ -14,6 +14,7 @@ function setupHighlightEnv (context, text) {
   if (context.editable) context.editable.unload()
   context.editable = new Editable()
   context.editable.add(context.div)
+  // eslint-disable-next-line no-shadow
   context.highlightRange = (text, highlightId, start, end, dispatcher, type) => {
     return highlightSupport.highlightRange(
       context.div,
