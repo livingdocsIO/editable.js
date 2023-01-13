@@ -1,6 +1,60 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base"
-  ]
+  ],
+  "dependencyDashboard": true,
+  "labels": ["dependencies"],
+  "baseBranches": [
+    "master",
+    "release-2023-01",
+    "release-2022-11",
+    "release-2022-09"
+  ],
+  "rebaseWhen": "auto",
+  "commitMessageExtra": "from {{{currentVersion}}} to {{#if isPinDigest}}{{{newDigestShort}}}{{else}}{{#if isMajor}}v{{{newMajor}}}{{else}}{{#if isSingleVersion}}v{{{newVersion}}}{{else}}{{#if newValue}}{{{newValue}}}{{else}}{{{newDigestShort}}}{{/if}}{{/if}}{{/if}}{{/if}}",
+  "prConcurrentLimit": 6,
+  "schedule": ["every weekend"],
+  "timezone": "CET",
+  "reviewers": ["@JordiVM", "@marcbachmann"],
+  "enabledManagers": ["npm"],
+  "rangeStrategy": "update-lockfile",
+  "prHourlyLimit": 6,
+  "separateMinorPatch": true,
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["babel"],
+      "groupName": "babel"
+    },
+    {
+      "matchPackagePatterns": ["karma"],
+      "groupName": "babel"
+    },
+    {
+      "matchBaseBranches": ["/release-20[0-9]{2}-[0-9]{2}$/"],
+      "enabled": false
+    },
+    {
+      "matchBaseBranches": ["master"],
+      "matchUpdateTypes": ["patch", "pin", "digest"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "matchBaseBranches": ["master"],
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "enabled": true,
+    "reviewers": ["@JordiVM", "@marcbachmann", "@DaRaFF"],
+    "schedule": ["after 10pm and before 4am every day"],
+    "stabilityDays": 0,
+    "commitMessageExtra": "from {{{currentVersion}}} to {{{newVersion}}}",
+    "prCreation": "immediate"
+  }
 }
