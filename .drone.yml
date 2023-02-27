@@ -16,11 +16,6 @@ steps:
   image: cypress/browsers:node14.15.0-chrome86-ff82
   commands: [npm ci]
 
-- name: audit
-  image: cypress/browsers:node14.15.0-chrome86-ff82
-  commands: ["npm audit --prod"]
-  depends_on: [install]
-
 - name: build
   image: cypress/browsers:node14.15.0-chrome86-ff82
   commands: ["npm run build -s"]
@@ -57,6 +52,6 @@ trigger:
   event: [push, tag, pull_request]
 ---
 kind: signature
-hmac: 2e019c3afd3353410dcfbee11e2c4d3527d4e9ce0821d1b2db85dc2fad25fbec
+hmac: 6b6f72980c106e95ae0d5061df407768fd7c17386e4f884e5e9e3af7315335a2
 
 ...

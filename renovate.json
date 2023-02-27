@@ -20,6 +20,7 @@
   "rangeStrategy": "update-lockfile",
   "prHourlyLimit": 6,
   "separateMinorPatch": true,
+  "platformAutomerge": true,
   "packageRules": [
     {
       "matchPackagePatterns": ["babel"],
@@ -37,15 +38,13 @@
       "matchBaseBranches": ["master"],
       "matchUpdateTypes": ["patch", "pin", "digest"],
       "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": true
+      "automergeType": "pr"
     },
     {
       "matchBaseBranches": ["master"],
       "matchDepTypes": ["devDependencies"],
       "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": true
+      "automergeType": "pr"
     }
   ],
   "vulnerabilityAlerts": {
