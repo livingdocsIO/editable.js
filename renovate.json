@@ -5,17 +5,13 @@
   "dependencyDashboard": true,
   "labels": ["dependencies"],
   "baseBranches": [
-    "master",
-    "release-2023-01",
-    "release-2022-11",
-    "release-2022-09"
+    "master"
   ],
   "rebaseWhen": "auto",
   "commitMessageExtra": "from {{{currentVersion}}} to {{#if isPinDigest}}{{{newDigestShort}}}{{else}}{{#if isMajor}}v{{{newMajor}}}{{else}}{{#if isSingleVersion}}v{{{newVersion}}}{{else}}{{#if newValue}}{{{newValue}}}{{else}}{{{newDigestShort}}}{{/if}}{{/if}}{{/if}}{{/if}}",
   "prConcurrentLimit": 6,
-  "schedule": ["every weekend"],
+  "schedule": ["after 10pm and before 4am every day"],
   "timezone": "CET",
-  "reviewers": ["@JordiVM", "@marcbachmann"],
   "enabledManagers": ["npm"],
   "rangeStrategy": "update-lockfile",
   "prHourlyLimit": 6,
@@ -50,8 +46,8 @@
   "vulnerabilityAlerts": {
     "labels": ["security"],
     "enabled": true,
-    "reviewers": ["@JordiVM", "@marcbachmann", "@DaRaFF"],
-    "schedule": ["after 10pm and before 4am every day"],
+    "reviewers": ["@JordiVM", "@marcbachmann"],
+    "schedule": ["after 6pm and before 8am every day"],
     "stabilityDays": 0,
     "commitMessageExtra": "from {{{currentVersion}}} to {{{newVersion}}}",
     "prCreation": "immediate"
