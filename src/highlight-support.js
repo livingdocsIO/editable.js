@@ -40,6 +40,7 @@ const highlightSupport = {
     const markerNode = highlightSupport.createMarkerNode(firstMarker, type, this.win)
     const textSearch = new TextHighlighting(markerNode, 'text')
     const blockText = highlightText.extractText(editableHost)
+    if (blockText === '') return -1 // the text was deleted so we can't highlight it
     const matchesArray = textSearch.findMatches(blockText, [text])
     const {actualStartIndex, actualEndIndex} = this.getIndex(matchesArray, startIndex, endIndex)
     const range = rangy.createRange()
