@@ -382,6 +382,11 @@ ke The <br> World Go Round`)
       expect(highlightSpan.length).to.equal(0)
     })
 
+    it('does not throw when text has been deleted', function () {
+      setupHighlightEnv(this, '')
+      expect(() => this.highlightRange('not found', 'myId', 33, 38)).to.not.throw()
+    })
+
     it('normalizes a simple text node after removing a highlight', function () {
       setupHighlightEnv(this, 'People Make The World Go Round')
       this.highlightRange('ple ', 'myId', 3, 7)
@@ -670,7 +675,5 @@ Make The&nbsp;<br>&nbsp;W<span class="highlight-spellcheck" data-word-id="spellc
       expect(this.getHtml()).to.equal(expectedHtml)
       expect(this.extractWithoutNativeRange('comment')).to.deep.equal(expectedRanges)
     })
-
-
   })
 })
