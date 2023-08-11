@@ -72,7 +72,7 @@ describe('Editable', function () {
         expect(div.innerHTML).to.equal('a<span>b</span>c')
       })
 
-      it('returns a curosr a the right position', function () {
+      it('returns a cursor a the right position', function () {
         div.innerHTML = 'a'
         const cursor = editable.appendTo(div, 'b')
         expect(cursor.beforeHtml()).to.equal('a')
@@ -102,7 +102,7 @@ describe('Editable', function () {
         expect(div.innerHTML).to.equal('<span>So</span> be it. A sentence.')
       })
 
-      it('returns a curosr a the right position', function () {
+      it('returns a cursor a the right position', function () {
         div.innerHTML = 'a'
         const cursor = editable.prependTo(div, 'b')
         expect(cursor.beforeHtml()).to.equal('b')

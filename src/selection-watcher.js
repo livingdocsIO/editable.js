@@ -1,9 +1,8 @@
-import rangy from 'rangy'
-
 import * as parser from './parser'
 import RangeContainer from './range-container'
 import Cursor from './cursor'
 import Selection from './selection'
+import {getSelection} from './util/dom'
 
 /**
  * The SelectionWatcher module watches for selection changes inside
@@ -29,7 +28,7 @@ export default class SelectionWatcher {
   syncSelection () {
     // it is possible that rangy has a problem with the nativeSelection
     try {
-      this.rangySelection = rangy.getSelection(this.win)
+      this.rangySelection = getSelection(this.win)
     } catch (err) {
       return false
     }

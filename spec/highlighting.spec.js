@@ -1,11 +1,10 @@
 import {expect} from 'chai'
 import sinon from 'sinon'
-import rangy from 'rangy'
 import {Editable} from '../src/core'
 import Highlighting from '../src/highlighting'
 import highlightSupport from '../src/highlight-support'
 import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
-import {createElement} from '../src/util/dom'
+import {createElement, createRange, toCharacterRange} from '../src/util/dom'
 
 function setupHighlightEnv (context, text) {
   context.text = text
@@ -415,10 +414,10 @@ ke The <br> World Go Round`)
 
       characters.forEach(([char, expectedLength, expectedText]) => {
         setupHighlightEnv(this, char)
-        const range = rangy.createRange()
+        const range = createRange()
         const node = this.div
         range.selectNode(node.firstChild)
-        const {start, end} = range.toCharacterRange(this.div)
+        const {start, end} = toCharacterRange(range, this.div)
         this.highlightRange(char, 'char', start, end)
         if (expectedLength === 0) {
           expect(this.extractWithoutNativeRange()).to.equal(undefined)
@@ -470,11 +469,11 @@ ke The <br> World Go Round`)
     })
 
     it('maps selection offsets to ranges containing multibyte symbols consistently', function () {
-      const range = rangy.createRange()
+      const range = createRange()
       const node = this.div
       range.setStart(node.firstChild, 0)
       range.setEnd(node.firstChild, 2)
-      const {start, end} = range.toCharacterRange(this.div)
+      const {start, end} = toCharacterRange(range, this.div)
 
       this.highlightRange('😐', 'first', start, end)
       const expectedRanges = {

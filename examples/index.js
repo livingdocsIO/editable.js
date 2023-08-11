@@ -2,6 +2,7 @@ import Prism from 'prismjs'
 
 import {Editable} from '../src/core'
 import eventList from './events.js'
+import {getSelectionCoordinates} from '../src/util/dom'
 
 // Paragraph Example
 const editable = new Editable({browserSpellcheck: false})
@@ -80,7 +81,7 @@ function setupTooltip () {
         return
       }
 
-      const coords = selection.getCoordinates()
+      const coords = getSelectionCoordinates(window.getSelection())
       tooltip.style.display = 'block'
 
       // position tooltip

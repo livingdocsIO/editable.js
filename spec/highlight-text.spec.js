@@ -1,11 +1,10 @@
 import {expect} from 'chai'
-import rangy from 'rangy'
 import sinon from 'sinon'
 
 import Cursor from '../src/cursor'
 import highlightText from '../src/highlight-text'
 import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
-import {createElement} from '../src/util/dom'
+import {createElement, createRange} from '../src/util/dom'
 
 describe('highlightText', function () {
 
@@ -33,7 +32,7 @@ describe('highlightText', function () {
   }
 
   function createCursor (host, elem, offset) {
-    const range = rangy.createRange()
+    const range = createRange()
     range.setStart(elem, offset)
     range.setEnd(elem, offset)
     return new Cursor(host, range)
