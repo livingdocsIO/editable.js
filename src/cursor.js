@@ -1,4 +1,3 @@
-import rangy from 'rangy'
 import * as viewport from './util/viewport'
 
 import * as content from './content'
@@ -8,7 +7,7 @@ import {elementNode, documentFragmentNode} from './node-type'
 import error from './util/error'
 import * as rangeSaveRestore from './range-save-restore'
 // import printRange from './util/print_range'
-import {closest} from './util/dom'
+import {closest, getSelection, rangesAreEqual} from './util/dom'
 
 /**
  * The Cursor module provides a cross-browser abstraction layer for cursor.
@@ -149,7 +148,11 @@ export default class Cursor {
     if (parser.isDocumentFragmentWithoutChildren(element)) return
 
     element = this.adoptElement(element)
-    this.range.insertNode(element)
+
+    const after = this.range.cloneRange()
+    after.setStart(after.endContainer, after.endOffset)
+    after.collapse(true)
+    after.insertNode(element)
   }
 
   // Alias for #setVisibleSelection()
@@ -162,7 +165,10 @@ export default class Cursor {
       const {x, y} = viewport.getScrollPosition(this.win)
       this.win.scrollTo(x, y)
     }
-    rangy.getSelection(this.win).setSingleRange(this.range)
+
+    const selection = getSelection(this.win)
+    selection.removeAllRanges()
+    selection.addRange(this.range)
   }
 
   // Take the following example:
@@ -227,7 +233,6 @@ export default class Cursor {
   getCoordinates (positioning = 'absolute') {
     const coords = this.range.nativeRange.getBoundingClientRect()
     if (positioning === 'fixed') return coords
-
 
     // translate into absolute positions
     const {x, y} = viewport.getScrollPosition(this.win)
@@ -315,7 +320,7 @@ export default class Cursor {
     if (!cursor.host.isEqualNode(this.host)) return false
 
     if (!cursor.range) return false
-    if (!cursor.range.equals(this.range)) return false
+    if (!rangesAreEqual(cursor.range, this.range)) return false
 
     return true
   }

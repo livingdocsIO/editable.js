@@ -1,10 +1,9 @@
 import {expect} from 'chai'
-import {createRange} from 'rangy'
+import {createRange, createElement} from '../src/util/dom'
 
 import * as content from '../src/content'
 import Cursor from '../src/cursor'
 import config from '../src/config'
-import {createElement} from '../src/util/dom'
 
 describe('Cursor', function () {
 

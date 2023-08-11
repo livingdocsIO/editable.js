@@ -1,5 +1,3 @@
-
-import 'rangy/lib/rangy-textrange'
 import Cursor from './cursor'
 import * as content from './content'
 import * as parser from './parser'
@@ -7,6 +5,7 @@ import * as block from './block'
 import config from './config'
 import highlightSupport from './highlight-support'
 import highlightText from './highlight-text'
+import {toCharacterRange, rangeToHtml} from './util/dom'
 
 /**
  * The Selection module provides a cross-browser abstraction layer for range
@@ -37,7 +36,7 @@ export default class Selection extends Cursor {
 
   // Get the html inside the selection.
   html () {
-    return this.range.toHtml()
+    return rangeToHtml(this.range)
   }
 
   isAllSelected () {
@@ -53,7 +52,7 @@ export default class Selection extends Cursor {
   }
 
   getTextRange () {
-    return this.range.toCharacterRange(this.host)
+    return toCharacterRange(this.range, this.host)
   }
 
   // Return a plain string of the current selection content.

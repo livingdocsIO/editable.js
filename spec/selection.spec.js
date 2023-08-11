@@ -1,11 +1,10 @@
 import {expect} from 'chai'
-import rangy from 'rangy'
 
 import {Editable} from '../src/core'
 import Selection from '../src/selection'
 import Cursor from '../src/cursor'
 import config from '../src/config'
-import {createElement} from '../src/util/dom'
+import {createElement, createRange} from '../src/util/dom'
 
 describe('Selection', function () {
 
@@ -17,7 +16,7 @@ describe('Selection', function () {
 
     beforeEach(function () {
       this.div = createElement('<div>f</div>')
-      const range = rangy.createRange()
+      const range = createRange()
       range.selectNodeContents(this.div)
       this.selection = new Selection(this.div, range)
     })
@@ -47,7 +46,7 @@ describe('Selection', function () {
 
     it('removes multiple characters', function () {
       this.div = createElement('<div>«Foo "bar" foo»</div>')
-      const range = rangy.createRange()
+      const range = createRange()
       range.selectNodeContents(this.div)
       this.selection = new Selection(this.div, range)
 
@@ -61,7 +60,7 @@ describe('Selection', function () {
     beforeEach(function () {
       // <div>a|b|c</div>
       const host = createElement('<div>abc</div>')
-      const range = rangy.createRange()
+      const range = createRange()
       range.setStart(host.firstChild, 1)
       range.setEnd(host.firstChild, 2)
 
@@ -83,7 +82,7 @@ describe('Selection', function () {
     it('deletes the farest ancestor that exactly surrounds the selection', function () {
       const content = createElement('<p>text <strong><em>italic</em></strong> text</p>')
       const em = content.getElementsByTagName('em')[0]
-      const range = rangy.createRange()
+      const range = createRange()
       range.setStart(em, 0)
       range.setEnd(em, 1)
       let selection = new Selection(content, range)
@@ -95,7 +94,7 @@ describe('Selection', function () {
   describe('deleteContainedTags:', function () {
     it('deletes all the tags whose content is completely within the current selection: ', function () {
       const content = createElement('<p>text <strong>bold</strong> text')
-      const range = rangy.createRange()
+      const range = createRange()
       range.setStart(content, 1)
       range.setEnd(content, 3)
       let selection = new Selection(content, range)
@@ -108,7 +107,7 @@ describe('Selection', function () {
 
     beforeEach(function () {
       this.oneWord = createElement('<div>foobar</div>')
-      const range = rangy.createRange()
+      const range = createRange()
       range.selectNodeContents(this.oneWord)
       this.selection = new Selection(this.oneWord, range)
     })
@@ -129,13 +128,13 @@ describe('Selection', function () {
 
       it('returns false if not all is selected', function () {
         const textNode = this.oneWord.firstChild
-        let range = rangy.createRange()
+        let range = createRange()
         range.setStartBefore(textNode)
         range.setEnd(textNode, 6)
         let selection = new Selection(this.oneWord, range)
         expect(selection.isAllSelected()).to.equal(true)
 
-        range = rangy.createRange()
+        range = createRange()
         range.setStartBefore(textNode)
         range.setEnd(textNode, 5)
         selection = new Selection(this.oneWord, range)
@@ -343,14 +342,14 @@ describe('Selection', function () {
 
         it('toggles a link bold in a selection with text after', function () {
           // set foo in <div>|foo|bar</div> as the selection
-          let range = rangy.createRange()
+          let range = createRange()
           range.setStart(this.oneWord.firstChild, 0)
           range.setEnd(this.oneWord.firstChild, 3)
           let selection = new Selection(this.oneWord, range)
           // link foo
           selection.link('https://livingdocs.io')
           // select 1 char more to the right (b)
-          range = rangy.createRange()
+          range = createRange()
           // Note: we need to use firstChild twice to get the textNode inside the a tag which is
           // also what the normal browser select behavior does
           range.setStart(this.oneWord.firstChild.firstChild, 0)
@@ -364,14 +363,16 @@ describe('Selection', function () {
 
         it('toggles a link bold in a selection with text before', function () {
           // set bar in <div>foo|bar|</div> as the selection
-          let range = rangy.createRange()
+          // this.oneWord = createElement('<div>foobar</div>')
+          let range = createRange()
           range.setStart(this.oneWord.firstChild, 3)
           range.setEnd(this.oneWord.firstChild, 6)
           let selection = new Selection(this.oneWord, range)
           // link bar
           selection.link('https://livingdocs.io')
+          console.log(getHtml(this.oneWord))
           // select 1 char more to the left (o)
-          range = rangy.createRange()
+          range = createRange()
           range.setStart(this.oneWord.firstChild, 2)
           range.setEnd(this.oneWord.lastChild.firstChild, 3)
           selection = new Selection(this.oneWord, range)
@@ -388,7 +389,7 @@ describe('Selection', function () {
   describe('triming:', function () {
     beforeEach(function () {
       this.wordWithWhitespace = createElement('<div> foobar </div>')
-      const range = rangy.createRange()
+      const range = createRange()
       range.selectNodeContents(this.wordWithWhitespace.firstChild)
       this.selection = new Selection(this.wordWithWhitespace, range)
 
@@ -435,7 +436,7 @@ describe('Selection', function () {
     it('trims a range with special whitespaces', function () {
       // at the beginning we have U+2002, U+2005 and U+2006 in the end a normal whitespace
       const wordWithSpecialWhitespaces = createElement('<div>   bar </div>')
-      const range = rangy.createRange()
+      const range = createRange()
       range.selectNodeContents(wordWithSpecialWhitespaces.firstChild)
       const selection = new Selection(wordWithSpecialWhitespaces, range)
       selection.trimRange()
@@ -445,7 +446,7 @@ describe('Selection', function () {
 
     it('does trim if only a whitespace is selected', function () {
       const whitespaceOnly = createElement('<div> </div>')
-      const range = rangy.createRange()
+      const range = createRange()
       range.selectNodeContents(whitespaceOnly.firstChild)
       const selection = new Selection(whitespaceOnly, range)
       selection.trimRange()
@@ -477,7 +478,7 @@ describe('Selection', function () {
     describe('with regular text', function () {
       beforeEach(function () {
         this.div = createElement('<div>regular text</div>')
-        const range = rangy.createRange()
+        const range = createRange()
         range.selectNodeContents(this.div)
         this.selection = new Selection(this.div, range)
 

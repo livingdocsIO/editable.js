@@ -1,5 +1,6 @@
 import Cursor from './cursor'
 import Selection from './selection'
+import {rangesAreEqual} from './util/dom'
 
 /** RangeContainer
  *
@@ -36,7 +37,7 @@ export default class RangeContainer {
   isDifferentFrom (otherRangeContainer = new RangeContainer()) {
     const self = this.range
     const other = otherRangeContainer.range
-    if (self && other) return !self.equals(other)
+    if (self && other) return !rangesAreEqual(self, other)
     if (!self && !other) return false
     return true
   }

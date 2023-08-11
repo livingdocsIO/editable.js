@@ -1,7 +1,6 @@
-import rangy from 'rangy'
-
 import NodeIterator from './node-iterator'
 import * as nodeType from './node-type'
+import {createRange} from './util/dom'
 
 export default {
 
@@ -109,7 +108,7 @@ export default {
   },
 
   wrapPortion (portion, stencilElement, title) {
-    const range = rangy.createRange()
+    const range = createRange()
     range.setStart(portion.element, portion.offset)
     range.setEnd(portion.element, portion.offset + portion.length)
     const node = stencilElement.cloneNode(true)

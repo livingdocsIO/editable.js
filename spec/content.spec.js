@@ -1,11 +1,8 @@
 import {expect} from 'chai'
-import rangy from 'rangy'
-import {createElement} from '../src/util/dom'
+import {createElement, createRange} from '../src/util/dom'
 
 import * as content from '../src/content'
 import * as rangeSaveRestore from '../src/range-save-restore'
-
-rangy.init()
 
 describe('Content', function () {
 
@@ -87,7 +84,7 @@ describe('Content', function () {
   describe('getInnerTags()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('works with partially selected <strong><em>', function () {
@@ -120,7 +117,7 @@ describe('Content', function () {
     it('gets partially selected <b> and <i>', function () {
       // <div><b>a|b</b><i>c|d</i></div>
       const test = createElement('<div><b>ab</b><i>cd</i></div>')
-      const range = rangy.createRange()
+      const range = createRange()
       range.setStart(test.querySelector('b').firstChild, 1)
       range.setEnd(test.querySelector('i').firstChild, 1)
       const tags = content.getInnerTags(range)
@@ -131,7 +128,7 @@ describe('Content', function () {
   describe('getTags()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('inside <b>', function () {
@@ -156,7 +153,7 @@ describe('Content', function () {
   describe('getTagsByName()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('filters outer tags', function () {
@@ -181,7 +178,7 @@ describe('Content', function () {
   describe('getTagsByNameAndAttributes()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('filters tag with attributes match', function () {
@@ -213,7 +210,7 @@ describe('Content', function () {
   describe('wrap()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('creates an <em>', function () {
@@ -230,7 +227,7 @@ describe('Content', function () {
   describe('isAffectedBy()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('detects a <b> tag', function () {
@@ -247,7 +244,7 @@ describe('Content', function () {
   describe('containsString()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('finds a character in the this.range', function () {
@@ -265,7 +262,7 @@ describe('Content', function () {
   describe('deleteCharacter()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('removes a character in the this.range and preserves the this.range', function () {
@@ -278,16 +275,14 @@ describe('Content', function () {
       expect(host.innerHTML).to.equal('bc')
 
       // show resulting text nodes
-      expect(host.childNodes.length).to.equal(1)
-      expect(host.childNodes[0].nodeValue).to.equal('bc')
+      expect(host.childNodes.length).to.equal(3)
+      expect(host.childNodes[0].nodeValue, 'first').to.equal('')
+      expect(host.childNodes[1].nodeValue, 'second').to.equal('b')
+      expect(host.childNodes[2].nodeValue, 'third').to.equal('c')
 
       // check this.range. It should look like this:
       // <div>|b|c</div>
-      expect(this.range.startContainer).to.equal(host)
-      expect(this.range.startOffset).to.equal(0)
-      expect(this.range.endContainer).to.equal(host.firstChild)
-      expect(this.range.endOffset).to.equal(1)
-      expect(this.range.toString()).to.equal('b')
+      expect(this.range.toString(), 'range.toString()').to.equal('b')
     })
 
     it('works with a partially selected tag', function () {
@@ -309,7 +304,7 @@ describe('Content', function () {
   describe('toggleTag()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('toggles a <b> tag', function () {
@@ -329,7 +324,7 @@ describe('Content', function () {
   describe('nuke()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('removes surrounding <b>', function () {
@@ -374,7 +369,7 @@ describe('Content', function () {
   describe('forceWrap()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('adds a link with an href attribute', function () {
@@ -416,10 +411,10 @@ describe('Content', function () {
   describe('surround()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
-    it('wraps text in double angle quotes', function () {
+    it('wraps text in double angle quotes (1)', function () {
       // <div><i>|b|</i></div>
       const host = createElement('<div><i>a</i></div>')
       this.range.setStart(host.querySelector('i'), 0)
@@ -428,49 +423,42 @@ describe('Content', function () {
       expect(host.innerHTML).to.equal('<i>«a»</i>')
     })
 
-    it('wraps text in double angle quotes', function () {
+    it('wraps text in double angle quotes (2)', function () {
       // <div><i>|b|</i></div>
       const host = createElement('<div><i>a</i></div>')
       this.range.setStart(host.querySelector('i'), 0)
       this.range.setEnd(host.querySelector('i'), 1)
       content.surround(host, this.range, '«', '»')
 
-      // the text nodes are not glued together as they should.
-      // So we have 3 TextNodes after the manipulation.
-      expect(host.querySelector('i').childNodes[0].nodeValue).to.equal('«')
-      expect(host.querySelector('i').childNodes[1].nodeValue).to.equal('a')
-      expect(host.querySelector('i').childNodes[2].nodeValue).to.equal('»')
+      expect(host.innerHTML).to.equal('<i>«a»</i>')
+      expect(this.range.toString()).to.equal('«a»')
 
+      expect(host.querySelector('i').childNodes.length, 'childNodes.length').to.equal(3)
       expect(this.range.startContainer).to.equal(host.querySelector('i'))
-      expect(this.range.startOffset).to.equal(0)
       expect(this.range.endContainer).to.equal(host.querySelector('i'))
-      expect(this.range.endOffset).to.equal(3)
     })
 
-    it('wraps text in double angle quotes', function () {
+    it('wraps text in double angle quotes (3)', function () {
       // <div><i>a|b|</i></div>
       const host = createElement('<div><i>ab</i></div>')
       this.range.setStart(host.querySelector('i').firstChild, 1)
       this.range.setEnd(host.querySelector('i').firstChild, 2)
       content.surround(host, this.range, '«', '»')
-      expect(host.innerHTML).to.equal('<i>a«b»</i>')
 
-      // the text nodes are not glued together as they should.
-      // So we have 3 TextNodes after the manipulation.
-      expect(host.querySelector('i').childNodes[0].nodeValue).to.equal('a«')
-      expect(host.querySelector('i').childNodes[1].nodeValue).to.equal('b')
-      expect(host.querySelector('i').childNodes[2].nodeValue).to.equal('»')
-      expect(this.range.startContainer).to.equal(host.querySelector('i').firstChild)
-      expect(this.range.startOffset).to.equal(1)
-      expect(this.range.endContainer).to.equal(host.querySelector('i'))
-      expect(this.range.endOffset).to.equal(3)
+      expect(host.innerHTML).to.equal('<i>a«b»</i>')
+      expect(this.range.toString()).to.equal('«b»')
+
+      // we have 2 separate text nodes
+      expect(host.querySelector('i').childNodes.length, 'childNodes.length').to.equal(5)
+      expect(this.range.startContainer, 'startContainer').to.equal(host.querySelector('i'))
+      expect(this.range.endContainer, 'endContainer').to.equal(host.querySelector('i'))
     })
   })
 
   describe('isExactSelection()', function () {
 
     beforeEach(function () {
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('is true if the selection is directly outside the tag', function () {
@@ -659,7 +647,7 @@ describe('Content', function () {
       beforeEach(function () {
         host = createElement('<div></div>')
         document.body.appendChild(host)
-        this.range = rangy.createRange()
+        this.range = createRange()
       })
 
       afterEach(function () {

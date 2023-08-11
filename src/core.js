@@ -1,4 +1,3 @@
-import rangy from 'rangy'
 import config from './config'
 import error from './util/error'
 import * as parser from './parser'
@@ -13,7 +12,7 @@ import createDefaultEvents from './create-default-events'
 import browser from 'bowser'
 import {textNodesUnder, getTextNodeAndRelativeOffset} from './util/element'
 import {binaryCursorSearch} from './util/binary_search'
-import {domArray} from './util/dom'
+import {domArray, createRange} from './util/dom'
 
 /**
  * The Core module provides the Editable class that defines the Editable.JS
@@ -48,10 +47,6 @@ export class Editable {
     this.config = Object.assign(defaultInstanceConfig, instanceConfig)
     this.win = this.config.window
     this.editableSelector = `.${config.editableClass}`
-
-    if (!rangy.initialized) {
-      rangy.init()
-    }
 
     this.dispatcher = new Dispatcher(this)
     if (this.config.defaultBehavior === true) {
@@ -217,7 +212,7 @@ export class Editable {
     const host = Cursor.findHost(element, this.editableSelector)
     if (!host) return undefined
 
-    const range = rangy.createRange()
+    const range = createRange()
 
     if (position === 'beginning' || position === 'end') {
       range.selectNodeContents(element)
@@ -240,7 +235,7 @@ export class Editable {
   createCursorAtCharacterOffset ({element, offset}) {
     const textNodes = textNodesUnder(element)
     const {node, relativeOffset} = getTextNodeAndRelativeOffset({textNodes, absOffset: offset})
-    const newRange = rangy.createRange()
+    const newRange = createRange()
     newRange.setStart(node, relativeOffset)
     newRange.collapse(true)
 

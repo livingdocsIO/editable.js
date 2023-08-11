@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {createRange} from 'rangy'
+import {createRange} from '../src/util/dom'
 
 import Cursor from '../src/cursor'
 import {Editable} from '../src/core'

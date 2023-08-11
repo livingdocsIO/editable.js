@@ -1,6 +1,5 @@
 import {expect} from 'chai'
-import rangy from 'rangy'
-
+import {createRange, rangesAreEqual} from '../src/util/dom'
 import * as content from '../src/content'
 import Cursor from '../src/cursor'
 import Keyboard from '../src/keyboard'
@@ -19,14 +18,14 @@ describe('Dispatcher', function () {
   }
 
   function createRangeAtEnd (node) {
-    const range = rangy.createRange()
+    const range = createRange()
     range.selectNodeContents(node)
     range.collapse(false)
     return range
   }
 
   function createRangeAtBeginning (node) {
-    const range = rangy.createRange()
+    const range = createRange()
     range.selectNodeContents(node)
     range.collapse(true)
     return range
@@ -39,7 +38,7 @@ describe('Dispatcher', function () {
   }
 
   function createFullRange (node) {
-    const range = rangy.createRange()
+    const range = createRange()
     range.selectNodeContents(node)
     return range
   }
@@ -125,7 +124,7 @@ describe('Dispatcher', function () {
       it('fires insert "before" if cursor is at the beginning', function () {
         // <div>|foo</div>
         elem.innerHTML = 'foo'
-        const range = rangy.createRange()
+        const range = createRange()
         range.selectNodeContents(elem)
         range.collapse(true)
         createCursor(range)
@@ -144,7 +143,7 @@ describe('Dispatcher', function () {
       it('fires "split" if cursor is in the middle', function () {
         // <div>ba|r</div>
         elem.innerHTML = 'bar'
-        const range = rangy.createRange()
+        const range = createRange()
         range.setStart(elem.firstChild, 2)
         range.setEnd(elem.firstChild, 2)
         range.collapse()
@@ -272,7 +271,7 @@ describe('Dispatcher', function () {
         createSelection(range)
 
         on('toggleBold', (selection) => {
-          expect(selection.range.equals(range)).to.equal(true)
+          expect(rangesAreEqual(selection.range, range)).to.equal(true)
           done()
         })
 
@@ -289,7 +288,7 @@ describe('Dispatcher', function () {
         createSelection(range)
 
         on('toggleEmphasis', (selection) => {
-          expect(selection.range.equals(range)).to.equal(true)
+          expect(rangesAreEqual(selection.range, range)).to.equal(true)
           done()
         })
 
@@ -303,7 +302,7 @@ describe('Dispatcher', function () {
       it('fires "both" if all is selected', function () {
         elem.innerHTML = 'People Make The World Go Round'
         // select all
-        const range = rangy.createRange()
+        const range = createRange()
         range.selectNodeContents(elem)
         createCursor(range)
         // listen for event
@@ -320,7 +319,7 @@ describe('Dispatcher', function () {
       it('fires "start" if selection is at beginning but not end', function () {
         elem.innerHTML = 'People Make The World Go Round'
         // select "People"
-        const range = rangy.createRange()
+        const range = createRange()
         range.setStart(elem.firstChild, 0)
         range.setEnd(elem.firstChild, 5)
         createCursor(range)
@@ -338,7 +337,7 @@ describe('Dispatcher', function () {
       it('fires "end" if selection is at end but not beginning', function () {
         elem.innerHTML = 'People Make The World Go Round'
         // select "Round"
-        const range = rangy.createRange()
+        const range = createRange()
         range.setStart(elem.firstChild, 25)
         range.setEnd(elem.firstChild, 30)
         createCursor(range)

@@ -1,7 +1,5 @@
 import {expect} from 'chai'
-import rangy from 'rangy'
-
-import {createElement} from '../src/util/dom'
+import {createElement, createRange} from '../src/util/dom'
 import RangeContainer from '../src/range-container'
 
 describe('RangeContainer', function () {
@@ -42,7 +40,7 @@ describe('RangeContainer', function () {
 
     beforeEach(function () {
       const elem = createElement('<div>Text</div>')
-      let range = rangy.createRange()
+      let range = createRange()
       range.selectNodeContents(elem)
       range = new RangeContainer(elem, range)
       this.range = range
@@ -74,7 +72,7 @@ describe('RangeContainer', function () {
 
     beforeEach(function () {
       const elem = createElement('<div>Text</div>')
-      let range = rangy.createRange()
+      let range = createRange()
       range.selectNodeContents(elem)
       range.collapse(true)
       range = new RangeContainer(elem, range)

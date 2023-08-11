@@ -1,7 +1,5 @@
 import {expect} from 'chai'
-import rangy from 'rangy'
-
-import {createElement} from '../src/util/dom'
+import {createElement, createRange} from '../src/util/dom'
 import Keyboard from '../src/keyboard'
 import * as nodeType from '../src/node-type'
 
@@ -142,7 +140,7 @@ describe('Keyboard', function () {
     beforeEach(function () {
       this.contenteditable = createElement('<CONTENTEDITABLE>Text1<A><B>Text2</B>Text3<C>Text4</C>Text5</A>Text6</CONTENTEDITABLE>')
       destructureNodes(this.contenteditable, this)
-      this.range = rangy.createRange()
+      this.range = createRange()
     })
 
     it('returns undefined for a ranga within a node', function () {

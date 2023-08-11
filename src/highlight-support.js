@@ -1,8 +1,7 @@
-import rangy from 'rangy'
 import * as content from './content'
 import highlightText from './highlight-text'
 import TextHighlighting from './plugins/highlighting/text-highlighting'
-import {closest, createElement} from './util/dom'
+import {closest, createElement, createRange, toCharacterRange, getRangeText, selectCharacters} from './util/dom'
 
 function isInHost (elem, host) {
   return closest(elem, '[data-editable]:not([data-word-id])') === host
@@ -43,8 +42,9 @@ const highlightSupport = {
     if (blockText === '') return -1 // the text was deleted so we can't highlight it
     const matchesArray = textSearch.findMatches(blockText, [text])
     const {actualStartIndex, actualEndIndex} = this.getIndex(matchesArray, startIndex, endIndex)
-    const range = rangy.createRange()
-    range.selectCharacters(editableHost, actualStartIndex, actualEndIndex)
+    const range = createRange()
+
+    selectCharacters(range, editableHost, actualStartIndex, actualEndIndex)
 
     if (!isInHost(range.commonAncestorContainer, editableHost)) {
       return -1
@@ -116,7 +116,7 @@ const highlightSupport = {
   },
 
   extractMarkerNodePosition (editableHost, markers) {
-    const range = rangy.createRange()
+    const range = createRange()
     if (markers.length > 1) {
       range.setStartBefore(markers[0])
       range.setEndAfter(markers[markers.length - 1])
@@ -124,11 +124,11 @@ const highlightSupport = {
       range.selectNode(markers[0])
     }
 
-    const textRange = range.toCharacterRange(editableHost)
+    const textRange = toCharacterRange(range, editableHost)
     return {
       start: textRange.start,
       end: textRange.end,
-      text: range.text(),
+      text: getRangeText(range),
       nativeRange: range.nativeRange
     }
   },

@@ -1,6 +1,6 @@
-import rangy from 'rangy'
 import error from './util/error'
 import * as nodeType from './node-type'
+import {createRange, normalizeBoundaries} from './util/dom'
 
 /**
  * Inspired by the Selection save and restore module for Rangy by Tim Down
@@ -100,7 +100,8 @@ export function save (range) {
 
   // Adjust each range's boundaries to lie between its markers
   if (range.collapsed) {
-    range.collapseBefore(endEl)
+    range.setStartBefore(endEl)
+    range.collapse(true)
   } else {
     range.setEndBefore(endEl)
     range.setStartAfter(startEl)
@@ -112,7 +113,7 @@ export function save (range) {
 export function restore (host, rangeInfo) {
   if (rangeInfo.restored) return
 
-  const range = rangy.createRange()
+  const range = createRange()
   if (rangeInfo.collapsed) {
     const markerEl = getMarker(host, rangeInfo.markerId)
     if (markerEl) {
@@ -122,9 +123,10 @@ export function restore (host, rangeInfo) {
       // Workaround for rangy issue 17
       if (previousNode && previousNode.nodeType === nodeType.textNode) {
         markerEl.remove()
-        range.collapseToPoint(previousNode, previousNode.length)
+        range.setStart(previousNode, previousNode.length)
       } else {
-        range.collapseBefore(markerEl)
+        range.setStartBefore(markerEl)
+        range.collapse(true)
         markerEl.remove()
       }
     } else {
@@ -135,7 +137,7 @@ export function restore (host, rangeInfo) {
     setRangeBoundary(host, range, rangeInfo.endMarkerId, false)
   }
 
-  range.normalizeBoundaries()
+  normalizeBoundaries(range)
   return range
 }
 

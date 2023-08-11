@@ -1,9 +1,8 @@
-import rangy from 'rangy'
 import * as nodeType from './node-type'
 import * as rangeSaveRestore from './range-save-restore'
 import * as parser from './parser'
 import * as string from './util/string'
-import {createElement} from './util/dom'
+import {createElement, createRange, getNodes, normalizeBoundaries, splitBoundaries, containsNodeText} from './util/dom'
 import config from './config'
 
 function restoreRange (host, range, func) {
@@ -241,13 +240,13 @@ export function areSameAttributes (attrs1, attrs2) {
 
 // Get all tags that start or end inside the range
 export function getInnerTags (range, filterFunc) {
-  return range.getNodes([nodeType.elementNode], filterFunc)
+  return getNodes(range, [nodeType.elementNode], filterFunc)
 }
 
 // Get all tags whose text is completely within the current selection.
 export function getContainedTags (range, filterFunc) {
-  return range.getNodes([nodeType.elementNode], filterFunc)
-    .filter(elem => range.containsNodeText(elem))
+  return getNodes(range, [nodeType.elementNode], filterFunc)
+    .filter(elem => containsNodeText(range, elem))
 }
 
 // Transform an array of elements into an array
@@ -265,9 +264,14 @@ export function isAffectedBy (host, range, tagName) {
 
 // select a whole element
 export function selectNodeContents (element) {
-  const range = rangy.createRange()
+  const range = createRange()
   range.selectNodeContents(element)
   return range
+}
+
+function intersectsRange (range1, range2) {
+  return range1.compareBoundaryPoints(Range.END_TO_START, range2) === -1 &&
+    range2.compareBoundaryPoints(Range.END_TO_START, range1) === -1
 }
 
 // Check if the range selects all of the elements contents,
@@ -276,10 +280,10 @@ export function selectNodeContents (element) {
 // @param visible: Only compare visible text. That way it does not
 //   matter if the user selects an additional whitespace or not.
 export function isExactSelection (range, elem, visible) {
-  const elemRange = rangy.createRange()
+  const elemRange = createRange()
   elemRange.selectNodeContents(elem)
 
-  if (!range.intersectsRange(elemRange)) return false
+  if (!intersectsRange(range, elemRange)) return false
 
   let rangeText = range.toString()
   let elemText = (elem.jquery ? elem[0] : elem).textContent
@@ -309,7 +313,7 @@ export function toggleTag (host, range, elem) {
 }
 
 export function isWrappable (range) {
-  return range.canSurroundContents()
+  return canSurroundContents(range)
 }
 
 export function forceWrap (host, range, elem) {
@@ -384,11 +388,10 @@ export function nukeElem (host, range, node) {
 export function insertCharacter (range, character, atStart) {
   const insertEl = document.createTextNode(character)
   const boundaryRange = range.cloneRange()
-
   boundaryRange.collapse(atStart)
   boundaryRange.insertNode(insertEl)
   range[atStart ? 'setStartBefore' : 'setEndAfter'](insertEl)
-  range.normalizeBoundaries()
+  normalizeBoundaries(range)
 }
 
 // Surround the range with characters like start and end quotes.
@@ -406,19 +409,18 @@ export function surround (host, range, startCharacter, endCharacter) {
 export function deleteCharacter (host, range, character) {
   if (!containsString(range, character)) return range
 
-  range.splitBoundaries()
+  // check for selection.rangeCount > 0 ?
+  if (window.getSelection().rangeCount > 0) splitBoundaries(range)
   const restoredRange = restoreRange(host, range, () => {
-    const charRegexp = string.regexp(character)
-
-    range.getNodes([nodeType.textNode], (node) => {
-      return node.nodeValue.search(charRegexp) >= 0
+    getNodes(range, [nodeType.textNode], (node) => {
+      return node.nodeValue.indexOf(character) >= 0
     })
       .forEach((node) => {
-        node.nodeValue = node.nodeValue.replace(charRegexp, '')
+        node.nodeValue = node.nodeValue.replaceAll(character, '')
       })
   })
 
-  restoredRange.normalizeBoundaries()
+  normalizeBoundaries(restoredRange)
   return restoredRange
 }
 
@@ -432,4 +434,75 @@ export function nukeTag (host, range, tagName) {
   getTags(host, range).forEach((elem) => {
     if (elem.nodeName.toUpperCase() === tagName.toUpperCase()) unwrap(elem)
   })
+}
+
+function createNodeIterator (root, filter) {
+  let currentNode = root
+  let previousNode = null
+
+  function nextNode () {
+    if (!currentNode) {
+      return null
+    }
+
+    if (currentNode.firstChild && previousNode !== currentNode.firstChild) {
+      previousNode = currentNode
+      currentNode = currentNode.firstChild
+    } else if (currentNode.nextSibling) {
+      previousNode = currentNode
+      currentNode = currentNode.nextSibling
+    } else {
+      let parent = currentNode.parentNode
+      while (parent && parent !== root) {
+        if (parent.nextSibling) {
+          previousNode = currentNode = parent.nextSibling
+          break
+        }
+        parent = parent.parentNode
+      }
+      if (!parent || parent === root) {
+        previousNode = currentNode = null
+      }
+    }
+
+    return currentNode
+  }
+
+  return {
+    next: nextNode
+  }
+}
+
+function isNodeFullyContained (node, range) {
+  const nodeRange = document.createRange()
+  nodeRange.selectNodeContents(node)
+  return range.compareBoundaryPoints(Range.START_TO_START, nodeRange) <= 0 &&
+         range.compareBoundaryPoints(Range.END_TO_END, nodeRange) >= 0
+}
+
+function canSurroundContents (range) {
+  if (!range || !range.startContainer || !range.endContainer) {
+    return false
+  }
+
+  if (range.startContainer === range.endContainer) return true
+
+  // Create a custom node iterator for the common ancestor container
+  const iterator = createNodeIterator(range.commonAncestorContainer, function (node) {
+    return range.isPointInRange(node, 0)
+  })
+
+  let currentNode
+  let boundariesInvalid = false
+
+  while ((currentNode = iterator.next())) {
+    if (currentNode.nodeType === Node.ELEMENT_NODE) {
+      if (!isNodeFullyContained(currentNode, range)) {
+        boundariesInvalid = true
+        break
+      }
+    }
+  }
+
+  return !boundariesInvalid
 }

@@ -1,11 +1,9 @@
 import {expect} from 'chai'
 import sinon from 'sinon'
-import rangy from 'rangy'
-
 import {Editable} from '../src/core'
 import Highlighting from '../src/highlighting'
 import Cursor from '../src/cursor'
-import {createElement} from '../src/util/dom'
+import {createElement, createRange} from '../src/util/dom'
 
 // import Spellcheck from '../src/plugins/highlighting/spellcheck'
 
@@ -14,7 +12,7 @@ describe('Spellcheck:', function () {
   // Helpers
 
   function createCursor (host, elem, offset) {
-    const range = rangy.createRange()
+    const range = createRange()
     range.setStart(elem, offset)
     range.setEnd(elem, offset)
     return new Cursor(host, range)

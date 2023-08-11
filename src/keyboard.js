@@ -1,5 +1,4 @@
-import rangy from 'rangy'
-
+import {createRange, containsRange} from './util/dom'
 import {contenteditableSpanBug} from './feature-detection'
 import * as nodeType from './node-type'
 import eventable from './eventable'
@@ -144,10 +143,10 @@ export default class Keyboard {
 
     // We get a range that contains everything within the sartNodeElement to test
     // if the selectionRange is within the startNode, we have nothing to do.
-    const startNodeRange = rangy.createRange()
+    const startNodeRange = createRange()
     startNodeRange.setStartBefore(startNodeElement.firstChild)
     startNodeRange.setEndAfter(startNodeElement.lastChild)
-    if (startNodeRange.containsRange(selectionRange)) return
+    if (containsRange(startNodeRange, selectionRange)) return
 
     // If the selectionRange.startContainer was a textNode, we have to make sure
     // that its parent's content starts with this node. Content is either a
