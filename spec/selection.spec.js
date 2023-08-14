@@ -348,6 +348,8 @@ describe('Selection', function () {
           let selection = new Selection(this.oneWord, range)
           // link foo
           selection.link('https://livingdocs.io')
+          this.oneWord.normalize()
+
           // select 1 char more to the right (b)
           range = createRange()
           // Note: we need to use firstChild twice to get the textNode inside the a tag which is
@@ -370,7 +372,8 @@ describe('Selection', function () {
           let selection = new Selection(this.oneWord, range)
           // link bar
           selection.link('https://livingdocs.io')
-          console.log(getHtml(this.oneWord))
+          this.oneWord.normalize()
+
           // select 1 char more to the left (o)
           range = createRange()
           range.setStart(this.oneWord.firstChild, 2)
