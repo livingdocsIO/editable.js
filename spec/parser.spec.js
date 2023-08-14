@@ -6,14 +6,14 @@ import config from '../src/config'
 
 describe('Parser', function () {
   // helper methods
-  function createRangyCursorAfter (node) {
+  function createCursorAfter (node) {
     const range = createRange()
     range.setStartAfter(node)
     range.setEndAfter(node)
     return range
   }
 
-  function createRangyCursorAtEnd (node) {
+  function createCursorAtEnd (node) {
     const range = createRange()
     range.selectNodeContents(node)
     range.collapse(false)
@@ -144,14 +144,14 @@ describe('Parser', function () {
 
     it('works for single child node', function () {
       // <div>foobar|</div>
-      const range = createRangyCursorAfter(oneWord.firstChild)
+      const range = createCursorAfter(oneWord.firstChild)
       expect(range.endOffset).to.equal(1)
       expect(parser.isEndOffset(oneWord, 1)).to.equal(true)
     })
 
     it('works for empty node', function () {
       // <div>|</div>
-      const range = createRangyCursorAtEnd(empty)
+      const range = createCursorAtEnd(empty)
       expect(parser.isEndOffset(empty, range.endOffset)).to.equal(true)
     })
 
@@ -172,12 +172,12 @@ describe('Parser', function () {
 
     it('works with text and element nodes', function () {
       // <div>foo <a href='#'>bar</a>.|</div>
-      let range = createRangyCursorAfter(textWithLink.childNodes[2])
+      let range = createCursorAfter(textWithLink.childNodes[2])
       expect(range.endOffset).to.equal(3)
       expect(parser.isEndOffset(textWithLink, 3)).to.equal(true)
 
       // <div>foo <a href='#'>bar</a>|.</div>
-      range = createRangyCursorAfter(textWithLink.childNodes[1])
+      range = createCursorAfter(textWithLink.childNodes[1])
       expect(range.endOffset).to.equal(2)
       expect(parser.isEndOffset(textWithLink, 2)).to.equal(false)
     })
@@ -212,7 +212,7 @@ describe('Parser', function () {
 
     it('ignores whitespace after the last element', function () {
       // <div><a href="#">bar|</a> </div>
-      const range = createRangyCursorAfter(linkWithWhitespace.firstChild.firstChild)
+      const range = createCursorAfter(linkWithWhitespace.firstChild.firstChild)
       expect(range.endOffset).to.equal(1)
       expect(parser.isTextEndOffset(linkWithWhitespace.firstChild, 1)).to.equal(true)
       expect(parser.isTextEndOffset(linkWithWhitespace.firstChild, 0)).to.equal(false)
@@ -220,7 +220,7 @@ describe('Parser', function () {
 
     it('ignores whitespace after the last element', function () {
       // <div><a href="#">bar</a>| </div>
-      const range = createRangyCursorAfter(linkWithWhitespace.firstChild)
+      const range = createCursorAfter(linkWithWhitespace.firstChild)
       expect(range.endOffset).to.equal(1)
       expect(parser.isTextEndOffset(linkWithWhitespace, 1)).to.equal(true)
       expect(parser.isTextEndOffset(linkWithWhitespace, 0)).to.equal(false)
@@ -286,7 +286,7 @@ describe('Parser', function () {
     it('works with link node in nested content', function () {
       // <div><a href='#'>foo <span class='important'>bar</span>|</a></div>
       const endContainer = linkWithSpan.querySelector('a')
-      const range = createRangyCursorAtEnd(endContainer)
+      const range = createCursorAtEnd(endContainer)
       expect(range.endOffset).to.equal(2)
       expect(parser.isEndOfHost(linkWithSpan, endContainer, 2)).to.equal(true)
 
