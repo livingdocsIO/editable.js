@@ -59,12 +59,7 @@ describe('Default Events', function () {
         const onFocus = on(this.editable, 'focus', (element, selection) => {
           if (!selection) return
           expect(element).to.equal(this.elem)
-          const range = selection.range
-          const nativeRange = range.nativeRange
-          expect(range.startContainer).to.equal(nativeRange.startContainer)
-          expect(range.endContainer).to.equal(nativeRange.endContainer)
-          expect(range.startOffset).to.equal(nativeRange.startOffset)
-          expect(range.endOffset).to.equal(nativeRange.endOffset)
+          expect(selection.range).to.be.an.instanceOf(Range)
         })
 
         this.elem.dispatchEvent(this.focus)

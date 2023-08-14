@@ -99,7 +99,7 @@ export default class Cursor {
     hostRange.selectNodeContents(this.host)
     hostRange.collapse(false)
     const hostCoords = getRangeBoundingClientRect(hostRange, this.win)
-    const cursorCoords = getRangeBoundingClientRect(this.range.nativeRange, this.win)
+    const cursorCoords = getRangeBoundingClientRect(this.range, this.win)
     return isCloseTo(hostCoords.bottom, cursorCoords.bottom)
   }
 
@@ -108,7 +108,7 @@ export default class Cursor {
     hostRange.selectNodeContents(this.host)
     hostRange.collapse(true)
     const hostCoords = getRangeBoundingClientRect(hostRange, this.win)
-    const cursorCoords = getRangeBoundingClientRect(this.range.nativeRange, this.win)
+    const cursorCoords = getRangeBoundingClientRect(this.range, this.win)
     return isCloseTo(hostCoords.top, cursorCoords.top)
   }
 
@@ -224,14 +224,14 @@ export default class Cursor {
   }
 
   getBoundingClientRect () {
-    return this.range.nativeRange.getBoundingClientRect()
+    return this.range.getBoundingClientRect()
   }
 
   // Get the BoundingClientRect of the cursor.
   // The returned values are transformed to be absolute
   // (relative to the document).
   getCoordinates (positioning = 'absolute') {
-    const coords = this.range.nativeRange.getBoundingClientRect()
+    const coords = this.range.getBoundingClientRect()
     if (positioning === 'fixed') return coords
 
     // translate into absolute positions

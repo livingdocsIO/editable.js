@@ -142,23 +142,6 @@ export const containsNodeText = (range, node) => {
   return comparisonStart <= 0 && comparisonEnd >= 0
 }
 
-// export const splitBoundaries = (range) => {
-//   const clonedRange = range.cloneRange()
-
-//   // Split at the start boundary
-//   const startContainer = range.startContainer
-//   const startOffset = range.startOffset
-//   range.setEnd(startContainer, startOffset)
-//   clonedRange.setStart(startContainer, startOffset)
-
-//   // Split at the end boundary
-//   const endContainer = clonedRange.endContainer
-//   const endOffset = clonedRange.endOffset
-//   clonedRange.setStart(endContainer, endOffset)
-//   range.setEnd(endContainer, endOffset)
-
-//   return [range, clonedRange]
-// }
 const isCharacterDataNode = (node) => {
   return node && (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.COMMENT_NODE)
 }
@@ -183,17 +166,15 @@ export const splitBoundaries = (range) => {
   }
 }
 
-export const toCharacterRange = (range, containerElement) => {
-  const start = getCharacterOffset(containerElement, range.startContainer, range.startOffset)
-  const end = getCharacterOffset(containerElement, range.endContainer, range.endOffset)
-  return {start, end}
-}
+export const toCharacterRange = (range, container) => {
+  const startRange = range.cloneRange()
+  startRange.setStart(container, 0)
+  startRange.setEnd(range.startContainer, range.startOffset)
 
-function getCharacterOffset (containerElement, container, offset) {
-  const textContent = container.textContent || container.innerText
-  const containerStart = containerElement.textContent.indexOf(textContent)
-  if (containerStart !== -1) return containerStart + offset
-  return -1
+  const start = startRange.toString().length
+  const end = start + range.toString().length
+
+  return {start, end}
 }
 
 export const rangesAreEqual = (range1, range2) => {
@@ -232,96 +213,41 @@ export const getSelectionCoordinates = (selection) => {
   return coordinates
 }
 
-export const getRangeText = (range) => {
-  const container = range.commonAncestorContainer
-  const startNode = range.startContainer
-  const endNode = range.endContainer
-  const startOffset = range.startOffset
-  const endOffset = range.endOffset
+export const selectCharacters = (element, actualStartIndex, actualEndIndex) => {
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false)
+  let currentIndex = 0
+  let startNode, endNode, startOffset, endOffset
 
-  if (startNode.nodeType === Node.TEXT_NODE && startNode === endNode) {
-    return startNode.nodeValue.substring(startOffset, endOffset)
-  }
+  while (walker.nextNode()) {
+    const textNode = walker.currentNode
+    const nodeLength = textNode.nodeValue.length
 
-  let text = ''
-  let node = startNode
-
-  while (node && node !== container) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      if (node === startNode) {
-        text += node.nodeValue.substring(startOffset)
-      } else if (node === endNode) {
-        text += node.nodeValue.substring(0, endOffset)
-      } else {
-        text += node.nodeValue
-      }
+    if (currentIndex + nodeLength <= actualStartIndex) {
+      currentIndex += nodeLength
+      continue
     }
-    node = node.nextSibling || node.parentNode
-  }
 
-  return text
-}
-
-export const selectCharacters = (range, actualStartIndex, actualEndIndex) => {
-  const startContainer = range.startContainer
-  const endContainer = range.endContainer
-  const textNodes = getTextNodesInRange(startContainer, endContainer)
-
-  let startNode
-  let endNode
-  let startOffset = actualStartIndex
-  let endOffset = actualEndIndex
-
-  for (const textNode of textNodes) {
-    const textLength = textNode.length
-    startOffset -= textLength
-
-    if (startOffset <= textLength) {
+    if (!startNode) {
       startNode = textNode
-      break
+      startOffset = actualStartIndex - currentIndex
     }
 
-  }
-
-  for (const textNode of textNodes) {
-    const textLength = textNode.length
-    endOffset -= textLength
-
-    if (endOffset <= textLength) {
+    if (currentIndex + nodeLength >= actualEndIndex) {
       endNode = textNode
+      endOffset = actualEndIndex - currentIndex
       break
     }
+
+    currentIndex += nodeLength
   }
 
-  if (!startNode || !endNode) {
+  if (startNode && endNode) {
+    const range = createRange()
+    range.setStart(startNode, startOffset)
+    range.setEnd(endNode, endOffset)
+    return range
+  } else {
     throw new Error('Invalid character offsets.')
   }
-
-  range.setStart(startNode, startOffset)
-  range.setEnd(endNode, endOffset)
-
-  return range
 }
 
-// Helper function to get an array of text nodes within a range
-const getTextNodesInRange = (startContainer, endContainer) => {
-  const textNodes = []
-  let commonAncestor = startContainer
-
-  while (commonAncestor && !commonAncestor.contains(endContainer)) {
-    commonAncestor = commonAncestor.parentNode
-  }
-
-  if (!commonAncestor) {
-    return textNodes
-  }
-
-  const walker = document.createTreeWalker(commonAncestor, NodeFilter.SHOW_TEXT, null, false)
-
-  let node
-  while ((node = walker.nextNode())) {
-    textNodes.push(node)
-  }
-
-  return textNodes
-}
