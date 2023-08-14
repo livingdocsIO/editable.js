@@ -23,6 +23,7 @@ const characters = {
 // a paragraph and the highlighting prevents browsers from converting
 // the no-break space back to a normal space when the user keeps typing.
 const specialWhitespaceChars = '\\u2000-\\u200A\\u202F\\u205F\\u3000'
+const specialWhitespaceCharsRegex = new RegExp(`[${specialWhitespaceChars}]`, 'g')
 
 export default class WhitespaceHighlighting {
 
@@ -33,13 +34,7 @@ export default class WhitespaceHighlighting {
   findMatches (text) {
     if (!text) return
 
-    let regex = `[${specialWhitespaceChars}]`
-    regex = new RegExp(regex, 'g')
-
-    const matches = []
-    let match
-    while ((match = regex.exec(text))) matches.push(match)
-
+    const matches = [...text.matchAll(specialWhitespaceCharsRegex)]
     return matches.map((entry) => this.prepareMatch(entry))
   }
 
