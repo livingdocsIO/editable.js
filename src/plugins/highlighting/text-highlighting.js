@@ -23,10 +23,8 @@ export default class WordHighlighting {
 
   findMatches (text, highlights) {
     if (!text || text === '' || !this.isElement(this.marker)) return
-
-    if (highlights && highlights.length > 0) {
-      return this.searchMatches(text, highlights)
-    }
+    if (!highlights?.length) return
+    return this.searchMatches(text, highlights)
   }
 
   searchMatches (text, highlights) {
