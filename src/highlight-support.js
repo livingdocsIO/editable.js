@@ -1,7 +1,7 @@
 import * as content from './content'
 import highlightText from './highlight-text'
 import TextHighlighting from './plugins/highlighting/text-highlighting'
-import {closest, createElement, createRange, toCharacterRange, getRangeText, selectCharacters} from './util/dom'
+import {closest, createElement, createRange, toCharacterRange, selectCharacters} from './util/dom'
 
 function isInHost (elem, host) {
   return closest(elem, '[data-editable]:not([data-word-id])') === host
@@ -42,9 +42,8 @@ const highlightSupport = {
     if (blockText === '') return -1 // the text was deleted so we can't highlight it
     const matchesArray = textSearch.findMatches(blockText, [text])
     const {actualStartIndex, actualEndIndex} = this.getIndex(matchesArray, startIndex, endIndex)
-    const range = createRange()
 
-    selectCharacters(range, editableHost, actualStartIndex, actualEndIndex)
+    const range = selectCharacters(editableHost, actualStartIndex, actualEndIndex)
 
     if (!isInHost(range.commonAncestorContainer, editableHost)) {
       return -1
@@ -104,7 +103,6 @@ const highlightSupport = {
       if (!groups[highlightId]) {
         groups[highlightId] = editableHost.querySelectorAll(`[data-word-id="${highlightId}"]`)
       }
-
     }
 
     const res = {}
@@ -129,8 +127,8 @@ const highlightSupport = {
     return {
       start: textRange.start,
       end: textRange.end,
-      text: getRangeText(range),
-      nativeRange: range.nativeRange
+      text: range.toString(),
+      nativeRange: range
     }
   },
 

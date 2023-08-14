@@ -71,7 +71,7 @@ export default class Selection extends Cursor {
   getRects () {
     // consider: translate into absolute positions
     // just like Cursor#getCoordinates()
-    return this.range.nativeRange.getClientRects()
+    return this.range.getClientRects()
   }
 
 
