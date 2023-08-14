@@ -21,8 +21,6 @@
     "css-loader": "^6.5.1",
     "eslint": "^8.8.0",
     "eslint-plugin-react": "^7.28.0",
-    "font-awesome": "^4.7.0",
-    "gh-pages": "^5.0.0",
     "karma": "^6.3.13",
     "karma-chrome-launcher": "^3.1.0",
     "karma-coverage": "^2.1.0",
