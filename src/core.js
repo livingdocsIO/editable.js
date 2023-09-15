@@ -93,10 +93,11 @@ export class Editable {
    * @param {HTMLElement|Array(HTMLElement)|String} target A HTMLElement, an
    *    array of HTMLElement or a query selector representing the target where
    *    the API should be added on.
+   * @param {normalize, plainText} options Block specific configuration
    * @chainable
    */
-  add (target) {
-    this.enable(target)
+  add (target, options) {
+    this.enable(target, options)
     // TODO check css whitespace settings
     return this
   }
@@ -143,19 +144,26 @@ export class Editable {
   }
 
   /**
-  * Adds the Editable.JS API to the given target elements.
-  *
-  * @method enable
-  * @param { HTMLElement | undefined } target editable root element(s)
-  *    If no param is specified all editables marked as disabled are enabled.
-  * @chainable
-  */
-  enable (target, normalize) {
+   * Adds the Editable.JS API to the given target elements.
+   *
+   * @method enable
+   * @param { HTMLElement | undefined } target editable root element(s)
+   *    If no param is specified all editables marked as disabled are enabled.
+   * @param {boolean} normalize normalizes target content (legacy param)
+   * @param {boolean} options.normalize normalizes target content
+   * @param {boolean} options.plainText prevents text formatting for block
+   * @chainable
+   */
+  enable (target, options) {
+    const {
+      normalize = typeof options === 'boolean' ? options : false,
+      plainText = false
+    } = options ?? {}
     const shouldSpellcheck = this.config.browserSpellcheck
     const targets = domArray(target || `.${config.editableDisabledClass}`, this.win.document)
 
     for (const element of targets) {
-      block.init(element, {normalize, shouldSpellcheck})
+      block.init(element, {normalize, plainText, shouldSpellcheck})
       this.dispatcher.notify('init', element)
     }
 

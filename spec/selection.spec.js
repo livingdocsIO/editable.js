@@ -1,6 +1,7 @@
 import {expect} from 'chai'
 import rangy from 'rangy'
 
+import {Editable} from '../src/core'
 import Selection from '../src/selection'
 import Cursor from '../src/cursor'
 import config from '../src/config'
@@ -465,6 +466,47 @@ describe('Selection', function () {
       expect(Selection.prototype.hasOwnProperty('isAtEnd')).to.equal(false)
       expect(Cursor.prototype.hasOwnProperty('isAtEnd')).to.equal(true)
       expect('isAtEnd' in Selection.prototype).to.equal(true)
+    })
+  })
+
+  describe('plain text host', function () {
+    beforeEach(function () {
+      this.editable = new Editable()
+    })
+
+    describe('with regular text', function () {
+      beforeEach(function () {
+        this.div = createElement('<div>regular text</div>')
+        const range = rangy.createRange()
+        range.selectNodeContents(this.div)
+        this.selection = new Selection(this.div, range)
+
+        this.editable.enable(this.div, {plainText: true})
+      })
+
+      it('should not make regular text bold on toggle', function () {
+        this.selection.toggleBold()
+        expect(this.div.innerHTML).to.equal('regular text')
+      })
+
+      it('should not make regular text bold on forceWrap', function () {
+        this.selection.makeBold()
+        expect(this.div.innerHTML).to.equal('regular text')
+      })
+
+      it('should not make regular text italic on toggle', function () {
+        this.selection.toggleEmphasis()
+        expect(this.div.innerHTML).to.equal('regular text')
+      })
+
+      it('should not make regular text italic on forceWrap', function () {
+        this.selection.giveEmphasis()
+        expect(this.div.innerHTML).to.equal('regular text')
+      })
+    })
+
+    afterEach(function () {
+      this.editable.disable(this.div)
     })
   })
 })
