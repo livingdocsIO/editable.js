@@ -8,14 +8,17 @@ const editable = new Editable({browserSpellcheck: false})
 
 // Paragraph
 // ---------
-editable.enable('.paragraph-example p', true)
+editable.enable('.paragraph-example p', {normalize: true})
 eventList(editable)
 
 // Text formatting toolbar
-editable.enable('.formatting-example p', true)
+editable.enable('.formatting-example p', {normalize: true})
 setupTooltip()
 
-editable.enable('.styling-example p', true)
+// Plain Text
+editable.enable('.plain-text-example.example-sheet', {plainText: true})
+
+editable.enable('.styling-example p', {normalize: true})
 const secondExample = document.querySelector('.formatting-example p')
 updateCode(secondExample)
 

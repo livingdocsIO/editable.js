@@ -7,11 +7,12 @@ const state = {}
 export const next = getSibling('nextElementSibling')
 export const previous = getSibling('previousElementSibling')
 
-export function init (elem, {normalize, shouldSpellcheck}) {
+export function init (elem, {normalize, plainText, shouldSpellcheck}) {
   setBlockId(elem)
 
   elem.setAttribute('contenteditable', true)
   elem.setAttribute('spellcheck', Boolean(shouldSpellcheck))
+  elem.setAttribute('data-plaintext', Boolean(plainText))
 
   elem.classList.remove(config.editableDisabledClass)
   elem.classList.add(config.editableClass)
@@ -23,6 +24,7 @@ export function init (elem, {normalize, shouldSpellcheck}) {
 export function disable (elem) {
   elem.removeAttribute('contenteditable')
   elem.removeAttribute('spellcheck')
+  elem.removeAttribute('data-plaintext')
 
   setState(elem, undefined)
 
@@ -30,6 +32,9 @@ export function disable (elem) {
   elem.classList.add(config.editableDisabledClass)
 }
 
+export function isPlainTextBlock (elem) {
+  return elem.getAttribute('data-plaintext') === 'true'
+}
 
 export function setBlockId (elem) {
   if (!elem.hasAttribute('data-editable')) {

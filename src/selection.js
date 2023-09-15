@@ -3,6 +3,7 @@ import 'rangy/lib/rangy-textrange'
 import Cursor from './cursor'
 import * as content from './content'
 import * as parser from './parser'
+import * as block from './block'
 import config from './config'
 import highlightSupport from './highlight-support'
 import highlightText from './highlight-text'
@@ -144,6 +145,7 @@ export default class Selection extends Cursor {
 
   // toggle('<em>')
   toggle (elem) {
+    if (block.isPlainTextBlock(this.host)) return
     elem = this.adoptElement(elem)
     this.range = content.toggleTag(this.host, this.range, elem)
     this.setSelection()
@@ -307,6 +309,7 @@ export default class Selection extends Cursor {
   // the same tagName is affecting the selection this tag will be
   // remove first.
   forceWrap (elem) {
+    if (block.isPlainTextBlock(this.host)) return
     elem = this.adoptElement(elem)
     this.range = content.forceWrap(this.host, this.range, elem)
     this.setSelection()
