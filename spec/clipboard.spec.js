@@ -17,6 +17,12 @@ describe('Clipboard', function () {
       return parseContent(div)
     }
 
+    function extractPlainText (str) {
+      const div = document.createElement('div')
+      div.innerHTML = str
+      return parseContent(div, {plainText: true})
+    }
+
     function extractSingleBlock (str) {
       return extract(str)[0]
     }
@@ -375,6 +381,43 @@ describe('Clipboard', function () {
       it('replaces quotation marks around elements with attributes', function () {
         const block = extractSingleBlock('text outside "<a href="https://livingdocs.io">text inside</a>"')
         expect(block).to.equal('text outside “<a href="https://livingdocs.io">text inside</a>”')
+      })
+    })
+
+    // Plain Text
+    // ----------
+
+    describe('plain text option', function () {
+      it('unwraps a single <b>', function () {
+        expect(extractPlainText('<b>a</b>')[0]).to.equal('a')
+      })
+
+      it('unwraps a single <strong>', function () {
+        expect(extractPlainText('<strong>a</strong>')[0]).to.equal('a')
+      })
+
+      it('unwraps nested <b><strong>', function () {
+        expect(extractPlainText('<b><strong>a</strong></b>')[0]).to.equal('a')
+      })
+
+      it('unwraps nested <span><strong>', function () {
+        expect(extractPlainText('<span><strong>a</strong></span>')[0]).to.equal('a')
+      })
+
+      it('keeps <br> tags', function () {
+        expect(extractPlainText('a<br>b')[0]).to.equal('a<br>b')
+      })
+
+      it('creates two blocks from two paragraphs', function () {
+        const blocks = extractPlainText('<p>a</p><p>b</p>')
+        expect(blocks[0]).to.equal('a')
+        expect(blocks[1]).to.equal('b')
+      })
+
+      it('unwraps phrasing tags within blocks', function () {
+        const blocks = extractPlainText('<p><i>a</i></p><p><em>b</em></p>')
+        expect(blocks[0]).to.equal('a')
+        expect(blocks[1]).to.equal('b')
       })
     })
   })

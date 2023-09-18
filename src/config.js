@@ -52,6 +52,9 @@ export default {
       'em': {},
       'br': {}
     },
+    allowedPlainTextElements: {
+      'br': {}
+    },
 
     // Elements that have required attributes.
     // If these are not present the elements are filtered out.
