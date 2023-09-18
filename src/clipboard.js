@@ -2,8 +2,9 @@ import config from './config'
 import * as string from './util/string'
 import * as nodeType from './node-type'
 import * as quotes from './quotes'
+import {isPlainTextBlock} from './block'
 
-let allowedElements, requiredAttributes, transformElements, blockLevelElements, replaceQuotes
+let allowedElements, allowedPlainTextElements, requiredAttributes, transformElements, blockLevelElements, replaceQuotes
 let splitIntoBlocks, blacklistedElements
 const whitespaceOnly = /^\s*$/
 const blockPlaceholder = '<!-- BLOCK -->'
@@ -13,6 +14,7 @@ updateConfig(config)
 export function updateConfig (conf) {
   const rules = conf.pastedHtmlRules
   allowedElements = rules.allowedElements || {}
+  allowedPlainTextElements = rules.allowedPlainTextElements || {}
   requiredAttributes = rules.requiredAttributes || {}
   transformElements = rules.transformElements || {}
   blacklistedElements = rules.blacklistedElements || []
@@ -25,9 +27,9 @@ export function updateConfig (conf) {
   rules.splitIntoBlocks.forEach((name) => { splitIntoBlocks[name] = true })
 }
 
-export function paste (element, cursor, clipboardContent) {
-  const document = element.ownerDocument
-  element.setAttribute(config.pastingAttribute, true)
+export function paste (block, cursor, clipboardContent) {
+  const document = block.ownerDocument
+  block.setAttribute(config.pastingAttribute, true)
 
   if (cursor.isSelection) {
     cursor = cursor.deleteExactSurroundingTags()
@@ -39,9 +41,10 @@ export function paste (element, cursor, clipboardContent) {
   const pasteHolder = document.createElement('div')
   pasteHolder.innerHTML = clipboardContent
 
-  const blocks = parseContent(pasteHolder)
+  const isPlainText = isPlainTextBlock(block)
+  const blocks = parseContent(pasteHolder, {plainText: isPlainText})
 
-  element.removeAttribute(config.pastingAttribute)
+  block.removeAttribute(config.pastingAttribute)
   return {blocks, cursor}
 }
 
@@ -55,30 +58,35 @@ export function paste (element, cursor, clipboardContent) {
  * @param {DOM node} A container where the pasted content is located.
  * @returns {Array of Strings} An array of cleaned innerHTML like strings.
  */
-export function parseContent (element) {
+export function parseContent (element, {plainText = false} = {}) {
+  const options = {
+    allowedElements: plainText ? allowedPlainTextElements : allowedElements,
+    keepInternalRelativeLinks: plainText ? false : keepInternalRelativeLinks
+  }
+
   // Filter pasted content
-  return filterHtmlElements(element)
+  return filterHtmlElements(element, options)
   // Handle Blocks
     .split(blockPlaceholder)
     .map((entry) => string.trim(cleanWhitespace(replaceAllQuotes(entry))))
     .filter((entry) => !whitespaceOnly.test(entry))
 }
 
-export function filterHtmlElements (elem) {
+function filterHtmlElements (elem, options) {
   return Array.from(elem.childNodes).reduce((content, child) => {
     if (blacklistedElements.indexOf(child.nodeName.toLowerCase()) !== -1) {
       return ''
     }
 
     // Keep internal relative links relative (on paste).
-    if (keepInternalRelativeLinks && child.nodeName === 'A' && child.href) {
+    if (options.keepInternalRelativeLinks && child.nodeName === 'A' && child.href) {
       const stripInternalHost = child.getAttribute('href').replace(window.location.origin, '')
       child.setAttribute('href', stripInternalHost)
     }
 
     if (child.nodeType === nodeType.elementNode) {
-      const childContent = filterHtmlElements(child)
-      return content + conditionalNodeWrap(child, childContent)
+      const childContent = filterHtmlElements(child, options)
+      return content + conditionalNodeWrap(child, childContent, options)
     }
 
     // Escape HTML characters <, > and &
@@ -87,11 +95,11 @@ export function filterHtmlElements (elem) {
   }, '')
 }
 
-export function conditionalNodeWrap (child, content) {
+function conditionalNodeWrap (child, content, options) {
   let nodeName = child.nodeName.toLowerCase()
   nodeName = transformNodeName(nodeName)
 
-  if (shouldKeepNode(nodeName, child)) {
+  if (shouldKeepNode(nodeName, child, options)) {
     const attributes = filterAttributes(nodeName, child)
 
     if (nodeName === 'br') return `<${nodeName + attributes}>`
@@ -115,7 +123,7 @@ export function conditionalNodeWrap (child, content) {
 }
 
 // returns string of concatenated attributes e.g. 'target="_blank" rel="nofollow" href="/test.com"'
-export function filterAttributes (nodeName, node) {
+function filterAttributes (nodeName, node) {
   return Array.from(node.attributes).reduce((attributes, {name, value}) => {
     if (allowedElements[nodeName][name] && value) {
       return `${attributes} ${name}="${value}"`
@@ -124,22 +132,22 @@ export function filterAttributes (nodeName, node) {
   }, '')
 }
 
-export function transformNodeName (nodeName) {
+function transformNodeName (nodeName) {
   return transformElements[nodeName] || nodeName
 }
 
-export function hasRequiredAttributes (nodeName, node) {
+function hasRequiredAttributes (nodeName, node) {
   const requiredAttrs = requiredAttributes[nodeName]
   if (!requiredAttrs) return true
 
   return !requiredAttrs.some((name) => !node.getAttribute(name))
 }
 
-export function shouldKeepNode (nodeName, node) {
-  return allowedElements[nodeName] && hasRequiredAttributes(nodeName, node)
+function shouldKeepNode (nodeName, node, options) {
+  return options.allowedElements[nodeName] && hasRequiredAttributes(nodeName, node)
 }
 
-export function cleanWhitespace (str) {
+function cleanWhitespace (str) {
   return str
     .replace(/\n/g, ' ')
     .replace(/ {2,}/g, ' ')
@@ -149,7 +157,7 @@ export function cleanWhitespace (str) {
     ))
 }
 
-export function replaceAllQuotes (str) {
+function replaceAllQuotes (str) {
   if (replaceQuotes.quotes || replaceQuotes.singleQuotes || replaceQuotes.apostrophe) {
     return quotes.replaceAllQuotes(str, replaceQuotes)
   }
