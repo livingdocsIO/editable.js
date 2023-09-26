@@ -81,8 +81,9 @@ function setupTooltip () {
         return
       }
 
-      const coords = getSelectionCoordinates(window.getSelection())
+      const coords = getSelectionCoordinates(window.getSelection())?.[0]
       tooltip.style.display = 'block'
+      tooltip.style.position = 'fixed'
 
       // position tooltip
       const top = coords.top - tooltip.offsetHeight - 15
