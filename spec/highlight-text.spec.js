@@ -3,7 +3,7 @@ import sinon from 'sinon'
 
 import Cursor from '../src/cursor'
 import highlightText from '../src/highlight-text'
-import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
+import {searchAllWords} from '../src/plugins/highlighting/text-search'
 import {createElement, createRange} from '../src/util/dom'
 
 describe('highlightText', function () {
@@ -21,12 +21,11 @@ describe('highlightText', function () {
     return elem
   }
 
-  function highlight (elem, words) {
+  function highlight (elem, searchTexts) {
     const stencil = createElement('<span spellcheck="true">')
-    const highlighter = new WordHighlighter(stencil)
 
     const text = highlightText.extractText(elem)
-    const matches = highlighter.findMatches(text, words)
+    const matches = searchAllWords(text, searchTexts, stencil)
 
     highlightText.highlightMatches(elem, matches)
   }
@@ -92,6 +91,18 @@ describe('highlightText', function () {
       this.element = createElement('<div>a<br>b</div>')
       const text = highlightText.extractText(this.element)
       expect(text).to.equal('a\nb')
+    })
+
+    it(`extracts ' <br>' properly`, function () {
+      this.element = createElement('<div> <br></div>')
+      const text = highlightText.extractText(this.element)
+      expect(text).to.equal(' \n')
+    })
+
+    it(`extracts ' <br> ' properly`, function () {
+      this.element = createElement('<div> <br> </div>')
+      const text = highlightText.extractText(this.element)
+      expect(text).to.equal(' \n ')
     })
   })
 

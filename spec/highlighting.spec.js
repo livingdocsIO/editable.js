@@ -3,7 +3,7 @@ import sinon from 'sinon'
 import {Editable} from '../src/core'
 import Highlighting from '../src/highlighting'
 import highlightSupport from '../src/highlight-support'
-import WordHighlighter from '../src/plugins/highlighting/text-highlighting'
+import {searchText, searchWord} from '../src/plugins/highlighting/text-search'
 import {createElement, createRange, toCharacterRange} from '../src/util/dom'
 
 function setupHighlightEnv (context, text) {
@@ -88,15 +88,11 @@ describe('Highlighting', function () {
     })
   })
 
-  describe('WordHighlighter', function () {
-    beforeEach(function () {
-      const markerNode = createElement('<span class="highlight"></span>')
-      this.highlighter = new WordHighlighter(markerNode)
-    })
+  describe('text-search', function () {
 
     it('finds the word "a"', function () {
       const text = 'a'
-      const matches = this.highlighter.findMatches(text, ['a'])
+      const matches = searchWord(text, 'a')
 
       const firstMatch = matches[0]
       expect(firstMatch.match).to.equal('a')
@@ -106,13 +102,13 @@ describe('Highlighting', function () {
 
     it('does not find the word "b"', function () {
       const text = 'a'
-      const matches = this.highlighter.findMatches(text, ['b'])
+      const matches = searchWord(text, 'b')
       expect(matches.length).to.equal(0)
     })
 
     it('finds the word "juice"', function () {
       const text = 'Some juice.'
-      const matches = this.highlighter.findMatches(text, ['juice'])
+      const matches = searchWord(text, 'juice')
       const firstMatch = matches[0]
       expect(firstMatch.match).to.equal('juice')
       expect(firstMatch.startIndex).to.equal(5)
@@ -121,28 +117,22 @@ describe('Highlighting', function () {
 
     it('does not go into an endless loop without a marker node', function () {
       const blockText = 'Mehr als 90 Prozent der Fälle in Grossbritannien in den letzten vier Wochen gehen auf die Delta-Variante zurück. Anders als bei vorangegangenen Wellen scheinen sich jedoch die Fallzahlen von den Todesfällen und Hospitalisierungen zu entkoppeln.'
-      const text = ''
-      const textSearch = new WordHighlighter(null, 'text')
-      const matches = textSearch.findMatches(blockText, [text])
+      const matches = searchText(blockText, 'foobar')
       expect(matches).to.equal(undefined)
     })
 
     it('does not go into an endless loop without a html marker node', function () {
       const blockText = 'Mehr als 90 Prozent der Fälle in Grossbritannien in den letzten vier Wochen gehen auf die Delta-Variante zurück. Anders als bei vorangegangenen Wellen scheinen sich jedoch die Fallzahlen von den Todesfällen und Hospitalisierungen zu entkoppeln.'
-      const text = ''
-      const textSearch = new WordHighlighter('something', 'text')
-      const matches = textSearch.findMatches(blockText, [text])
+      const matches = searchText(blockText, 'foobar')
       expect(matches).to.equal(undefined)
     })
 
-    it('handle the marker with other ownerdocument correctly', function () {
+    it('handle the marker with a different owner-document correctly', function () {
       const blockText = 'Mehr als 90 Prozent'
       const text = 'Mehr als 90 Prozent'
       const ifrm = window.document.createElement('iframe')
       window.document.body.append(ifrm)
-      const markerNode = createElement('<span class="highlight"></span>', ifrm.contentWindow)
-      const textSearch = new WordHighlighter(markerNode, 'text')
-      const matches = textSearch.findMatches(blockText, [text])
+      const matches = searchText(blockText, text)
       expect(matches[0].match).to.equal(text)
     })
   })
@@ -299,8 +289,8 @@ le Make The <br> World Go Round`)
 <span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"> The <br> World</span>
  Go Round`)
 
-      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
       expect(this.getHtml()).to.equal(expectedHtml)
+      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
 
     })
 

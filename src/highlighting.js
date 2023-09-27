@@ -4,7 +4,7 @@ import * as content from './content'
 import highlightText from './highlight-text'
 import SpellcheckService from './plugins/highlighting/spellcheck-service'
 import WhitespaceHighlighting from './plugins/highlighting/whitespace-highlighting'
-import WordHighlighting from './plugins/highlighting/text-highlighting'
+import {searchAllWords} from './plugins/highlighting/text-search'
 import MatchCollection from './plugins/highlighting/match-collection'
 import highlightSupport from './highlight-support'
 import {domArray, domSelector} from './util/dom'
@@ -41,13 +41,12 @@ export default class Highlighting {
     const spellcheckService = this.config.spellcheck.spellcheckService
     const spellcheckMarker = this.config.spellcheck.marker
     const whitespaceMarker = this.config.whitespace.marker
-    const spellcheckMarkerNode = highlightSupport
-      .createMarkerNode(spellcheckMarker, 'spellcheck', this.win)
     const whitespaceMarkerNode = highlightSupport
       .createMarkerNode(whitespaceMarker, 'spellcheck', this.win)
+    this.spellcheckMarkerNode = highlightSupport
+      .createMarkerNode(spellcheckMarker, 'spellcheck', this.win)
 
     this.spellcheckService = new SpellcheckService(spellcheckService)
-    this.spellcheck = new WordHighlighting(spellcheckMarkerNode)
     this.whitespace = new WhitespaceHighlighting(whitespaceMarkerNode)
 
     this.setupListeners()
@@ -127,7 +126,7 @@ export default class Highlighting {
 
       const matchCollection = new MatchCollection()
 
-      let matches = this.spellcheck.findMatches(text, misspelledWords)
+      let matches = searchAllWords(text, misspelledWords, this.spellcheckMarkerNode)
       matchCollection.addMatches('spellcheck', matches)
 
       matches = this.whitespace.findMatches(text)
