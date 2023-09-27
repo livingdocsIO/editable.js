@@ -1,8 +1,6 @@
 {
   "parserOptions": {
-    // Node 14 already supports ES2020, Node 12 only supports ES2019
-    // https://node.green/#ES2020
-    "ecmaVersion": 2020,
+    "ecmaVersion": 2021,
     "ecmaFeatures": {
       "jsx": true
     },

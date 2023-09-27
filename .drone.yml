@@ -13,16 +13,16 @@ steps:
       from_secret: GH_TOKEN
 
 - name: install
-  image: cypress/browsers:node14.15.0-chrome86-ff82
+  image: cypress/browsers:node16.5.0-chrome94-ff93
   commands: [npm ci]
 
 - name: build
-  image: cypress/browsers:node14.15.0-chrome86-ff82
+  image: cypress/browsers:node16.5.0-chrome94-ff93
   commands: ["npm run build -s"]
   depends_on: [install]
 
 - name: test
-  image: cypress/browsers:node14.15.0-chrome86-ff82
+  image: cypress/browsers:node16.5.0-chrome94-ff93
   commands: ["npm run test:ci -s"]
   depends_on: [install]
 
@@ -52,6 +52,6 @@ trigger:
   event: [push, tag, pull_request]
 ---
 kind: signature
-hmac: eb464a2613271948ef65fd8922a217d90f89a6faecaea006cace700b5acaeeb4
+hmac: fbd7cb3397c4f9cd9376301fbb2a72e10367cfeec9432c4c2098b2b1f0430f7e
 
 ...
