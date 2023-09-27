@@ -7,7 +7,7 @@ import * as clipboard from './clipboard'
 import Dispatcher from './dispatcher'
 import Cursor from './cursor'
 import highlightSupport from './highlight-support'
-import Highlighting from './highlighting'
+import MonitoredHighlighting from './monitored-highlighting'
 import createDefaultEvents from './create-default-events'
 import browser from 'bowser'
 import {textNodesUnder, getTextNodeAndRelativeOffset} from './util/element'
@@ -338,7 +338,7 @@ export class Editable {
    * @chainable
    */
   setupHighlighting (hightlightingConfig) {
-    this.highlighting = new Highlighting(this, hightlightingConfig)
+    this.highlighting = new MonitoredHighlighting(this, hightlightingConfig)
 
     return this
   }

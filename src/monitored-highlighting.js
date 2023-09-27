@@ -9,7 +9,13 @@ import MatchCollection from './plugins/highlighting/match-collection'
 import highlightSupport from './highlight-support'
 import {domArray, domSelector} from './util/dom'
 
-export default class Highlighting {
+// Spellcheck and Whitespace Highlighting
+// --------------------------------------
+//
+// This instance monitors an editable block for changes and
+// updates highlights accordingly. It also calls the spellcheck
+// service after the content has changed.
+export default class MonitoredHighlighting {
 
   constructor (editable, configuration, spellcheckConfig) {
     this.editable = editable
