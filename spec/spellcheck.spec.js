@@ -1,11 +1,9 @@
 import {expect} from 'chai'
 import sinon from 'sinon'
 import {Editable} from '../src/core'
-import Highlighting from '../src/highlighting'
+import MonitoredHighlighting from '../src/monitored-highlighting'
 import Cursor from '../src/cursor'
 import {createElement, createRange} from '../src/util/dom'
-
-// import Spellcheck from '../src/plugins/highlighting/spellcheck'
 
 describe('Spellcheck:', function () {
 
@@ -33,7 +31,7 @@ describe('Spellcheck:', function () {
     beforeEach(function () {
       this.p = createElement('<p>A simple sentence.</p>')
       this.errors = ['simple']
-      this.highlighting = new Highlighting(this.editable, {
+      this.highlighting = new MonitoredHighlighting(this.editable, {
         spellcheck: {
           marker: '<span class="misspelled-word"></span>',
           spellcheckService: (text, callback) => {

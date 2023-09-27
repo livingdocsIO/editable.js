@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import sinon from 'sinon'
 import {Editable} from '../src/core'
-import Highlighting from '../src/highlighting'
+import MonitoredHighlighting from '../src/monitored-highlighting'
 import highlightSupport from '../src/highlight-support'
 import {searchText, searchWord} from '../src/plugins/highlighting/text-search'
 import {createElement, createRange, toCharacterRange} from '../src/util/dom'
@@ -81,9 +81,9 @@ describe('Highlighting', function () {
     this.editable && this.editable.unload()
   })
 
-  describe('new Highlighting()', function () {
+  describe('new MonitoredHighlighting()', function () {
     it('creates an instance with a reference to editable', function () {
-      const highlighting = new Highlighting(this.editable, {})
+      const highlighting = new MonitoredHighlighting(this.editable, {})
       expect(highlighting.editable).to.equal(this.editable)
     })
   })
