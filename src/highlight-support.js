@@ -1,7 +1,7 @@
 import * as content from './content'
 import highlightText from './highlight-text'
-import TextHighlighting from './plugins/highlighting/text-highlighting'
-import {closest, createElement, createRange, toCharacterRange, selectCharacters} from './util/dom'
+import {searchText} from './plugins/highlighting/text-search'
+import {closest, createElement, createRange, toCharacterRange, createRangeFromCharacterRange} from './util/dom'
 
 function isInHost (elem, host) {
   return closest(elem, '[data-editable]:not([data-word-id])') === host
@@ -16,8 +16,7 @@ const highlightSupport = {
     const marker = `<span class="highlight-${type}"></span>`
     const markerNode = highlightSupport.createMarkerNode(marker, type, this.win)
 
-    const textSearch = new TextHighlighting(markerNode, 'text')
-    const matches = textSearch.findMatches(blockText, [text])
+    const matches = searchText(blockText, text, markerNode)
 
     if (matches && matches.length) {
       if (highlightId) matches[0].id = highlightId
@@ -27,23 +26,31 @@ const highlightSupport = {
   },
 
 
-  // This function was changed to track matches when text is added to the start of a component, but multiple white spaces break it in a strict sense
-  // The function works in the editor and in browsers, but tests with multiple white spaces will fail.
-  // Browsers change the white spaces to &nbsp and the function works, and the tests in highlight.spec.js have been updated to represent this.
-
+  // This function was changed to track matches when text is added to the start
+  // of a component, but multiple white spaces break it in a strict sense
+  // The function works in the editor and in browsers, but tests with
+  // multiple white spaces will fail.
+  // Browsers change the white spaces to &nbsp and the function works,
+  // and the tests in highlight.spec.js have been updated to represent this.
   highlightRange (editableHost, text, highlightId, startIndex, endIndex, dispatcher, type = 'comment') {
     if (this.hasHighlight(editableHost, highlightId)) {
       this.removeHighlight(editableHost, highlightId)
     }
-    const firstMarker = `<span class="highlight-${type}"></span>`
-    const markerNode = highlightSupport.createMarkerNode(firstMarker, type, this.win)
-    const textSearch = new TextHighlighting(markerNode, 'text')
+
     const blockText = highlightText.extractText(editableHost)
     if (blockText === '') return -1 // the text was deleted so we can't highlight it
-    const matchesArray = textSearch.findMatches(blockText, [text])
-    const {actualStartIndex, actualEndIndex} = this.getIndex(matchesArray, startIndex, endIndex)
 
-    const range = selectCharacters(editableHost, actualStartIndex, actualEndIndex)
+    const markerNode = highlightSupport.createMarkerNode(
+      `<span class="highlight-${type}"></span>`,
+      type,
+      this.win
+    )
+
+    const matchesArray = searchText(blockText, text, markerNode)
+    const {actualStartIndex, actualEndIndex} = this.correctIndex(matchesArray, startIndex, endIndex)
+
+    // Note: we use the stardIndex and endIndex even if searchText didn't return anything
+    const range = createRangeFromCharacterRange(editableHost, actualStartIndex, actualEndIndex)
 
     if (!isInHost(range.commonAncestorContainer, editableHost)) {
       return -1
@@ -59,9 +66,11 @@ const highlightSupport = {
     range.deleteContents()
     range.insertNode(marker)
     highlightSupport.cleanupStaleMarkerNodes(editableHost, 'comment')
+
     if (dispatcher) {
       dispatcher.notify('change', editableHost)
     }
+
     return actualStartIndex
   },
 
@@ -150,7 +159,7 @@ const highlightSupport = {
 
   // This function checks to see if text has been added to the component before the comment
   // If it has, the start index is updated, otherwise it remains the same
-  getIndex (matchesArray, startIndex, endIndex) {
+  correctIndex (matchesArray, startIndex, endIndex) {
     const newStartIndex = matchesArray.find((match) => {
       return match.startIndex >= startIndex // checks if the startIndex has increased
     })

@@ -20,7 +20,14 @@ export default {
   // @params
   // - matches
   //   Array of positions in the string to highlight:
-  //   e.g [{startIndex: 0, endIndex: 1, match: 'The'}]
+  //   e.g [{
+  //         startIndex: 0,
+  //         endIndex: 1,
+  //         match: 'The', // not used, only the indexes are used for highlighting)
+  //         marker: DOMNode, // A clone of this element will be inserted
+  //         id: 'a7382', // used in word-id attribute
+  //         title: 'The World' // used in title attribute (optional)
+  //       }]
   highlightMatches (element, matches) {
     if (!matches || matches.length === 0) {
       return

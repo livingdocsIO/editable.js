@@ -213,7 +213,7 @@ export const getSelectionCoordinates = (selection) => {
   return coordinates
 }
 
-export const selectCharacters = (element, actualStartIndex, actualEndIndex) => {
+export const createRangeFromCharacterRange = (element, actualStartIndex, actualEndIndex) => {
   const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false)
   let currentIndex = 0
   let startNode, endNode, startOffset, endOffset
