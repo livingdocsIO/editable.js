@@ -1,9 +1,8 @@
 import {expect} from 'chai'
 import sinon from 'sinon'
+
 import {Editable} from '../src/core'
-import MonitoredHighlighting from '../src/monitored-highlighting'
 import highlightSupport from '../src/highlight-support'
-import {searchText, searchWord} from '../src/plugins/highlighting/text-search'
 import {createElement, createRange, toCharacterRange} from '../src/util/dom'
 
 function setupHighlightEnv (context, text) {
@@ -71,73 +70,55 @@ function teardownHighlightEnv (context) {
   context.editable = undefined
 }
 
-describe('Highlighting', function () {
+describe('highlight-support:', function () {
 
-  beforeEach(function () {
-    this.editable = new Editable()
-  })
+  describe('editable.highlight()', function () {
 
-  afterEach(function () {
-    this.editable && this.editable.unload()
-  })
+    beforeEach(function () {
+      this.editable = new Editable()
+      setupHighlightEnv(this, 'People Make The <br> World Go Round')
+    })
 
-  describe('new MonitoredHighlighting()', function () {
-    it('creates an instance with a reference to editable', function () {
-      const highlighting = new MonitoredHighlighting(this.editable, {})
-      expect(highlighting.editable).to.equal(this.editable)
+    afterEach(function () {
+      teardownHighlightEnv(this)
+      this.editable?.unload()
+    })
+
+    it('skips and warns if an invalid range object was passed', function () {
+      this.editable.highlight({
+        editableHost: this.div,
+        highlightId: 'myId',
+        textRange: {foo: 3, bar: 7}
+      })
+      const highlightSpan = this.div.querySelectorAll('[data-word-id="myId"]')
+      expect(highlightSpan.length).to.equal(0)
+    })
+
+    it('skips if the range exceeds the content length', function () {
+      const result = this.editable.highlight({
+        editableHost: this.div,
+        highlightId: 'myId',
+        textRange: {foo: 3, bar: 32}
+      })
+      const highlightSpan = this.div.querySelectorAll('[data-word-id="myId"]')
+      expect(highlightSpan.length).to.equal(0)
+      expect(result).to.equal(-1)
+    })
+
+    it('skips and warns if the range object represents a cursor', function () {
+      this.editable.highlight({
+        editableHost: this.div,
+        highlightId: 'myId',
+        textRange: {start: 3, end: 3}
+      })
+
+      const highlightSpan = this.div.querySelectorAll('[data-word-id="myId"]')
+      expect(highlightSpan.length).to.equal(0)
     })
   })
 
-  describe('text-search', function () {
+  describe('highlightRange()', function () {
 
-    it('finds the word "a"', function () {
-      const text = 'a'
-      const matches = searchWord(text, 'a')
-
-      const firstMatch = matches[0]
-      expect(firstMatch.match).to.equal('a')
-      expect(firstMatch.startIndex).to.equal(0)
-      expect(firstMatch.endIndex).to.equal(1)
-    })
-
-    it('does not find the word "b"', function () {
-      const text = 'a'
-      const matches = searchWord(text, 'b')
-      expect(matches.length).to.equal(0)
-    })
-
-    it('finds the word "juice"', function () {
-      const text = 'Some juice.'
-      const matches = searchWord(text, 'juice')
-      const firstMatch = matches[0]
-      expect(firstMatch.match).to.equal('juice')
-      expect(firstMatch.startIndex).to.equal(5)
-      expect(firstMatch.endIndex).to.equal(10)
-    })
-
-    it('does not go into an endless loop without a marker node', function () {
-      const blockText = 'Mehr als 90 Prozent der Fälle in Grossbritannien in den letzten vier Wochen gehen auf die Delta-Variante zurück. Anders als bei vorangegangenen Wellen scheinen sich jedoch die Fallzahlen von den Todesfällen und Hospitalisierungen zu entkoppeln.'
-      const matches = searchText(blockText, 'foobar')
-      expect(matches).to.equal(undefined)
-    })
-
-    it('does not go into an endless loop without a html marker node', function () {
-      const blockText = 'Mehr als 90 Prozent der Fälle in Grossbritannien in den letzten vier Wochen gehen auf die Delta-Variante zurück. Anders als bei vorangegangenen Wellen scheinen sich jedoch die Fallzahlen von den Todesfällen und Hospitalisierungen zu entkoppeln.'
-      const matches = searchText(blockText, 'foobar')
-      expect(matches).to.equal(undefined)
-    })
-
-    it('handle the marker with a different owner-document correctly', function () {
-      const blockText = 'Mehr als 90 Prozent'
-      const text = 'Mehr als 90 Prozent'
-      const ifrm = window.document.createElement('iframe')
-      window.document.body.append(ifrm)
-      const matches = searchText(blockText, text)
-      expect(matches[0].match).to.equal(text)
-    })
-  })
-
-  describe('highlightSupport', function () {
     beforeEach(function () {
       setupHighlightEnv(this, 'People Make The <br> World Go Round')
     })
@@ -146,7 +127,7 @@ describe('Highlighting', function () {
       teardownHighlightEnv(this)
     })
 
-    it('can handle a single highlight', function () {
+    it('handles a single highlight', function () {
       const text = 'ple '
       const startIndex = this.highlightRange(text, 'myId', 3, 7)
       const expectedRanges = {
@@ -171,7 +152,7 @@ Make The <br> World Go Round`)
       expect(extracted.myId.nativeRange.constructor.name).to.equal('Range')
     })
 
-    it('can handle adjaccent highlights', function () {
+    it('handles adjaccent highlights', function () {
       this.highlightRange('P', 'first', 0, 1)
       this.highlightRange('e', 'second', 1, 2)
       this.highlightRange('o', 'third', 2, 3)
@@ -210,7 +191,7 @@ le Make The <br> World Go Round`)
 
     })
 
-    it('can handle nested highlights', function () {
+    it('handles nested highlights', function () {
       this.highlightRange('P', 'first', 0, 1)
       this.highlightRange('e', 'second', 1, 2)
       this.highlightRange('ople', 'third', 2, 6)
@@ -247,7 +228,7 @@ le Make The <br> World Go Round`)
       expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
     })
 
-    it('can handle intersecting highlights', function () {
+    it('handles intersecting highlights', function () {
       this.highlightRange('Peo', 'first', 0, 3)
       this.highlightRange('ople', 'second', 2, 7)
       this.highlightRange('le', 'third', 4, 6)
@@ -276,7 +257,10 @@ le Make The <br> World Go Round`)
       expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
     })
 
-    it('can handle highlights containing break tags', function () {
+    // todo: it seems the string ' The \nWorld' does not matter -> check if this is true
+    // todo: the input is ' The <br> World' which would be 11 - 23
+    // todo:   is there some whitespace normalization going on?
+    it('handles highlights containing break tags', function () {
       this.highlightRange(' The \nWorld', 'first', 11, 22)
       const expectedRanges = {
         first: {
@@ -294,7 +278,7 @@ le Make The <br> World Go Round`)
 
     })
 
-    it('can handle identical ranges', function () {
+    it('handles identical ranges', function () {
       this.highlightRange(' The \nWorld', 'first', 11, 22)
       this.highlightRange(' The \nWorld', 'second', 11, 22)
       const expectedRanges = {
@@ -321,7 +305,7 @@ le Make The <br> World Go Round`)
 
     })
 
-    it('will update any existing range found under `highlightId` aka upsert', function () {
+    it('updates any existing range found under `highlightId` aka upsert', function () {
       this.highlightRange('a', 'first', 11, 22)
       this.highlightRange('a', 'first', 8, 9)
       const expectedRanges = {
@@ -337,38 +321,6 @@ ke The <br> World Go Round`)
 
       expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
       expect(this.getHtml()).to.equal(expectedHtml)
-    })
-
-    it('skips and warns if an invalid range object was passed', function () {
-      this.editable.highlight({
-        editableHost: this.div,
-        highlightId: 'myId',
-        textRange: {foo: 3, bar: 7}
-      })
-      const highlightSpan = this.div.querySelectorAll('[data-word-id="myId"]')
-      expect(highlightSpan.length).to.equal(0)
-    })
-
-    it('skips if the range exceeds the content length', function () {
-      const result = this.editable.highlight({
-        editableHost: this.div,
-        highlightId: 'myId',
-        textRange: {foo: 3, bar: 32}
-      })
-      const highlightSpan = this.div.querySelectorAll('[data-word-id="myId"]')
-      expect(highlightSpan.length).to.equal(0)
-      expect(result).to.equal(-1)
-    })
-
-    it('skips and warns if the range object represents a cursor', function () {
-      this.editable.highlight({
-        editableHost: this.div,
-        highlightId: 'myId',
-        textRange: {start: 3, end: 3}
-      })
-
-      const highlightSpan = this.div.querySelectorAll('[data-word-id="myId"]')
-      expect(highlightSpan.length).to.equal(0)
     })
 
     it('does not throw when text has been deleted', function () {
@@ -388,7 +340,33 @@ ke The <br> World Go Round`)
     })
   })
 
-  describe('highlight support with special characters', function () {
+  describe('highlightRange() - with formatted text', function () {
+
+    it('handles highlights surrounding <span> tags', function () {
+      setupHighlightEnv(this, 'a<span>b</span>cd')
+      this.highlightRange('bc', 'first', 1, 3)
+      const extract = this.extractWithoutNativeRange()
+
+      expect(extract.first.text).to.equal('bc')
+
+      const content = this.getHtml()
+      expect(content).to.equal('a<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"><span>b</span>c</span>d')
+    })
+
+    it('handles highlights intersecting <span> tags', function () {
+      setupHighlightEnv(this, 'a<span data-word-id="x">bc</span>d')
+      this.highlightRange('ab', 'first', 0, 2)
+      const extract = this.extractWithoutNativeRange()
+
+      expect(extract.first.text).to.equal('ab')
+
+      const content = this.getHtml()
+      expect(content).to.equal('<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">a<span data-word-id="x">b</span></span><span data-word-id="x">c</span>d')
+    })
+  })
+
+  describe('highlightRange() - single special characters', function () {
+
     it('treats special characters as expected', function () {
       // actual / expected length / expected text
       const characters = [
@@ -425,31 +403,7 @@ ke The <br> World Go Round`)
     })
   })
 
-  describe('highlightSupport on formatted text', function () {
-    it('can handle highlights surrounding <span> tags', function () {
-      setupHighlightEnv(this, 'a<span>b</span>cd')
-      this.highlightRange('bc', 'first', 1, 3)
-      const extract = this.extractWithoutNativeRange()
-
-      expect(extract.first.text).to.equal('bc')
-
-      const content = this.getHtml()
-      expect(content).to.equal('a<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"><span>b</span>c</span>d')
-    })
-
-    it('can handle highlights intersecting <span> tags', function () {
-      setupHighlightEnv(this, 'a<span data-word-id="x">bc</span>d')
-      this.highlightRange('ab', 'first', 0, 2)
-      const extract = this.extractWithoutNativeRange()
-
-      expect(extract.first.text).to.equal('ab')
-
-      const content = this.getHtml()
-      expect(content).to.equal('<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">a<span data-word-id="x">b</span></span><span data-word-id="x">c</span>d')
-    })
-  })
-
-  describe('highlightSupport with special characters', function () {
+  describe('highlightRange() - with special characters', function () {
     beforeEach(function () {
       setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
     })
@@ -558,13 +512,16 @@ ke The <br> World Go Round`)
     })
   })
 
-  describe('highlightSupport with multiple white spaces as received in browsers', function () {
+  describe('highlightRange() - multiple white spaces', function () {
+
     beforeEach(function () {
+      this.editable = new Editable()
       setupHighlightEnv(this, 'People Make The&nbsp;<br>&nbsp;World Go Round')
     })
 
     afterEach(function () {
       teardownHighlightEnv(this)
+      this.editable?.unload()
     })
 
     it('can handle all cases combined and creates consistent output', function () {
@@ -628,7 +585,7 @@ Make The&nbsp;<br>&nbsp;W<span class="highlight-spellcheck" data-word-id="spellc
     })
   })
 
-  describe('highlightSupport matches based on both start index and match', function () {
+  describe('highlightRange() - matches based on both start index and match', function () {
     beforeEach(function () {
       setupHighlightEnv(this, 'People make the world go round and round and round the world')
     })
