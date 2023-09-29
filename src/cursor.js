@@ -350,8 +350,7 @@ export default class Cursor {
   // This is to prevent excessive triggering of the change event during
   // merge or split operations or other manipulations by scripts.
   triggerChange () {
-    const event = document.createEvent('HTMLEvents')
-    event.initEvent('formatEditable', true, false)
+    const event = new Event('formatEditable', {bubbles: true, cancelable: false})
     this.host.dispatchEvent(event)
   }
 }
