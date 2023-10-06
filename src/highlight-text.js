@@ -33,6 +33,8 @@ export default {
       return
     }
 
+    element.normalize() // mend text nodes
+
     const iterator = new NodeIterator(element)
     let currentMatchIndex = 0
     let totalOffset = 0
