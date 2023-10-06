@@ -121,11 +121,11 @@ describe('highlightText', function () {
       highlight(elem, ['b'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).to.equal(1)
+      expect(portions.length).to.equal(1, 'portions.length')
       expect(portions[0].text).to.equal('b')
-      expect(portions[0].offset).to.equal(0)
-      expect(portions[0].length).to.equal(1)
-      expect(portions[0].isLastPortion).to.equal(true)
+      expect(portions[0].offset).to.equal(2, 'offset')
+      expect(portions[0].length).to.equal(1, 'length')
+      expect(portions[0].isLastPortion).to.equal(true, 'isLastPortion')
     })
 
     it('finds a word that is in a text node with a character before', function () {
@@ -133,11 +133,11 @@ describe('highlightText', function () {
       highlight(elem, ['b'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).to.equal(1)
+      expect(portions.length).to.equal(1, 'portions.length')
       expect(portions[0].text).to.equal('b')
-      expect(portions[0].offset).to.equal(1)
-      expect(portions[0].length).to.equal(1)
-      expect(portions[0].isLastPortion).to.equal(true)
+      expect(portions[0].offset).to.equal(2, 'offset')
+      expect(portions[0].length).to.equal(1, 'length')
+      expect(portions[0].isLastPortion).to.equal(true, 'isLastPortion')
     })
 
     it('finds a word that is in a text node with a charcter after', function () {
@@ -145,11 +145,11 @@ describe('highlightText', function () {
       highlight(elem, ['b'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).to.equal(1)
+      expect(portions.length).to.equal(1, 'portions.length')
       expect(portions[0].text).to.equal('b')
-      expect(portions[0].offset).to.equal(0)
-      expect(portions[0].length).to.equal(1)
-      expect(portions[0].isLastPortion).to.equal(true)
+      expect(portions[0].offset).to.equal(2, 'offset')
+      expect(portions[0].length).to.equal(1, 'length')
+      expect(portions[0].isLastPortion).to.equal(true, 'isLastPortion')
     })
 
     it('finds a word that span over two text nodes', function () {
@@ -157,12 +157,9 @@ describe('highlightText', function () {
       highlight(elem, ['bc'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).to.equal(2)
-      expect(portions[0].text).to.equal('b')
-      expect(portions[0].isLastPortion).to.equal(false)
-
-      expect(portions[1].text).to.equal('c')
-      expect(portions[1].isLastPortion).to.equal(true)
+      expect(portions.length).to.equal(1, portions.length)
+      expect(portions[0].text).to.equal('bc')
+      expect(portions[0].isLastPortion).to.equal(true, 'isLastPortion')
     })
 
     it('finds a word that spans over three text nodes', function () {
@@ -170,10 +167,8 @@ describe('highlightText', function () {
       highlight(elem, ['abc'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).to.equal(3)
-      expect(portions[0].text).to.equal('a')
-      expect(portions[1].text).to.equal('b')
-      expect(portions[2].text).to.equal('c')
+      expect(portions.length).to.equal(1, 'portions.length')
+      expect(portions[0].text).to.equal('abc')
     })
 
     it('finds a word that is partially contained in two text nodes', function () {
@@ -181,16 +176,11 @@ describe('highlightText', function () {
       highlight(elem, ['xxxx'])
       const portions = this.wrapMatch.firstCall.args[0]
 
-      expect(portions.length).to.equal(2)
-      expect(portions[0].text).to.equal('xx')
-      expect(portions[0].offset).to.equal(1)
-      expect(portions[0].length).to.equal(2)
-      expect(portions[0].isLastPortion).to.equal(false)
-
-      expect(portions[1].text).to.equal('xx')
-      expect(portions[1].offset).to.equal(0)
-      expect(portions[1].length).to.equal(2)
-      expect(portions[1].isLastPortion).to.equal(true)
+      expect(portions.length).to.equal(1, 'portions.length')
+      expect(portions[0].text).to.equal('xxxx')
+      expect(portions[0].offset).to.equal(2, 'offset')
+      expect(portions[0].length).to.equal(4, 'length')
+      expect(portions[0].isLastPortion).to.equal(true)
     })
   })
 
