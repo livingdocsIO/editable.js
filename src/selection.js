@@ -120,6 +120,18 @@ export default class Selection extends Cursor {
     }
   }
 
+  highlightComment ({highlightId, textRange}) {
+    highlightSupport.highlightRange(
+      this.host,
+      highlightId,
+      textRange.text,
+      textRange.start,
+      textRange.end,
+      undefined, // dispatcher
+      'comment'
+    )
+  }
+
   // Manually add a highlight
   // Note: the current code does not work with newlines (LP)
   highlight ({highlightId}) {
@@ -142,7 +154,7 @@ export default class Selection extends Cursor {
     highlightText.highlightMatches(this.host, [match])
   }
 
-  // toggle('<em>')
+  // e.g. toggle('<em>')
   toggle (elem) {
     if (block.isPlainTextBlock(this.host)) return
     elem = this.adoptElement(elem)
