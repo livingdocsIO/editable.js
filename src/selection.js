@@ -74,7 +74,6 @@ export default class Selection extends Cursor {
     return this.range.getClientRects()
   }
 
-
   link (href, attrs = {}) {
     if (href) attrs.href = href
     const link = this.createElement(config.linkMarkup.name, config.linkMarkup.attribs)
