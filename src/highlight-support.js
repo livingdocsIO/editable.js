@@ -1,14 +1,13 @@
 import * as content from './content'
 import highlightText from './highlight-text'
 import {searchText} from './plugins/highlighting/text-search'
-import {closest, createElement, createRange, toCharacterRange, createRangeFromCharacterRange} from './util/dom'
+import {createElement, createRange, toCharacterRange} from './util/dom'
 
-function isInHost (elem, host) {
-  return closest(elem, '[data-editable]:not([data-word-id])') === host
-}
 
 const highlightSupport = {
 
+  // Used to highlight arbitrary text in an editable. All occurrences
+  // will be highlighted.
   highlightText (editableHost, text, highlightId, type) {
     if (this.hasHighlight(editableHost, highlightId)) return
     const blockText = highlightText.extractText(editableHost)
@@ -25,7 +24,7 @@ const highlightSupport = {
     }
   },
 
-
+  // Used to highlight comments.
   // This function was changed to track matches when text is added to the start
   // of a component, but multiple white spaces break it in a strict sense
   // The function works in the editor and in browsers, but tests with
@@ -37,35 +36,27 @@ const highlightSupport = {
       this.removeHighlight(editableHost, highlightId)
     }
 
-    const blockText = highlightText.extractText(editableHost)
+    const blockText = highlightText.extractText(editableHost, false)
     if (blockText === '') return -1 // the text was deleted so we can't highlight it
 
-    const markerNode = highlightSupport.createMarkerNode(
+    const marker = highlightSupport.createMarkerNode(
       `<span class="highlight-${type}"></span>`,
       type,
       this.win
     )
 
-    const matchesArray = searchText(blockText, text, markerNode)
-    const {actualStartIndex, actualEndIndex} = this.correctIndex(matchesArray, startIndex, endIndex)
+    const actualStartIndex = startIndex
+    const actualEndIndex = endIndex
 
     // Note: we use the stardIndex and endIndex even if searchText didn't return anything
-    const range = createRangeFromCharacterRange(editableHost, actualStartIndex, actualEndIndex)
 
-    if (!isInHost(range.commonAncestorContainer, editableHost)) {
-      return -1
-    }
 
-    const marker = highlightSupport.createMarkerNode(
-      `<span class="highlight-${type}" data-word-id="${highlightId}"></span>`,
-      type,
-      this.win
-    )
-    const fragment = range.extractContents()
-    marker.appendChild(fragment)
-    range.deleteContents()
-    range.insertNode(marker)
-    highlightSupport.cleanupStaleMarkerNodes(editableHost, 'comment')
+    highlightText.highlightMatches(editableHost, [{
+      startIndex: actualStartIndex,
+      endIndex: actualEndIndex,
+      id: highlightId,
+      marker
+    }], false)
 
     if (dispatcher) {
       dispatcher.notify('change', editableHost)
@@ -90,8 +81,9 @@ const highlightSupport = {
       content.unwrap(elem)
     }
 
-    // in Chrome browsers the unwrap method leaves the host node split into 2 (lastChild !== firstChild)
+    // remove empty text nodes, combine adjacent text nodes
     editableHost.normalize()
+
     if (dispatcher) dispatcher.notify('change', editableHost)
   },
 
@@ -136,7 +128,7 @@ const highlightSupport = {
     return {
       start: textRange.start,
       end: textRange.end,
-      text: range.toString(),
+      text: textRange.text, // browser range result (does whitespace normalization)
       nativeRange: range
     }
   },
@@ -159,8 +151,8 @@ const highlightSupport = {
 
   // This function checks to see if text has been added to the component before the comment
   // If it has, the start index is updated, otherwise it remains the same
-  correctIndex (matchesArray, startIndex, endIndex) {
-    const newStartIndex = matchesArray.find((match) => {
+  correctIndex (matches, startIndex, endIndex) {
+    const newStartIndex = matches.find((match) => {
       return match.startIndex >= startIndex // checks if the startIndex has increased
     })
     const actualStartIndex = newStartIndex ? newStartIndex.startIndex : startIndex

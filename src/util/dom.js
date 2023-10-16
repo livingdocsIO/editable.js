@@ -171,10 +171,11 @@ export const toCharacterRange = (range, container) => {
   startRange.setStart(container, 0)
   startRange.setEnd(range.startContainer, range.startOffset)
 
+  const rangeText = range.toString()
   const start = startRange.toString().length
-  const end = start + range.toString().length
+  const end = start + rangeText.length
 
-  return {start, end}
+  return {start, end, text: rangeText}
 }
 
 export const rangesAreEqual = (range1, range2) => {

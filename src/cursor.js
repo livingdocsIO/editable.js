@@ -138,6 +138,7 @@ export default class Cursor {
     this.range.insertNode(element)
     this.range.setStartAfter(preceedingElement)
     this.range.setEndAfter(preceedingElement)
+    this.host.normalize() // mend text nodes
   }
 
   // Insert content after the cursor
@@ -153,6 +154,7 @@ export default class Cursor {
     after.setStart(after.endContainer, after.endOffset)
     after.collapse(true)
     after.insertNode(element)
+    this.host.normalize() // mend text nodes
   }
 
   // Alias for #setVisibleSelection()

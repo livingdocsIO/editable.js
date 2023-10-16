@@ -32,14 +32,15 @@ function endContainerIsChild (range) {
   return isChildOf(parent, possibleChild)
 }
 
+
 export function insertRangeBoundaryMarker (range, atStart) {
   const container = range.commonAncestorContainer
-  const directlyBeforeFormatTag = startContainerIsChild(range) && atStart
-  const directlyAfterFormatTag = endContainerIsChild(range) && !atStart
+  const directlyBeforeFormatTag = atStart && startContainerIsChild(range)
+  const directlyAfterFormatTag = !atStart && endContainerIsChild(range)
 
   // If ownerDocument is null the commonAncestorContainer is window.document
-  if (container.ownerDocument === null || container.ownerDocument === undefined) {
-    error('Cannot save range: range is emtpy')
+  if (!container.ownerDocument) {
+    error('Cannot save range: range is empty')
   }
 
   // Create the marker element containing a single
