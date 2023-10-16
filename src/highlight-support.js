@@ -3,7 +3,6 @@ import highlightText from './highlight-text'
 import {searchText} from './plugins/highlighting/text-search'
 import {createElement, createRange, toCharacterRange} from './util/dom'
 
-
 const highlightSupport = {
 
   // Used to highlight arbitrary text in an editable. All occurrences
@@ -37,7 +36,7 @@ const highlightSupport = {
     }
 
     const blockText = highlightText.extractText(editableHost, false)
-    if (blockText === '') return -1 // the text was deleted so we can't highlight it
+    if (blockText === '') return -1 // the text was deleted so we can't highlight anything
 
     const marker = highlightSupport.createMarkerNode(
       `<span class="highlight-${type}"></span>`,
@@ -48,9 +47,6 @@ const highlightSupport = {
     const actualStartIndex = startIndex
     const actualEndIndex = endIndex
 
-    // Note: we use the stardIndex and endIndex even if searchText didn't return anything
-
-
     highlightText.highlightMatches(editableHost, [{
       startIndex: actualStartIndex,
       endIndex: actualEndIndex,
@@ -58,9 +54,7 @@ const highlightSupport = {
       marker
     }], false)
 
-    if (dispatcher) {
-      dispatcher.notify('change', editableHost)
-    }
+    if (dispatcher) dispatcher.notify('change', editableHost)
 
     return actualStartIndex
   },
@@ -147,20 +141,7 @@ const highlightSupport = {
     marker.setAttribute('data-editable', 'ui-unwrap')
     marker.setAttribute('data-highlight', highlightType)
     return marker
-  },
-
-  // This function checks to see if text has been added to the component before the comment
-  // If it has, the start index is updated, otherwise it remains the same
-  correctIndex (matches, startIndex, endIndex) {
-    const newStartIndex = matches.find((match) => {
-      return match.startIndex >= startIndex // checks if the startIndex has increased
-    })
-    const actualStartIndex = newStartIndex ? newStartIndex.startIndex : startIndex
-    const actualEndIndex = actualStartIndex ? (actualStartIndex + (endIndex - startIndex)) : endIndex
-
-    return {actualStartIndex, actualEndIndex}
   }
-
 }
 
 export default highlightSupport
