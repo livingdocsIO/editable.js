@@ -11,32 +11,15 @@ let boundaryMarkerId = 0
 // (U+FEFF) zero width no-break space
 const markerTextChar = '\ufeff'
 
-function isChildOf (parent, possibleChild) {
-  for (let i = 0; i < parent.children.length; i++) {
-    if (parent.children[i] === possibleChild) return true
-  }
-  return false
-}
-
-function startContainerIsChild (range) {
+function isSecondChildOfCommonAncestor (range, rangeContainer) {
   const parent = range.commonAncestorContainer
   if (parent.nodeType === 3) return false // if we are on the text node it can't be a parent
-  const possibleChild = range.startContainer.parentElement
-  return isChildOf(parent, possibleChild)
+  const possibleChild = rangeContainer.parentElement
+  return possibleChild?.parentElement === parent
 }
-
-function endContainerIsChild (range) {
-  const parent = range.commonAncestorContainer
-  if (parent.nodeType === 3) return false // if we are on the text node it can't be a parent
-  const possibleChild = range.endContainer.parentElement
-  return isChildOf(parent, possibleChild)
-}
-
 
 export function insertRangeBoundaryMarker (range, atStart) {
   const container = range.commonAncestorContainer
-  const directlyBeforeFormatTag = atStart && startContainerIsChild(range)
-  const directlyAfterFormatTag = !atStart && endContainerIsChild(range)
 
   // If ownerDocument is null the commonAncestorContainer is window.document
   if (!container.ownerDocument) {
@@ -53,14 +36,21 @@ export function insertRangeBoundaryMarker (range, atStart) {
   markerEl.style.display = 'none'
   markerEl.appendChild(doc.createTextNode(markerTextChar))
 
-  // if another tag is trailing exactly at the start or end, prepend
-  // or append the marker element directly on the parent in order to prevent breaking HTML markup.
+  // This logic can expand the selection by inserting the marker before the element
+  // of the start or end container. In some cases this prevents breaking up existing tags.
+  // The solution is not perfect, but has been here a while.
+  // And it is somewhat inconsistent as it check if the container is a second grade child
+  // of the common ancestor.
+  // It can help to prevent the nuking of e.g. comments when formatting like bold
+  // is applied.
+  const directlyBeforeFormatTag = atStart && isSecondChildOfCommonAncestor(range, range.startContainer)
+  const directlyAfterFormatTag = !atStart && isSecondChildOfCommonAncestor(range, range.endContainer)
   if (directlyBeforeFormatTag) {
-    range.endContainer.parentElement.insertBefore(markerEl, range.startContainer.parentElement)
+    const startParentElem = range.startContainer.parentElement
+    startParentElem.parentElement.insertBefore(markerEl, startParentElem)
   } else if (directlyAfterFormatTag) {
-    // emulating insertAfter with nextSibling
-    range.startContainer.parentElement.insertBefore(markerEl,
-      range.endContainer.parentElement.nextSibling)
+    const endParentElem = range.endContainer.parentElement
+    endParentElem.parentElement.insertBefore(markerEl, endParentElem.nextSibling)
   } else {
     // Clone the Range and collapse to the appropriate boundary point
     const boundaryRange = range.cloneRange()
