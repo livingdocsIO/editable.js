@@ -7,9 +7,9 @@ export default {
   // Get the text from an editable block with a NodeIterator.
   // This must work the same as when later iterating over the text
   // in highlightMatches().
-  extractText (element) {
+  extractText (element, convertBRs = true) {
     let text = ''
-    getText(element, (part) => { text += part })
+    getText(element, convertBRs, (part) => { text += part })
     return text
   },
 
@@ -28,7 +28,7 @@ export default {
   //         id: 'a7382', // used in word-id attribute
   //         title: 'The World' // used in title attribute (optional)
   //       }]
-  highlightMatches (element, matches) {
+  highlightMatches (element, matches, countBRs = true) {
     if (!matches || matches.length === 0) {
       return
     }
@@ -47,7 +47,7 @@ export default {
       // Account for <br> elements
       if (next.nodeType === nodeType.textNode && next.data !== '') {
         textNode = next
-      } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
+      } else if (countBRs && next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
         totalOffset += 1
         continue
       } else {
@@ -144,14 +144,14 @@ export default {
 //   with data-editable="remove"
 // - It returns a \n for <br> elements
 //   (The only block level element allowed inside of editables)
-function getText (element, callback) {
+function getText (element, convertBRs, func) {
   const iterator = new NodeIterator(element)
   let next
   while ((next = iterator.getNext())) {
     if (next.nodeType === nodeType.textNode && next.data !== '') {
-      callback(next.data)
-    } else if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
-      callback('\n')
+      func(next.data)
+    } else if (convertBRs && next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
+      func('\n')
     }
   }
 }

@@ -4,6 +4,7 @@ import sinon from 'sinon'
 import {Editable} from '../src/core'
 import highlightSupport from '../src/highlight-support'
 import {createElement, createRange, toCharacterRange} from '../src/util/dom'
+import Selection from '../src/selection'
 
 function setupHighlightEnv (context, text) {
   context.text = text
@@ -12,6 +13,14 @@ function setupHighlightEnv (context, text) {
   if (context.editable) context.editable.unload()
   context.editable = new Editable()
   context.editable.add(context.div)
+
+  context.getCharacterRange = () => {
+    const range = createRange()
+    range.selectNodeContents(context.div)
+    const selection = new Selection(context.div, range)
+    return selection.getTextRange()
+  }
+
   // eslint-disable-next-line no-shadow
   context.highlightRange = (text, highlightId, start, end, dispatcher, type) => {
     return highlightSupport.highlightRange(
@@ -40,8 +49,7 @@ function setupHighlightEnv (context, text) {
     const extracted = {}
     for (const id in positions) {
       const val = positions[id]
-      // eslint-disable-next-line
-      const {nativeRange, ...withoutNativeRange} = val
+      const {nativeRange, ...withoutNativeRange} = val // eslint-disable-line
       extracted[id] = withoutNativeRange
     }
     return extracted
@@ -60,28 +68,19 @@ function setupHighlightEnv (context, text) {
   }
 }
 
-function teardownHighlightEnv (context) {
-  context.div.remove()
-  context.highlightRange = undefined
-  context.assertUniqueSpan = undefined
-
-  if (!context.editable) return
-  context.editable.unload()
-  context.editable = undefined
-}
-
 describe('highlight-support:', function () {
+
+  afterEach(function () {
+    // teardownHighlightEnv
+    this.div?.remove()
+    this.editable?.unload()
+  })
 
   describe('editable.highlight()', function () {
 
     beforeEach(function () {
       this.editable = new Editable()
       setupHighlightEnv(this, 'People Make The <br> World Go Round')
-    })
-
-    afterEach(function () {
-      teardownHighlightEnv(this)
-      this.editable?.unload()
     })
 
     it('skips and warns if an invalid range object was passed', function () {
@@ -119,15 +118,8 @@ describe('highlight-support:', function () {
 
   describe('highlightRange()', function () {
 
-    beforeEach(function () {
-      setupHighlightEnv(this, 'People Make The <br> World Go Round')
-    })
-
-    afterEach(function () {
-      teardownHighlightEnv(this)
-    })
-
     it('handles a single highlight', function () {
+      setupHighlightEnv(this, 'People Make The <br> World Go Round')
       const text = 'ple '
       const startIndex = this.highlightRange(text, 'myId', 3, 7)
       const expectedRanges = {
@@ -138,7 +130,7 @@ describe('highlight-support:', function () {
         }
       }
       const expectedHtml = this.formatHtml(`Peo
-<span class="highlight-comment" data-word-id="myId" data-editable="ui-unwrap" data-highlight="comment">ple </span>
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">ple </span>
 Make The <br> World Go Round`)
 
       expect(this.getHtml()).to.equal(expectedHtml)
@@ -147,43 +139,45 @@ Make The <br> World Go Round`)
     })
 
     it('has the native range', function () {
+      setupHighlightEnv(this, 'People Make The <br> World Go Round')
       this.highlightRange('ple ', 'myId', 3, 7)
       const extracted = this.extract()
       expect(extracted.myId.nativeRange.constructor.name).to.equal('Range')
     })
 
     it('handles adjaccent highlights', function () {
-      this.highlightRange('P', 'first', 0, 1)
-      this.highlightRange('e', 'second', 1, 2)
-      this.highlightRange('o', 'third', 2, 3)
-      this.highlightRange('p', 'fourth', 3, 4)
+      setupHighlightEnv(this, 'People Make The <br> World Go Round')
+      this.highlightRange('P', 'firstId', 0, 1)
+      this.highlightRange('e', 'secondId', 1, 2)
+      this.highlightRange('o', 'thirdId', 2, 3)
+      this.highlightRange('p', 'fourthId', 3, 4)
 
       const expectedRanges = {
-        first: {
+        firstId: {
           text: 'P',
           start: 0,
           end: 1
         },
-        second: {
+        secondId: {
           text: 'e',
           start: 1,
           end: 2
         },
-        third: {
+        thirdId: {
           text: 'o',
           start: 2,
           end: 3
         },
-        fourth: {
+        fourthId: {
           text: 'p',
           start: 3,
           end: 4
         }
       }
-      const expectedHtml = this.formatHtml(`<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">P</span>
-<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">e</span>
-<span class="highlight-comment" data-word-id="third" data-editable="ui-unwrap" data-highlight="comment">o</span>
-<span class="highlight-comment" data-word-id="fourth" data-editable="ui-unwrap" data-highlight="comment">p</span>
+      const expectedHtml = this.formatHtml(`<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="firstId">P</span>
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="secondId">e</span>
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="thirdId">o</span>
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="fourthId">p</span>
 le Make The <br> World Go Round`)
 
       expect(this.getHtml()).to.equal(expectedHtml)
@@ -192,67 +186,74 @@ le Make The <br> World Go Round`)
     })
 
     it('handles nested highlights', function () {
-      this.highlightRange('P', 'first', 0, 1)
-      this.highlightRange('e', 'second', 1, 2)
-      this.highlightRange('ople', 'third', 2, 6)
-      this.highlightRange('People', 'fourth', 0, 6)
+      setupHighlightEnv(this, 'People Make The <br> World Go Round')
+      this.highlightRange('P', 'firstId', 0, 1)
+      this.highlightRange('e', 'secondId', 1, 2)
+      this.highlightRange('ople', 'thirdId', 2, 6)
+      this.highlightRange('People', 'fourthId', 0, 6)
       const expectedRanges = {
-        first: {
+        firstId: {
           text: 'P',
           start: 0,
           end: 1
         },
-        second: {
+        secondId: {
           text: 'e',
           start: 1,
           end: 2
         },
-        third: {
+        thirdId: {
           text: 'ople',
           start: 2,
           end: 6
         },
-        fourth: {
+        fourthId: {
           text: 'People',
           start: 0,
           end: 6
         }
       }
-      const expectedHtml = this.formatHtml(`<span class="highlight-comment" data-word-id="fourth" data-editable="ui-unwrap" data-highlight="comment">
-<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">P</span>
-<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">e</span>
-<span class="highlight-comment" data-word-id="third" data-editable="ui-unwrap" data-highlight="comment">ople</span>
-</span>
+      const expectedHtml = this.formatHtml(`<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="firstId">
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="fourthId">P</span></span>
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="secondId">
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="fourthId">e</span></span>
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="thirdId">
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="fourthId">ople</span></span>
  Make The <br> World Go Round`)
+
       expect(this.getHtml()).to.equal(expectedHtml)
       expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
     })
 
     it('handles intersecting highlights', function () {
-      this.highlightRange('Peo', 'first', 0, 3)
-      this.highlightRange('ople', 'second', 2, 7)
-      this.highlightRange('le', 'third', 4, 6)
+      setupHighlightEnv(this, 'People Make The <br> World Go Round')
+      this.highlightRange('Peo', 'firstId', 0, 3)
+      this.highlightRange('ople', 'secondId', 2, 6)
+      this.highlightRange('le', 'thirdId', 4, 6)
       const expectedRanges = {
-        first: {
+        firstId: {
           text: 'Peo',
           start: 0,
           end: 3
         },
-        second: {
-          text: 'ople ',
+        secondId: {
+          text: 'ople',
           start: 2,
-          end: 7
+          end: 6
         },
-        third: {
+        thirdId: {
           text: 'le',
           start: 4,
           end: 6
         }
       }
-      const expectedHtml = this.formatHtml(`<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">Pe</span>
-<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">
-<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">o</span>p
-<span class="highlight-comment" data-word-id="third" data-editable="ui-unwrap" data-highlight="comment">le</span> </span>Make The <br> World Go Round`)
+
+      const expectedHtml = this.formatHtml(`
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="firstId">Pe
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="secondId">o</span></span>
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="secondId">p
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="thirdId">le</span></span>
+ Make The <br> World Go Round`)
       expect(this.getHtml()).to.equal(expectedHtml)
       expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
     })
@@ -261,16 +262,18 @@ le Make The <br> World Go Round`)
     // todo: the input is ' The <br> World' which would be 11 - 23
     // todo:   is there some whitespace normalization going on?
     it('handles highlights containing break tags', function () {
-      this.highlightRange(' The \nWorld', 'first', 11, 22)
+      setupHighlightEnv(this, 'The <br> World Go Round')
+      this.highlightRange('The  World', 'myId', 0, 10)
       const expectedRanges = {
-        first: {
-          text: ' The \nWorld',
-          start: 11,
-          end: 22
+        myId: {
+          text: 'The  World',
+          start: 0,
+          end: 10
         }
       }
-      const expectedHtml = this.formatHtml(`People Make
-<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"> The <br> World</span>
+      const expectedHtml = this.formatHtml(`
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">The </span>
+<br><span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId"> World</span>
  Go Round`)
 
       expect(this.getHtml()).to.equal(expectedHtml)
@@ -279,47 +282,57 @@ le Make The <br> World Go Round`)
     })
 
     it('handles identical ranges', function () {
-      this.highlightRange(' The \nWorld', 'first', 11, 22)
-      this.highlightRange(' The \nWorld', 'second', 11, 22)
+      setupHighlightEnv(this, 'People Make The World Go Round')
+      this.highlightRange(' The World', 'firstId', 11, 21)
+      this.highlightRange(' The World', 'secondId', 11, 21)
       const expectedRanges = {
-        first: {
-          text: ' The \nWorld',
+        firstId: {
+          text: ' The World',
           start: 11,
-          end: 22
+          end: 21
         },
-        second: {
-          text: ' The \nWorld',
+        secondId: {
+          text: ' The World',
           start: 11,
-          end: 22
+          end: 21
         }
       }
       const expectedHtml = this.formatHtml(`People Make
-<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">
-<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"> The <br> World</span>
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="firstId">
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="secondId"> The World</span>
 </span>
  Go Round`)
-
 
       expect(this.getHtml()).to.equal(expectedHtml)
       expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
 
     })
 
-    it('updates any existing range found under `highlightId` aka upsert', function () {
-      this.highlightRange('a', 'first', 11, 22)
-      this.highlightRange('a', 'first', 8, 9)
+    it('updates any existing range', function () {
+      setupHighlightEnv(this, 'People Make The <br> World Go Round')
+      this.highlightRange('a', 'myId', 11, 22)
+      this.highlightRange('a', 'myId', 8, 9)
       const expectedRanges = {
-        first: {
+        myId: {
           text: 'a',
           start: 8,
           end: 9
         }
       }
       const expectedHtml = this.formatHtml(`People M
-<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">a</span>
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">a</span>
 ke The <br> World Go Round`)
 
       expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
+      expect(this.getHtml()).to.equal(expectedHtml)
+    })
+
+    it('handles a <br> tag without whitespaces', function () {
+      setupHighlightEnv(this, 'a<br>b')
+      this.highlightRange('b', 'myId', 1, 2)
+      const expectedHtml = this.formatHtml(`a<br>
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">b</span>`)
+
       expect(this.getHtml()).to.equal(expectedHtml)
     })
 
@@ -344,49 +357,56 @@ ke The <br> World Go Round`)
 
     it('handles highlights surrounding <span> tags', function () {
       setupHighlightEnv(this, 'a<span>b</span>cd')
-      this.highlightRange('bc', 'first', 1, 3)
+      this.highlightRange('bc', 'myId', 1, 3)
       const extract = this.extractWithoutNativeRange()
 
-      expect(extract.first.text).to.equal('bc')
+      expect(extract.myId.text).to.equal('bc')
 
       const content = this.getHtml()
-      expect(content).to.equal('a<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"><span>b</span>c</span>d')
+      expect(content).to.equal('a<span><span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">b</span></span><span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">c</span>d')
     })
 
     it('handles highlights intersecting <span> tags', function () {
       setupHighlightEnv(this, 'a<span data-word-id="x">bc</span>d')
-      this.highlightRange('ab', 'first', 0, 2)
+      this.highlightRange('ab', 'myId', 0, 2)
       const extract = this.extractWithoutNativeRange()
 
-      expect(extract.first.text).to.equal('ab')
+      expect(extract.myId.text).to.equal('ab')
 
       const content = this.getHtml()
-      expect(content).to.equal('<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">a<span data-word-id="x">b</span></span><span data-word-id="x">c</span>d')
+      expect(content).to.equal('<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">a</span><span data-word-id="x"><span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">b</span>c</span>d')
     })
   })
 
-  describe('highlightRange() - single special characters', function () {
+  // How characters are counted determines how the the highlight
+  // startIndex and endIndex are applied.
+  describe('highlightRange() - character counting', function () {
 
-    it('treats special characters as expected', function () {
-      // actual / expected length / expected text
-      const characters = [
-        ['😐', 2, '😐'],
-        ['&nbsp;', 1, ' '], // eslint-disable-line
-        [' ', 1, ' '], // eslint-disable-line
-        [' ', 1, ' '], // eslint-disable-line,
-        [' ', 1, ' '], // eslint-disable-line,
-        ['\r', 0],
-        ['\n', 0],
-        ['<br>', 0]
-      ]
+    // actual / expected length / expected text
+    const cases = [
+      ['😐', 2, '😐'],
+      ['&nbsp;', 1, ' '],
+      [' ', 1, ' '], // 160 - no-break space
+      [' ', 1, ' '], // 8201 - thin space
+      [' ', 1, ' '], // 8202 - hair space
+      ['\r', 1, '\n'], // was: ['\r', 0]
+      ['\n', 1, '\n'], // was: ['\n', 0]
+      ['\n 🌍', 4, '\n 🌍'], // new
+      ['\r\n', 1, '\n'], // new
+      ['\r \n', 3, '\n \n'], // new
+      ['&nbsp; ', 2, '  '], // new
+      ['<br>', 0]
+    ]
 
-      characters.forEach(([char, expectedLength, expectedText]) => {
+    // Generate a test for each test case
+    for (const [char, expectedLength, expectedText] of cases) {
+
+      it(`treats '${char}' as ${expectedLength} characters`, function () {
         setupHighlightEnv(this, char)
-        const range = createRange()
-        const node = this.div
-        range.selectNode(node.firstChild)
-        const {start, end} = toCharacterRange(range, this.div)
+
+        const {start, end} = this.getCharacterRange()
         this.highlightRange(char, 'char', start, end)
+
         if (expectedLength === 0) {
           expect(this.extractWithoutNativeRange()).to.equal(undefined)
         } else {
@@ -398,114 +418,97 @@ ke The <br> World Go Round`)
             }
           })
         }
-        teardownHighlightEnv(this)
       })
-    })
+    }
   })
 
   describe('highlightRange() - with special characters', function () {
-    beforeEach(function () {
-      setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
-    })
-
-    afterEach(function () {
-      teardownHighlightEnv(this)
-    })
 
     it('maps selection offsets to ranges containing multibyte symbols consistently', function () {
+      setupHighlightEnv(this, '😐 Make&nbsp;The \n 🌍 Go \n🔄')
       const range = createRange()
       const node = this.div
       range.setStart(node.firstChild, 0)
       range.setEnd(node.firstChild, 2)
       const {start, end} = toCharacterRange(range, this.div)
 
-      this.highlightRange('😐', 'first', start, end)
+      this.highlightRange('😐', 'myId', start, end)
       const expectedRanges = {
-        first: {
+        myId: {
           text: '😐',
           start: 0,
           end: 2
         }
       }
 
-      const expectedHtml = '<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">😐</span> Make&nbsp;The \n 🌍 Go \n🔄'
+      const expectedHtml = '<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">😐</span> Make&nbsp;The \n 🌍 Go \n🔄'
 
       expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
       expect(this.getHtml()).to.equal(expectedHtml)
     })
 
     it('treats non-breakable spaces consistently', function () {
-      this.highlightRange(' Make T', 'first', 2, 9)
+      setupHighlightEnv(this, '😐 Make&nbsp;The \n 🌍 Go \n🔄')
+      this.highlightRange(' Make T', 'myId', 2, 9)
       const expectedRanges = {
-        first: {
+        myId: {
           text: ' Make T',
           start: 2,
           end: 9
         }
       }
-      const expectedHtml = '😐<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment"> Make&nbsp;T</span>he \n 🌍 Go \n🔄'
+      const expectedHtml = `😐<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId"> Make&nbsp;T</span>he \n 🌍 Go \n🔄`
+
       expect(this.getHtml()).to.equal(expectedHtml)
       expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
-
-
-    })
-
-    it('treats \\n\\r spaces consistently', function () {
-      this.highlightRange('The 🌍 ', 'first', 8, 15)
-      const expectedRanges = {
-        first: {
-          text: 'The 🌍 ',
-          start: 8,
-          end: 15
-        }
-      }
-
-      const expectedHtml = '😐 Make&nbsp;<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">The \n 🌍 </span>Go \n🔄'
-      expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
-
     })
 
     it('treats \\n spaces consistently', function () {
-      this.highlightRange('Go 🔄', 'first', 15, 20)
+      setupHighlightEnv(this, '&nbsp;The \n 🌍 Go \n🔄')
+      this.highlightRange('The \n 🌍', 'myId', 1, 9)
       const expectedRanges = {
-        first: {
-          text: 'Go 🔄',
-          start: 15,
-          end: 20
+        myId: {
+          text: 'The \n 🌍',
+          start: 1,
+          end: 9
         }
       }
-      const expectedHtml = '😐 Make&nbsp;The \n 🌍 <span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">Go \n🔄</span>'
+
+      const expectedHtml = `&nbsp;<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">The \n 🌍</span> Go \n🔄`
+
       expect(this.getHtml()).to.equal(expectedHtml)
       expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
     })
 
     it('extracts a readable text', function () {
-      this.highlightRange('😐 Make The 🌍 Go 🔄', 'first', 0, 20)
+      setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
+      this.highlightRange('😐 Make The 🌍 Go 🔄', 'myId', 0, 23)
       const expectedRanges = {
-        first: {
-          text: '😐 Make The 🌍 Go 🔄',
+        myId: {
+          text: '😐 Make The \n 🌍 Go \n🔄',
           start: 0,
-          end: 20
+          end: 23
         }
       }
-      const expectedHtml = '<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">😐 Make&nbsp;The \n 🌍 Go \n🔄</span>'
+      const expectedHtml = '<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">😐 Make&nbsp;The \n 🌍 Go \n🔄</span>'
       expect(this.getHtml()).to.equal(expectedHtml)
       expect(this.extractWithoutNativeRange()).to.deep.equal(expectedRanges)
     })
 
     it('notify change on add highlight when dispatcher is given', function () {
+      setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
       let called = 0
       const dispatcher = {notify: () => called++}
-      this.highlightRange('😐 Make The 🌍 Go 🔄', 'first', 0, 20, dispatcher)
+      this.highlightRange('😐 Make The 🌍 Go 🔄', 'myId', 0, 20, dispatcher)
 
       expect(called).to.equal(1)
     })
 
     it('notify change on remove highlight when dispatcher is given', function () {
+      setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
       let called = 0
       const dispatcher = {notify: () => called++}
-      this.highlightRange('😐 Make The 🌍 Go 🔄', 'first', 0, 20)
+      this.highlightRange('😐 Make The 🌍 Go 🔄', 'myId', 0, 20)
       this.removeHighlight('first', dispatcher)
 
       expect(called).to.equal(1)
@@ -519,46 +522,49 @@ ke The <br> World Go Round`)
       setupHighlightEnv(this, 'People Make The&nbsp;<br>&nbsp;World Go Round')
     })
 
-    afterEach(function () {
-      teardownHighlightEnv(this)
-      this.editable?.unload()
-    })
-
     it('can handle all cases combined and creates consistent output', function () {
-      this.highlightRange('ople Mak', 'first', 2, 10)
-      this.highlightRange('l', 'second', 4, 5)
-      this.highlightRange('ld Go Round', 'third', 21, 32)
-      this.highlightRange(' ', 'fourth', 23, 24)
-      this.highlightRange(' ', 'fifth', 23, 24)
+      this.highlightRange('ople Mak', 'firstId', 2, 10)
+      this.highlightRange('l', 'secondId', 4, 5)
+      this.highlightRange('ld Go Round', 'thirdId', 20, 31)
+      this.highlightRange(' ', 'fourthId', 22, 23)
+      this.highlightRange(' ', 'fifthId', 22, 23)
 
       const expectedRanges = {
-        first: {
+        firstId: {
           start: 2,
           end: 10,
           text: 'ople Mak'
         },
-        second: {
+        secondId: {
           start: 4,
           end: 5,
           text: 'l'
         },
-        third: {
-          start: 21,
-          end: 32,
+        thirdId: {
+          start: 20,
+          end: 31,
           text: 'ld Go Round'
         },
-        fourth: {
-          start: 23,
-          end: 24,
+        fourthId: {
+          start: 22,
+          end: 23,
           text: ' '
         },
-        fifth: {
-          start: 23,
-          end: 24,
+        fifthId: {
+          start: 22,
+          end: 23,
           text: ' '
         }
       }
-      const expectedHtml = this.formatHtml(`Pe<span class="highlight-comment" data-word-id="first" data-editable="ui-unwrap" data-highlight="comment">op<span class="highlight-comment" data-word-id="second" data-editable="ui-unwrap" data-highlight="comment">l</span>e Mak</span>e The&nbsp;<br>&nbsp;Wor<span class="highlight-comment" data-word-id="third" data-editable="ui-unwrap" data-highlight="comment">ld<span class="highlight-comment" data-word-id="fifth" data-editable="ui-unwrap" data-highlight="comment"><span class="highlight-comment" data-word-id="fourth" data-editable="ui-unwrap" data-highlight="comment"> </span></span>Go Round</span>`)
+      const expectedHtml = this.formatHtml(`Pe
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="firstId">op
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="secondId">l</span>
+e Mak</span>
+e The&nbsp;<br>&nbsp;Wor<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="thirdId">ld
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="fourthId">
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="fifthId"> </span></span>
+Go Round</span>`)
+
       const extractedRanges = this.extractWithoutNativeRange()
       const content = this.editable.getContent(this.div)
       expect(content).to.equal(this.text)
@@ -577,8 +583,8 @@ ke The <br> World Go Round`)
         }
       }
       const expectedHtml = this.formatHtml(`Peo
-<span class="highlight-comment" data-word-id="myId" data-editable="ui-unwrap" data-highlight="comment">ple </span>
-Make The&nbsp;<br>&nbsp;W<span class="highlight-spellcheck" data-word-id="spellcheckId" data-editable="ui-unwrap" data-highlight="spellcheck">orld</span> Go Round`)
+<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">ple </span>
+Make The&nbsp;<br>&nbsp;W<span class="highlight-spellcheck" data-editable="ui-unwrap" data-highlight="spellcheck" data-word-id="spellcheckId">orld</span> Go Round`)
       expect(this.getHtml()).to.equal(expectedHtml)
       expect(this.extractWithoutNativeRange('comment')).to.deep.equal(expectedRanges)
       expect(startIndex).to.equal(3)
@@ -590,10 +596,6 @@ Make The&nbsp;<br>&nbsp;W<span class="highlight-spellcheck" data-word-id="spellc
       setupHighlightEnv(this, 'People make the world go round and round and round the world')
     })
 
-    afterEach(function () {
-      teardownHighlightEnv(this)
-    })
-
     it('highlights based on both match and start index', function () {
       this.highlightRange('round', 'myId', 35, 40)
       const expectedRanges = {
@@ -603,21 +605,7 @@ Make The&nbsp;<br>&nbsp;W<span class="highlight-spellcheck" data-word-id="spellc
           end: 40
         }
       }
-      const expectedHtml = this.formatHtml(`People make the world go round and <span class="highlight-comment" data-word-id="myId" data-editable="ui-unwrap" data-highlight="comment">round</span> and round the world`)
-      expect(this.getHtml()).to.equal(expectedHtml)
-      expect(this.extractWithoutNativeRange('comment')).to.deep.equal(expectedRanges)
-    })
-
-    it('highlights based on nearest match despite wrong index', function () {
-      this.highlightRange('round', 'myId', 33, 38)
-      const expectedRanges = {
-        myId: {
-          text: 'round',
-          start: 35,
-          end: 40
-        }
-      }
-      const expectedHtml = this.formatHtml(`People make the world go round and <span class="highlight-comment" data-word-id="myId" data-editable="ui-unwrap" data-highlight="comment">round</span> and round the world`)
+      const expectedHtml = this.formatHtml(`People make the world go round and <span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">round</span> and round the world`)
       expect(this.getHtml()).to.equal(expectedHtml)
       expect(this.extractWithoutNativeRange('comment')).to.deep.equal(expectedRanges)
     })
