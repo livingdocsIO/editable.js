@@ -158,7 +158,7 @@ export default class Selection extends Cursor {
     if (block.isPlainTextBlock(this.host)) return
     elem = this.adoptElement(elem)
     this.range = content.toggleTag(this.host, this.range, elem)
-    this.setSelection()
+    this.setVisibleSelection()
   }
 
   toggleCustom ({tagName, attributes, trim = false}) {
@@ -213,7 +213,7 @@ export default class Selection extends Cursor {
     const cursor = this.deleteContent()
     const textNode = cursor.createTextNode(character)
     cursor.insertBefore(textNode)
-    cursor.setSelection()
+    cursor.setVisibleSelection()
     return cursor
   }
 
@@ -223,13 +223,13 @@ export default class Selection extends Cursor {
   // @param {String} E.g. '»'
   surround (startCharacter, endCharacter) {
     this.range = content.surround(this.host, this.range, startCharacter, endCharacter)
-    this.setSelection()
+    this.setVisibleSelection()
   }
 
   removeSurround (startCharacter, endCharacter) {
     this.range = content.deleteCharacter(this.host, this.range, startCharacter)
     this.range = content.deleteCharacter(this.host, this.range, endCharacter)
-    this.setSelection()
+    this.setVisibleSelection()
   }
 
   removeChars (chars = []) {
@@ -237,7 +237,7 @@ export default class Selection extends Cursor {
       const char = chars[i]
       this.range = content.deleteCharacter(this.host, this.range, char)
     }
-    this.setSelection()
+    this.setVisibleSelection()
   }
 
   toggleSurround (startCharacter, endCharacter) {
@@ -254,7 +254,7 @@ export default class Selection extends Cursor {
   //                           remove all.
   removeFormatting (selector) {
     this.range = content.removeFormatting(this.host, this.range, selector)
-    this.setSelection()
+    this.setVisibleSelection()
   }
 
   // Delete the farest ancestor that is an exact selection
@@ -294,7 +294,7 @@ export default class Selection extends Cursor {
   // @param {DOM Node}
   expandTo (elem) {
     this.range = content.expandTo(this.host, this.range, elem)
-    this.setSelection()
+    this.setVisibleSelection()
   }
 
   //  Collapse the selection at the beginning of the selection
@@ -302,7 +302,7 @@ export default class Selection extends Cursor {
   //  @return Cursor instance
   collapseAtBeginning (elem) {
     this.range.collapse(true)
-    this.setSelection()
+    this.setVisibleSelection()
     return new Cursor(this.host, this.range)
   }
 
@@ -311,7 +311,7 @@ export default class Selection extends Cursor {
   //  @return Cursor instance
   collapseAtEnd (elem) {
     this.range.collapse(false)
-    this.setSelection()
+    this.setVisibleSelection()
     return new Cursor(this.host, this.range)
   }
 
@@ -322,7 +322,7 @@ export default class Selection extends Cursor {
     if (block.isPlainTextBlock(this.host)) return
     elem = this.adoptElement(elem)
     this.range = content.forceWrap(this.host, this.range, elem)
-    this.setSelection()
+    this.setVisibleSelection()
   }
 
   // Check if the selection is the same as the elements contents.
@@ -349,6 +349,6 @@ export default class Selection extends Cursor {
   // selection.
   deleteCharacter (character) {
     this.range = content.deleteCharacter(this.host, this.range, character)
-    this.setSelection()
+    this.setVisibleSelection()
   }
 }

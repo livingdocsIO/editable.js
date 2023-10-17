@@ -13,7 +13,7 @@ describe('Dispatcher', function () {
   // create a Cursor object and set the selection to it
   function createCursor (range) {
     const cursor = new Cursor(elem, range)
-    cursor.setSelection()
+    cursor.setVisibleSelection()
     return cursor
   }
 
@@ -33,7 +33,7 @@ describe('Dispatcher', function () {
 
   function createSelection (range) {
     const selection = new Selection(elem, range)
-    selection.setSelection()
+    selection.setVisibleSelection()
     return selection
   }
 
