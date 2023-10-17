@@ -12,7 +12,7 @@ import createDefaultEvents from './create-default-events'
 import browser from 'bowser'
 import {textNodesUnder, getTextNodeAndRelativeOffset} from './util/element'
 import {binaryCursorSearch} from './util/binary_search'
-import {domArray, createRange} from './util/dom'
+import {domArray, createRange, nodeContainsRange} from './util/dom'
 
 /**
  * The Core module provides the Editable class that defines the Editable.JS
@@ -315,21 +315,15 @@ export class Editable {
    * @returns A Cursor or Selection object or undefined.
    */
   getSelection (editableHost) {
-    let selection = this.dispatcher.selectionWatcher.getFreshSelection()
-    if (!(editableHost && selection)) return selection
+    const selection = this.dispatcher.selectionWatcher.getFreshSelection()
+    if (!editableHost || !selection) return selection
 
     const range = selection.range
-    // Check if the selection is inside the editableHost
-    // The try...catch is required if the editableHost was removed from the DOM.
-    try {
-      if (range.compareNode(editableHost) !== range.NODE_BEFORE_AND_AFTER) {
-        selection = undefined
-      }
-    } catch (e) {
-      selection = undefined
-    }
 
-    return selection
+    // Check if the selection is inside the editableHost
+    if (editableHost?.isConnected && nodeContainsRange(editableHost, range)) {
+      return selection
+    }
   }
 
   /**
