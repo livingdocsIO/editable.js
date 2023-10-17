@@ -11,13 +11,13 @@ import {rangesAreEqual} from './util/dom'
  */
 
 export default class RangeContainer {
-  constructor (editableHost, rangyRange) {
+  constructor (editableHost, range) {
     this.host = editableHost && editableHost.jquery
       ? editableHost[0]
       : editableHost
-    this.range = rangyRange
-    this.isAnythingSelected = (rangyRange !== undefined)
-    this.isCursor = (this.isAnythingSelected && rangyRange.collapsed)
+    this.range = range
+    this.isAnythingSelected = (range !== undefined)
+    this.isCursor = (this.isAnythingSelected && range.collapsed)
     this.isSelection = (this.isAnythingSelected && !this.isCursor)
   }
 

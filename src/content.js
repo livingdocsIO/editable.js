@@ -128,11 +128,10 @@ export function adoptElement (node, doc) {
     : node
 }
 
-// This is a slight variation of the cloneContents method of a rangyRange.
 // It will return a fragment with the cloned contents of the range
 // without the commonAncestorElement.
 //
-// @param {rangyRange}
+// @param {Range}
 // @return {DocumentFragment}
 export function cloneRangeContents (range) {
   const rangeFragment = range.cloneContents()
