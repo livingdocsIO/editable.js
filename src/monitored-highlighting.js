@@ -133,10 +133,10 @@ export default class MonitoredHighlighting {
       const matchCollection = new MatchCollection()
 
       let matches = searchAllWords(text, misspelledWords, this.spellcheckMarkerNode)
-      matchCollection.addMatches('spellcheck', matches)
+      matchCollection.addMatches(matches)
 
       matches = this.whitespace.findMatches(text)
-      matchCollection.addMatches('whitespace', matches)
+      matchCollection.addMatches(matches)
 
       this.safeHighlightMatches(editableHost, matchCollection.matches)
     })
