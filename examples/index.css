@@ -18,20 +18,20 @@ button,
 input,
 select,
 textarea {
-    color: #222;
+  color: #222;
 }
 
 body {
-    font-size: 1em;
-    line-height: 1.4;
+  font-size: 1em;
+  line-height: 1.4;
 }
 
 /*
-    Make trailing whitespaces visible since they can be quite confusing.
+  Make trailing whitespaces visible since they can be quite confusing.
 */
-[data-editable] {
-    white-space: pre-wrap;
-  }
+/* [data-editable] {
+  white-space: pre-wrap;
+} */
 
 /*
  * Remove text-shadow in selection highlight: h5bp.com/i
@@ -40,24 +40,24 @@ body {
  */
 
 ::-moz-selection {
-    background: rgba(132, 187, 255, 0.5);
-    text-shadow: none;
+  background: rgba(132, 187, 255, 0.5);
+  text-shadow: none;
 }
 
 ::selection {
-    /*
-    * We use a transparent color as chrome has a "bug" where
-    * the underline is not visible when the text is selected. Safari behaves different
-    */
-    background: rgba(132, 187, 255, 0.5);
-    text-shadow: none;
+  /*
+  * We use a transparent color as chrome has a "bug" where
+  * the underline is not visible when the text is selected. Safari behaves different
+  */
+  background: rgba(132, 187, 255, 0.5);
+  text-shadow: none;
 }
 
 /*
 * Chrome has issues displaying the cursor because the outline is too thick
 */
 [contenteditable]:focus {
-    outline-offset: 1px;
+  outline-offset: 1px;
 }
 
 /*
@@ -65,12 +65,12 @@ body {
  */
 
 hr {
-    display: block;
-    height: 1px;
-    border: 0;
-    border-top: 1px solid #ccc;
-    margin: 1em 0;
-    padding: 0;
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
 }
 
 /*
@@ -78,7 +78,7 @@ hr {
  */
 
 img {
-    vertical-align: middle;
+  vertical-align: middle;
 }
 
 /*
@@ -86,9 +86,9 @@ img {
  */
 
 fieldset {
-    border: 0;
-    margin: 0;
-    padding: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
 }
 
 /* ==========================================================================
@@ -96,46 +96,46 @@ fieldset {
    ========================================================================== */
 
 html {
-    background-color: #f4f7f9;
+  background-color: #f4f7f9;
 }
 
 .logo-section {
-    padding: 4em 0;
-    /*background-color: #2b414d;*/
+  padding: 4em 0;
+  /*background-color: #2b414d;*/
 }
 
 .logo {
-    max-width: 800px;
-    margin: 0 auto;
+  max-width: 800px;
+  margin: 0 auto;
 
-    text-align: center;
-    /* text on yellow*/
-    /*color: #fffce1;*/
-    color: #fff;
+  text-align: center;
+  /* text on yellow*/
+  /*color: #fffce1;*/
+  color: #fff;
 }
 
 .square {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    margin: 0 auto;
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
 
-    /* yellow */
-    background: #efc75e;
+  /* yellow */
+  background: #efc75e;
 }
 
 .logo h1 {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    margin: .2em .5em;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: .2em .5em;
 }
 
 .logo h2 {
-    margin-top: .5em;
-    font-weight: 400;
-    color: rgba(255, 255, 255, .5);
-    color: rgba(0, 0, 0, 0.6);
+  margin-top: .5em;
+  font-weight: 400;
+  color: rgba(255, 255, 255, .5);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 /* ==========================================================================
@@ -143,16 +143,16 @@ html {
    ========================================================================== */
 
 section {
-    padding: 0 0 2em 0;
+  padding: 0 0 2em 0;
 }
 
 .section-content {
-    max-width: 800px;
-    margin: 0 auto;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .section-dark {
-    background-color: #2b414d;
+  background-color: #2b414d;
 }
 
 /* ==========================================================================
@@ -160,47 +160,47 @@ section {
    ========================================================================== */
 
 .example-title {
-    font-size: 2rem;
-    color: rgba(0, 0, 0, 0.9);
+  font-size: 2rem;
+  color: rgba(0, 0, 0, 0.9);
 }
 
 .example-sheet {
-    padding: 1em 2em;
+  padding: 1em 2em;
 
-    font-size: 1.5rem;
-    border: 1px solid #eee;
-    background-color: #fff;
+  font-size: 1.5rem;
+  border: 1px solid #eee;
+  background-color: #fff;
 }
 
 .code-example {
-    margin: 1rem 0;
-    font-size: 1.3rem;
+  margin: 1rem 0;
+  font-size: 1.3rem;
 }
 
 .code-example pre {
-    border: 1px solid #eee;
+  border: 1px solid #eee;
 }
 
 .code-example h3 {
-    font-size: 1rem;
-    color: rgba(0, 0, 0, 0.75);
-    margin: 0;
+  font-size: 1rem;
+  color: rgba(0, 0, 0, 0.75);
+  margin: 0;
 }
 
 /* old stuff */
 
 article {
-    max-width: 660px;
-    margin: 0 auto;
+  max-width: 660px;
+  margin: 0 auto;
 }
 
 [contenteditable="true"]:focus {
-    background-color: #eee;
+  background-color: #eee;
 }
 
 .iframe-container iframe{
-    width: 100%;
-    height: 500px;
+  width: 100%;
+  height: 500px;
 }
 
 
@@ -209,63 +209,63 @@ article {
    ========================================================================== */
 
 .selection-tip {
-    position: absolute;
-    color: #eee;
-    padding: 2px 5px;
-    background: #333;
-    border-radius: 5px;
+  position: absolute;
+  color: #eee;
+  padding: 2px 5px;
+  background: #333;
+  border-radius: 5px;
 }
 
 .selection-tip button {
-    background: none;
-    border: none;
-    padding: 11px 18px 8px;
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fff;
+  background: none;
+  border: none;
+  padding: 11px 18px 8px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
 
 .selection-tip button:last-child {
-    border-right: none;
+  border-right: none;
 }
 
 .selection-tip button:hover {
-    color: #efc75e;
+  color: #efc75e;
 }
 
 
 .selection-tip:after /* triangle decoration */
 {
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid #333;
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: -8px;
-    margin-left: -8px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #333;
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  margin-left: -8px;
 }
 
 .selection-tip.top:after
 {
-    border-top-color: transparent;
-    border-bottom: 8px solid #111;
-    top: -20px;
-    bottom: auto;
+  border-top-color: transparent;
+  border-bottom: 8px solid #111;
+  top: -20px;
+  bottom: auto;
 }
 
 .selection-tip.left:after
 {
-    left: 8px;
-    margin: 0;
+  left: 8px;
+  margin: 0;
 }
 
 .selection-tip.right:after
 {
-    right: 8px;
-    left: auto;
-    margin: 0;
+  right: 8px;
+  left: auto;
+  margin: 0;
 }
 
 
@@ -276,10 +276,10 @@ article {
 
 
 .highlight {
-    background: #ecbc3f;
-    color: #fff;
-    border-radius: 10px;
-    padding: 1px 5px;
+  background: #ecbc3f;
+  color: #fff;
+  border-radius: 10px;
+  padding: 1px 5px;
 }
 
 .highlight-spellcheck {
@@ -290,6 +290,10 @@ article {
 .highlight-whitespace {
   background: rgba(7, 165, 206, .1);
   border-bottom: 1px solid rgba(7, 165, 206, .5);
+}
+
+.highlight-comment {
+  background-color: #f8c13075;
 }
 
 
@@ -376,17 +380,17 @@ article {
 }
 
 .example-style-dark {
-    padding: 0.5em;
-    color: white;
-    background-color: darkgrey;
-    border: 1px solid darkgrey;
-    border-radius: 4px;
-    caret-color: yellow;
+  padding: 0.5em;
+  color: white;
+  background-color: darkgrey;
+  border: 1px solid darkgrey;
+  border-radius: 4px;
+  caret-color: yellow;
 }
 .example-style-dark:focus {
-    outline: none;
-    background-color: dimgrey;
-    box-shadow: 0px 0px 8px black;
+  outline: none;
+  background-color: dimgrey;
+  box-shadow: 0px 0px 8px black;
 }
 
 /* ==========================================================================
@@ -394,20 +398,19 @@ article {
    ========================================================================== */
 
 .iframe-sheet {
-    padding: 1em;
-    border: 1px solid #eee;
-    background-color: #fff;
+  padding: 1em;
+  border: 1px solid #eee;
+  background-color: #fff;
 }
 
 .iframe-example {
-    width: 100%;
-    min-height: 500px;
+  width: 100%;
+  min-height: 500px;
 
-    border: 1px solid #ccc;
-    border-top: 1px solid #666;
-    border-left: 1px solid #666;
-    box-sizing: border-box;
-
+  border: 1px solid #ccc;
+  border-top: 1px solid #666;
+  border-left: 1px solid #666;
+  box-sizing: border-box;
 }
 
 /* ==========================================================================
@@ -415,43 +418,42 @@ article {
    ========================================================================== */
 
 .documentation {
-    border-bottom: 1px solid rgba(0, 0, 0, .5);
+  border-bottom: 1px solid rgba(0, 0, 0, .5);
 }
 
 .documentation h4 {
-    font-size: 1.2rem;
+  font-size: 1.2rem;
 }
 
 .documentation h4 span {
-    display: inline-block;
-    padding: 3px 10px 2px;
-    border-radius: 5px;
-    background: #eab730;
-    color: #fff;
-    font-weight: 400;
+  display: inline-block;
+  padding: 3px 10px 2px;
+  border-radius: 5px;
+  background: #eab730;
+  color: #fff;
+  font-weight: 400;
 }
 
 .documentation pre {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 
 .edit-example {
-    padding: 1em 2em;
+  padding: 1em 2em;
 
-    font-size: 1.5rem;
-    border: 1px solid #eee;
-    background-color: #fff;
+  font-size: 1.5rem;
+  border: 1px solid #eee;
+  background-color: #fff;
 }
 
 .cursor {
-    display: inline-block;
-    width: 1px;
-    height: 100%;
-    position: relative;
-    top: -3px;
-    border-right: 2px solid #0c86b1;
-    margin-right: 1px;
-
+  display: inline-block;
+  width: 1px;
+  height: 100%;
+  position: relative;
+  top: -3px;
+  border-right: 2px solid #0c86b1;
+  margin-right: 1px;
 }
 
 
@@ -460,7 +462,7 @@ article {
    ========================================================================== */
 
 .space-after {
-    margin-bottom: 5em;
+  margin-bottom: 5em;
 }
 
 /*
@@ -477,21 +479,12 @@ article {
 
 .clearfix:before,
 .clearfix:after {
-    content: " "; /* 1 */
-    display: table; /* 2 */
+  content: " "; /* 1 */
+  display: table; /* 2 */
 }
 
 .clearfix:after {
-    clear: both;
-}
-
-/*
- * For IE 6/7 only
- * Include this rule to trigger hasLayout and contain floats.
- */
-
-.clearfix {
-    *zoom: 1;
+  clear: both;
 }
 
 /* ==========================================================================
@@ -501,12 +494,12 @@ article {
    ========================================================================== */
 
 @media only screen and (min-width: 35em) {
-    /* Style adjustments for viewports that meet the condition */
+  /* Style adjustments for viewports that meet the condition */
 }
 
 @media print,
-       (-o-min-device-pixel-ratio: 5/4),
-       (-webkit-min-device-pixel-ratio: 1.25),
-       (min-resolution: 120dpi) {
-    /* Style adjustments for high resolution devices */
+  (-o-min-device-pixel-ratio: 5/4),
+  (-webkit-min-device-pixel-ratio: 1.25),
+  (min-resolution: 120dpi) {
+  /* Style adjustments for high resolution devices */
 }
