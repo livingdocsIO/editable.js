@@ -48,7 +48,7 @@ export default class MonitoredHighlighting {
     const spellcheckMarker = this.config.spellcheck.marker
     const whitespaceMarker = this.config.whitespace.marker
     const whitespaceMarkerNode = highlightSupport
-      .createMarkerNode(whitespaceMarker, 'spellcheck', this.win)
+      .createMarkerNode(whitespaceMarker, 'whitespace', this.win)
     this.spellcheckMarkerNode = highlightSupport
       .createMarkerNode(spellcheckMarker, 'spellcheck', this.win)
 
@@ -171,7 +171,7 @@ export default class MonitoredHighlighting {
 
   removeHighlights (editableHost) {
     editableHost = domSelector(editableHost, this.win.document)
-    for (const elem of domArray('[data-highlight="spellcheck"]', editableHost)) {
+    for (const elem of domArray('[data-highlight="spellcheck"], [data-highlight="whitespace"]', editableHost)) {
       content.unwrap(elem)
     }
   }
@@ -189,7 +189,7 @@ export default class MonitoredHighlighting {
       do {
         if (elementAtCursor === editableHost) return
         const highlightType = elementAtCursor.getAttribute('data-highlight')
-        if (highlightType === 'spellcheck') {
+        if (highlightType === 'spellcheck' || highlightType === 'whitespace') {
           wordId = elementAtCursor.getAttribute('data-word-id')
           break
         }
