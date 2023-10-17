@@ -4,9 +4,8 @@ export default class MatchCollection {
     this.matches = []
   }
 
-  addMatches (name, matches) {
-    if (!matches || !matches.length) return
-
+  addMatches (matches) {
+    if (!matches?.length) return
     this.matches = mergeMatches(this.matches, matches)
   }
 

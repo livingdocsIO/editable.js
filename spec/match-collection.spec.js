@@ -21,7 +21,7 @@ describe('MatchCollection', function () {
 
 
     it('adds a match', function () {
-      this.collection.addMatches('test', [{
+      this.collection.addMatches([{
         startIndex: 0,
         endIndex: 1
       }])
@@ -33,12 +33,12 @@ describe('MatchCollection', function () {
     })
 
     it('merges two matches', function () {
-      this.collection.addMatches('test', [{
+      this.collection.addMatches([{
         startIndex: 0,
         endIndex: 1
       }])
 
-      this.collection.addMatches('second test', [{
+      this.collection.addMatches([{
         startIndex: 1,
         endIndex: 2
       }])
@@ -54,12 +54,12 @@ describe('MatchCollection', function () {
 
 
     it('prevents overlaps', function () {
-      this.collection.addMatches('test', [{
+      this.collection.addMatches([{
         startIndex: 0,
         endIndex: 2
       }])
 
-      this.collection.addMatches('second test', [{
+      this.collection.addMatches([{
         startIndex: 1,
         endIndex: 2
       }])
