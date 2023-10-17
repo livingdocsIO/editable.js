@@ -142,6 +142,14 @@ export const containsNodeText = (range, node) => {
   return comparisonStart <= 0 && comparisonEnd >= 0
 }
 
+export const nodeContainsRange = (node, range) => {
+  const nodeRange = document.createRange()
+  nodeRange.selectNodeContents(node)
+  const comparisonStart = range.compareBoundaryPoints(Range.START_TO_START, nodeRange)
+  const comparisonEnd = range.compareBoundaryPoints(Range.END_TO_END, nodeRange)
+  return comparisonStart >= 0 && comparisonEnd <= 0
+}
+
 const isCharacterDataNode = (node) => {
   return node && (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.COMMENT_NODE)
 }
