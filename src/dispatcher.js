@@ -252,10 +252,10 @@ export default class Dispatcher {
       })
 
       .on('backspace', function (event) {
-        const range = self.selectionWatcher.getFreshRange()
-        if (!range.isCursor) return self.triggerChangeEvent(this)
+        const rangeContainer = self.selectionWatcher.getFreshRange()
+        if (!rangeContainer.isCursor) return self.triggerChangeEvent(this)
 
-        const cursor = range.getCursor()
+        const cursor = rangeContainer.getCursor()
         if (!cursor.isAtBeginning()) return self.triggerChangeEvent(this)
 
         event.preventDefault()
@@ -264,10 +264,10 @@ export default class Dispatcher {
       })
 
       .on('delete', function (event) {
-        const range = self.selectionWatcher.getFreshRange()
-        if (!range.isCursor) return self.triggerChangeEvent(this)
+        const rangeContainer = self.selectionWatcher.getFreshRange()
+        if (!rangeContainer.isCursor) return self.triggerChangeEvent(this)
 
-        const cursor = range.getCursor()
+        const cursor = rangeContainer.getCursor()
         if (!cursor.isAtTextEnd()) return self.triggerChangeEvent(this)
 
         event.preventDefault()
@@ -278,8 +278,8 @@ export default class Dispatcher {
       .on('enter', function (event) {
         event.preventDefault()
         event.stopPropagation()
-        const range = self.selectionWatcher.getFreshRange()
-        const cursor = range.forceCursor()
+        const rangeContainer = self.selectionWatcher.getFreshRange()
+        const cursor = rangeContainer.forceCursor()
 
         if (cursor.isAtTextEnd()) {
           self.notify('insert', this, 'after', cursor)

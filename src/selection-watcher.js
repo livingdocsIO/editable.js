@@ -16,19 +16,19 @@ export default class SelectionWatcher {
   constructor (dispatcher, win) {
     this.dispatcher = dispatcher
     this.win = win || window
-    this.rangySelection = undefined
+    this.selection = undefined
     this.currentSelection = undefined
     this.currentRange = undefined
   }
 
   /**
-   * Updates the internal selection pointer to the current rangy selection.
+   * Updates the internal selection pointer to the current selection.
    * Returns true if no exception occurred.
    */
   syncSelection () {
-    // it is possible that rangy has a problem with the nativeSelection
+    // Note: the try catch was introduced because of rangy exceptions with nativeSelections
     try {
-      this.rangySelection = getSelection(this.win)
+      this.selection = getSelection(this.win)
     } catch (err) {
       return false
     }
@@ -46,8 +46,8 @@ export default class SelectionWatcher {
     // rangeCount is 0 or 1 in all browsers except firefox
     // firefox can work with multiple ranges
     // (on a mac hold down the command key to select multiple ranges)
-    if (this.rangySelection.rangeCount && successfulSync) {
-      const range = this.rangySelection.getRangeAt(0)
+    if (this.selection.rangeCount && successfulSync) {
+      const range = this.selection.getRangeAt(0)
       const hostNode = parser.getHost(range.commonAncestorContainer)
       if (hostNode) return new RangeContainer(hostNode, range)
     }
@@ -72,11 +72,11 @@ export default class SelectionWatcher {
   * there is neither a selection or cursor.
   */
   getFreshSelection () {
-    const range = this.getRangeContainer()
+    const rangeContainer = this.getRangeContainer()
 
-    return range.isCursor
-      ? range.getCursor(this.win)
-      : range.getSelection(this.win)
+    return rangeContainer.isCursor
+      ? rangeContainer.getCursor(this.win)
+      : rangeContainer.getSelection(this.win)
   }
 
   /**
@@ -93,15 +93,15 @@ export default class SelectionWatcher {
   }
 
   forceCursor () {
-    const range = this.getRangeContainer()
-    return range.forceCursor()
+    const rangeContainer = this.getRangeContainer()
+    return rangeContainer.forceCursor()
   }
 
   selectionChanged () {
-    const newRange = this.getRangeContainer()
-    if (newRange.isDifferentFrom(this.currentRange)) {
+    const newRangeContainer = this.getRangeContainer()
+    if (newRangeContainer.isDifferentFrom(this.currentRange)) {
       const lastSelection = this.currentSelection
-      this.currentRange = newRange
+      this.currentRange = newRangeContainer
 
       // empty selection or cursor
       if (lastSelection) {

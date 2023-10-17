@@ -117,10 +117,10 @@ export default class Keyboard {
     //
     // Manually remove the element that would be removed anyway before inserting
     // the new letter.
-    const rangyInstance = this.selectionWatcher.getFreshRange()
-    if (!rangyInstance.isSelection) return
+    const rangeContainer = this.selectionWatcher.getFreshRange()
+    if (!rangeContainer.isSelection) return
 
-    const nodeToRemove = Keyboard.getNodeToRemove(rangyInstance.range, target)
+    const nodeToRemove = Keyboard.getNodeToRemove(rangeContainer.range, target)
     if (nodeToRemove) nodeToRemove.remove()
   }
 

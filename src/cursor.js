@@ -28,9 +28,9 @@ export default class Cursor {
   * @class Cursor
   * @constructor
   */
-  constructor (editableHost, rangyRange) {
+  constructor (editableHost, range) {
     this.setHost(editableHost)
-    this.range = rangyRange
+    this.range = range
     this.isCursor = true
   }
 

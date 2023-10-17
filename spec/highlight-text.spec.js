@@ -12,12 +12,6 @@ describe('highlightText', function () {
     const elem = document.createElement('p')
     for (const part of parts) elem.appendChild(document.createTextNode(part))
 
-    // Note: Without appending the elem to the body rangy throws
-    // a range exception (probably a bug as it can be prevented
-    // if the 'p' is created by jquery with some text inside.
-    // Yeah it's strange)
-    document.body.appendChild(elem)
-
     return elem
   }
 
