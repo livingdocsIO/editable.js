@@ -30,6 +30,11 @@ describe('Spellcheck:', function () {
 
     beforeEach(function () {
       this.p = createElement('<p>A simple sentence.</p>')
+
+      // The spellcheck has a safeguard against disconnected elments
+      // so we need to append the element to the document.
+      window.document.body.appendChild(this.p)
+
       this.errors = ['simple']
       this.highlighting = new MonitoredHighlighting(this.editable, {
         spellcheck: {
@@ -39,6 +44,10 @@ describe('Spellcheck:', function () {
           }
         }
       })
+    })
+
+    this.afterEach(function () {
+      this.p.remove()
     })
 
     describe('highlight()', function () {

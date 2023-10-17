@@ -121,14 +121,14 @@ export default class MonitoredHighlighting {
   }
 
   highlight (editableHost) {
-    let text = highlightText.extractText(editableHost)
+    const textBefore = highlightText.extractText(editableHost)
 
     // getSpellcheck
-    this.spellcheckService.check(text, (err, misspelledWords) => {
-      if (err) { return }
+    this.spellcheckService.check(textBefore, (err, misspelledWords) => {
+      if (err || !editableHost.isConnected) { return } // return in case the host was removed from the dom
 
       // refresh the text
-      text = highlightText.extractText(editableHost)
+      const text = highlightText.extractText(editableHost)
 
       const matchCollection = new MatchCollection()
 
