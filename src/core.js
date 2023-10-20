@@ -9,7 +9,6 @@ import Cursor from './cursor'
 import highlightSupport from './highlight-support'
 import MonitoredHighlighting from './monitored-highlighting'
 import createDefaultEvents from './create-default-events'
-import browser from 'bowser'
 import {textNodesUnder, getTextNodeAndRelativeOffset} from './util/element'
 import {binaryCursorSearch} from './util/binary_search'
 import {domArray, createRange, nodeContainsRange} from './util/dom'
@@ -513,7 +512,6 @@ export class Editable {
 // Expose modules and editable
 Editable.parser = parser
 Editable.content = content
-Editable.browser = browser
 
 // Set up callback functions for several events.
 ;['focus', 'blur', 'flow', 'selection', 'cursor', 'newline',

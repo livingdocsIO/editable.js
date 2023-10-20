@@ -1,5 +1,3 @@
-import browser from 'bowser'
-
 /**
 * Check for contenteditable support
 *
@@ -10,9 +8,13 @@ import browser from 'bowser'
 */
 export const contenteditable = typeof document.documentElement.contentEditable !== 'undefined'
 
-const parser = browser.getParser(window.navigator.userAgent)
-const browserEngine = parser.getEngineName()
-const webKit = browserEngine === 'WebKit'
+// Detect webkit browser engine
+// That way we can detect the contenteditable span bug on safari, but exclude chrome
+// Regex taken from: https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/parser-engines.js#L93-L106
+// Attention, this might be error prone as any engine version change breaks this.
+const isBlink = /(apple)?webkit\/537\.36/i.test(window.navigator.userAgent)
+const isWebkit = /(apple)?webkit/i.test(window.navigator.userAgent)
+const webKit = !isBlink && isWebkit
 
 /**
  * Check selectionchange event (supported in IE, Chrome, Firefox and Safari)
