@@ -4,7 +4,6 @@
   "version": "0.0.0-development",
   "dependencies": {
     "@babel/runtime": "^7.16.7",
-    "bowser": "2.11.0",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
