@@ -146,6 +146,7 @@ export default class Selection extends Cursor {
   // toggle('<em>')
   toggle (elem) {
     if (block.isPlainTextBlock(this.host)) return
+    if (this.range.collapsed) return
     elem = this.adoptElement(elem)
     this.range = content.toggleTag(this.host, this.range, elem)
     this.setSelection()
@@ -310,6 +311,7 @@ export default class Selection extends Cursor {
   // remove first.
   forceWrap (elem) {
     if (block.isPlainTextBlock(this.host)) return
+    if (this.range.collapsed) return
     elem = this.adoptElement(elem)
     this.range = content.forceWrap(this.host, this.range, elem)
     this.setSelection()
