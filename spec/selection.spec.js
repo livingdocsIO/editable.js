@@ -462,6 +462,26 @@ describe('Selection', function () {
       const html = getHtml(spanTags[0])
       expect(html).to.equal('<span class="foo">foobar</span>')
     })
+
+    it('does not apply tags to whitespace when toggling', function () {
+      const range = createRange()
+      range.setStart(this.wordWithWhitespace.firstChild, 0)
+      range.setEnd(this.wordWithWhitespace.firstChild, 1)
+      const selection = new Selection(this.wordWithWhitespace, range)
+      selection.toggleBold()
+      expect(selection.toString()).to.equal('')
+      expect(this.wordWithWhitespace.innerHTML).to.equal(' foobar ')
+    })
+
+    it('does not apply tags to whitespace when wrapping', function () {
+      const range = createRange()
+      range.setStart(this.wordWithWhitespace.firstChild, 0)
+      range.setEnd(this.wordWithWhitespace.firstChild, 1)
+      const selection = new Selection(this.wordWithWhitespace, range)
+      selection.makeBold()
+      expect(selection.toString()).to.equal('')
+      expect(this.wordWithWhitespace.innerHTML).to.equal(' foobar ')
+    })
   })
 
   describe('inherits form Cursor', function () {
