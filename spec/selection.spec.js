@@ -437,14 +437,16 @@ describe('Selection', function () {
     })
 
     it('trims a range with special whitespaces', function () {
-      // at the beginning we have U+2002, U+2005 and U+2006 in the end a normal whitespace
-      const wordWithSpecialWhitespaces = createElement('<div>   bar </div>')
+      // At the beginning we have U+2002, U+2005, U+2006, U+FEFF.
+      // At the end a normal whitespace.
+      // Note: U+200B is not handled by regular expression \s whitespace.
+      const wordWithSpecialWhitespaces = createElement('<div>   ﻿bar </div>')
       const range = createRange()
       range.selectNodeContents(wordWithSpecialWhitespaces.firstChild)
       const selection = new Selection(wordWithSpecialWhitespaces, range)
       selection.trimRange()
-      expect(selection.range.startOffset).to.equal(3)
-      expect(selection.range.endOffset).to.equal(6)
+      expect(selection.range.startOffset).to.equal(4)
+      expect(selection.range.endOffset).to.equal(7)
     })
 
     it('does trim if only a whitespace is selected', function () {
@@ -481,6 +483,25 @@ describe('Selection', function () {
       selection.makeBold()
       expect(selection.toString()).to.equal('')
       expect(this.wordWithWhitespace.innerHTML).to.equal(' foobar ')
+    })
+
+    it('handles nodes and characters', function () {
+      // Split word into three nodes: ` `, `foo`, `bar `
+      const range = createRange()
+      range.setStart(this.wordWithWhitespace.firstChild, 1)
+      range.setEnd(this.wordWithWhitespace.firstChild, 4)
+      const selection = new Selection(this.wordWithWhitespace, range)
+      selection.save()
+      selection.restore()
+
+      // Select specific characters within nodes across multiple nodes
+      const rangeTwo = createRange()
+      rangeTwo.setStart(this.wordWithWhitespace, 0) // Select first node (start)
+      rangeTwo.setEnd(this.wordWithWhitespace.childNodes[2], 2) // Select middle of last node
+      const selectionTwo = new Selection(this.wordWithWhitespace, rangeTwo)
+      selectionTwo.makeBold()
+
+      expect(this.wordWithWhitespace.innerHTML).to.equal(' <strong>fooba</strong>r ')
     })
   })
 
