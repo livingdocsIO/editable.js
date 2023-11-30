@@ -5,7 +5,12 @@ import * as block from './block'
 import config from './config'
 import highlightSupport from './highlight-support'
 import highlightText from './highlight-text'
-import {toCharacterRange, rangeToHtml} from './util/dom'
+import {
+  toCharacterRange,
+  rangeToHtml,
+  findStartExcludingWhitespace,
+  findEndExcludingWhitespace
+} from './util/dom'
 
 /**
  * The Selection module provides a cross-browser abstraction layer for range
@@ -96,9 +101,25 @@ export default class Selection extends Cursor {
     const textToTrim = this.range.toString()
     const whitespacesOnTheLeft = textToTrim.search(/\S|$/)
     const lastNonWhitespace = textToTrim.search(/\S[\s]+$/)
-    const whitespacesOnTheRight = lastNonWhitespace === -1 ? 0 : textToTrim.length - (lastNonWhitespace + 1)
-    this.range.setStart(this.range.startContainer, this.range.startOffset + whitespacesOnTheLeft)
-    this.range.setEnd(this.range.endContainer, this.range.endOffset - whitespacesOnTheRight)
+    const whitespacesOnTheRight = lastNonWhitespace === -1
+      ? 0
+      : textToTrim.length - (lastNonWhitespace + 1)
+
+    const [startContainer, startOffset] = findStartExcludingWhitespace({
+      root: this.range.commonAncestorContainer,
+      startContainer: this.range.startContainer,
+      startOffset: this.range.startOffset,
+      whitespacesOnTheLeft
+    })
+    this.range.setStart(startContainer, startOffset)
+
+    const [endContainer, endOffset] = findEndExcludingWhitespace({
+      root: this.range.commonAncestorContainer,
+      endContainer: this.range.endContainer,
+      endOffset: this.range.endOffset,
+      whitespacesOnTheRight
+    })
+    this.range.setEnd(endContainer, endOffset)
   }
 
   unlink () {
