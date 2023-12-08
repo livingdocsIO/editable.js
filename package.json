@@ -75,7 +75,11 @@
     "test:watch": "npm run test:karma -s -- --single-run false",
     "lint": "eslint --ignore-path .gitignore ."
   },
+  "publishConfig": {
+    "tag": "3.x"
+  },
   "release": {
-    "extends": "@livingdocs/semantic-release-presets/npm-github-verify"
+    "extends": "@livingdocs/semantic-release-presets/npm-github-verify",
+    "branch": "3.x"
   }
 }
