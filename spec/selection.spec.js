@@ -489,11 +489,13 @@ describe('Selection', function () {
       const selection = new Selection(this.wordWithWhitespace, range)
       selection.save()
       selection.restore()
+      // With rangy normalizeBoundaries the nodes are merged together again
+      expect(this.wordWithWhitespace.childNodes.length).to.equal(1)
 
       // Select specific characters within nodes across multiple nodes
       const rangeTwo = rangy.createRange()
       rangeTwo.setStart(this.wordWithWhitespace, 0) // Select first node (start)
-      rangeTwo.setEnd(this.wordWithWhitespace.childNodes[2], 2) // Select middle of last node
+      rangeTwo.setEnd(this.wordWithWhitespace.firstChild, 6) // Select middle of the string
       const selectionTwo = new Selection(this.wordWithWhitespace, rangeTwo)
       selectionTwo.makeBold()
 
