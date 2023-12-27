@@ -40,7 +40,8 @@ steps:
 - name: publish-gh-pages
   image: plugins/gh-pages
   settings:
-    pages_directory: examples/
+    pages_directory: examples
+    copy_contents: "true"
     username: x-oauth-basic
     password:
       from_secret: GH_TOKEN
@@ -52,6 +53,6 @@ trigger:
   event: [push, tag, pull_request]
 ---
 kind: signature
-hmac: fbd7cb3397c4f9cd9376301fbb2a72e10367cfeec9432c4c2098b2b1f0430f7e
+hmac: a95440bc33cbbf31ecf9ef2668fb861890ff029ece436be4ddc6e10099b8a797
 
 ...
