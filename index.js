@@ -1,8 +1,8 @@
 import Prism from 'prismjs'
 
-import {Editable} from '../src/core'
+import {Editable} from '../src/core.js'
 import eventList from './events.js'
-import {getSelectionCoordinates} from '../src/util/dom'
+import {getSelectionCoordinates} from '../src/util/dom.js'
 
 // Paragraph Example
 const editable = new Editable({browserSpellcheck: false})
