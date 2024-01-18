@@ -1,6 +1,6 @@
-import error from './util/error'
-import * as nodeType from './node-type'
-import {createRange, normalizeBoundaries} from './util/dom'
+import error from './util/error.js'
+import * as nodeType from './node-type.js'
+import {createRange, normalizeBoundaries} from './util/dom.js'
 
 /**
  * Inspired by the Selection save and restore module for Rangy by Tim Down

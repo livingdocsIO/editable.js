@@ -1,6 +1,6 @@
 import {expect} from 'chai'
-import {createElement, createRange} from '../src/util/dom'
-import RangeContainer from '../src/range-container'
+import {createElement, createRange} from '../src/util/dom.js'
+import RangeContainer from '../src/range-container.js'
 
 describe('RangeContainer', function () {
   describe('with no params', function () {

@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {escapeHtml} from '../src/util/string'
+import {escapeHtml} from '../src/util/string.js'
 
 describe('string util', function () {
 

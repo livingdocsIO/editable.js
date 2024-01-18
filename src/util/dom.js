@@ -1,5 +1,5 @@
-import NodeIterator from '../node-iterator'
-import {textNode} from '../node-type'
+import NodeIterator from '../node-iterator.js'
+import {textNode} from '../node-type.js'
 
 /**
  * @param {HTMLElement | Array | String} target

@@ -1,5 +1,5 @@
-import config from './config'
-import * as content from './content'
+import config from './config.js'
+import * as content from './content.js'
 
 let nextBlockId = 1
 const state = {}

@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import eventable from '../src/eventable'
+import eventable from '../src/eventable.js'
 
 describe('eventable', function () {
 

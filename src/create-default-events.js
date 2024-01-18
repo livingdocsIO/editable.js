@@ -1,4 +1,4 @@
-import createDefaultBehavior from './create-default-behavior'
+import createDefaultBehavior from './create-default-behavior.js'
 
 export default function createDefaultEvents (editable) {
   const behavior = createDefaultBehavior(editable)

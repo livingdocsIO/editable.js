@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 
-import {Editable} from '../src/core'
-import MonitoredHighlighting from '../src/monitored-highlighting'
+import {Editable} from '../src/core.js'
+import MonitoredHighlighting from '../src/monitored-highlighting.js'
 
 describe('MonitoredHighlighting:', function () {
 

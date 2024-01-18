@@ -1,8 +1,8 @@
 import {expect} from 'chai'
-import {createElement, createRange} from '../src/util/dom'
+import {createElement, createRange} from '../src/util/dom.js'
 
-import * as content from '../src/content'
-import * as rangeSaveRestore from '../src/range-save-restore'
+import * as content from '../src/content.js'
+import * as rangeSaveRestore from '../src/range-save-restore.js'
 
 describe('Content', function () {
 

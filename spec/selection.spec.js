@@ -1,10 +1,10 @@
 import {expect} from 'chai'
 
-import {Editable} from '../src/core'
-import Selection from '../src/selection'
-import Cursor from '../src/cursor'
-import config from '../src/config'
-import {createElement, createRange} from '../src/util/dom'
+import {Editable} from '../src/core.js'
+import Selection from '../src/selection.js'
+import Cursor from '../src/cursor.js'
+import config from '../src/config.js'
+import {createElement, createRange} from '../src/util/dom.js'
 
 describe('Selection', function () {
 

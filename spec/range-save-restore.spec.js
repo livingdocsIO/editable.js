@@ -1,6 +1,6 @@
 import {expect} from 'chai'
-import {createElement, createRange, rangeToHtml} from '../src/util/dom'
-import * as rangeSaveRestore from '../src/range-save-restore'
+import {createElement, createRange, rangeToHtml} from '../src/util/dom.js'
+import * as rangeSaveRestore from '../src/range-save-restore.js'
 
 describe('RangeSaveRestore', function () {
 

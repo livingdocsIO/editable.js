@@ -1,13 +1,12 @@
-import * as viewport from './util/viewport'
+import * as viewport from './util/viewport.js'
 
-import * as content from './content'
-import * as parser from './parser'
-import * as string from './util/string'
-import {elementNode, documentFragmentNode} from './node-type'
-import error from './util/error'
-import * as rangeSaveRestore from './range-save-restore'
-// import printRange from './util/print_range'
-import {closest, getSelection, rangesAreEqual} from './util/dom'
+import * as content from './content.js'
+import * as parser from './parser.js'
+import * as string from './util/string.js'
+import {elementNode, documentFragmentNode} from './node-type.js'
+import error from './util/error.js'
+import * as rangeSaveRestore from './range-save-restore.js'
+import {closest, getSelection, rangesAreEqual} from './util/dom.js'
 
 /**
  * The Cursor module provides a cross-browser abstraction layer for cursor.

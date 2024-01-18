@@ -1,11 +1,11 @@
-import {selectionchange} from './feature-detection'
-import * as clipboard from './clipboard'
-import eventable from './eventable'
-import SelectionWatcher from './selection-watcher'
-import config from './config'
-import Keyboard from './keyboard'
-import {closest} from './util/dom'
-import {replaceLast, endsWithSingleSpace} from './util/string'
+import {selectionchange} from './feature-detection.js'
+import * as clipboard from './clipboard.js'
+import eventable from './eventable.js'
+import SelectionWatcher from './selection-watcher.js'
+import config from './config.js'
+import Keyboard from './keyboard.js'
+import {closest} from './util/dom.js'
+import {replaceLast, endsWithSingleSpace} from './util/string.js'
 
 // This will be set to true once we detect the input event is working.
 // Input event description on MDN:

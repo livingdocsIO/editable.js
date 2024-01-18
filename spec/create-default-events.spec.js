@@ -1,8 +1,8 @@
 import {expect} from 'chai'
-import {createRange} from '../src/util/dom'
+import {createRange} from '../src/util/dom.js'
 
-import Cursor from '../src/cursor'
-import {Editable} from '../src/core'
+import Cursor from '../src/cursor.js'
+import {Editable} from '../src/core.js'
 
 describe('Default Events', function () {
 

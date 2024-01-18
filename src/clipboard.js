@@ -1,8 +1,8 @@
-import config from './config'
-import * as string from './util/string'
-import * as nodeType from './node-type'
-import * as quotes from './quotes'
-import {isPlainTextBlock} from './block'
+import config from './config.js'
+import * as string from './util/string.js'
+import * as nodeType from './node-type.js'
+import * as quotes from './quotes.js'
+import {isPlainTextBlock} from './block.js'
 
 let allowedElements, allowedPlainTextElements, requiredAttributes, transformElements, blockLevelElements, replaceQuotes
 let splitIntoBlocks, blacklistedElements

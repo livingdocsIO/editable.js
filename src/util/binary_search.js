@@ -1,5 +1,5 @@
 'use strict'
-import {getTotalCharCount, textNodesUnder, getTextNodeAndRelativeOffset} from './element'
+import {getTotalCharCount, textNodesUnder, getTextNodeAndRelativeOffset} from './element.js'
 
 /**
  * This is a binary search algorithm implementation aimed at finding

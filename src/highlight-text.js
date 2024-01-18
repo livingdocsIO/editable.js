@@ -1,6 +1,6 @@
-import NodeIterator from './node-iterator'
-import * as nodeType from './node-type'
-import {createRange} from './util/dom'
+import NodeIterator from './node-iterator.js'
+import * as nodeType from './node-type.js'
+import {createRange} from './util/dom.js'
 
 export default {
 

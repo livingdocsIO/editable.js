@@ -1,7 +1,7 @@
-import {createRange, containsRange} from './util/dom'
-import {contenteditableSpanBug} from './feature-detection'
-import * as nodeType from './node-type'
-import eventable from './eventable'
+import {createRange, containsRange} from './util/dom.js'
+import {contenteditableSpanBug} from './feature-detection.js'
+import * as nodeType from './node-type.js'
+import eventable from './eventable.js'
 
 /**
  * The Keyboard module defines an event API for key events.

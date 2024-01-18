@@ -1,5 +1,5 @@
 'use strict'
-import NodeIterator from '../node-iterator'
+import NodeIterator from '../node-iterator.js'
 
 export function textNodesUnder (node) {
   const iterator = new NodeIterator(node, 'getNextTextNode')

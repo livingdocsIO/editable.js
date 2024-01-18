@@ -1,10 +1,10 @@
 import {expect} from 'chai'
 import sinon from 'sinon'
 
-import {Editable} from '../src/core'
-import highlightSupport from '../src/highlight-support'
-import {createElement, createRange, toCharacterRange} from '../src/util/dom'
-import Selection from '../src/selection'
+import {Editable} from '../src/core.js'
+import highlightSupport from '../src/highlight-support.js'
+import {createElement, createRange, toCharacterRange} from '../src/util/dom.js'
+import Selection from '../src/selection.js'
 
 function setupHighlightEnv (context, text) {
   context.text = text

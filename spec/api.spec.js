@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {Editable} from '../src/core'
+import {Editable} from '../src/core.js'
 
 describe('Editable', function () {
   let editable, div

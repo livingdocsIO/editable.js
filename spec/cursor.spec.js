@@ -1,9 +1,9 @@
 import {expect} from 'chai'
-import {createRange, createElement} from '../src/util/dom'
+import {createRange, createElement} from '../src/util/dom.js'
 
-import * as content from '../src/content'
-import Cursor from '../src/cursor'
-import config from '../src/config'
+import * as content from '../src/content.js'
+import Cursor from '../src/cursor.js'
+import config from '../src/config.js'
 
 describe('Cursor', function () {
 
