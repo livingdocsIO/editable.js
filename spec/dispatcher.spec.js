@@ -1,10 +1,10 @@
 import {expect} from 'chai'
-import {createRange, rangesAreEqual} from '../src/util/dom'
-import * as content from '../src/content'
-import Cursor from '../src/cursor'
-import Keyboard from '../src/keyboard'
-import {Editable} from '../src/core'
-import Selection from '../src/selection'
+import {createRange, rangesAreEqual} from '../src/util/dom.js'
+import * as content from '../src/content.js'
+import Cursor from '../src/cursor.js'
+import Keyboard from '../src/keyboard.js'
+import {Editable} from '../src/core.js'
+import Selection from '../src/selection.js'
 const {key} = Keyboard
 
 describe('Dispatcher', function () {

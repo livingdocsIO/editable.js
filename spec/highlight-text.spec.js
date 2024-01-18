@@ -1,10 +1,10 @@
 import {expect} from 'chai'
 import sinon from 'sinon'
 
-import Cursor from '../src/cursor'
-import highlightText from '../src/highlight-text'
-import {searchAllWords} from '../src/plugins/highlighting/text-search'
-import {createElement, createRange} from '../src/util/dom'
+import Cursor from '../src/cursor.js'
+import highlightText from '../src/highlight-text.js'
+import {searchAllWords} from '../src/plugins/highlighting/text-search.js'
+import {createElement, createRange} from '../src/util/dom.js'
 
 describe('highlightText', function () {
 

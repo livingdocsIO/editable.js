@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import cloneDeep from 'lodash-es/cloneDeep'
-import config from '../src/config'
-import {Editable} from '../src/core'
+import config from '../src/config.js'
+import {Editable} from '../src/core.js'
 
 describe('Editable configuration', function () {
 

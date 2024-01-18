@@ -1,7 +1,7 @@
-import * as content from './content'
-import highlightText from './highlight-text'
-import {searchText} from './plugins/highlighting/text-search'
-import {createElement, createRange, toCharacterRange} from './util/dom'
+import * as content from './content.js'
+import highlightText from './highlight-text.js'
+import {searchText} from './plugins/highlighting/text-search.js'
+import {createElement, createRange, toCharacterRange} from './util/dom.js'
 
 const highlightSupport = {
 

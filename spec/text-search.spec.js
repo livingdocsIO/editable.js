@@ -1,6 +1,6 @@
 import {expect} from 'chai'
 
-import {searchText, searchWord} from '../src/plugins/highlighting/text-search'
+import {searchText, searchWord} from '../src/plugins/highlighting/text-search.js'
 
 describe('text-search:', function () {
 

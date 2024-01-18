@@ -1,7 +1,7 @@
 import {expect} from 'chai'
-import {createElement} from '../src/util/dom'
-import NodeIterator from '../src/node-iterator'
-import highlightText from '../src/highlight-text'
+import {createElement} from '../src/util/dom.js'
+import NodeIterator from '../src/node-iterator.js'
+import highlightText from '../src/highlight-text.js'
 
 describe('NodeIterator', function () {
   // Helper methods

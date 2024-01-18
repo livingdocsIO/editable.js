@@ -1,7 +1,7 @@
 import {expect} from 'chai'
-import {parseContent, updateConfig} from '../src/clipboard'
+import {parseContent, updateConfig} from '../src/clipboard.js'
 import cloneDeep from 'lodash-es/cloneDeep'
-import config from '../src/config'
+import config from '../src/config.js'
 
 describe('Clipboard', function () {
 

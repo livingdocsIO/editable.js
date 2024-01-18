@@ -1,4 +1,4 @@
-import {textNode} from './node-type'
+import {textNode} from './node-type.js'
 
 // A DOM node iterator.
 //

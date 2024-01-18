@@ -1,7 +1,7 @@
 import {expect} from 'chai'
-import {createElement, createRange} from '../src/util/dom'
-import Keyboard from '../src/keyboard'
-import * as nodeType from '../src/node-type'
+import {createElement, createRange} from '../src/util/dom.js'
+import Keyboard from '../src/keyboard.js'
+import * as nodeType from '../src/node-type.js'
 
 describe('Keyboard', function () {
 

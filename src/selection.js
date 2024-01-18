@@ -1,16 +1,16 @@
-import Cursor from './cursor'
-import * as content from './content'
-import * as parser from './parser'
-import * as block from './block'
-import config from './config'
-import highlightSupport from './highlight-support'
-import highlightText from './highlight-text'
+import Cursor from './cursor.js'
+import * as content from './content.js'
+import * as parser from './parser.js'
+import * as block from './block.js'
+import config from './config.js'
+import highlightSupport from './highlight-support.js'
+import highlightText from './highlight-text.js'
 import {
   toCharacterRange,
   rangeToHtml,
   findStartExcludingWhitespace,
   findEndExcludingWhitespace
-} from './util/dom'
+} from './util/dom.js'
 
 /**
  * The Selection module provides a cross-browser abstraction layer for range

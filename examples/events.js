@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {PropTypes} from 'prop-types'
 import ReactDOM from 'react-dom'
 import {CSSTransition, TransitionGroup} from 'react-transition-group'
-import {closest} from '../src/util/dom'
+import {closest} from '../src/util/dom.js'
 
 class Events extends Component {
   render () {

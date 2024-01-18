@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import MatchCollection from '../src/plugins/highlighting/match-collection'
+import MatchCollection from '../src/plugins/highlighting/match-collection.js'
 
 
 describe('MatchCollection', function () {

@@ -1,8 +1,8 @@
 import {expect} from 'chai'
-import {createRange, createElement} from '../src/util/dom'
+import {createRange, createElement} from '../src/util/dom.js'
 
-import * as parser from '../src/parser'
-import config from '../src/config'
+import * as parser from '../src/parser.js'
+import config from '../src/config.js'
 
 describe('Parser', function () {
   // helper methods

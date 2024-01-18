@@ -1,6 +1,6 @@
-import Cursor from './cursor'
-import Selection from './selection'
-import {rangesAreEqual} from './util/dom'
+import Cursor from './cursor.js'
+import Selection from './selection.js'
+import {rangesAreEqual} from './util/dom.js'
 
 /** RangeContainer
  *

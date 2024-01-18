@@ -1,9 +1,9 @@
-import * as nodeType from './node-type'
-import * as rangeSaveRestore from './range-save-restore'
-import * as parser from './parser'
-import * as string from './util/string'
-import {createElement, createRange, getNodes, normalizeBoundaries, splitBoundaries, containsNodeText} from './util/dom'
-import config from './config'
+import * as nodeType from './node-type.js'
+import * as rangeSaveRestore from './range-save-restore.js'
+import * as parser from './parser.js'
+import * as string from './util/string.js'
+import {createElement, createRange, getNodes, normalizeBoundaries, splitBoundaries, containsNodeText} from './util/dom.js'
+import config from './config.js'
 
 function restoreRange (host, range, func) {
   range = rangeSaveRestore.save(range)

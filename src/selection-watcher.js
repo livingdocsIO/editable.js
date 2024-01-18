@@ -1,8 +1,8 @@
-import * as parser from './parser'
-import RangeContainer from './range-container'
-import Cursor from './cursor'
-import Selection from './selection'
-import {getSelection} from './util/dom'
+import * as parser from './parser.js'
+import RangeContainer from './range-container.js'
+import Cursor from './cursor.js'
+import Selection from './selection.js'
+import {getSelection} from './util/dom.js'
 
 /**
  * The SelectionWatcher module watches for selection changes inside

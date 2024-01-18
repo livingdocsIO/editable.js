@@ -1,8 +1,8 @@
-import * as parser from './parser'
-import * as content from './content'
-import log from './util/log'
-import * as block from './block'
-import * as nodeType from './node-type'
+import * as parser from './parser.js'
+import * as content from './content.js'
+import log from './util/log.js'
+import * as block from './block.js'
+import * as nodeType from './node-type.js'
 
 /**
  * The Behavior module defines the behavior triggered in response to the Editable.JS

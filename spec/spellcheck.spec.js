@@ -1,9 +1,9 @@
 import {expect} from 'chai'
 import sinon from 'sinon'
-import {Editable} from '../src/core'
-import MonitoredHighlighting from '../src/monitored-highlighting'
-import Cursor from '../src/cursor'
-import {createElement, createRange} from '../src/util/dom'
+import {Editable} from '../src/core.js'
+import MonitoredHighlighting from '../src/monitored-highlighting.js'
+import Cursor from '../src/cursor.js'
+import {createElement, createRange} from '../src/util/dom.js'
 
 describe('Spellcheck:', function () {
 

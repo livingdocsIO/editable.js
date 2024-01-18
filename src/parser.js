@@ -1,7 +1,7 @@
-import * as string from './util/string'
-import * as nodeType from './node-type'
-import config from './config'
-import {closest} from './util/dom'
+import * as string from './util/string.js'
+import * as nodeType from './node-type.js'
+import config from './config.js'
+import {closest} from './util/dom.js'
 
 /**
  * The parser module provides helper methods to parse html-chunks

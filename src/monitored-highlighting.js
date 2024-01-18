@@ -1,13 +1,13 @@
 import _merge from 'lodash-es/merge'
-import * as nodeType from './node-type'
-import * as content from './content'
-import highlightText from './highlight-text'
-import SpellcheckService from './plugins/highlighting/spellcheck-service'
-import WhitespaceHighlighting from './plugins/highlighting/whitespace-highlighting'
-import {searchAllWords} from './plugins/highlighting/text-search'
-import MatchCollection from './plugins/highlighting/match-collection'
-import highlightSupport from './highlight-support'
-import {domArray, domSelector} from './util/dom'
+import * as nodeType from './node-type.js'
+import * as content from './content.js'
+import highlightText from './highlight-text.js'
+import SpellcheckService from './plugins/highlighting/spellcheck-service.js'
+import WhitespaceHighlighting from './plugins/highlighting/whitespace-highlighting.js'
+import {searchAllWords} from './plugins/highlighting/text-search.js'
+import MatchCollection from './plugins/highlighting/match-collection.js'
+import highlightSupport from './highlight-support.js'
+import {domArray, domSelector} from './util/dom.js'
 
 // Spellcheck and Whitespace Highlighting
 // --------------------------------------
