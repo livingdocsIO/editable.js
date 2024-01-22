@@ -46,7 +46,7 @@ export default class SelectionWatcher {
     // rangeCount is 0 or 1 in all browsers except firefox
     // firefox can work with multiple ranges
     // (on a mac hold down the command key to select multiple ranges)
-    if (this.selection.rangeCount && successfulSync) {
+    if (this.selection?.rangeCount && successfulSync) {
       const range = this.selection.getRangeAt(0)
       const hostNode = parser.getHost(range.commonAncestorContainer)
       if (hostNode) return new RangeContainer(hostNode, range)
