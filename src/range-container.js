@@ -15,7 +15,10 @@ export default class RangeContainer {
     this.host = editableHost && editableHost.jquery
       ? editableHost[0]
       : editableHost
-    this.range = range
+    // Safari 17 seems to modify the range instance on the fly which breaks later comparisons.
+    // We clone the range at the time of the RangeContainer creation.
+    // https://developer.apple.com/documentation/safari-release-notes/safari-17-release-notes#New-Features
+    this.range = range?.cloneRange()
     this.isAnythingSelected = (range !== undefined)
     this.isCursor = (this.isAnythingSelected && range.collapsed)
     this.isSelection = (this.isAnythingSelected && !this.isCursor)
