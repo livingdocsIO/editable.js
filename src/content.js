@@ -15,6 +15,10 @@ const zeroWidthSpace = /\u200B/g
 const zeroWidthNonBreakingSpace = /\uFEFF/g
 const whitespaceExceptSpace = /[^\S ]/g
 
+const everythingWhitespace = /^\s+$/
+const leadingWhitespace = /^\s+/
+const trailingWhitespace = /\s+$/
+
 // Clean up the Html.
 export function tidyHtml (element) {
   // if (element.normalize) element.normalize()
@@ -143,25 +147,34 @@ export function cloneRangeContents (range) {
 
 function removeWhitespaces (node, type, firstCall = true) {
   let elem
+  // loop through all children:
+  // from left to right if type = 'firstChild',
+  // from right to left if type = 'lastChild'
   while ((elem = node[type])) {
     if (elem.nodeType === nodeType.textNode) {
-      if (/^\s+$/.test(elem.textContent)) node.removeChild(elem)
+      // Just remove text nodes if they consist only of whitespace
+      if (everythingWhitespace.test(elem.textContent)) node.removeChild(elem)
       else break
     } else if (elem.nodeName === 'BR') {
       elem.remove()
     } else {
+      // For element nodes (e.g. <strong> tags), we repeat the logic recursively
+      // to remove empty text nodes or <br> tags.
       if (elem[type]) removeWhitespaces(elem, type, false)
       break
     }
   }
 
+  // Text nodes with leading/trailing whitespace can be trimmed if config allows.
+  // We only do it to the outermost text node. Once a text was wrapped in
+  // another element, we preserve the whitespace.
   if (!firstCall) return
   elem = node[type]
   if (elem?.nodeType !== nodeType.textNode) return
   // Remove whitespaces at the end or start of a block with content
   //   e.g. '  Hello world' > 'Hello World'
   if (config.trimLeadingAndTrailingWhitespaces) {
-    elem.textContent = elem.textContent.replace(type.startsWith('last') ? / +$/ : /^ +/, '')
+    elem.textContent = elem.textContent.replace(type.startsWith('last') ? trailingWhitespace : leadingWhitespace, '')
   }
 }
 
