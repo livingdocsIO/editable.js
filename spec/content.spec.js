@@ -626,6 +626,82 @@ describe('Content', function () {
       expect(result).to.equal('ac')
     })
 
+    describe('trim leading white space', function () {
+      it('removes single regular whitespace', function () {
+        const element = createElement('<div> hello world</div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('hello world')
+      })
+
+      it('removes multiple regular whitespaces', function () {
+        const element = createElement('<div>   hello world</div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('hello world')
+      })
+
+      it('removes &nbsp;', function () {
+        const element = createElement('<div>&nbsp; &nbsp;hello world</div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('hello world')
+      })
+
+      it('removes multiple regular whitespaces before tag', function () {
+        const element = createElement('<div>   <strong>hello world</strong></div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('<strong>hello world</strong>')
+      })
+
+      it('removes &nbsp; before tag', function () {
+        const element = createElement('<div>&nbsp;<strong>hello world</strong></div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('<strong>hello world</strong>')
+      })
+
+      it('keeps whitespace within tag', function () {
+        const element = createElement('<div>&nbsp;<strong> hello world</strong></div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('<strong> hello world</strong>')
+      })
+    })
+
+    describe('trim trailing white space', function () {
+      it('removes single regular whitespace', function () {
+        const element = createElement('<div>hello world </div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('hello world')
+      })
+
+      it('removes multiple regular whitespaces', function () {
+        const element = createElement('<div>hello world   </div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('hello world')
+      })
+
+      it('removes &nbsp;', function () {
+        const element = createElement('<div>hello world&nbsp; &nbsp;</div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('hello world')
+      })
+
+      it('removes multiple regular whitespaces after tag', function () {
+        const element = createElement('<div><strong>hello world</strong>   </div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('<strong>hello world</strong>')
+      })
+
+      it('removes &nbsp; after tag', function () {
+        const element = createElement('<div><strong>hello world</strong>&nbsp;</div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('<strong>hello world</strong>')
+      })
+
+      it('keeps whitespace within tag', function () {
+        const element = createElement('<div><strong>hello world </strong>&nbsp;</div>')
+        const result = content.extractContent(element)
+        expect(result).to.equal('<strong>hello world </strong>')
+      })
+    })
+
     describe('called with keepUiElements', function () {
 
       it('does not unwrap a "ui-unwrap" span', function () {
