@@ -125,7 +125,7 @@ function conditionalNodeWrap (child, content, options) {
 // returns string of concatenated attributes e.g. 'target="_blank" rel="nofollow" href="/test.com"'
 function filterAttributes (nodeName, node) {
   return Array.from(node.attributes).reduce((attributes, {name, value}) => {
-    if (allowedElements[nodeName][name] && value) {
+    if (allowedElements[nodeName]?.[name] && value) {
       return `${attributes} ${name}="${value}"`
     }
     return attributes
