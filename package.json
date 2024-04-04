@@ -16,7 +16,7 @@
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-istanbul": "^6.1.1",
     "chai": "^5.0.0",
-    "css-loader": "^6.5.1",
+    "css-loader": "^7.0.0",
     "eslint": "^8.8.0",
     "eslint-plugin-react": "^7.28.0",
     "karma": "^6.3.13",
