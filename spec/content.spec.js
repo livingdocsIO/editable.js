@@ -7,60 +7,129 @@ import * as rangeSaveRestore from '../src/range-save-restore.js'
 describe('Content', function () {
 
   describe('normalizeTags()', function () {
-    const plain = createElement('<div>Plain <strong>text</strong><strong>block</strong> example snippet</div>')
-    const plainWithSpace = createElement('<div>Plain <strong>text</strong> <strong>block</strong> example snippet</div>')
-    const nested = createElement('<div>Nested <strong><em>text</em></strong><strong><em>block</em></strong> example snippet</div>')
-    const nestedMixed = createElement('<div>Nested <strong>and mixed <em>text</em></strong><strong><em>block</em> <em>examples</em></strong> snippet</div>')
-    const consecutiveNewLines = createElement('<div>Consecutive<br><br>new lines</div>')
-    const emptyTags = createElement('<div>Example with <strong>empty <em></em>nested</strong><br>tags</div>')
+    it('should sort tags lexically', function () {
+      const tests = [
+        {
+          input: '<div><a><b>text</b></a></div>',
+          output: '<div><a><b>text</b></a></div>'
+        },
+        {
+          input: '<div><b><a>text</a></b></div>',
+          output: '<div><a><b>text</b></a></div>'
+        },
+        {
+          input: '<div><b><a>text1</a>text2</b></div>',
+          output: '<div><a><b>text1</b></a><b>text2</b></div>'
+        },
+        {
+          input: '<div><b><c>text1</c><a>text2</a></b></div>',
+          output: '<div><b><c>text1</c></b><a><b>text2</b></a></div>'
+        },
+        {
+          input: '<div><e><d><c><b><a>text</a></b></c></d></e></div>',
+          output: '<div><a><b><c><d><e>text</e></d></c></b></a></div>'
+        },
+        {
+          input: '<div><a>text1<br>text2</a></div>',
+          output: '<div><a>text1<br>text2</a></div>'
+        }
+      ]
+
+      for (const test of tests) {
+        const host = createElement(test.input)
+        content.normalizeTags(host)
+        expect(host.outerHTML).to.equal(test.output)
+      }
+    })
+
+    it('should merge identical tags', function () {
+      const tests = [
+        {
+          input: '<div><a>text1</a><a>text2</a></div>',
+          output: '<div><a>text1text2</a></div>'
+        },
+        {
+          input: '<div><a><b>text1</b></a><b><a>text2</b></a></div>',
+          output: '<div><a><b>text1text2</b></a></div>'
+        }
+      ]
+
+      for (const test of tests) {
+        const host = createElement(test.input)
+        content.normalizeTags(host)
+        expect(host.outerHTML).to.equal(test.output)
+      }
+    })
+
+    it('should remove empty tags', function () {
+      const tests = [
+        {
+          input: '<div></div>',
+          output: '<div></div>'
+        },
+        {
+          input: '<div><a><a/></div>',
+          output: '<div></div>'
+        },
+        {
+          input: '<div><a><a/><b><c></c><b/></div>',
+          output: '<div></div>'
+        },
+        {
+          input: '<div><a>text1<b><br><c></c></b><a/></div>',
+          output: '<div><a>text1</a></div>'
+        }
+      ]
+
+      for (const test of tests) {
+        const host = createElement(test.input)
+        content.normalizeTags(host)
+        expect(host.outerHTML).to.equal(test.output)
+      }
+    })
 
     it('works with plain block', function () {
-      const expected = createElement('<div>Plain <strong>textblock</strong> example snippet</div>')
-      const actual = plain.cloneNode(true)
-      content.normalizeTags(actual)
-      expect(actual.innerHTML).to.equal(expected.innerHTML)
+      const host = createElement('<div>Plain <strong>text</strong><strong>block</strong> example snippet</div>')
+      content.normalizeTags(host)
+      expect(host.outerHTML).to.equal('<div>Plain <strong>textblock</strong> example snippet</div>')
     })
 
     it('does not merge tags if not consecutives', function () {
-      const expected = plainWithSpace.cloneNode(true)
-      const actual = plainWithSpace.cloneNode(true)
-      content.normalizeTags(actual)
-      expect(actual.innerHTML).to.equal(expected.innerHTML)
+      const host = createElement('<div>Plain <strong>text</strong> <strong>block</strong> example snippet</div>')
+      content.normalizeTags(host)
+      expect(host.outerHTML).to.equal('<div>Plain <strong>text</strong> <strong>block</strong> example snippet</div>')
     })
 
     it('works with nested blocks', function () {
-      const expected = createElement('<div>Nested <strong><em>textblock</em></strong> example snippet</div>')
-      const actual = nested.cloneNode(true)
-      content.normalizeTags(actual)
-      expect(actual.innerHTML).to.equal(expected.innerHTML)
+      const host = createElement('<div>Nested <strong><em>text</em></strong><strong><em>block</em></strong> example snippet</div>')
+      content.normalizeTags(host)
+      expect(host.outerHTML).to.equal('<div>Nested <em><strong>textblock</strong></em> example snippet</div>')
     })
 
     it('works with nested blocks that mix other tags', function () {
-      const expected = createElement('<div>Nested <strong>and mixed <em>textblock</em> <em>examples</em></strong> snippet</div>')
-      const actual = nestedMixed.cloneNode(true)
-      content.normalizeTags(actual)
-      expect(actual.innerHTML).to.equal(expected.innerHTML)
+      const host = createElement('<div>Nested <strong>and mixed <em>text</em></strong><strong><em>block</em> <em>examples</em></strong> snippet</div>')
+      content.normalizeTags(host)
+      expect(host.outerHTML).to.equal('<div>Nested <strong>and mixed </strong><em><strong>textblock</strong></em><strong> </strong><em><strong>examples</strong></em> snippet</div>')
     })
 
     it('does not merge consecutive new lines', function () {
-      const expected = consecutiveNewLines.cloneNode(true)
-      const actual = consecutiveNewLines.cloneNode(true)
-      content.normalizeTags(actual)
-      expect(actual.innerHTML).to.equal(expected.innerHTML)
+      const host = createElement('<div>Consecutive<br><br>new lines</div>')
+      content.normalizeTags(host)
+      expect(host.outerHTML).to.equal('<div>Consecutive<br><br>new lines</div>')
     })
 
     it('should remove empty tags and preserve new lines', function () {
-      const expected = createElement('<div>Example with <strong>empty nested</strong><br>tags</div>')
-      const actual = emptyTags.cloneNode(true)
-      content.normalizeTags(actual)
-      expect(actual.innerHTML).to.equal(expected.innerHTML)
+      const host = createElement('<div>Example with <strong>empty <em></em>nested</strong><br>tags</div>')
+      content.normalizeTags(host)
+      expect(host.outerHTML).to.equal('<div>Example with <strong>empty nested</strong><br>tags</div>')
     })
 
     it('removes whitespaces at the start and end', function () {
-      const elem = createElement('<div> Hello <strong>world</strong>&nbsp; &nbsp;</div>')
-      content.normalizeTags(elem)
-      expect(elem.innerHTML).to.equal('Hello <strong>world</strong>')
+      const host = createElement('<div> Hello <strong>world</strong>&nbsp; &nbsp;</div>')
+      content.normalizeTags(host)
+      expect(host.outerHTML).to.equal('<div>Hello <strong>world</strong></div>')
     })
+
   })
 
   describe('normalizeWhitespace()', function () {

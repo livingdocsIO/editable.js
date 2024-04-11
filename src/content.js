@@ -1,6 +1,5 @@
 import * as nodeType from './node-type.js'
 import * as rangeSaveRestore from './range-save-restore.js'
-import * as parser from './parser.js'
 import * as string from './util/string.js'
 import {createElement, createRange, getNodes, normalizeBoundaries, splitBoundaries, containsNodeText} from './util/dom.js'
 import config from './config.js'
@@ -21,45 +20,15 @@ export function tidyHtml (element) {
   normalizeTags(element)
 }
 
-// Remove empty tags and merge consecutive tags (they must have the same
-// attributes).
-//
-// @method normalizeTags
-// @param  {HTMLElement} element The element to process.
-export function normalizeTags (element) {
-  const fragment = document.createDocumentFragment()
-
-  // Remove line breaks at the beginning of a content block
-  removeWhitespaces(element, 'firstChild')
-
-  // Remove line breaks at the end of a content block
-  removeWhitespaces(element, 'lastChild')
-
-  for (const node of element.childNodes) {
-    // skip empty tags, so they'll get removed
-    if (node.nodeName !== 'BR' && !node.textContent) continue
-
-    if (node.nodeType === nodeType.elementNode && node.nodeName !== 'BR') {
-      let sibling = node
-      while ((sibling = sibling.nextSibling) !== null) {
-        if (!parser.isSameNode(sibling, node)) break
-
-        for (const siblingChild of sibling.childNodes) {
-          node.appendChild(siblingChild.cloneNode(true))
-        }
-
-        sibling.remove()
-      }
-
-      normalizeTags(node)
-    }
-
-    fragment.appendChild(node.cloneNode(true))
-  }
-
-  while (element.firstChild) element.removeChild(element.firstChild)
-
-  element.appendChild(fragment)
+/**
+ * Normalize a provided HTML node by lexically sorting the DOM tree under it,
+ * removing empty tags, and merging identical consecutive tags.
+ *
+ * @param {HTMLElement} node
+ */
+export function normalizeTags (node) {
+  sort(node)
+  merge(node)
 }
 
 export function normalizeWhitespace (text) {
@@ -504,4 +473,143 @@ function canSurroundContents (range) {
   }
 
   return !boundariesInvalid
+}
+
+
+/**
+ * Merge identical consecutive tags and remove empty ones.
+ *
+ * @param {HTMLElement} node
+ */
+function merge (node) {
+  const fragment = document.createDocumentFragment()
+
+  for (const child of node.childNodes) {
+    // Skip empty tags, so they'll get removed
+    if (child.nodeName !== 'BR' && !child.textContent) continue
+
+    if (child.nodeType === Node.ELEMENT_NODE && child.nodeName !== 'BR') {
+      let sibling = child
+      while ((sibling = sibling.nextSibling) !== null) {
+        if (!child.cloneNode().isEqualNode(sibling.cloneNode())) break
+
+        for (const siblingChild of sibling.childNodes) {
+          child.appendChild(siblingChild.cloneNode(true))
+        }
+
+        sibling.remove()
+      }
+
+      merge(child)
+    }
+
+    fragment.appendChild(child.cloneNode(true))
+  }
+
+  while (node.firstChild) node.removeChild(node.firstChild)
+
+  node.appendChild(fragment)
+}
+
+/**
+ * Sort the nodes under a given host node lexically in place.
+ *
+ * @param {HTMLElement} host
+ */
+export function sort (host) {
+  if (!host.childNodes.length) return
+
+  // Perform h-1 - 1 (host) - 1 (text node) = h-3 sort passes to ensure that the
+  // DOM tree is fully sorted
+  const requiredPasses = getTreeHeight(host) - 3
+  for (let pass = 0; pass < requiredPasses; pass++) {
+    const sortedChildren = []
+    while (host.childNodes.length) {
+      sortedChildren.push(...sortPass(host.childNodes[0]))
+      host.removeChild(host.childNodes[0])
+    }
+
+    for (const sortedChild of sortedChildren) {
+      host.appendChild(sortedChild)
+    }
+  }
+
+  return
+}
+
+/**
+ * Traverse the DOM tree under the given node in post-order and sort the tree
+ * lexically. To ensure the DOM tree is fully sorted, this function needs to be
+ * called h-1 times, where h represents the height of the tree.
+ *
+ * @param {HTMLElement} node
+ * @returns {HTMLElement[]}
+ */
+function sortPass (node) {
+  const children = node.childNodes
+  if (!children.length) return [node]
+
+  // Traverse
+  const sortedChildren = []
+  for (const child of children) {
+    sortedChildren.push(...sortPass(child))
+  }
+
+  // Sort
+  const sortedNodes = []
+  for (const sortedChild of sortedChildren) {
+    // No swap
+    if (
+      sortedChild.nodeType === Node.TEXT_NODE ||
+      getNodeString(node) <= getNodeString(sortedChild)
+    ) {
+      const currentNode = node.cloneNode()
+      currentNode.appendChild(sortedChild)
+      sortedNodes.push(currentNode)
+      continue
+    }
+
+    // Swap
+    const currentNode = sortedChild.cloneNode()
+    currentNode.appendChild(node.cloneNode())
+    while (sortedChild.childNodes.length) {
+      currentNode.children[0].appendChild(sortedChild.childNodes[0])
+    }
+    sortedNodes.push(currentNode)
+  }
+
+  return sortedNodes
+}
+
+/**
+ * Compute the height of the DOM tree under the given node.
+ *
+ * @param {HTMLElement} node
+ * @returns {number}
+ */
+function getTreeHeight (node) {
+  if (!node) return 0
+
+  let maxHeight = 0
+  for (const child of node.childNodes) {
+    maxHeight = Math.max(maxHeight, getTreeHeight(child))
+  }
+
+  return maxHeight + 1
+}
+
+/**
+ * Convert a DOM node into its string representation.
+ *
+ * @param {HTMLElement} node
+ * @returns {string}
+ *
+ * @example
+ * <strong></strong>
+ * <a href="#"></a>
+ */
+function getNodeString (node) {
+  const clone = node.cloneNode()
+  clone.innerHTML = ''
+  return clone.outerHTML
 }
