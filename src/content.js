@@ -29,6 +29,7 @@ export function tidyHtml (element) {
 export function normalizeTags (node) {
   sort(node)
   merge(node)
+  node.normalize()
 }
 
 export function normalizeWhitespace (text) {
@@ -482,33 +483,32 @@ function canSurroundContents (range) {
  * @param {HTMLElement} node
  */
 function merge (node) {
-  const fragment = document.createDocumentFragment()
-
   for (const child of node.childNodes) {
-    // Skip empty tags, so they'll get removed
-    if (child.nodeName !== 'BR' && !child.textContent) continue
-
-    if (child.nodeType === Node.ELEMENT_NODE && child.nodeName !== 'BR') {
-      let sibling = child
-      while ((sibling = sibling.nextSibling) !== null) {
-        if (!child.cloneNode().isEqualNode(sibling.cloneNode())) break
-
-        for (const siblingChild of sibling.childNodes) {
-          child.appendChild(siblingChild.cloneNode(true))
-        }
-
-        sibling.remove()
-      }
-
-      merge(child)
+    // Remove empty tags
+    if (child.nodeName !== 'BR' && !child.textContent) {
+      node.removeChild(child)
+      continue
     }
 
-    fragment.appendChild(child.cloneNode(true))
+    // Skip non-mergable nodes
+    if (child.nodeType !== Node.ELEMENT_NODE || child.nodeName === 'BR') {
+      continue
+    }
+
+    // Merge identical adjecent nodes
+    while (child.nextSibling) {
+      const sibling = child.nextSibling
+
+      if (!child.cloneNode().isEqualNode(sibling.cloneNode())) {
+        break
+      }
+
+      while (sibling.firstChild) child.appendChild(sibling.firstChild)
+      sibling.remove()
+    }
+
+    merge(child)
   }
-
-  while (node.firstChild) node.removeChild(node.firstChild)
-
-  node.appendChild(fragment)
 }
 
 /**
