@@ -72,7 +72,9 @@ const highlightSupport = {
   removeHighlight (editableHost, highlightId, dispatcher) {
     const elems = editableHost.querySelectorAll(`[data-word-id="${highlightId}"]`)
     for (const elem of elems) {
-      content.unwrap(elem)
+      const range = document.createRange()
+      range.selectNode(elem)
+      content.unwrap(editableHost, range, elem)
     }
 
     // remove empty text nodes, combine adjacent text nodes

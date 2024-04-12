@@ -65,12 +65,6 @@ export default class Selection extends Cursor {
     return this.range.toString()
   }
 
-  // Return true if the selection can be wrapped, i.e. all open nodes
-  // are closed within this selection.
-  isWrappable () {
-    return content.isWrappable(this.range)
-  }
-
   // Get the ClientRects of this selection.
   // Use this if you want more precision than getBoundingClientRect can give.
   getRects () {
@@ -93,7 +87,7 @@ export default class Selection extends Cursor {
     }
     if (config.linkMarkup.trim) this.trimRange()
 
-    this.forceWrap(link)
+    this.wrap(link)
   }
 
   // trims whitespaces on the left and right of a selection, i.e. what you want in case of links
@@ -192,13 +186,13 @@ export default class Selection extends Cursor {
   makeCustom ({tagName, attributes, trim = false}) {
     const customElem = this.createElement(tagName, attributes)
     if (trim) this.trimRange()
-    this.forceWrap(customElem)
+    this.wrap(customElem)
   }
 
   makeBold () {
     const bold = this.createElement(config.boldMarkup.name, config.boldMarkup.attribs)
     if (config.boldMarkup.trim) this.trimRange()
-    this.forceWrap(bold)
+    this.wrap(bold)
   }
 
   toggleBold () {
@@ -210,7 +204,7 @@ export default class Selection extends Cursor {
   giveEmphasis () {
     const em = this.createElement(config.italicMarkup.name, config.italicMarkup.attribs)
     if (config.italicMarkup.trim) this.trimRange()
-    this.forceWrap(em)
+    this.wrap(em)
   }
 
   toggleEmphasis () {
@@ -222,7 +216,7 @@ export default class Selection extends Cursor {
   makeUnderline () {
     const u = this.createElement(config.underlineMarkup.name, config.underlineMarkup.attribs)
     if (config.underlineMarkup.trim) this.trimRange()
-    this.forceWrap(u)
+    this.wrap(u)
   }
 
   toggleUnderline () {
@@ -275,7 +269,15 @@ export default class Selection extends Cursor {
   //                           that represents elements to be removed; if undefined,
   //                           remove all.
   removeFormatting (selector) {
-    this.range = content.removeFormatting(this.host, this.range, selector)
+    const elems = document.querySelectorAll(selector)
+    if (elems.length) {
+      for (const elem of elems) {
+        this.range = content.unwrap(this.host, this.range, elem)
+      }
+    } else {
+      this.range = content.unwrap(this.host, this.range)
+    }
+
     this.setVisibleSelection()
   }
 
@@ -337,14 +339,12 @@ export default class Selection extends Cursor {
     return new Cursor(this.host, this.range)
   }
 
-  // Wrap the selection with the specified tag. If any other tag with
-  // the same tagName is affecting the selection this tag will be
-  // remove first.
-  forceWrap (elem) {
+  // Wrap the selection with the specified tag.
+  wrap (elem) {
     if (block.isPlainTextBlock(this.host)) return
     if (this.range.collapsed) return
     elem = this.adoptElement(elem)
-    this.range = content.forceWrap(this.host, this.range, elem)
+    this.range = content.wrap(this.host, this.range, elem)
     this.setVisibleSelection()
   }
 
