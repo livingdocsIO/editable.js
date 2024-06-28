@@ -7,7 +7,7 @@ const highlightSupport = {
 
   // Used to highlight arbitrary text in an editable. All occurrences
   // will be highlighted.
-  highlightText (editableHost, text, highlightId, type) {
+  highlightText (editableHost, text, highlightId, type, dispatcher) {
     if (this.hasHighlight(editableHost, highlightId)) return
     const blockText = highlightText.extractText(editableHost)
 
@@ -19,6 +19,7 @@ const highlightSupport = {
     if (matches && matches.length) {
       if (highlightId) matches[0].id = highlightId
       highlightText.highlightMatches(editableHost, matches)
+      if (dispatcher) dispatcher.notify('change', editableHost)
       return matches[0].startIndex
     }
   },

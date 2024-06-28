@@ -382,7 +382,7 @@ export class Editable {
    */
   highlight ({editableHost, text, highlightId, textRange, raiseEvents, type = 'comment'}) {
     if (!textRange) {
-      return highlightSupport.highlightText(editableHost, text, highlightId, type)
+      return highlightSupport.highlightText(editableHost, text, highlightId, type, raiseEvents ? this.dispatcher : undefined)
     }
     if (typeof textRange.start !== 'number' || typeof textRange.end !== 'number') {
       error(
