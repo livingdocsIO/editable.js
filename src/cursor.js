@@ -296,7 +296,7 @@ export default class Cursor {
 
   retainVisibleSelection (callback) {
     this.save()
-    callback()
+    callback() // eslint-disable-line callback-return
     this.restore()
     this.setVisibleSelection()
   }

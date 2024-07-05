@@ -96,12 +96,12 @@ module.exports = [
       'comma-style': [2, 'last'],
       'computed-property-spacing': [2, 'never'],
       'constructor-super': 2,
-      curly: [2, 'multi-line'],
+      curly: [2, 'multi-line', 'consistent'],
       'dot-location': [2, 'property'],
       'eol-last': [2, 'always'],
       eqeqeq: [2, 'allow-null'],
       'func-call-spacing': [2, 'never'],
-      'callback-return': 0,
+      'callback-return': [1, ['callback', 'cb', 'done']],
       'handle-callback-err': [2, '^(err|error)$'],
 
       indent: [
@@ -141,7 +141,26 @@ module.exports = [
       ],
 
       'linebreak-style': [2, 'unix'],
+
       'max-len': 0,
+      // Other Livingdocs packages use max-len 100
+      // 'max-len': [
+      //   'error',
+      //   {
+      //     code: 100,
+      //     ignoreRegExpLiterals: true,
+      //     ignorePattern: [
+      //       '\\s+require\\(',
+      //       '\\s+require\\.resolve\\(',
+      //       'https?://',
+      //       '\\s+it\\(',
+      //       '\\s+import\\(',
+      //       '\\s+describe\\('
+      //     ].join('|')
+      //   }
+      // ],
+
+      'max-nested-callbacks': 2,
 
       'new-cap': [
         2,
@@ -161,10 +180,21 @@ module.exports = [
       ],
 
       'no-array-constructor': 2,
+      'no-async-promise-executor': 2,
+      'no-await-in-loop': 0,
       'no-caller': 2,
       'no-class-assign': 2,
       'no-cond-assign': 2,
+
       'no-console': 0,
+      // Other Livingdocs packages use no-console 1
+      // 'no-console': [
+      //   1,
+      //   {
+      //     allow: ['error']
+      //   }
+      // ],
+
       'no-const-assign': 2,
 
       'no-constant-condition': [
@@ -213,7 +243,7 @@ module.exports = [
       'no-lonely-if': 2,
 
       'no-mixed-operators': [
-        1,
+        2,
         {
           groups: [
             ['+', '-', '*', '/', '%', '**'],
@@ -252,16 +282,18 @@ module.exports = [
       'no-octal-escape': 2,
       'no-path-concat': 2,
       'no-proto': 2,
+      'no-promise-executor-return': 0,
       'no-redeclare': 2,
       'no-regex-spaces': 2,
       'no-return-assign': [2, 'except-parens'],
+      'no-return-await': 2,
       'no-self-assign': 2,
       'no-self-compare': 2,
       'no-sequences': 2,
       'no-shadow-restricted-names': 2,
 
       'no-shadow': [
-        1,
+        'error',
         {
           allow: ['argv', 'callback', 'cb', 'done', 'err', 'params']
         }
@@ -306,7 +338,7 @@ module.exports = [
       'no-var': 2,
       'no-whitespace-before-property': 2,
       'no-with': 2,
-      'object-curly-spacing': [1, 'never'],
+      'object-curly-spacing': [2, 'never'],
 
       'object-property-newline': [
         2,
@@ -336,13 +368,26 @@ module.exports = [
       'padded-blocks': [0, 'never'],
 
       'prefer-const': [
-        1,
+        2,
         {
           destructuring: 'any',
           ignoreReadBeforeAssign: true
         }
       ],
 
+      'prefer-promise-reject-errors': 2,
+      'prefer-template': 2,
+
+      quotes: [
+        2,
+        'single',
+        {
+          avoidEscape: true,
+          allowTemplateLiterals: true
+        }
+      ],
+
+      'require-atomic-updates': 0,
       'rest-spread-spacing': [2, 'never'],
       semi: [2, 'never'],
 
@@ -383,6 +428,7 @@ module.exports = [
         }
       ],
 
+      // strict: [2, 'global'], // Server uses this
       'template-curly-spacing': [2, 'never'],
       'unicode-bom': [2, 'never'],
       'use-isnan': 2,
