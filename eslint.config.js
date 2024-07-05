@@ -6,6 +6,14 @@ const {
 
 const globals = require('globals')
 
+function toNewGlobalsConfig (obj) {
+  for (const key in obj) {
+    if (obj[key] === true) obj[key] = 'writable'
+    else if (obj[key] === false) obj[key] = 'readonly'
+  }
+  return obj
+}
+
 module.exports = [
   {
     ignores: [
@@ -22,7 +30,7 @@ module.exports = [
     },
 
     languageOptions: {
-      globals: {
+      globals: toNewGlobalsConfig({
         ...globals.browser,
         ...globals.node,
         ...globals.jasmine,
@@ -33,7 +41,7 @@ module.exports = [
         test: true,
         sinon: true,
         angular: true
-      },
+      }),
 
       ecmaVersion: 2021,
       sourceType: 'module',
