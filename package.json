@@ -12,13 +12,15 @@
     "@babel/plugin-transform-runtime": "^7.16.10",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
+    "@eslint/compat": "^1.1.0",
     "babel-loader": "^9.0.0",
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-istanbul": "^7.0.0",
     "chai": "^5.0.0",
     "css-loader": "^7.0.0",
-    "eslint": "^8.8.0",
-    "eslint-plugin-react": "^7.28.0",
+    "eslint": "^9.6.0",
+    "eslint-plugin-react": "^7.34.3",
+    "globals": "^15.8.0",
     "karma": "^6.3.13",
     "karma-chrome-launcher": "^3.1.0",
     "karma-coverage": "^2.1.0",
@@ -71,7 +73,7 @@
     "test:all": "npm run test:karma -s -- --browsers Chrome,Firefox,Safari",
     "test:karma": "karma start",
     "test:watch": "npm run test:karma -s -- --single-run false",
-    "lint": "eslint --ignore-path .gitignore ."
+    "lint": "eslint"
   },
   "release": {
     "extends": "@livingdocs/semantic-release-presets/npm-github-verify"
