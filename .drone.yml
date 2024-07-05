@@ -7,7 +7,7 @@ clone:
 
 steps:
 - name: eslint
-  image: marcbachmann/eslint:8.47.0
+  image: marcbachmann/eslint:9.1.1
   environment:
     GH_TOKEN:
       from_secret: GH_TOKEN
@@ -53,6 +53,6 @@ trigger:
   event: [push, tag, pull_request]
 ---
 kind: signature
-hmac: a95440bc33cbbf31ecf9ef2668fb861890ff029ece436be4ddc6e10099b8a797
+hmac: da3c74532ef15d34138bf9d3a14261332a0cf67ad6f611f02c3ae3841b6005a2
 
 ...
