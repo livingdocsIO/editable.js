@@ -19,10 +19,9 @@ export default class SpellcheckService {
 
     this.spellcheckService(condensedText, (misspelledWords) => {
       if (misspelledWords && misspelledWords.length > 0) {
-        callback(null, misspelledWords)
-      } else {
-        callback(null)
+        return callback(null, misspelledWords)
       }
+      return callback(null)
     })
   }
 
