@@ -32,15 +32,8 @@ module.exports = [
     languageOptions: {
       globals: toNewGlobalsConfig({
         ...globals.browser,
-        ...globals.node,
         ...globals.jasmine,
-        document: false,
-        navigator: false,
-        window: false,
-        expect: true,
-        test: true,
-        sinon: true,
-        angular: true
+        ...globals.node
       }),
 
       ecmaVersion: 2021,
