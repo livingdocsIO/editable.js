@@ -7,7 +7,7 @@ import {Editable} from '../src/core.js'
 import Selection from '../src/selection.js'
 const {key} = Keyboard
 
-describe('Dispatcher', function () {
+describe('Dispatcher:', function () {
   let editable, elem
 
   // create a Cursor object and set the selection to it
@@ -55,7 +55,7 @@ describe('Dispatcher', function () {
     return obj
   }
 
-  describe('for editable', function () {
+  describe('for editable:', function () {
 
     beforeEach(function () {
       elem = document.createElement('div')
@@ -71,7 +71,7 @@ describe('Dispatcher', function () {
       editable.unload()
     })
 
-    describe('on focus', function () {
+    describe('on focus:', function () {
       it('should trigger the focus event', function () {
         elem.blur()
         const focus = on('focus', function (element) {
@@ -103,7 +103,7 @@ describe('Dispatcher', function () {
       })
     })
 
-    describe('on enter', function () {
+    describe('on enter:', function () {
 
       it('fires insert "after" if cursor is at the end', function () {
         // <div>foo\</div>
@@ -162,7 +162,7 @@ describe('Dispatcher', function () {
       })
     })
 
-    describe('on backspace', function () {
+    describe('on backspace:', function () {
 
       it('fires "merge" if cursor is at the beginning', function (done) {
         elem.innerHTML = 'foo'
@@ -175,21 +175,9 @@ describe('Dispatcher', function () {
 
         elem.dispatchEvent(new KeyboardEvent('keydown', {keyCode: key.backspace}))
       })
-
-      it('fires "change" if cursor is not at the beginning', (done) => {
-        elem.innerHTML = 'foo'
-        createCursor(createRangeAtEnd(elem))
-
-        on('change', (element) => {
-          expect(element).to.equal(elem)
-          done()
-        })
-
-        elem.dispatchEvent(new KeyboardEvent('keydown', {keyCode: key.backspace}))
-      })
     })
 
-    describe('on delete', function () {
+    describe('on delete:', function () {
 
       it('fires "merge" if cursor is at the end', (done) => {
         elem.innerHTML = 'foo'
@@ -202,25 +190,9 @@ describe('Dispatcher', function () {
 
         elem.dispatchEvent(new KeyboardEvent('keydown', {keyCode: key.delete}))
       })
-
-      it('fires "change" if cursor is at the beginning', (done) => {
-        elem.innerHTML = 'foo'
-        createCursor(createRangeAtBeginning(elem))
-        on('change', () => done())
-        elem.dispatchEvent(new KeyboardEvent('keydown', {keyCode: key.delete}))
-      })
     })
 
-    describe('on keydown', function () {
-
-      it('fires change when a character is pressed', (done) => {
-        const evt = new KeyboardEvent('keydown', {keyCode: 'e'.charCodeAt(0)})
-        on('change', () => done())
-        elem.dispatchEvent(evt)
-      })
-    })
-
-    describe('on newline', function () {
+    describe('on newline:', function () {
 
       function typeKeys (element, chars) {
         const selection = window.getSelection()
@@ -245,25 +217,28 @@ describe('Dispatcher', function () {
         expect(elem.innerHTML).to.equal('<br>\uFEFF')
       })
 
-      it('appends a zero-width space after the br tag to force a line break', () => {
+      it('appends a zero-width space after the br tag to force a line break', async () => {
         typeKeys(elem, 'foobar')
         shiftReturn(elem)
+        elem.addEventListener('input', function (e) { console.log('input event', e) })
+        await 1
         expect(elem.innerHTML).to.equal(
           `\uFEFFfoobar<br>\uFEFF`
         )
       })
 
-      it('does not append another zero-width space when one is present already', () => {
+      it('does not append another zero-width space when one is present already', async () => {
         typeKeys(elem, 'foobar')
         shiftReturn(elem)
         shiftReturn(elem)
+        await 1
         expect(elem.innerHTML).to.equal(
           `\uFEFFfoobar<br><br>\uFEFF`
         )
       })
     })
 
-    describe('on bold', function () {
+    describe('on bold:', function () {
 
       it('fires toggleBold when ctrl + b is pressed', (done) => {
         elem.innerHTML = 'foo'
@@ -280,7 +255,7 @@ describe('Dispatcher', function () {
       })
     })
 
-    describe('on italic', function () {
+    describe('on italic:', function () {
 
       it('fires toggleEmphasis when ctrl + i is pressed', (done) => {
         elem.innerHTML = 'foo'
@@ -297,7 +272,7 @@ describe('Dispatcher', function () {
       })
     })
 
-    describe('selectToBoundary event:', function () {
+    describe('selectToBoundary event::', function () {
 
       it('fires "both" if all is selected', function () {
         elem.innerHTML = 'People Make The World Go Round'
@@ -353,7 +328,7 @@ describe('Dispatcher', function () {
       })
     })
 
-    describe('on paste', function () {
+    describe('on paste:', function () {
 
       it('inserts plain text clipboard content', (done) => {
         on('paste', (block, blocks) => {
@@ -407,6 +382,20 @@ describe('Dispatcher', function () {
           const evt = new ClipboardEvent('paste', {clipboardData, bubbles: true})
           elem.dispatchEvent(evt)
         })
+    })
+
+    describe('input event:', function () {
+      it('fires "change" event', (done) => {
+        elem.innerHTML = 'foo'
+        createCursor(createRangeAtEnd(elem))
+
+        on('change', (element) => {
+          expect(element).to.equal(elem)
+          done()
+        })
+
+        elem.dispatchEvent(new Event('input', {bubbles: true}))
+      })
     })
   })
 })
