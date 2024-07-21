@@ -7,11 +7,6 @@ import Keyboard from './keyboard.js'
 import {closest} from './util/dom.js'
 import {replaceLast, endsWithSingleSpace} from './util/string.js'
 
-// This will be set to true once we detect the input event is working.
-// Input event description on MDN:
-// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/input
-let isInputEventSupported = false
-
 /**
  * The Dispatcher module is responsible for dealing with events and their handlers.
  *
@@ -23,7 +18,6 @@ export default class Dispatcher {
   constructor (editable) {
     const win = editable.win
     eventable(this, editable)
-    this.supportsInputEvent = false
     this.document = win.document
     this.config = editable.config
     this.editable = editable
@@ -122,7 +116,6 @@ export default class Dispatcher {
         const selection = this.selectionWatcher.getFreshSelection()
         if (selection && selection.isSelection) {
           this.notify('clipboard', block, 'cut', selection)
-          this.triggerChangeEvent(block)
         }
       })
       .setupDocumentListener('paste', function pasteListener (evt) {
@@ -151,14 +144,7 @@ export default class Dispatcher {
       .setupDocumentListener('input', function inputListener (evt) {
         const block = this.getEditableBlockByEvent(evt)
         if (!block) return
-        if (isInputEventSupported) {
-          this.notify('change', block)
-        } else {
-          // Most likely the event was already handled manually by
-          // triggerChangeEvent so the first time we just switch the
-          // isInputEventSupported flag without notifying the change event.
-          isInputEventSupported = true
-        }
+        this.notify('change', block)
       })
 
       .setupDocumentListener('formatEditable', function formatEditableListener (evt) {
@@ -166,26 +152,6 @@ export default class Dispatcher {
         if (!block) return
         this.notify('change', block)
       })
-  }
-
-  /**
-  * Trigger a change event
-  *
-  * This should be done in these cases:
-  * - typing a letter
-  * - delete (backspace and delete keys)
-  * - cut
-  * - paste
-  * - copy and paste (not easily possible manually as far as I know)
-  *
-  * Preferably this is done using the input event. But the input event is not
-  * supported on all browsers for contenteditable elements.
-  * To make things worse it is not detectable either. So instead of detecting
-  * we set 'isInputEventSupported' when the input event fires the first time.
-  */
-  triggerChangeEvent (target) {
-    if (isInputEventSupported) return
-    this.notify('change', target)
   }
 
   dispatchSwitchEvent (event, element, direction) {
@@ -228,8 +194,7 @@ export default class Dispatcher {
     this.setupDocumentListener('keydown', function (evt) {
       const block = this.getEditableBlockByEvent(evt)
       if (!block) return
-      const notifyCharacterEvent = !isInputEventSupported
-      this.keyboard.dispatchKeyEvent(evt, block, notifyCharacterEvent)
+      this.keyboard.dispatchKeyEvent(evt, block, false)
     }, true)
   }
 
@@ -253,10 +218,10 @@ export default class Dispatcher {
 
       .on('backspace', function (event) {
         const rangeContainer = self.selectionWatcher.getFreshRange()
-        if (!rangeContainer.isCursor) return self.triggerChangeEvent(this)
+        if (!rangeContainer.isCursor) return
 
         const cursor = rangeContainer.getCursor()
-        if (!cursor.isAtBeginning()) return self.triggerChangeEvent(this)
+        if (!cursor.isAtBeginning()) return
 
         event.preventDefault()
         event.stopPropagation()
@@ -265,10 +230,10 @@ export default class Dispatcher {
 
       .on('delete', function (event) {
         const rangeContainer = self.selectionWatcher.getFreshRange()
-        if (!rangeContainer.isCursor) return self.triggerChangeEvent(this)
+        if (!rangeContainer.isCursor) return
 
         const cursor = rangeContainer.getCursor()
-        if (!cursor.isAtTextEnd()) return self.triggerChangeEvent(this)
+        if (!cursor.isAtTextEnd()) return
 
         event.preventDefault()
         event.stopPropagation()
