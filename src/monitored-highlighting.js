@@ -138,6 +138,7 @@ export default class MonitoredHighlighting {
       matches = this.whitespace.findMatches(text)
       matchCollection.addMatches(matches)
 
+      // TODO: Fix: Do not expand range in some cases
       this.safeHighlightMatches(editableHost, matchCollection.matches)
     })
   }
@@ -172,7 +173,9 @@ export default class MonitoredHighlighting {
   removeHighlights (editableHost) {
     editableHost = domSelector(editableHost, this.win.document)
     for (const elem of domArray('[data-highlight="spellcheck"], [data-highlight="whitespace"]', editableHost)) {
-      content.unwrap(elem)
+      const range = document.createRange()
+      range.selectNode(elem)
+      content.unwrap(editableHost, range, elem)
     }
   }
 
@@ -198,7 +201,9 @@ export default class MonitoredHighlighting {
       if (wordId) {
         selection.retainVisibleSelection(() => {
           for (const elem of domArray(`[data-word-id="${wordId}"]`, editableHost)) {
-            content.unwrap(elem)
+            const range = document.createRange()
+            range.selectNode(elem)
+            content.unwrap(editableHost, range, elem)
           }
         })
       }
