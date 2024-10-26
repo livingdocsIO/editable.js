@@ -156,11 +156,18 @@ export default class Cursor {
       const lastIndex = element.childNodes.length - 1
       preceedingElement = element.childNodes[lastIndex]
     }
+    console.log(`this.range.startOffset: ${this.range.startOffset}`)
+    
+    console.log(`startContainer: ${this.range.startContainer.data}`)
     this.range.setStart(this.range.startContainer, this.range.startOffset - 1)
+    
+    console.log(`range content: ${this.range.toString()}`)
     this.range.deleteContents()
+    console.log(`range content: ${this.range.toString()}`)
     this.range.insertNode(element)
     this.range.setStartAfter(preceedingElement)
     this.range.setEndAfter(preceedingElement)
+    console.log(`range content: ${this.range.toString()}`)
   }
 
   // Insert content after the cursor

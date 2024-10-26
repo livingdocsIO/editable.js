@@ -233,16 +233,23 @@ export default class Dispatcher {
       const notifyCharacterEvent = !isInputEventSupported
       this.keyboard.dispatchKeyEvent(evt, block, notifyCharacterEvent)
     }, true)
-
+    this.setupDocumentListener('keypress', function (evt) {
+      if (evt.key === '"') {
+        self.quoteDetection = true
+      }
+    }, true)
     this.setupDocumentListener('keyup', function (evt) {
       const block = this.getEditableBlockByEvent(evt)
       if (!block) return
-      if (evt.key === '"') {
+      console.log(`key: ${evt.key}`)
+      if (self.quoteDetection) {
+        self.quoteDetection = false
         console.log('quote')
         const range = self.selectionWatcher.getFreshRange()
         if (!range.isCursor) return
         const cursor = range.getCursor()
         const textBefore = cursor.textBefore()
+        console.log(textBefore)
         if ((/^\s+$/.test(textBefore.charAt(textBefore.length - 2)))) {
           cursor.changeCharacterBefore('„')
         } else {
