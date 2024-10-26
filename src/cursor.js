@@ -141,6 +141,28 @@ export default class Cursor {
     this.range.setEndAfter(preceedingElement)
   }
 
+
+  // Insert content before the cursor
+  //
+  // @param {String, DOM node or document fragment}
+  changeCharacterBefore (element) {
+    if (string.isString(element)) element = content.createFragmentFromString(element)
+    if (parser.isDocumentFragmentWithoutChildren(element)) return
+
+    element = this.adoptElement(element)
+
+    let preceedingElement = element
+    if (element.nodeType === documentFragmentNode) {
+      const lastIndex = element.childNodes.length - 1
+      preceedingElement = element.childNodes[lastIndex]
+    }
+    this.range.setStart(this.range.startContainer, this.range.startOffset - 1)
+    this.range.deleteContents()
+    this.range.insertNode(element)
+    this.range.setStartAfter(preceedingElement)
+    this.range.setEndAfter(preceedingElement)
+  }
+
   // Insert content after the cursor
   //
   // @param {String, DOM node or document fragment}

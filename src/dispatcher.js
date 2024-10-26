@@ -78,8 +78,9 @@ export default class Dispatcher {
   }
 
   setupEventListeners () {
+    const self = this
     this.setupElementListeners()
-    this.setupKeydownListener()
+    this.setupKeydownListener(self)
 
     if (selectionchange) {
       this.setupSelectionChangeListeners()
@@ -224,12 +225,32 @@ export default class Dispatcher {
   *
   * @method setupKeydownListener
   */
-  setupKeydownListener () {
+  setupKeydownListener (self) {
     this.setupDocumentListener('keydown', function (evt) {
       const block = this.getEditableBlockByEvent(evt)
       if (!block) return
+
       const notifyCharacterEvent = !isInputEventSupported
       this.keyboard.dispatchKeyEvent(evt, block, notifyCharacterEvent)
+    }, true)
+
+    this.setupDocumentListener('keyup', function (evt) {
+      const block = this.getEditableBlockByEvent(evt)
+      if (!block) return
+      if (evt.key === '"') {
+        console.log('quote')
+        const range = self.selectionWatcher.getFreshRange()
+        if (!range.isCursor) return
+        const cursor = range.getCursor()
+        const textBefore = cursor.textBefore()
+        if ((/^\s+$/.test(textBefore.charAt(textBefore.length - 2)))) {
+          cursor.changeCharacterBefore('„')
+        } else {
+          cursor.changeCharacterBefore('“')
+        }
+
+        cursor.setVisibleSelection()
+      }
     }, true)
   }
 
@@ -316,6 +337,7 @@ export default class Dispatcher {
       })
 
       .on('character', function (event) {
+        console.log('character')
         self.notify('change', this)
       })
   }
