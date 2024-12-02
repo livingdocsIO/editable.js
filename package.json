@@ -29,7 +29,7 @@
     "karma-safari-launcher": "^1.0.0",
     "karma-sourcemap-loader": "^0.4.0",
     "karma-webpack": "^5.0.0",
-    "mocha": "^10.0.0",
+    "mocha": "^11.0.0",
     "normalize.css": "^8.0.1",
     "prismjs": "^1.26.0",
     "react": "^18.0.0",
