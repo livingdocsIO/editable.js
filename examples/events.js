@@ -94,8 +94,9 @@ function showEvent (event) {
 }
 
 function draw () {
-  const paragraph = createRoot(document.querySelector('.paragraph-example-events'));
-  paragraph.render(<Events list={events} />);}
+  const paragraph = createRoot(document.querySelector('.paragraph-example-events'))
+  paragraph.render(<Events list={events} />)
+}
 
 function isFromFirstExample (elem) {
   return !!closest(elem, '.paragraph-example')
