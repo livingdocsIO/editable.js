@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
+import {createRoot} from 'react-dom/client'
 import {PropTypes} from 'prop-types'
-import ReactDOM from 'react-dom'
 import {CSSTransition, TransitionGroup} from 'react-transition-group'
 import {closest} from '../src/util/dom.js'
 
@@ -94,8 +94,8 @@ function showEvent (event) {
 }
 
 function draw () {
-  ReactDOM.render(<Events list={events} />, document.querySelector('.paragraph-example-events'))
-}
+  const paragraph = createRoot(document.querySelector('.paragraph-example-events'));
+  paragraph.render(<Events list={events} />);}
 
 function isFromFirstExample (elem) {
   return !!closest(elem, '.paragraph-example')
