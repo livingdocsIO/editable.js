@@ -1,0 +1,55 @@
+name: Patch Vulnerabilities in Node.js
+
+on:
+  schedule:
+    # Run daily at midnight UTC
+    - cron: '0 1 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+jobs:
+  patch-vulnerabilities:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run npm audit fix
+      run: npm audit fix
+
+    - name: Commit and push changes
+      run: |
+        BRANCH_NAME="security-patch-${GITHUB_REF_NAME}-$(date +'%Y-%m-%d')"
+        git config user.name "livingdocs-machine"
+        git config user.email "machine@livingdocs.io"
+        git checkout -b $BRANCH_NAME
+        git add package.json package-lock.json
+        if git diff --quiet; then
+          echo "No changes to commit."
+          exit 0
+        fi
+        git commit -m "fix(deps): automatically patch Node.js vulnerabilities"
+        git push origin $BRANCH_NAME
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create a pull request
+      run: |
+        BRANCH_NAME="security-patch-${GITHUB_REF_NAME}-$(date +'%Y-%m-%d')"
+        if git ls-remote --exit-code --heads origin $BRANCH_NAME; then
+          gh pr create -B $GITHUB_REF_NAME -H $BRANCH_NAME --title "Patch vulnerabilities [$GITHUB_REF_NAME]" --body 'Created by Github action'
+        else
+          echo "Branch doesn't exist, so PR creation can be skipped."
+          exit 0
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
