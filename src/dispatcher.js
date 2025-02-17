@@ -6,6 +6,7 @@ import config from './config.js'
 import Keyboard from './keyboard.js'
 import {closest} from './util/dom.js'
 import {replaceLast, endsWithSingleSpace} from './util/string.js'
+import {shouldApplySmartQuotes, isQuote, isOpeningQuote, isClosingQuote} from './smartQuotes.js'
 
 /**
  * The Dispatcher module is responsible for dealing with events and their handlers.
@@ -144,6 +145,39 @@ export default class Dispatcher {
       .setupDocumentListener('input', function inputListener (evt) {
         const block = this.getEditableBlockByEvent(evt)
         if (!block) return
+
+        const target = evt.target
+        const currentChar = evt.data
+
+
+        if (target.isContentEditable && shouldApplySmartQuotes(config)) {
+          if (isQuote(currentChar)) {
+            const selection = this.selectionWatcher.getFreshSelection()
+            const wholeText = selection.range.startContainer.wholeText
+            // const firstPart = selection.range.startContainer.textContent
+            const offset = selection.range.startOffset
+            if (isClosingQuote([...wholeText], offset - 2)) {
+              const textArr = [...target.innerText]
+              const index = offset - 1
+              if (index >= 0 && index < textArr.length) {
+                textArr[index] = '»'
+                target.innerText = textArr.join('')
+              }
+              this.editable.createCursorAtCharacterOffset({element: block, offset})
+            }
+
+            if (isOpeningQuote([...wholeText], offset - 2)) {
+              const textArr = [...target.innerText]
+              const index = offset - 1
+              if (index >= 0 && index < textArr.length) {
+                textArr[index] = '«'
+                target.innerText = textArr.join('')
+              }
+              this.editable.createCursorAtCharacterOffset({element: block, offset})
+            }
+          }
+
+        }
         this.notify('change', block)
       })
 
