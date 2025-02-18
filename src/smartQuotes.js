@@ -5,22 +5,35 @@ export const shouldApplySmartQuotes = (config, target) => {
   return !!smartQuotes && isValidQuotePairConfig(quotes) && isValidQuotePairConfig(singleQuotes) && target.isContentEditable
 }
 
-// export const isQuote = (char) => /^[‘’‹›‚'«»"“”„]$/.test(char)
 const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
 const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
+const isApostrophe = (char) => /^[’']$/.test(char)
 
-// Test: '>', ' ', no space & all kinds of dashes dash
-const isOpeningQuote = (text, indexCharBefore) => indexCharBefore < 0 || /\s|[>\-–—]/.test(text[indexCharBefore])
-const isClosingQuote = (text, indexCharBefore) => text[indexCharBefore] !== ' '
+// TODO: Test with: '>', ' ', no space & all kinds of dashes dash
+// edge case: applied tooltip quotes and then inserted single quote after space
+const shouldBeOpeningQuote = (text, indexCharBefore) => indexCharBefore < 0 || /\s|[>\-–—]/.test(text[indexCharBefore])
+const shouldBeClosingQuote = (text, indexCharBefore) => text[indexCharBefore] && !/\s/.test(text[indexCharBefore])
 
-const applySmartQuote = (textArr, index, target, quoteType) => {
-  if (index >= 0 && index < textArr.length) {
-    textArr[index] = quoteType
-    target.innerText = textArr.join('')
-  }
+const replaceQuote = (range, index, quoteType) => {
+  const startContainer = range.startContainer
+  const textNode = document.createTextNode(`${startContainer.nodeValue.substring(0, index)}${quoteType}${startContainer.nodeValue.substring(index + 1)}`)
+  range.startContainer.replaceWith(textNode)
+  return textNode
 }
 
-export const applySmartQuotes = (config, char, wholeText, offset, target, resetCursor) => {
+const hasSingleOpeningQuote = (textArr, offset, singleOpeningQuote) => {
+  if (offset <= 0) {
+    return false
+  }
+  for (let i = offset - 1; i >= 0; i--) {
+    if (isSingleQuote(textArr[i]) && (!isApostrophe(singleOpeningQuote) && !isApostrophe(textArr[i]))) {
+      return textArr[i] === singleOpeningQuote
+    }
+  }
+  return false
+}
+
+export const applySmartQuotes = (range, config, char, target) => {
   const isCharSingleQuote = isSingleQuote(char)
   const isCharDoubleQuote = isDoubleQuote(char)
 
@@ -28,16 +41,33 @@ export const applySmartQuotes = (config, char, wholeText, offset, target, resetC
     return
   }
 
+  const offset = range.startOffset
+  const textArr = [...range.startContainer.textContent]
   const {quotes, singleQuotes} = config
-  if (isClosingQuote(wholeText, offset - 2)) {
+  let newTextNode
+
+  if (shouldBeClosingQuote(textArr, offset - 2)) {
+    // Don't transform single-quote if there is no respective single-opening-quote
+    if (isCharSingleQuote && !hasSingleOpeningQuote(textArr, offset, singleQuotes[0])) {
+      return
+    }
+    // TODO: Fix ‹Didn’t› case -> only works with timeout
+    // if (isCharSingleQuote && hasTextAfter(target, offset)) {
+    //   return
+    // }
     const closingQuote = isCharSingleQuote ? singleQuotes[1] : quotes[1]
-    applySmartQuote(wholeText, offset - 1, target, closingQuote)
-  }
-
-  if (isOpeningQuote(wholeText, offset - 2)) {
+    newTextNode = replaceQuote(range, offset - 1, closingQuote)
+  } else if (shouldBeOpeningQuote(textArr, offset - 2)) {
     const openingQuote = isCharSingleQuote ? singleQuotes[0] : quotes[0]
-    applySmartQuote(wholeText, offset - 1, target, openingQuote)
+    newTextNode = replaceQuote(range, offset - 1, openingQuote)
   }
 
-  resetCursor()
+  if (!newTextNode) {
+    return
+  }
+
+  // Resets the cursor
+  const window = target.ownerDocument.defaultView
+  const selection = window.getSelection()
+  selection.collapse(newTextNode, offset)
 }

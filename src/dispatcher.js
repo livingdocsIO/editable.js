@@ -146,16 +146,11 @@ export default class Dispatcher {
         const block = this.getEditableBlockByEvent(evt)
         if (!block) return
 
-        const target = evt.target
-
-        if (shouldApplySmartQuotes(config, target)) {
-          const currentChar = evt.data
+        if (shouldApplySmartQuotes(config, evt.target)) {
           const selection = this.selectionWatcher.getFreshSelection()
-          const offset = selection.range.startOffset
-          const wholeText = [...target.innerText]
-          const resetCursor = () => this.editable.createCursorAtCharacterOffset({element: block, offset})
-          applySmartQuotes(config, currentChar, wholeText, offset, target, resetCursor)
+          applySmartQuotes(selection.range, config, evt.data, evt.target)
         }
+
         this.notify('change', block)
       })
 
