@@ -8,11 +8,11 @@ export const shouldApplySmartQuotes = (config, target) => {
 const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
 const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
 const isApostrophe = (char) => /^[’']$/.test(char)
+const isWhitespace = (char) => /^\s$/.test(char)
 
-// TODO: Test with: '>', ' ', no space & all kinds of dashes dash
-// edge case: applied tooltip quotes and then inserted single quote after space
 const shouldBeOpeningQuote = (text, indexCharBefore) => indexCharBefore < 0 || /\s|[>\-–—]/.test(text[indexCharBefore])
-const shouldBeClosingQuote = (text, indexCharBefore) => text[indexCharBefore] && !/\s/.test(text[indexCharBefore])
+const shouldBeClosingQuote = (text, indexCharBefore) => !!text[indexCharBefore] && !isWhitespace(text[indexCharBefore])
+const hasCharAfter = (textArr, indexCharAfter) => !!textArr[indexCharAfter] && !isWhitespace(textArr[indexCharAfter])
 
 const replaceQuote = (range, index, quoteType) => {
   const startContainer = range.startContainer
@@ -24,13 +24,6 @@ const replaceQuote = (range, index, quoteType) => {
   return textNode
 }
 
-// TODO: Fix ‹Didn’t› case -> only works with timeout
-const hasCharAfter = (textArr, offset) => {
-  console.log('textArr :>> ', textArr)
-  console.log('offset :>> ', offset)
-  return false
-}
-
 const hasSingleOpeningQuote = (textArr, offset, singleOpeningQuote) => {
   if (offset <= 0) {
     return false
@@ -38,10 +31,6 @@ const hasSingleOpeningQuote = (textArr, offset, singleOpeningQuote) => {
   for (let i = offset - 1; i >= 0; i--) {
     if (isSingleQuote(textArr[i]) && (!isApostrophe(singleOpeningQuote) && !isApostrophe(textArr[i]))) {
       return textArr[i] === singleOpeningQuote
-      // TODO: keep on looking for an unclosed single opening quote -> need to save single opening and closing quotes
-      // if (textArr[i] === singleOpeningQuote) {
-      //   return true
-      // }
     }
   }
   return false
@@ -82,10 +71,9 @@ export const applySmartQuotes = (range, config, char, target, carretOffset) => {
     return
   }
 
-  // Resets the cursor
+  // Resets the cursor to the currentPosition after applying the smart-quote
   const window = target.ownerDocument.defaultView
   const selection = window.getSelection()
   selection.collapse(newTextNode, carretOffset ?? offset)
 }
 
-// TODO: fix special case when quickly typing two quotes after each other
