@@ -89,6 +89,7 @@ export default class Dispatcher {
   * @method setupElementListeners
   */
   setupElementListeners () {
+    const currentInput = {offset: undefined}
     this
       .setupDocumentListener('focus', function focusListener (evt) {
         const block = this.getEditableBlockByEvent(evt)
@@ -148,7 +149,12 @@ export default class Dispatcher {
 
         if (shouldApplySmartQuotes(config, evt.target)) {
           const selection = this.selectionWatcher.getFreshSelection()
-          applySmartQuotes(selection.range, config, evt.data, evt.target)
+          // Save offset of new input, to reset cursor correctly after timeout delay
+          currentInput.offset = selection.range?.startOffset
+          setTimeout(() => {
+            applySmartQuotes(selection.range, config, evt.data, evt.target, currentInput.offset)
+          }, 500
+          )
         }
 
         this.notify('change', block)
