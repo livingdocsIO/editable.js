@@ -36,7 +36,7 @@ const hasSingleOpeningQuote = (textArr, offset, singleOpeningQuote) => {
   return false
 }
 
-export const applySmartQuotes = (range, config, char, target, carretOffset) => {
+export const applySmartQuotes = (range, config, char, target, cursorOffset) => {
   const isCharSingleQuote = isSingleQuote(char)
   const isCharDoubleQuote = isDoubleQuote(char)
 
@@ -74,6 +74,6 @@ export const applySmartQuotes = (range, config, char, target, carretOffset) => {
   // Resets the cursor to the currentPosition after applying the smart-quote
   const window = target.ownerDocument.defaultView
   const selection = window.getSelection()
-  selection.collapse(newTextNode, carretOffset ?? offset)
+  selection.collapse(newTextNode, cursorOffset ?? offset)
 }
 
