@@ -9,9 +9,10 @@ const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
 const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
 const isApostrophe = (char) => /^[’']$/.test(char)
 const isWhitespace = (char) => /^\s$/.test(char)
+const isSeparatorOrWhitespace = (char) => /\s|[>\-–—]/.test(char)
 
-const shouldBeOpeningQuote = (text, indexCharBefore) => indexCharBefore < 0 || /\s|[>\-–—]/.test(text[indexCharBefore])
-const shouldBeClosingQuote = (text, indexCharBefore) => !!text[indexCharBefore] && !isWhitespace(text[indexCharBefore])
+const shouldBeOpeningQuote = (text, indexCharBefore) => indexCharBefore < 0 || isSeparatorOrWhitespace(text[indexCharBefore])
+const shouldBeClosingQuote = (text, indexCharBefore) => !!text[indexCharBefore] && !isSeparatorOrWhitespace(text[indexCharBefore])
 const hasCharAfter = (textArr, indexCharAfter) => !!textArr[indexCharAfter] && !isWhitespace(textArr[indexCharAfter])
 
 const replaceQuote = (range, index, quoteType) => {
