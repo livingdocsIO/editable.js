@@ -44,9 +44,13 @@ export const applySmartQuotes = (range, config, char, target, cursorOffset) => {
     return
   }
 
+  const {quotes, singleQuotes} = config
+  if (char === quotes[0] || char === quotes[1] || char === singleQuotes[0] || char === singleQuotes[1]) {
+    return
+  }
+
   const offset = range.startOffset
   const textArr = [...range.startContainer.textContent]
-  const {quotes, singleQuotes} = config
   let newTextNode
 
   if (shouldBeClosingQuote(textArr, offset - 2)) {
