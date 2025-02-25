@@ -153,7 +153,7 @@ export default class Dispatcher {
           currentInput.offset = selection.range?.startOffset
           setTimeout(() => {
             applySmartQuotes(selection.range, config, evt.data, evt.target, currentInput.offset)
-          }, 500
+          }, 300
           )
         }
 
