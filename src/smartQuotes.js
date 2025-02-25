@@ -4,12 +4,12 @@ export const shouldApplySmartQuotes = (config, target) => {
   const {smartQuotes, quotes, singleQuotes} = config
   return !!smartQuotes && isValidQuotePairConfig(quotes) && isValidQuotePairConfig(singleQuotes) && target.isContentEditable
 }
-
-const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
-const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
-const isApostrophe = (char) => /^[’']$/.test(char)
-const isWhitespace = (char) => /^\s$/.test(char)
-const isSeparatorOrWhitespace = (char) => /\s|[>\-–—]/.test(char)
+// TODO: isDoubleQuote, isSingleQuote, isApostrophe, isWhitespace accept more than one char
+export const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
+export const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
+export const isApostrophe = (char) => /^[’']$/.test(char)
+export const isWhitespace = (char) => /^\s$/.test(char)
+export const isSeparatorOrWhitespace = (char) => /\s|[>\-–—]/.test(char)
 
 const shouldBeOpeningQuote = (text, indexCharBefore) => indexCharBefore < 0 || isSeparatorOrWhitespace(text[indexCharBefore])
 const shouldBeClosingQuote = (text, indexCharBefore) => !!text[indexCharBefore] && !isSeparatorOrWhitespace(text[indexCharBefore])
