@@ -13,7 +13,7 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@eslint/compat": "^1.1.0",
-    "babel-loader": "^9.0.0",
+    "babel-loader": "^10.0.0",
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-istanbul": "^7.0.0",
     "chai": "^5.0.0",
