@@ -5,24 +5,27 @@ export const shouldApplySmartQuotes = (config, target) => {
   return !!smartQuotes && isValidQuotePairConfig(quotes) && isValidQuotePairConfig(singleQuotes) && target.isContentEditable
 }
 
-const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
-const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
-const isApostrophe = (char) => /^[’']$/.test(char)
-const isWhitespace = (char) => /^\s$/.test(char)
-const isSeparatorOrWhitespace = (char) => /\s|[>\-–—]/.test(char)
+export const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
+export const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
+export const isApostrophe = (char) => /^[’']$/.test(char)
+export const isWhitespace = (char) => /^\s$/.test(char)
+export const isSeparatorOrWhitespace = (char) => /\s|[>\-–—]/.test(char)
 
 const shouldBeOpeningQuote = (text, indexCharBefore) => indexCharBefore < 0 || isSeparatorOrWhitespace(text[indexCharBefore])
 const shouldBeClosingQuote = (text, indexCharBefore) => !!text[indexCharBefore] && !isSeparatorOrWhitespace(text[indexCharBefore])
 const hasCharAfter = (textArr, indexCharAfter) => !!textArr[indexCharAfter] && !isWhitespace(textArr[indexCharAfter])
+const shouldBeSingleOpeningQuote = (text, indexCharBefore) => !!text[indexCharBefore] && isDoubleQuote(text[indexCharBefore])
 
-const replaceQuote = (range, index, quoteType) => {
-  const startContainer = range.startContainer
-  if (!startContainer.nodeValue) {
-    return
+export const replaceQuote = (range, index, quoteType) => {
+  const startContainer = range?.startContainer
+  const nodeValue = startContainer?.nodeValue
+  if (!nodeValue) {
+    return null
   }
-  const textNode = document.createTextNode(`${startContainer.nodeValue.substring(0, index)}${quoteType}${startContainer.nodeValue.substring(index + 1)}`)
-  startContainer.replaceWith(textNode)
-  return textNode
+  const newText = `${nodeValue.substring(0, index)}${quoteType}${nodeValue.substring(index + 1)}`
+  const newTextNode = document.createTextNode(newText)
+  startContainer.replaceWith(newTextNode)
+  return newTextNode
 }
 
 const hasSingleOpeningQuote = (textArr, offset, singleOpeningQuote) => {
@@ -54,7 +57,11 @@ export const applySmartQuotes = (range, config, char, target, cursorOffset) => {
   const textArr = [...range.startContainer.textContent]
   let newTextNode
 
-  if (shouldBeClosingQuote(textArr, offset - 2)) {
+  // Special case for a single quote following a double quote,
+  // which should be transformed into a single opening quote
+  if (isCharSingleQuote && shouldBeSingleOpeningQuote(textArr, offset - 2)) {
+    newTextNode = replaceQuote(range, offset - 1, singleQuotes[0])
+  } else if (shouldBeClosingQuote(textArr, offset - 2)) {
     if (isCharSingleQuote) {
       // Don't transform apostrophes
       if (hasCharAfter(textArr, offset)) {
