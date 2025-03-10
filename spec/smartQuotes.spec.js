@@ -108,7 +108,7 @@ describe('replaceQuote(): ', () => {
     expect(replacedTextNode).to.equal(null)
   })
 
-  it('should insert quote at the end, if index is out of bounce', () => {
+  it('should insert quote at the end, if index is out of bounds', () => {
     const range = createRangeWithText(testString)
     const replacedTextNode = replaceQuote(range, 40, '`')
     expect(replacedTextNode.textContent).to.equal(`${testString}${'`'}`)
