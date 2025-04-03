@@ -142,6 +142,17 @@ describe('Selection', function () {
       })
     })
 
+    describe('getTextRange()', function () {
+
+      it('handles a zero width non-break space', function () {
+        const oneWord = createElement('<div>\uFEFFfoobar\uFEFF</div>')
+        const range = createRange()
+        range.selectNodeContents(oneWord)
+        const selection = new Selection(oneWord, range)
+        expect(selection.getTextRange()).to.deep.equal({start: 0, end: 6, text: 'foobar'})
+      })
+    })
+
     describe('custom:', function () {
 
       beforeEach(function () {
