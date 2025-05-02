@@ -45,8 +45,9 @@ const highlightSupport = {
       this.win
     )
 
-    const actualStartIndex = startIndex
-    const actualEndIndex = endIndex
+    // Do not let highlight exceed text range - it should also be at least 1 character long
+    const actualStartIndex = Math.min(Math.max(startIndex, 0), blockText.length - 1)
+    const actualEndIndex = Math.min(Math.max(endIndex, 1), blockText.length)
 
     highlightText.highlightMatches(editableHost, [{
       startIndex: actualStartIndex,

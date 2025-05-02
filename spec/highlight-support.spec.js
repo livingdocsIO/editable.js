@@ -327,6 +327,36 @@ ke The <br> World Go Round`)
       expect(this.getHtml()).to.equal(expectedHtml)
     })
 
+    it('limits start and end values to text range', function () {
+      setupHighlightEnv(this, 'ab')
+      this.highlightRange('ab', 'myId', -1, 100)
+      const expectedHtml = this.formatHtml(
+        `<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">ab</span>`
+      )
+
+      expect(this.getHtml()).to.equal(expectedHtml)
+    })
+
+    it('always selects the first character if values are too small', function () {
+      setupHighlightEnv(this, 'ab')
+      this.highlightRange('ab', 'myId', 0, 0)
+      const expectedHtml = this.formatHtml(
+        `<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">a</span>b`
+      )
+
+      expect(this.getHtml()).to.equal(expectedHtml)
+    })
+
+    it('always selects the last character if values are too large', function () {
+      setupHighlightEnv(this, 'ab')
+      this.highlightRange('ab', 'myId', 2, 5)
+      const expectedHtml = this.formatHtml(
+        `a<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">b</span>`
+      )
+
+      expect(this.getHtml()).to.equal(expectedHtml)
+    })
+
     it('handles a <br> tag without whitespaces', function () {
       setupHighlightEnv(this, 'a<br>b')
       this.highlightRange('b', 'myId', 1, 2)
