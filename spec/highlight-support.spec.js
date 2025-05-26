@@ -339,7 +339,8 @@ ke The <br> World Go Round`)
 
     it('always selects the first character if values are too small', function () {
       setupHighlightEnv(this, 'ab')
-      this.highlightRange('ab', 'myId', 0, 0)
+      const highlightText = undefined // Avoid validation
+      this.highlightRange(highlightText, 'myId', 0, 0)
       const expectedHtml = this.formatHtml(
         `<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">a</span>b`
       )
@@ -349,7 +350,8 @@ ke The <br> World Go Round`)
 
     it('always selects the last character if values are too large', function () {
       setupHighlightEnv(this, 'ab')
-      this.highlightRange('ab', 'myId', 2, 5)
+      const highlightText = undefined // Avoid validation
+      this.highlightRange(highlightText, 'myId', 2, 5)
       const expectedHtml = this.formatHtml(
         `a<span class="highlight-comment" data-editable="ui-unwrap" data-highlight="comment" data-word-id="myId">b</span>`
       )
@@ -512,7 +514,7 @@ ke The <br> World Go Round`)
 
     it('extracts a readable text', function () {
       setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
-      this.highlightRange('😐 Make The 🌍 Go 🔄', 'myId', 0, 23)
+      this.highlightRange('😐 Make The \n 🌍 Go \n🔄', 'myId', 0, 23)
       const expectedRanges = {
         myId: {
           text: '😐 Make The \n 🌍 Go \n🔄',
@@ -529,7 +531,7 @@ ke The <br> World Go Round`)
       setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
       let called = 0
       const dispatcher = {notify: () => called++}
-      this.highlightRange('😐 Make The 🌍 Go 🔄', 'myId', 0, 20, dispatcher)
+      this.highlightRange('😐 Make The \n 🌍 Go \n🔄', 'myId', 0, 23, dispatcher)
 
       expect(called).to.equal(1)
     })
@@ -538,7 +540,7 @@ ke The <br> World Go Round`)
       setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
       let called = 0
       const dispatcher = {notify: () => called++}
-      this.highlightRange('😐 Make The 🌍 Go 🔄', 'myId', 0, 20)
+      this.highlightRange('😐 Make The \n  🌍 Go \n🔄', 'myId', 0, 23)
       this.removeHighlight('first', dispatcher)
 
       expect(called).to.equal(1)
