@@ -48,6 +48,11 @@ const highlightSupport = {
     const actualStartIndex = startIndex
     const actualEndIndex = endIndex
 
+    // If text is provided then validate that it matches
+    if (text && text !== blockText.slice(actualStartIndex, actualEndIndex)) {
+      return -1
+    }
+
     highlightText.highlightMatches(editableHost, [{
       startIndex: actualStartIndex,
       endIndex: actualEndIndex,
