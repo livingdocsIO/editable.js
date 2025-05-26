@@ -353,6 +353,47 @@ ke The <br> World Go Round`)
     })
   })
 
+  describe('highlightRange() - text validation', function () {
+
+    it('returns -1 when text does not match the range', function () {
+      setupHighlightEnv(this, 'People Make The World Go Round')
+      const result = this.highlightRange('wrong text', 'myId', 0, 6)
+      expect(result).to.equal(-1)
+    })
+
+    it('does not apply a highlight when text does not match', function () {
+      setupHighlightEnv(this, 'People Make The World Go Round')
+      this.highlightRange('wrong text', 'myId', 0, 6)
+      expect(this.extractWithoutNativeRange()).to.equal(undefined)
+    })
+
+    it('does not notify the dispatcher when text does not match', function () {
+      setupHighlightEnv(this, 'People Make The World Go Round')
+      let called = 0
+      const dispatcher = {notify: () => called++}
+      this.highlightRange('wrong text', 'myId', 0, 6, dispatcher)
+      expect(called).to.equal(0)
+    })
+
+    it('skips validation when text is undefined', function () {
+      setupHighlightEnv(this, 'People Make The World Go Round')
+      const result = this.highlightRange(undefined, 'myId', 0, 6)
+      expect(result).to.equal(0)
+    })
+
+    it('skips validation when text is null', function () {
+      setupHighlightEnv(this, 'People Make The World Go Round')
+      const result = this.highlightRange(null, 'myId', 0, 6)
+      expect(result).to.equal(0)
+    })
+
+    it('skips validation when text is empty string', function () {
+      setupHighlightEnv(this, 'People Make The World Go Round')
+      const result = this.highlightRange('', 'myId', 0, 6)
+      expect(result).to.equal(0)
+    })
+  })
+
   describe('highlightRange() - with formatted text', function () {
 
     it('handles highlights surrounding <span> tags', function () {
@@ -482,7 +523,7 @@ ke The <br> World Go Round`)
 
     it('extracts a readable text', function () {
       setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
-      this.highlightRange('😐 Make The 🌍 Go 🔄', 'myId', 0, 23)
+      this.highlightRange('😐 Make The \n 🌍 Go \n🔄', 'myId', 0, 23)
       const expectedRanges = {
         myId: {
           text: '😐 Make The \n 🌍 Go \n🔄',
@@ -499,7 +540,7 @@ ke The <br> World Go Round`)
       setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
       let called = 0
       const dispatcher = {notify: () => called++}
-      this.highlightRange('😐 Make The 🌍 Go 🔄', 'myId', 0, 20, dispatcher)
+      this.highlightRange('😐 Make The \n 🌍 Go \n🔄', 'myId', 0, 23, dispatcher)
 
       expect(called).to.equal(1)
     })
@@ -508,7 +549,7 @@ ke The <br> World Go Round`)
       setupHighlightEnv(this, '😐 Make&nbsp;The \r\n 🌍 Go \n🔄')
       let called = 0
       const dispatcher = {notify: () => called++}
-      this.highlightRange('😐 Make The 🌍 Go 🔄', 'myId', 0, 20)
+      this.highlightRange('😐 Make The \n  🌍 Go \n🔄', 'myId', 0, 23)
       this.removeHighlight('first', dispatcher)
 
       expect(called).to.equal(1)
