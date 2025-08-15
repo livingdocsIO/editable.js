@@ -1,8 +1,7 @@
 import * as nodeType from './node-type.js'
 import * as rangeSaveRestore from './range-save-restore.js'
-import * as parser from './parser.js'
 import * as string from './util/string.js'
-import {createElement, createRange, getNodes, normalizeBoundaries, splitBoundaries, containsNodeText} from './util/dom.js'
+import {createRange, getNodes, normalizeBoundaries, splitBoundaries, containsNodeText} from './util/dom.js'
 import config from './config.js'
 
 function restoreRange (host, range, func) {
@@ -25,45 +24,16 @@ export function tidyHtml (element) {
   normalizeTags(element)
 }
 
-// Remove empty tags and merge consecutive tags (they must have the same
-// attributes).
-//
-// @method normalizeTags
-// @param  {HTMLElement} element The element to process.
-export function normalizeTags (element) {
-  const fragment = document.createDocumentFragment()
-
-  // Remove line breaks at the beginning of a content block
-  removeWhitespaces(element, 'firstChild')
-
-  // Remove line breaks at the end of a content block
-  removeWhitespaces(element, 'lastChild')
-
-  for (const node of element.childNodes) {
-    // skip empty tags, so they'll get removed
-    if (node.nodeName !== 'BR' && !node.textContent) continue
-
-    if (node.nodeType === nodeType.elementNode && node.nodeName !== 'BR') {
-      let sibling = node
-      while ((sibling = sibling.nextSibling) !== null) {
-        if (!parser.isSameNode(sibling, node)) break
-
-        for (const siblingChild of sibling.childNodes) {
-          node.appendChild(siblingChild.cloneNode(true))
-        }
-
-        sibling.remove()
-      }
-
-      normalizeTags(node)
-    }
-
-    fragment.appendChild(node.cloneNode(true))
-  }
-
-  while (element.firstChild) element.removeChild(element.firstChild)
-
-  element.appendChild(fragment)
+/**
+ * Normalize a provided HTML node by lexically sorting the DOM tree under it,
+ * removing empty tags, and merging identical consecutive tags.
+ *
+ * @param {HTMLElement} node
+ */
+export function normalizeTags (node) {
+  sort(node)
+  merge(node)
+  node.normalize()
 }
 
 export function normalizeWhitespace (text) {
@@ -313,85 +283,135 @@ export function expandTo (host, range, elem) {
   return range
 }
 
+/**
+ * Toggles a formatting element within a range.
+ *
+ * @param {HTMLElement} host
+ * @param {Range} range
+ * @param {HTMLElement} elem
+ * @returns {Range}
+ */
 export function toggleTag (host, range, elem) {
-  const elems = getTagsByNameAndAttributes(host, range, elem)
+  const treeWalker = document.createTreeWalker(
+    host,
+    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+    (node) => {
+      if (!range.intersectsNode(node)) return NodeFilter.FILTER_REJECT
+      if (node.cloneNode().isEqualNode(elem)) return NodeFilter.FILTER_REJECT
+      if (node.nodeType === Node.ELEMENT_NODE) return NodeFilter.FILTER_SKIP
+      return NodeFilter.FILTER_ACCEPT
+    }
+  )
 
-  if (elems.length === 1 &&
-    isExactSelection(range, elems[0], 'visible')) {
-    return removeFormattingElem(host, range, elem)
+  // Check if there exists a node that is not wrapped in the element
+  if (treeWalker.nextNode()) {
+    return wrap(host, range, elem)
   }
 
-  return forceWrap(host, range, elem)
+  return unwrap(host, range, elem)
 }
 
-export function isWrappable (range) {
-  return canSurroundContents(range)
-}
-
-export function forceWrap (host, range, elem) {
-  let restoredRange = restoreRange(host, range, () => {
-    nukeElem(host, range, elem)
-  })
-
-  // remove all tags if the range is not wrappable
-  if (!isWrappable(restoredRange)) {
-    restoredRange = restoreRange(host, restoredRange, () => {
-      nuke(host, restoredRange)
-    })
-  }
-
-  wrap(restoredRange, elem)
-  return restoredRange
-}
-
-export function wrap (range, elem) {
-  if (!isWrappable(range)) {
-    console.log('content.wrap(): can not surround range')
-    return
-  }
-
-  if (typeof elem === 'string') elem = createElement(elem)
-  range.surroundContents(elem)
-}
-
-export function unwrap (elem) {
+/**
+ * Wraps a range within the specified element. If the range is already wrapped
+ * by the element, no action is taken.
+ *
+ * @param {HTMLElement} host
+ * @param {Range} range
+ * @param {HTMLElement} elem
+ * @returns {Range}
+ */
+export function wrap (host, range, elem) {
   elem = elem.jquery ? elem[0] : elem
-  const parent = elem.parentNode
-  while (elem.firstChild) parent.insertBefore(elem.firstChild, elem)
-  parent.removeChild(elem)
-}
 
-export function removeFormattingElem (host, range, elem) {
-  return restoreRange(host, range, () => {
-    nukeElem(host, range, elem)
-  })
-}
-
-export function removeFormatting (host, range, selector) {
-  return restoreRange(host, range, () => {
-    nuke(host, range, selector)
-  })
-}
-
-// Unwrap all tags this range is affected by.
-// Can also affect content outside of the range.
-export function nuke (host, range, selector) {
-  getTags(host, range).forEach((elem) => {
-    if (elem.nodeName.toUpperCase() !== 'BR' && (!selector || elem.matches(selector))) {
-      unwrap(elem)
+  const treeWalker = document.createTreeWalker(
+    host,
+    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
+    (node) => {
+      if (!range.intersectsNode(node) || node.cloneNode().isEqualNode(elem)) return NodeFilter.FILTER_REJECT
+      if (node.nodeType === Node.ELEMENT_NODE) return NodeFilter.FILTER_SKIP
+      return NodeFilter.FILTER_ACCEPT
     }
+  )
+
+  while (treeWalker.nextNode()) {
+    const node = treeWalker.currentNode
+    const isFirstNode = node === range.startContainer
+    const isLastNode = node === range.endContainer
+
+    // Create sub-range within the current node
+    const nodeRange = document.createRange()
+    isFirstNode
+      ? nodeRange.setStart(node, range.startOffset)
+      : nodeRange.setStartBefore(node)
+    isLastNode
+      ? nodeRange.setEnd(node, range.endOffset)
+      : nodeRange.setEndAfter(node)
+
+    // Wrap sub-range
+    const elemClone = elem.cloneNode()
+    nodeRange.surroundContents(elemClone)
+
+    // Adjust range where necessary
+    if (isFirstNode) range.setStartBefore(elemClone)
+    if (isLastNode) range.setEndAfter(elemClone)
+  }
+
+  // TODO: Preserve range without obstructing normalization
+  return restoreRange(host, range, () => {
+    normalizeTags(host)
   })
 }
 
-// Unwrap all tags this range is affected by.
-// Can also affect content outside of the range.
-export function nukeElem (host, range, node) {
-  getTags(host, range).forEach((elem) => {
-    if (elem.nodeName.toUpperCase() !== 'BR' && (!node ||
-        (elem.nodeName.toUpperCase() === node.nodeName.toUpperCase() &&
-          areSameAttributes(elem.attributes, node.attributes)))) {
-      unwrap(elem)
+/**
+ * Removes a specified element from a range. If the range does not contain the
+ * element, no action is taken.
+ *
+ * @param {HTMLElement} host
+ * @param {Range} range
+ * @param {HTMLElement|undefined} elem
+ * @returns {Range}
+ */
+export function unwrap (host, range, elem) {
+  elem = elem?.jquery ? elem[0] : elem
+
+  const treeWalker = document.createTreeWalker(
+    host,
+    NodeFilter.SHOW_ELEMENT,
+    (node) => {
+      if (!range.intersectsNode(node)) return NodeFilter.FILTER_REJECT
+      if (!elem || node.cloneNode().isEqualNode(elem)) return NodeFilter.FILTER_ACCEPT
+      return NodeFilter.FILTER_SKIP
     }
+  )
+
+  while (treeWalker.nextNode()) {
+    const node = treeWalker.currentNode
+    const isFirstNode = !range.isPointInRange(node, 0)
+    const isLastNode = !range.isPointInRange(node, node.childNodes.length)
+
+    let selectedNode = node
+    if (isFirstNode) {
+      const [, rightNode] = split(selectedNode, range.startContainer, range.startOffset)
+      selectedNode = rightNode
+    }
+    if (isLastNode) {
+      const [leftNode] = split(selectedNode, range.endContainer, range.endOffset)
+      selectedNode = leftNode
+    }
+
+    // Adjust range where necessary
+    if (isFirstNode) range.setStartBefore(selectedNode)
+    if (isLastNode) range.setEndAfter(selectedNode)
+
+    // Unwrap node
+    const parent = selectedNode.parentNode
+    while (selectedNode.firstChild) parent.insertBefore(selectedNode.firstChild, selectedNode)
+    parent.removeChild(selectedNode)
+  }
+
+  // TODO: Preserve range without obstructing normalization
+  return restoreRange(host, range, () => {
+    normalizeTags(host)
   })
 }
 
@@ -440,81 +460,158 @@ export function containsString (range, str) {
   return range.toString().indexOf(str) >= 0
 }
 
-// Unwrap all tags this range is affected by.
-// Can also affect content outside of the range.
-export function nukeTag (host, range, tagName) {
-  getTags(host, range).forEach((elem) => {
-    if (elem.nodeName.toUpperCase() === tagName.toUpperCase()) unwrap(elem)
-  })
+/**
+ * Splits a node at the specified offset, including all ancestors up to a given
+ * ancestor node, and returns both the left and right halves of the split.
+ *
+ * @param {HTMLElement} ancestorNode
+ * @param {HTMLElement} node
+ * @param {number} offset
+ */
+function split (ancestorNode, node, offset) {
+  const parent = ancestorNode.parentNode
+  const parentOffset = Array.from(parent.childNodes).indexOf(ancestorNode)
+
+  const leftRange = document.createRange()
+  leftRange.setStart(parent, parentOffset)
+  leftRange.setEnd(node, offset)
+
+  parent.insertBefore(leftRange.extractContents(), ancestorNode)
+
+  return [ancestorNode.previousSibling, ancestorNode]
 }
 
-function createNodeIterator (root, filter) {
-  let currentNode = root
-  let previousNode = null
-
-  function nextNode () {
-    if (!currentNode) {
-      return null
+/**
+ * Merge identical consecutive tags and remove empty ones.
+ *
+ * @param {HTMLElement} node
+ */
+function merge (node) {
+  for (const child of node.childNodes) {
+    // Remove empty tags
+    if (child.nodeName !== 'BR' && !child.textContent) {
+      node.removeChild(child)
+      continue
     }
 
-    if (currentNode.firstChild && previousNode !== currentNode.firstChild) {
-      previousNode = currentNode
-      currentNode = currentNode.firstChild
-    } else if (currentNode.nextSibling) {
-      previousNode = currentNode
-      currentNode = currentNode.nextSibling
-    } else {
-      let parent = currentNode.parentNode
-      while (parent && parent !== root) {
-        if (parent.nextSibling) {
-          previousNode = currentNode = parent.nextSibling
-          break
-        }
-        parent = parent.parentNode
-      }
-      if (!parent || parent === root) {
-        previousNode = currentNode = null
-      }
+    // Skip non-mergable nodes
+    if (child.nodeType !== Node.ELEMENT_NODE || child.nodeName === 'BR') {
+      continue
     }
 
-    return currentNode
-  }
+    // Merge identical adjecent nodes
+    while (child.nextSibling) {
+      const sibling = child.nextSibling
 
-  return {
-    next: nextNode
-  }
-}
-
-function isNodeFullyContained (node, range) {
-  const nodeRange = document.createRange()
-  nodeRange.selectNodeContents(node)
-  return range.compareBoundaryPoints(Range.START_TO_START, nodeRange) <= 0 &&
-         range.compareBoundaryPoints(Range.END_TO_END, nodeRange) >= 0
-}
-
-function canSurroundContents (range) {
-  if (!range || !range.startContainer || !range.endContainer) {
-    return false
-  }
-
-  if (range.startContainer === range.endContainer) return true
-
-  // Create a custom node iterator for the common ancestor container
-  const iterator = createNodeIterator(range.commonAncestorContainer, function (node) {
-    return range.isPointInRange(node, 0)
-  })
-
-  let currentNode
-  let boundariesInvalid = false
-
-  while ((currentNode = iterator.next())) {
-    if (currentNode.nodeType === Node.ELEMENT_NODE) {
-      if (!isNodeFullyContained(currentNode, range)) {
-        boundariesInvalid = true
+      if (!child.cloneNode().isEqualNode(sibling.cloneNode())) {
         break
       }
+
+      while (sibling.firstChild) child.appendChild(sibling.firstChild)
+      sibling.remove()
+    }
+
+    merge(child)
+  }
+}
+
+/**
+ * Sort the nodes under a given host node lexically in place.
+ *
+ * @param {HTMLElement} host
+ */
+export function sort (host) {
+  if (!host.childNodes.length) return
+
+  // Perform h-1 - 1 (host) - 1 (text node) = h-3 sort passes to ensure that the
+  // DOM tree is fully sorted
+  const requiredPasses = getTreeHeight(host) - 3
+  for (let pass = 0; pass < requiredPasses; pass++) {
+    const sortedChildren = []
+    while (host.childNodes.length) {
+      sortedChildren.push(...sortPass(host.childNodes[0]))
+      host.removeChild(host.childNodes[0])
+    }
+
+    for (const sortedChild of sortedChildren) {
+      host.appendChild(sortedChild)
     }
   }
+}
 
-  return !boundariesInvalid
+/**
+ * Traverse the DOM tree under the given node in post-order and sort the tree
+ * lexically. To ensure the DOM tree is fully sorted, this function needs to be
+ * called h-1 times, where h represents the height of the tree.
+ *
+ * @param {HTMLElement} node
+ * @returns {HTMLElement[]}
+ */
+function sortPass (node) {
+  const children = node.childNodes
+  if (!children.length) return [node]
+
+  // Traverse
+  const sortedChildren = []
+  for (const child of children) {
+    sortedChildren.push(...sortPass(child))
+  }
+
+  // Sort
+  const sortedNodes = []
+  for (const sortedChild of sortedChildren) {
+    // No swap
+    if (
+      sortedChild.nodeType === Node.TEXT_NODE ||
+      getNodeString(node) <= getNodeString(sortedChild)
+    ) {
+      const currentNode = node.cloneNode()
+      currentNode.appendChild(sortedChild)
+      sortedNodes.push(currentNode)
+      continue
+    }
+
+    // Swap
+    const currentNode = sortedChild.cloneNode()
+    currentNode.appendChild(node.cloneNode())
+    while (sortedChild.childNodes.length) {
+      currentNode.children[0].appendChild(sortedChild.childNodes[0])
+    }
+    sortedNodes.push(currentNode)
+  }
+
+  return sortedNodes
+}
+
+/**
+ * Compute the height of the DOM tree under the given node.
+ *
+ * @param {HTMLElement} node
+ * @returns {number}
+ */
+function getTreeHeight (node) {
+  if (!node) return 0
+
+  let maxHeight = 0
+  for (const child of node.childNodes) {
+    maxHeight = Math.max(maxHeight, getTreeHeight(child))
+  }
+
+  return maxHeight + 1
+}
+
+/**
+ * Convert a DOM node into its string representation.
+ *
+ * @param {HTMLElement} node
+ * @returns {string}
+ *
+ * @example
+ * <strong></strong>
+ * <a href="#"></a>
+ */
+function getNodeString (node) {
+  const clone = node.cloneNode()
+  clone.innerHTML = ''
+  return clone.outerHTML
 }
