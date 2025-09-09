@@ -110,8 +110,10 @@ export function extractContent (element, keepUiElements) {
 }
 
 export function getInnerHtmlOfFragment (documentFragment) {
+  const deep = true
+  const clonedDocumentFragment = documentFragment.cloneNode(deep)
   const div = document.createElement('div')
-  div.appendChild(documentFragment)
+  div.appendChild(clonedDocumentFragment)
   return div.innerHTML
 }
 
