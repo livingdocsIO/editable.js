@@ -182,7 +182,10 @@ export const toCharacterRange = (range, container) => {
   startRange.setStart(container, 0)
   startRange.setEnd(range.startContainer, range.startOffset)
 
-  const rangeText = range.toString()
+  // Remove zero width space to make selection more accurate,
+  // because it will be removed on component blur via extractContent.
+  const zeroWidthNonBreakingSpace = /\uFEFF/g
+  const rangeText = range.toString().replace(zeroWidthNonBreakingSpace, '')
   const start = startRange.toString().length
   const end = start + rangeText.length
 

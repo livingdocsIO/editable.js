@@ -154,6 +154,9 @@ describe('Dispatcher:', function () {
           expect(content.getInnerHtmlOfFragment(before)).to.equal('ba')
           expect(content.getInnerHtmlOfFragment(after)).to.equal('r')
           expect(cursor.isCursor).to.equal(true)
+          // Check again to avoid regression (DOM was mutated)
+          expect(content.getInnerHtmlOfFragment(before)).to.equal('ba')
+          expect(content.getInnerHtmlOfFragment(after)).to.equal('r')
         })
 
         const evt = new KeyboardEvent('keydown', {keyCode: key.enter})
