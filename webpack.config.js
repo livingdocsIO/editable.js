@@ -38,7 +38,6 @@ module.exports = {
             loader: 'babel-loader',
             options: {
               plugins: [
-                '@babel/plugin-transform-runtime',
                 ...(test ? ['babel-plugin-istanbul'] : [])
               ],
               presets: [

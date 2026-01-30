@@ -3,13 +3,11 @@
   "description": "Friendly contenteditable API",
   "version": "0.0.0-development",
   "dependencies": {
-    "@babel/runtime": "^7.16.7",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@babel/cli": "^7.16.8",
     "@babel/core": "^7.16.12",
-    "@babel/plugin-transform-runtime": "^7.16.10",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@eslint/compat": "^2.0.0",
