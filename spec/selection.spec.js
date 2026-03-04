@@ -142,6 +142,58 @@ describe('Selection', function () {
       })
     })
 
+    describe('getTextRange()', function () {
+
+      it('handles zero width non-breaking spaces at the start and end of text', function () {
+        const oneWord = createElement('<div>\uFEFFfoobar\uFEFF</div>')
+        const range = createRange()
+        range.selectNodeContents(oneWord)
+        const selection = new Selection(oneWord, range)
+        expect(selection.getTextRange()).to.deep.equal({start: 0, end: 6, text: 'foobar'})
+      })
+
+      it('handles zero width non-breaking spaces around parent element', function () {
+        const oneWord = createElement('\uFEFF<div>foobar</div>\uFEFF')
+        const range = createRange()
+        range.selectNodeContents(oneWord)
+        const selection = new Selection(oneWord, range)
+        expect(selection.getTextRange()).to.deep.equal({start: 0, end: 6, text: 'foobar'})
+      })
+
+      it('handles a zero width non-breaking space in the middle of text', function () {
+        const div = createElement('<div>foo\uFEFFbar</div>')
+        const range = createRange()
+        range.selectNodeContents(div)
+        const selection = new Selection(div, range)
+        expect(selection.getTextRange()).to.deep.equal({start: 0, end: 6, text: 'foobar'})
+      })
+
+      it('handles multiple consecutive zero width non-breaking spaces', function () {
+        const div = createElement('<div>\uFEFF\uFEFFfoo\uFEFF</div>')
+        const range = createRange()
+        range.selectNodeContents(div)
+        const selection = new Selection(div, range)
+        expect(selection.getTextRange()).to.deep.equal({start: 0, end: 3, text: 'foo'})
+      })
+
+      it('does not affect text without zero width non-breaking spaces', function () {
+        const div = createElement('<div>hello world</div>')
+        const range = createRange()
+        range.selectNodeContents(div)
+        const selection = new Selection(div, range)
+        expect(selection.getTextRange()).to.deep.equal({start: 0, end: 11, text: 'hello world'})
+      })
+
+      it('strips zero width non-breaking space from a partial selection', function () {
+        const div = createElement('<div>foo\uFEFFbar</div>')
+        const range = createRange()
+        range.setStart(div.firstChild, 0)
+        range.setEnd(div.firstChild, 4) // 'foo\uFEFF'
+        const selection = new Selection(div, range)
+        expect(selection.getTextRange()).to.deep.equal({start: 0, end: 3, text: 'foo'})
+      })
+    })
+
     describe('custom:', function () {
 
       beforeEach(function () {
