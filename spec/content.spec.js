@@ -567,20 +567,16 @@ describe('Content', function () {
       expect(content.extractContent(fragment)).to.equal('a<span>b</span>c')
     })
 
-    it('replaces a zeroWidthSpace with a <br> tag', function () {
+    it('removes a zeroWidthSpace', function () {
       const element = createElement('<div>a\u200Bb</div>')
       const result = content.extractContent(element)
-      expect(result).to.equal('a<br>b')
+      expect(result).to.equal('ab')
     })
 
     it('removes text nodes and line breaks at the end', function () {
-      const element = createElement('<div>a\u200B</div>')
-      const result = content.extractContent(element)
-      expect(result).to.equal('a')
-
-      const element2 = createElement('<div>b<br></div>')
+      const element2 = createElement('<div>a<br></div>')
       const result2 = content.extractContent(element2)
-      expect(result2).to.equal('b')
+      expect(result2).to.equal('a')
     })
 
     it('removes zeroWidthNonBreakingSpaces', function () {
