@@ -94,7 +94,7 @@ export function extractContent (element, keepUiElements) {
     : element.innerHTML
   )
     .replace(zeroWidthNonBreakingSpace, '') // Used for forcing inline elements to have a height
-    .replace(zeroWidthSpace, '<br>') // Used for cross-browser newlines
+    .replace(zeroWidthSpace, '')
 
   const clone = document.createElement('div')
   clone.innerHTML = innerHtml
