@@ -45,19 +45,25 @@ const highlightSupport = {
       this.win
     )
 
-    const actualStartIndex = startIndex
-    const actualEndIndex = endIndex
+    // If text is provided then validate that it matches
+    if (text) {
+      const tempElement = document.createElement('div')
+      tempElement.innerHTML = text
+      if (tempElement.textContent !== blockText.slice(startIndex, endIndex)) {
+        return -1
+      }
+    }
 
     highlightText.highlightMatches(editableHost, [{
-      startIndex: actualStartIndex,
-      endIndex: actualEndIndex,
+      startIndex,
+      endIndex,
       id: highlightId,
       marker
     }], false)
 
     if (dispatcher) dispatcher.notify('change', editableHost)
 
-    return actualStartIndex
+    return startIndex
   },
 
   updateHighlight (editableHost, highlightId, addCssClass, removeCssClass) {

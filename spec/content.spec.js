@@ -552,6 +552,29 @@ describe('Content', function () {
     })
   })
 
+  describe('getInnerHtmlOfFragment()', function () {
+
+    it('returns the html content of a fragment', function () {
+      const fragment = content.createFragmentFromString('<b>bold</b> text')
+      expect(content.getInnerHtmlOfFragment(fragment)).to.equal('<b>bold</b> text')
+    })
+
+    // Prevent regression where the child nodes were moved instead of cloned
+    it('does not mutate the fragment when called', function () {
+      const fragment = content.createFragmentFromString('hello')
+      content.getInnerHtmlOfFragment(fragment)
+      expect(fragment.childNodes.length).to.be.greaterThan(0)
+    })
+
+    it('returns consistent results when called multiple times', function () {
+      const fragment = content.createFragmentFromString('<b>bold</b> text')
+      const first = content.getInnerHtmlOfFragment(fragment)
+      const second = content.getInnerHtmlOfFragment(fragment)
+      expect(first).to.equal('<b>bold</b> text')
+      expect(second).to.equal('<b>bold</b> text')
+    })
+  })
+
   describe('extractContent()', function () {
     it('extracts the content', function () {
       const element = createElement('<div>a</div>')
