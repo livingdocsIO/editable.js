@@ -25,18 +25,19 @@ jobs:
 
     - name: Run npm audit fix
       run: npm audit fix
+      continue-on-error: true
 
     - name: Commit and push changes
       run: |
+        if git diff --quiet; then
+          echo "No changes to commit."
+          exit 0
+        fi
         BRANCH_NAME="security-patch-${GITHUB_REF_NAME}-$(date +'%Y-%m-%d')"
         git config user.name "livingdocs-machine"
         git config user.email "machine@livingdocs.io"
         git checkout -b $BRANCH_NAME
         git add package.json package-lock.json
-        if git diff --quiet; then
-          echo "No changes to commit."
-          exit 0
-        fi
         git commit -m "fix(deps): automatically patch Node.js vulnerabilities"
         git push origin $BRANCH_NAME
       env:
