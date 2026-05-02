@@ -1,6 +1,6 @@
 {
   "extends": [
-    "config:base"
+    "config:recommended"
   ],
   "dependencyDashboard": true,
   "labels": ["dependencies"],
@@ -19,11 +19,11 @@
   "platformAutomerge": true,
   "packageRules": [
     {
-      "matchPackagePatterns": ["babel"],
+      "matchPackageNames": ["/babel/"],
       "groupName": "babel"
     },
     {
-      "matchPackagePatterns": ["karma"],
+      "matchPackageNames": ["/karma/"],
       "groupName": "babel"
     },
     {
