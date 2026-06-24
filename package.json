@@ -75,5 +75,10 @@
   },
   "release": {
     "extends": "@livingdocs/semantic-release-presets/npm-github-verify"
+  },
+  "overrides": {
+    "eslint-plugin-react": {
+      "eslint": "$eslint"
+    }
   }
 }
