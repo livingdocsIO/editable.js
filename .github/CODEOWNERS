@@ -1,0 +1,3 @@
+# Changes under .github/ require code-owner review: workflow files decide what
+# runs in CI and with which credentials.
+/.github/ @livingdocsIO/devops @livingdocsIO/admins
