@@ -8,6 +8,12 @@ import Dispatcher from './dispatcher.js'
 import Cursor from './cursor.js'
 import highlightSupport from './highlight-support.js'
 import MonitoredHighlighting from './monitored-highlighting.js'
+import {
+  getCssHighlightText,
+  setCssHighlight,
+  clearCssHighlight,
+  findCharacterOffset
+} from './plugins/highlighting/css-highlights.js'
 import createDefaultEvents from './create-default-events.js'
 import {textNodesUnder, getTextNodeAndRelativeOffset} from './util/element.js'
 import {binaryCursorSearch} from './util/binary_search.js'
@@ -426,6 +432,46 @@ export class Editable {
 
   decorateHighlight ({editableHost, highlightId, addCssClass, removeCssClass}) {
     highlightSupport.updateHighlight(editableHost, highlightId, addCssClass, removeCssClass)
+  }
+
+  /**
+   * @param  {DOMNode} editableHost
+   * @return {String}
+   */
+  getCssHighlightText (editableHost) {
+    return getCssHighlightText(editableHost)
+  }
+
+  /**
+   * @param {Object} options
+   * @param {String} options.name
+   * @param {Array} [options.ranges]
+   * @param {DOMNode} options.ranges[].editableHost
+   * @param {Number} options.ranges[].start
+   * @param {Number} options.ranges[].end
+   */
+  setCssHighlight ({name, ranges = []}) {
+    setCssHighlight({name, ranges, win: this.win})
+  }
+
+  /**
+   * @param {Object} options
+   * @param {String} options.name
+   */
+  clearCssHighlight ({name}) {
+    clearCssHighlight({name, win: this.win})
+  }
+
+  /**
+   * @param  {DOMNode} editableHost
+   * @return {Number|undefined}
+   */
+  getCssHighlightCursorOffset (editableHost) {
+    const cursor = this.getSelection(editableHost)
+    if (!cursor?.isCursor) return
+
+    const {startContainer, startOffset} = cursor.range
+    return findCharacterOffset(editableHost, startContainer, startOffset)
   }
 
   /**
