@@ -1,9 +1,10 @@
 import NodeIterator from '../../node-iterator.js'
 import * as nodeType from '../../node-type.js'
 import {createRange} from '../../util/dom.js'
+import {getScrollPosition} from '../../util/viewport.js'
 
 /**
- * Read an editable as one flat string. Callers place marks by character
+ * Read an editable as one flat string. Callers place highlights by character
  * offset, so they need a view of the block with no markup in it. Elements
  * fall away, a <br> becomes a newline, and parts of the block that are
  * marked data-editable="remove" are left out.
@@ -23,8 +24,9 @@ export function getCssHighlightText (element) {
 }
 
 /**
- * Mark parts of an editable without touching its content. Marks like spell
- * errors are not part of the document, so they should not end up in the DOM.
+ * Highlight parts of an editable without touching its content. Highlights like
+ * spell errors are not part of the document, so they should not end up in the
+ * DOM.
  *
  * @param  {Object} options
  * @param  {String} options.name
@@ -69,8 +71,8 @@ export function createCssHighlightRange ({editableHost, start, end, win = window
 }
 
 /**
- * Take away all marks of a kind. The registry belongs to the window, not to
- * an editable, so marks stay around until someone removes them.
+ * Remove all highlights of one kind. The registry belongs to the window, not
+ * to an editable, so highlights stay around until someone removes them.
  *
  * @param  {Object} options
  * @param  {String} options.name
@@ -81,9 +83,32 @@ export function clearCssHighlight ({name, win = window}) {
 }
 
 /**
- * Count how far into a block a DOM position sits, the other way round from
+ * Where a highlight is positioned on screen.
+ *
+ * @param  {Object} options
+ * @param  {DOMNode} options.editableHost
+ * @param  {Number} options.start
+ * @param  {Number} options.end
+ * @param  {Window} [options.win]
+ * @return {Object|undefined}
+ */
+export function getCssHighlightRects ({editableHost, start, end, win = window}) {
+  const range = createCssHighlightRange({editableHost, start, end, win})
+  if (!range) return
+
+  const bounding = range.getBoundingClientRect()
+  const rects = Array.from(range.getClientRects())
+  const {x, y} = getScrollPosition(win)
+  return {
+    bounding: translate(bounding, x, y),
+    rects: rects.map((rect) => translate(rect, x, y))
+  }
+}
+
+/**
+ * Count how far into a block a DOM position sits, the inverse of
  * findRangeBoundary(). Counts the same characters as getCssHighlightText() so
- * that a cursor and a mark agree on where they are.
+ * that a cursor and a highlight agree on where they are.
  *
  * @param  {DOMNode} element
  * @param  {DOMNode} container
@@ -150,5 +175,24 @@ function findRangeBoundary (element, target, inclusive) {
     }
 
     offset = nodeEnd
+  }
+}
+
+/**
+ * Shift a rect by a scroll offset.
+ *
+ * @param  {DOMRect} rect
+ * @param  {Number} x
+ * @param  {Number} y
+ * @return {Object}
+ */
+function translate (rect, x, y) {
+  return {
+    top: rect.top + y,
+    bottom: rect.bottom + y,
+    left: rect.left + x,
+    right: rect.right + x,
+    width: rect.width,
+    height: rect.height
   }
 }
