@@ -8,10 +8,13 @@ import Dispatcher from './dispatcher.js'
 import Cursor from './cursor.js'
 import highlightSupport from './highlight-support.js'
 import MonitoredHighlighting from './monitored-highlighting.js'
+import Selection from './selection.js'
 import {
   getCssHighlightText,
   setCssHighlight,
   clearCssHighlight,
+  createCssHighlightRange,
+  getCssHighlightRects,
   findCharacterOffset
 } from './plugins/highlighting/css-highlights.js'
 import createDefaultEvents from './create-default-events.js'
@@ -460,6 +463,47 @@ export class Editable {
    */
   clearCssHighlight ({name}) {
     clearCssHighlight({name, win: this.win})
+  }
+
+  /**
+   * @param {Object} options
+   * @param {DOMNode} options.editableHost
+   * @param {Number} options.start
+   * @param {Number} options.end
+   * @return {Range|undefined}
+   */
+  getCssHighlightRange ({editableHost, start, end}) {
+    return createCssHighlightRange({editableHost, start, end, win: this.win})
+  }
+
+  /**
+   * @param {Object} options
+   * @param {DOMNode} options.editableHost
+   * @param {Number} options.start
+   * @param {Number} options.end
+   * @return {Object|undefined} {bounding, rects}
+   */
+  getCssHighlightRects ({editableHost, start, end}) {
+    return getCssHighlightRects({editableHost, start, end, win: this.win})
+  }
+
+  /**
+   * Swap the text under a highlight for something else.
+   *
+   * @param {Object} options
+   * @param {DOMNode} options.editableHost
+   * @param {Number} options.start
+   * @param {Number} options.end
+   * @param {String} options.text
+   * @return {Boolean} Whether the replacement happened.
+   */
+  replaceCssHighlightRange ({editableHost, start, end, text}) {
+    const range = createCssHighlightRange({editableHost, start, end, win: this.win})
+    if (!range) return false
+
+    const cursor = new Selection(editableHost, range).insertCharacter(text)
+    cursor.triggerChange()
+    return true
   }
 
   /**
