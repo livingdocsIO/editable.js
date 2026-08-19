@@ -12,10 +12,10 @@ import Selection from './selection.js'
 import {
   getCssHighlightText,
   setCssHighlight,
-  clearCssHighlight,
+  deleteCssHighlight,
   createCssHighlightRange,
   getCssHighlightRects,
-  findCharacterOffset
+  getCssHighlightTextOffset
 } from './plugins/highlighting/css-highlights.js'
 import createDefaultEvents from './create-default-events.js'
 import {textNodesUnder, getTextNodeAndRelativeOffset} from './util/element.js'
@@ -438,11 +438,12 @@ export class Editable {
   }
 
   /**
-   * @param  {DOMNode} editableHost
+   * @param  {Object} options
+   * @param  {DOMNode} options.editableHost
    * @return {String}
    */
-  getCssHighlightText (editableHost) {
-    return getCssHighlightText(editableHost)
+  getCssHighlightText ({editableHost}) {
+    return getCssHighlightText({editableHost})
   }
 
   /**
@@ -461,43 +462,19 @@ export class Editable {
    * @param {Object} options
    * @param {String} options.name
    */
-  clearCssHighlight ({name}) {
-    clearCssHighlight({name, win: this.win})
+  deleteCssHighlight ({name}) {
+    deleteCssHighlight({name, win: this.win})
   }
 
   /**
-   * @param {Object} options
-   * @param {DOMNode} options.editableHost
-   * @param {Number} options.start
-   * @param {Number} options.end
-   * @return {Range|undefined}
-   */
-  getCssHighlightRange ({editableHost, start, end}) {
-    return createCssHighlightRange({editableHost, start, end, win: this.win})
-  }
-
-  /**
-   * @param {Object} options
-   * @param {DOMNode} options.editableHost
-   * @param {Number} options.start
-   * @param {Number} options.end
-   * @return {Object|undefined} {bounding, rects}
-   */
-  getCssHighlightRects ({editableHost, start, end}) {
-    return getCssHighlightRects({editableHost, start, end, win: this.win})
-  }
-
-  /**
-   * Swap the text under a highlight for something else.
-   *
    * @param {Object} options
    * @param {DOMNode} options.editableHost
    * @param {Number} options.start
    * @param {Number} options.end
    * @param {String} options.text
-   * @return {Boolean} Whether the replacement happened.
+   * @return {Boolean}
    */
-  replaceCssHighlightRange ({editableHost, start, end, text}) {
+  replaceCssHighlight ({editableHost, start, end, text}) {
     const range = createCssHighlightRange({editableHost, start, end, win: this.win})
     if (!range) return false
 
@@ -507,15 +484,31 @@ export class Editable {
   }
 
   /**
-   * @param  {DOMNode} editableHost
+   * @param {Object} options
+   * @param {DOMNode} options.editableHost
+   * @param {Number} options.start
+   * @param {Number} options.end
+   * @return {Object|undefined}
+   */
+  getCssHighlightRects ({editableHost, start, end}) {
+    return getCssHighlightRects({editableHost, start, end, win: this.win})
+  }
+
+  /**
+   * @param  {Object} options
+   * @param  {DOMNode} options.editableHost
    * @return {Number|undefined}
    */
-  getCssHighlightCursorOffset (editableHost) {
+  getCssHighlightCursorOffset ({editableHost}) {
     const cursor = this.getSelection(editableHost)
     if (!cursor?.isCursor) return
 
     const {startContainer, startOffset} = cursor.range
-    return findCharacterOffset(editableHost, startContainer, startOffset)
+    return getCssHighlightTextOffset({
+      editableHost,
+      container: startContainer,
+      containerOffset: startOffset
+    })
   }
 
   /**
