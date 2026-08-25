@@ -1,6 +1,7 @@
 import {expect} from 'chai'
 
 import highlightSupport from '../src/highlight-support.js'
+import Selection from '../src/selection.js'
 import {createElement} from '../src/util/dom.js'
 import {
   createCssHighlightRange,
@@ -36,6 +37,13 @@ describe('css highlights', function () {
     for (const host of hosts) host.remove()
     hosts = []
   })
+
+  // Select characters the way a user would, so the formatting runs on a real range.
+  function selectChars (host, start, end) {
+    const range = createCssHighlightRange({editableHost: host, start, end})
+    return new Selection(host, range)
+  }
+
 
   describe('getCssHighlightText()', function () {
     it('reads the text of an editable without its markup', function () {
@@ -116,6 +124,40 @@ describe('css highlights', function () {
       host.textContent = 'Hello world'
       refreshCssHighlights({editableHost: host})
       expect(highlightedText()).to.deep.equal(['world'])
+    })
+
+    it('keeps the highlight on the same words when a format overlaps its start', function () {
+      const host = addEditable('Hello wrold there')
+      setCssHighlight({name, ranges: [{editableHost: host, start: 6, end: 11}]})
+
+      selectChars(host, 0, 8).toggleBold()
+
+      expect(host.innerHTML).to.equal('<strong>Hello wr</strong>old there')
+      expect(highlightedText()).to.deep.equal(['wrold'])
+    })
+
+    it('keeps the highlight on the same words when a format is applied to it and removed again', function () {
+      const host = addEditable('Hello wrold there')
+      setCssHighlight({name, ranges: [{editableHost: host, start: 6, end: 11}]})
+
+      selectChars(host, 6, 11).toggleBold()
+      expect(highlightedText()).to.deep.equal(['wrold'])
+
+      selectChars(host, 6, 11).toggleBold()
+      expect(host.innerHTML).to.equal('Hello wrold there')
+      expect(highlightedText()).to.deep.equal(['wrold'])
+    })
+
+    it('keeps the highlight on the same words when a link is added and removed', function () {
+      const host = addEditable('Hello wrold there')
+      setCssHighlight({name, ranges: [{editableHost: host, start: 6, end: 11}]})
+
+      selectChars(host, 0, 8).link('https://example.com')
+      expect(highlightedText()).to.deep.equal(['wrold'])
+
+      selectChars(host, 0, 8).unlink()
+      expect(host.innerHTML).to.equal('Hello wrold there')
+      expect(highlightedText()).to.deep.equal(['wrold'])
     })
 
     it('forgets editables that left the document', function () {

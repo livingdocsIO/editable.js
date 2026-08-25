@@ -2,6 +2,7 @@ import * as nodeType from './node-type.js'
 import * as rangeSaveRestore from './range-save-restore.js'
 import * as parser from './parser.js'
 import * as string from './util/string.js'
+import {refreshCssHighlights} from './plugins/highlighting/css-highlights.js'
 import {createElement, createRange, getNodes, normalizeBoundaries, splitBoundaries, containsNodeText} from './util/dom.js'
 import config from './config.js'
 
@@ -343,6 +344,7 @@ export function forceWrap (host, range, elem) {
   }
 
   wrap(restoredRange, elem)
+  refreshCssHighlights({editableHost: host})
   return restoredRange
 }
 
@@ -364,15 +366,19 @@ export function unwrap (elem) {
 }
 
 export function removeFormattingElem (host, range, elem) {
-  return restoreRange(host, range, () => {
+  const restoredRange = restoreRange(host, range, () => {
     nukeElem(host, range, elem)
   })
+  refreshCssHighlights({editableHost: host})
+  return restoredRange
 }
 
 export function removeFormatting (host, range, selector) {
-  return restoreRange(host, range, () => {
+  const restoredRange = restoreRange(host, range, () => {
     nuke(host, range, selector)
   })
+  refreshCssHighlights({editableHost: host})
+  return restoredRange
 }
 
 // Unwrap all tags this range is affected by.

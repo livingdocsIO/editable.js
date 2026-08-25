@@ -59,7 +59,7 @@ describe('RangeSaveRestore', function () {
     // the range is added outside the element instead of inside where the text node is
     // (compare with the previous test).
     expect(host.innerHTML)
-      .to.equal(`<span id="editable-range-boundary-35" data-editable="remove" style="line-height: 0; display: none;">\ufeff</span><em>a</em><em>b</em><span id="editable-range-boundary-34" data-editable="remove" style="line-height: 0; display: none;">\ufeff</span>`)
+      .to.equal(`<span id="${savedRange.startMarkerId}" data-editable="remove" style="line-height: 0; display: none;">\ufeff</span><em>a</em><em>b</em><span id="${savedRange.endMarkerId}" data-editable="remove" style="line-height: 0; display: none;">\ufeff</span>`)
 
     rangeSaveRestore.restore(host, savedRange)
 
