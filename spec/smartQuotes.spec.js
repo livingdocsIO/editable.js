@@ -1,5 +1,7 @@
 import {expect} from 'chai'
 import {isDoubleQuote, isSingleQuote, isWhitespace, isSeparatorOrWhitespace, isApostrophe, replaceQuote} from '../src/smartQuotes'
+import {createElement} from '../src/util/dom.js'
+import {deleteCssHighlight, setCssHighlight} from '../src/plugins/highlighting/css-highlights.js'
 
 const allSingleQuotes = ['‘', '’', '‹', '›', '‚', '‘', '›', '‹', `'`, `‘`]
 const allDoubleQuotes = ['«', '»', '»', '«', '"', '"', '“', '”', '”', '”', '“', '“', '„', '“']
@@ -93,24 +95,86 @@ describe('replaceQuote(): ', () => {
 
   it('should replace quote at given index', () => {
     const range = createRangeWithText(testString)
-    const replacedTextNode = replaceQuote(range, index, '`')
-    expect(replacedTextNode.textContent).to.equal('123 `you')
+    expect(replaceQuote(range, index, '`')).to.equal(true)
+    expect(range.startContainer.textContent).to.equal('123 `you')
   })
 
-  it('should return null if range is invalid', () => {
-    const invalidNodeValue = replaceQuote(undefined, index, '`')
-    expect(invalidNodeValue).to.equal(null)
+  it('should return false if range is invalid', () => {
+    expect(replaceQuote(undefined, index, '`')).to.equal(false)
   })
 
-  it('should return null if range is empty', () => {
+  it('should return false if range is empty', () => {
     const range = createRangeWithText('')
-    const replacedTextNode = replaceQuote(range, 0, '`')
-    expect(replacedTextNode).to.equal(null)
+    expect(replaceQuote(range, 0, '`')).to.equal(false)
+    expect(range.startContainer.textContent).to.equal('')
   })
 
   it('should insert quote at the end, if index is out of bounds', () => {
     const range = createRangeWithText(testString)
-    const replacedTextNode = replaceQuote(range, 40, '`')
-    expect(replacedTextNode.textContent).to.equal(`${testString}${'`'}`)
+    expect(replaceQuote(range, 40, '`')).to.equal(true)
+    expect(range.startContainer.textContent).to.equal(`${testString}${'`'}`)
+  })
+
+  describe('with a css highlight', () => {
+    const highlightName = 'spellcheck'
+    let host
+
+    beforeEach(() => {
+      host = createElement(`<div>${testString}</div>`)
+      document.body.appendChild(host)
+    })
+
+    afterEach(() => {
+      deleteCssHighlight({name: highlightName})
+      host.remove()
+    })
+
+    const highlight = (start, end) => {
+      setCssHighlight({name: highlightName, ranges: [{editableHost: host, start, end}]})
+    }
+
+    const replaceQuoteInHost = () => {
+      const range = document.createRange()
+      range.selectNodeContents(host.firstChild)
+      replaceQuote(range, index, '`')
+    }
+
+    const highlightedTexts = () => Array.from(CSS.highlights.get(highlightName), (r) => r.toString())
+
+    it('should keep a highlight around the quote', () => {
+      highlight(3, 6)
+
+      replaceQuoteInHost()
+
+      expect(host.textContent).to.equal('123 `you')
+      expect(highlightedTexts()).to.deep.equal([' `y'])
+    })
+
+    it('should keep a highlight away from the quote', () => {
+      highlight(0, 3)
+
+      replaceQuoteInHost()
+
+      expect(host.textContent).to.equal('123 `you')
+      expect(highlightedTexts()).to.deep.equal(['123'])
+    })
+
+    it('should keep a highlight starting right after the quote', () => {
+      highlight(5, 8)
+
+      replaceQuoteInHost()
+
+      expect(host.textContent).to.equal('123 `you')
+      expect(highlightedTexts()).to.deep.equal(['you'])
+    })
+
+    it('should keep a highlight ending right before the quote', () => {
+      highlight(0, 4)
+
+      replaceQuoteInHost()
+
+      expect(host.textContent).to.equal('123 `you')
+      expect(highlightedTexts()).to.deep.equal(['123 '])
+    })
   })
 })
