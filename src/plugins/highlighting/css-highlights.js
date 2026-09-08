@@ -23,25 +23,14 @@ const stripInternal = (data) => (hasInternal(data) ? data.replace(internalCharac
 
 /**
  * Read an editable as plain text. Callers work in character offsets, so they
- * need the text those offsets count against. A <br> counts as a newline,
- * otherwise the words around it would run together. Text marked
- * data-editable="remove" is left out.
- *
- * Internal characters are left out, so the text reads as what is on screen.
+ * need the text those offsets count against.
  *
  * @param  {Object} options
  * @param  {DOMNode} options.editableHost
  * @return {String}
  */
 export function getCssHighlightText ({editableHost}) {
-  let text = ''
-
-  for (const node of new NodeIterator(editableHost)) {
-    if (node.nodeType === nodeType.textNode) text += stripInternal(node.data)
-    else if (node.nodeName === 'BR') text += '\n'
-  }
-
-  return text
+  return readEditable(editableHost).text
 }
 
 /**
@@ -119,7 +108,7 @@ export function refreshCssHighlights ({
  * @return {Range|undefined}
  */
 export function createCssHighlightRange ({editableHost, start, end, win = window}) {
-  const segments = collectTextSegments(editableHost)
+  const {segments} = readEditable(editableHost)
   return createRangeFromSegments({segments, start, end, win})
 }
 
@@ -178,13 +167,16 @@ export function getCssHighlightTextOffset ({editableHost, container, containerOf
     ? container.childNodes[containerOffset]
     : undefined
 
+  const {text, leading} = readEditable(editableHost)
+  const counted = (raw) => Math.min(Math.max(raw - leading, 0), text.length)
+
   const iterator = new NodeIterator(editableHost)
 
   let offset = 0
   let next
 
   while ((next = iterator.getNext())) {
-    if (next === beforeNode) return offset
+    if (next === beforeNode) return counted(offset)
 
     if (next.nodeType === nodeType.elementNode && next.nodeName === 'BR') {
       offset += 1
@@ -193,14 +185,14 @@ export function getCssHighlightTextOffset ({editableHost, container, containerOf
     if (next.nodeType !== nodeType.textNode || next.data === '') continue
 
     if (next === container) {
-      return offset + stripInternal(next.data.slice(0, containerOffset)).length
+      return counted(offset + stripInternal(next.data.slice(0, containerOffset)).length)
     }
     offset = offset + stripInternal(next.data).length
   }
 
   // The walk never met the container. For an element that means the end of the
   // block. Anything else is a node we do not count, so there is no offset.
-  if (!beforeNode && container.nodeType === nodeType.elementNode) return offset
+  if (!beforeNode && container.nodeType === nodeType.elementNode) return counted(offset)
 }
 
 /**
@@ -215,7 +207,7 @@ function drawCssHighlight ({name, hosts, win}) {
   const domRanges = []
 
   for (const [editableHost, offsets] of hosts) {
-    const segments = collectTextSegments(editableHost)
+    const {segments} = readEditable(editableHost)
     if (!segments.length) continue
 
     for (const {start, end} of offsets) {
@@ -232,35 +224,36 @@ function drawCssHighlight ({name, hosts, win}) {
 }
 
 /**
- * List the text nodes of an editable with the offsets each one covers. Reading
- * the block once serves any number of lookups, and it is read the same way as
- * getCssHighlightText() so the two agree on where an offset falls.
+ * Read an editable once: the text callers count their offsets against, and the
+ * segments those offsets resolve back through, out of the same walk.
  *
- * An internal character splits its text node in two rather than shifting the
- * offsets after it, so `nodeOffset` says where in the node a segment starts.
+ * A <br> counts as a newline. Internal characters and the whitespace at either
+ * end of the block do not, because the clean on blur takes them out; an internal
+ * character splits its text node in two, which is what nodeOffset is for.
  *
  * @param  {DOMNode} element
- * @return {Array} [{node, nodeOffset, start, end}] ordered and non overlapping
+ * @return {Object} {text, leading, segments} with segments ordered and non
+ *   overlapping as [{node, nodeOffset, start, end}]
  */
-function collectTextSegments (element) {
-  const segments = []
-  let offset = 0
+function readEditable (element) {
+  const runs = []
+  let raw = ''
 
-  const push = (node, nodeOffset, length) => {
-    segments.push({node, nodeOffset, start: offset, end: offset + length})
-    offset += length
+  const push = (node, nodeOffset, data) => {
+    runs.push({node, nodeOffset, start: raw.length, end: raw.length + data.length})
+    raw += data
   }
 
   for (const node of new NodeIterator(element)) {
     if (node.nodeType === nodeType.elementNode && node.nodeName === 'BR') {
-      offset += 1
+      raw += '\n'
       continue
     }
     if (node.nodeType !== nodeType.textNode || node.data === '') continue
 
     const data = node.data
     if (!hasInternal(data)) {
-      push(node, 0, data.length)
+      push(node, 0, data)
       continue
     }
 
@@ -272,13 +265,30 @@ function collectTextSegments (element) {
         runLength += 1
         continue
       }
-      if (runLength) push(node, runStart, runLength)
+      if (runLength) push(node, runStart, data.slice(runStart, runStart + runLength))
       runLength = 0
     }
-    if (runLength) push(node, runStart, runLength)
+    if (runLength) push(node, runStart, data.slice(runStart, runStart + runLength))
   }
 
-  return segments
+  const leading = raw.length - raw.trimStart().length
+  const kept = raw.trimEnd().length
+
+  const segments = []
+  for (const run of runs) {
+    const start = Math.max(run.start, leading)
+    const end = Math.min(run.end, kept)
+    if (start >= end) continue
+
+    segments.push({
+      node: run.node,
+      nodeOffset: run.nodeOffset + (start - run.start),
+      start: start - leading,
+      end: end - leading
+    })
+  }
+
+  return {text: raw.slice(leading, Math.max(leading, kept)), leading, segments}
 }
 
 /**

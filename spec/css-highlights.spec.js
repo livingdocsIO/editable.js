@@ -66,6 +66,11 @@ describe('css highlights', function () {
       const host = addEditable('Hello wrold\uFEFFs')
       expect(getCssHighlightText({editableHost: host})).to.equal('Hello wrolds')
     })
+
+    it('leaves out whitespace and breaks at the edges of the block', function () {
+      const host = addEditable('<br> Hello wrold ')
+      expect(getCssHighlightText({editableHost: host})).to.equal('Hello wrold')
+    })
   })
 
   describe('setCssHighlight()', function () {
@@ -205,6 +210,29 @@ describe('css highlights', function () {
       expect(highlightedText()).to.deep.equal(['wrolds'])
     })
 
+    it('keeps the highlight when a leading break is cleaned away', function () {
+      // Shift+Enter at the very start of the block.
+      const host = addEditable('<br>Hello wrold')
+      setCssHighlight({name, ranges: [{editableHost: host, start: 6, end: 11}]})
+      expect(highlightedText()).to.deep.equal(['wrold'])
+
+      content.cleanInternals(host)
+
+      expect(host.innerHTML).to.equal('Hello wrold')
+      expect(highlightedText()).to.deep.equal(['wrold'])
+    })
+
+    it('keeps the highlight when leading whitespace is cleaned away', function () {
+      const host = addEditable('  Hello wrold')
+      setCssHighlight({name, ranges: [{editableHost: host, start: 6, end: 11}]})
+      expect(highlightedText()).to.deep.equal(['wrold'])
+
+      content.cleanInternals(host)
+
+      expect(host.innerHTML).to.equal('Hello wrold')
+      expect(highlightedText()).to.deep.equal(['wrold'])
+    })
+
     it('forgets editables that left the document', function () {
       const gone = addEditable('Hello world')
       const stays = addEditable('Hello moon')
@@ -287,6 +315,16 @@ describe('css highlights', function () {
       })
 
       expect(offset).to.equal(8)
+    })
+
+    it('counts from the first character that counts', function () {
+      const host = addEditable('<br>Hello wrold')
+
+      const offset = getCssHighlightTextOffset({
+        editableHost: host, container: host.lastChild, containerOffset: 6
+      })
+
+      expect(offset).to.equal(6)
     })
 
     it('does not count a zero width space', function () {
