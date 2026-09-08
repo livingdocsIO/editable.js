@@ -11,11 +11,23 @@ import {getScrollPosition} from '../../util/viewport.js'
 // win -> Map(name -> Map(editableHost -> [{start, end}]))
 const registries = new WeakMap()
 
+// Characters the editable inserts and strips again by itself, so an offset
+// counted with one of them in it would move as soon as it goes.
+const internalCharacters = /[\uFEFF\u200B]/g
+
+const isInternal = (character) => character === '\uFEFF' || character === '\u200B'
+
+const hasInternal = (data) => data.indexOf('\uFEFF') >= 0 || data.indexOf('\u200B') >= 0
+
+const stripInternal = (data) => (hasInternal(data) ? data.replace(internalCharacters, '') : data)
+
 /**
  * Read an editable as plain text. Callers work in character offsets, so they
  * need the text those offsets count against. A <br> counts as a newline,
  * otherwise the words around it would run together. Text marked
  * data-editable="remove" is left out.
+ *
+ * Internal characters are left out, so the text reads as what is on screen.
  *
  * @param  {Object} options
  * @param  {DOMNode} options.editableHost
@@ -25,7 +37,7 @@ export function getCssHighlightText ({editableHost}) {
   let text = ''
 
   for (const node of new NodeIterator(editableHost)) {
-    if (node.nodeType === nodeType.textNode) text += node.data
+    if (node.nodeType === nodeType.textNode) text += stripInternal(node.data)
     else if (node.nodeName === 'BR') text += '\n'
   }
 
@@ -180,8 +192,10 @@ export function getCssHighlightTextOffset ({editableHost, container, containerOf
     }
     if (next.nodeType !== nodeType.textNode || next.data === '') continue
 
-    if (next === container) return offset + containerOffset
-    offset = offset + next.data.length
+    if (next === container) {
+      return offset + stripInternal(next.data.slice(0, containerOffset)).length
+    }
+    offset = offset + stripInternal(next.data).length
   }
 
   // The walk never met the container. For an element that means the end of the
@@ -222,12 +236,20 @@ function drawCssHighlight ({name, hosts, win}) {
  * the block once serves any number of lookups, and it is read the same way as
  * getCssHighlightText() so the two agree on where an offset falls.
  *
+ * An internal character splits its text node in two rather than shifting the
+ * offsets after it, so `nodeOffset` says where in the node a segment starts.
+ *
  * @param  {DOMNode} element
- * @return {Array} [{node, start, end}] ordered and non overlapping
+ * @return {Array} [{node, nodeOffset, start, end}] ordered and non overlapping
  */
 function collectTextSegments (element) {
   const segments = []
   let offset = 0
+
+  const push = (node, nodeOffset, length) => {
+    segments.push({node, nodeOffset, start: offset, end: offset + length})
+    offset += length
+  }
 
   for (const node of new NodeIterator(element)) {
     if (node.nodeType === nodeType.elementNode && node.nodeName === 'BR') {
@@ -236,9 +258,24 @@ function collectTextSegments (element) {
     }
     if (node.nodeType !== nodeType.textNode || node.data === '') continue
 
-    const end = offset + node.data.length
-    segments.push({node, start: offset, end})
-    offset = end
+    const data = node.data
+    if (!hasInternal(data)) {
+      push(node, 0, data.length)
+      continue
+    }
+
+    let runStart = 0
+    let runLength = 0
+    for (let index = 0; index < data.length; index++) {
+      if (!isInternal(data[index])) {
+        if (runLength === 0) runStart = index
+        runLength += 1
+        continue
+      }
+      if (runLength) push(node, runStart, runLength)
+      runLength = 0
+    }
+    if (runLength) push(node, runStart, runLength)
   }
 
   return segments
@@ -289,7 +326,7 @@ function findRangeBoundary (segments, target, inclusive) {
   const segment = segments[low]
   if (!segment) return
 
-  return {node: segment.node, offset: Math.max(0, target - segment.start)}
+  return {node: segment.node, offset: segment.nodeOffset + Math.max(0, target - segment.start)}
 }
 
 /**
