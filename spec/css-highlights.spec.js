@@ -61,6 +61,11 @@ describe('css highlights', function () {
       const host = addEditable('Hello <span data-editable="remove">nope</span>world')
       expect(getCssHighlightText({editableHost: host})).to.equal('Hello world')
     })
+
+    it('leaves out a zero width space', function () {
+      const host = addEditable('Hello wrold\uFEFFs')
+      expect(getCssHighlightText({editableHost: host})).to.equal('Hello wrolds')
+    })
   })
 
   describe('setCssHighlight()', function () {
@@ -188,6 +193,18 @@ describe('css highlights', function () {
       expect(highlightedText()).to.deep.equal(['wrold', 'moon'])
     })
 
+    it('keeps the highlight when a zero width space inside it is cleaned away', function () {
+      // Typing either side of the space an empty editable is given puts it in a word.
+      const host = addEditable('Hello wrold\uFEFFs')
+      setCssHighlight({name, ranges: [{editableHost: host, start: 6, end: 12}]})
+      expect(highlightedText()).to.deep.equal(['wrold\uFEFFs'])
+
+      content.cleanInternals(host)
+
+      expect(getCssHighlightText({editableHost: host})).to.equal('Hello wrolds')
+      expect(highlightedText()).to.deep.equal(['wrolds'])
+    })
+
     it('forgets editables that left the document', function () {
       const gone = addEditable('Hello world')
       const stays = addEditable('Hello moon')
@@ -219,6 +236,12 @@ describe('css highlights', function () {
   })
 
   describe('createCssHighlightRange()', function () {
+    it('returns a range that reaches over a zero width space of its own', function () {
+      const host = addEditable('Hello <span>\uFEFF</span>world')
+      const range = createCssHighlightRange({editableHost: host, start: 6, end: 11})
+      expect(range.toString()).to.equal('world')
+    })
+
     it('returns a range over the given characters', function () {
       const host = addEditable('Hello world')
       const range = createCssHighlightRange({editableHost: host, start: 6, end: 11})
@@ -264,6 +287,16 @@ describe('css highlights', function () {
       })
 
       expect(offset).to.equal(8)
+    })
+
+    it('does not count a zero width space', function () {
+      const host = addEditable('Hello wrold\uFEFFs')
+
+      const offset = getCssHighlightTextOffset({
+        editableHost: host, container: host.firstChild, containerOffset: 13
+      })
+
+      expect(offset).to.equal(12)
     })
 
     it('returns the offset of the child a position in an element points at', function () {
