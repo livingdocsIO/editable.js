@@ -1,5 +1,6 @@
 import {expect} from 'chai'
 
+import * as content from '../src/content.js'
 import highlightSupport from '../src/highlight-support.js'
 import Selection from '../src/selection.js'
 import {createElement} from '../src/util/dom.js'
@@ -158,6 +159,33 @@ describe('css highlights', function () {
       selectChars(host, 0, 8).unlink()
       expect(host.innerHTML).to.equal('Hello wrold there')
       expect(highlightedText()).to.deep.equal(['wrold'])
+    })
+
+    it('keeps the highlight when the internals are cleaned', function () {
+      const host = addEditable('Hello wrold there')
+      setCssHighlight({name, ranges: [{editableHost: host, start: 6, end: 11}]})
+
+      const before = host.firstChild
+      content.cleanInternals(host)
+
+      expect(host.firstChild).to.not.equal(before)
+      expect(highlightedText()).to.deep.equal(['wrold'])
+    })
+
+    it('keeps the highlights of the other editables when one is cleaned', function () {
+      const cleaned = addEditable('Hello wrold')
+      const untouched = addEditable('Hello moon')
+      setCssHighlight({
+        name,
+        ranges: [
+          {editableHost: cleaned, start: 6, end: 11},
+          {editableHost: untouched, start: 6, end: 10}
+        ]
+      })
+
+      content.cleanInternals(cleaned)
+
+      expect(highlightedText()).to.deep.equal(['wrold', 'moon'])
     })
 
     it('forgets editables that left the document', function () {
