@@ -79,6 +79,7 @@ export function cleanInternals (element) {
   // Uses extract content for simplicity. A custom method
   // that does not clone the element could be faster if needed.
   element.innerHTML = extractContent(element, true)
+  refreshCssHighlights({editableHost: element})
 }
 
 // Extracts the content from a host element.
