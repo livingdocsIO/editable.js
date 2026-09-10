@@ -1,9 +1,11 @@
 name: Patch Vulnerabilities in Node.js
 
 on:
+  # Weekly safety net for nested-dependency vulnerabilities that Renovate's
+  # transitiveRemediation can't fix via a parent bump; npm audit fix rewrites
+  # the lockfile in place. Runs early Monday so PRs are ready for review.
   schedule:
-    # Run daily at midnight UTC
-    - cron: '0 1 * * 0'
+    - cron: '0 5 * * 1' # Mondays 05:00 UTC (~06:00-07:00 CET)
   workflow_dispatch:
 
 permissions:
@@ -18,13 +20,13 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 22
+        node-version: 24
         cache: 'npm'
     - name: Install dependencies
       run: npm ci
 
     - name: Run npm audit fix
-      run: npm audit fix
+      run: npm audit fix --min-release-age=0
       continue-on-error: true
 
     - name: Commit and push changes
