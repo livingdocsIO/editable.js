@@ -1,4 +1,5 @@
-const toString = Object.prototype.toString
+import {trimEnd, trimStart, trim as lodashTrim, isString as lodashIsString} from 'lodash-es'
+
 const htmlCharacters = {
   '&': '&amp;',
   '<': '&lt;',
@@ -7,21 +8,20 @@ const htmlCharacters = {
   "'": '&#39;'
 }
 
-// TODO: replace with lodash methods
 export function trimRight (text) {
-  return text.replace(/\s+$/, '')
+  return trimEnd(text)
 }
 
 export function trimLeft (text) {
-  return text.replace(/^\s+/, '')
+  return trimStart(text)
 }
 
 export function trim (text) {
-  return text.replace(/^\s+|\s+$/g, '')
+  return lodashTrim(text)
 }
 
 export function isString (obj) {
-  return toString.call(obj) === '[object String]'
+  return lodashIsString(obj)
 }
 
 /**
@@ -78,5 +78,5 @@ export function replaceLast (text, searchValue, replaceValue) {
 }
 
 export function endsWithSingleSpace (text) {
-  return /\S+\s{1}$/.test(text)
+  return /(?:[^\s]|^)\s$/.test(text)
 }
