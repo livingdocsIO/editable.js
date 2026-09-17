@@ -1,5 +1,6 @@
 import * as content from './content.js'
 import highlightText from './highlight-text.js'
+import {refreshCssHighlights} from './plugins/highlighting/css-highlights.js'
 import {searchText} from './plugins/highlighting/text-search.js'
 import {createElement, createRange, toCharacterRange} from './util/dom.js'
 
@@ -19,6 +20,7 @@ const highlightSupport = {
     if (matches && matches.length) {
       if (highlightId) matches[0].id = highlightId
       highlightText.highlightMatches(editableHost, matches)
+      refreshCssHighlights({editableHost})
       if (dispatcher) dispatcher.notify('change', editableHost)
       return matches[0].startIndex
     }
@@ -61,6 +63,8 @@ const highlightSupport = {
       marker
     }], false)
 
+    refreshCssHighlights({editableHost})
+
     if (dispatcher) dispatcher.notify('change', editableHost)
 
     return startIndex
@@ -84,6 +88,8 @@ const highlightSupport = {
 
     // remove empty text nodes, combine adjacent text nodes
     editableHost.normalize()
+
+    refreshCssHighlights({editableHost})
 
     if (dispatcher) dispatcher.notify('change', editableHost)
   },
