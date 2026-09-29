@@ -281,6 +281,16 @@ describe('applySmartQuotes():', () => {
       expect(typeQuote('Tor', 'a')).to.equal('Tora')
     })
 
+    it('leaves the text alone when the typed quote is gone', () => {
+      applySmartQuotes(render('geht', 4), germanConfig, `'`, host, 4)
+      expect(host.textContent).to.equal('geht')
+    })
+
+    it('leaves the text alone when the cursor is at the start', () => {
+      applySmartQuotes(render(`'abc`, 0), germanConfig, `'`, host, 0)
+      expect(host.textContent).to.equal(`'abc`)
+    })
+
     it('leaves the text alone when the cursor is not in a text node', () => {
       const range = render(`geht'`, 0)
       range.setStart(host, 1)
