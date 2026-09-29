@@ -16,15 +16,13 @@ const isInWord = (text, indexCharBefore) => !!text[indexCharBefore] && !isSepara
 const hasCharAfter = (textArr, indexCharAfter) => !!textArr[indexCharAfter] && !isWhitespace(textArr[indexCharAfter])
 const shouldBeSingleOpeningQuote = (text, indexCharBefore) => !!text[indexCharBefore] && isDoubleQuote(text[indexCharBefore])
 
-export const replaceQuote = (range, index, quoteType) => {
-  const startContainer = range?.startContainer
-  const nodeValue = startContainer?.nodeValue
-  if (!nodeValue) {
+const replaceQuote = (range, index, quoteType) => {
+  const {startContainer} = range
+  if (!startContainer.nodeValue) {
     return false
   }
-  const at = Math.min(index, nodeValue.length)
-  startContainer.insertData(at, quoteType)
-  startContainer.deleteData(at + quoteType.length, 1)
+  startContainer.insertData(index, quoteType)
+  startContainer.deleteData(index + quoteType.length, 1)
   return true
 }
 
