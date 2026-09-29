@@ -315,6 +315,10 @@ describe('applySmartQuotes():', () => {
       expect(typeQuote('‚Tor‘ sagte Hans', `'`)).to.equal('‚Tor‘ sagte Hans’')
     })
 
+    it('keeps a typed apostrophe', () => {
+      expect(typeQuote('‚er geht', '’')).to.equal('‚er geht’')
+    })
+
     it('leaves the quote alone without an apostrophe config', () => {
       expect(typeQuote('Hans', `'`, '', {...germanConfig, apostrophe: undefined})).to.equal(`Hans'`)
       expect(typeQuote('Hans', `'`, '', {...germanConfig, apostrophe: ''})).to.equal(`Hans'`)
