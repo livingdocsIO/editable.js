@@ -75,8 +75,8 @@ export const applySmartQuotes = (range, config, char, target, cursorOffset) => {
     return
   }
 
-  const {quotes, singleQuotes} = config
-  if (char === quotes[0] || char === quotes[1] || char === singleQuotes[0] || char === singleQuotes[1]) {
+  const {quotes, singleQuotes, apostrophe} = config
+  if (char === quotes[0] || char === quotes[1] || char === singleQuotes[0] || char === singleQuotes[1] || char === apostrophe) {
     return
   }
 
