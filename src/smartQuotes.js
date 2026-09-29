@@ -11,8 +11,8 @@ export const isApostrophe = (char) => /^[’']$/.test(char)
 export const isWhitespace = (char) => /^\s$/.test(char)
 export const isSeparatorOrWhitespace = (char) => /\s|[>\-–—]/.test(char)
 
-const shouldBeOpeningQuote = (text, indexCharBefore) => indexCharBefore < 0 || isSeparatorOrWhitespace(text[indexCharBefore])
-const shouldBeClosingQuote = (text, indexCharBefore) => !!text[indexCharBefore] && !isSeparatorOrWhitespace(text[indexCharBefore])
+const isAtWordStart = (text, indexCharBefore) => indexCharBefore < 0 || isSeparatorOrWhitespace(text[indexCharBefore])
+const isInWord = (text, indexCharBefore) => !!text[indexCharBefore] && !isSeparatorOrWhitespace(text[indexCharBefore])
 const hasCharAfter = (textArr, indexCharAfter) => !!textArr[indexCharAfter] && !isWhitespace(textArr[indexCharAfter])
 const shouldBeSingleOpeningQuote = (text, indexCharBefore) => !!text[indexCharBefore] && isDoubleQuote(text[indexCharBefore])
 
@@ -42,29 +42,27 @@ const hasSingleOpeningQuote = (textArr, offset, singleOpeningQuote) => {
 
 // Returns the quote to write in place of the typed one, or undefined if the
 // typed character should be left alone.
-const getQuote = (textArr, offset, isCharSingleQuote, {quotes, singleQuotes}) => {
+const getQuote = (textArr, offset, isCharSingleQuote, {quotes, singleQuotes, apostrophe}) => {
   // Special case for a single quote following a double quote,
   // which should be transformed into a single opening quote
   if (isCharSingleQuote && shouldBeSingleOpeningQuote(textArr, offset - 2)) {
     return singleQuotes[0]
   }
 
-  if (shouldBeClosingQuote(textArr, offset - 2)) {
+  if (isInWord(textArr, offset - 2)) {
     if (isCharSingleQuote) {
-      // Don't transform apostrophes
-      if (hasCharAfter(textArr, offset)) {
-        return
+      // An open single quote has precedence over the apostrophe,
+      // unless a character follows, e.g. when correcting an existing word
+      if (!hasCharAfter(textArr, offset) && hasSingleOpeningQuote(textArr, offset, singleQuotes[0])) {
+        return singleQuotes[1]
       }
-      // Don't transform single-quote if there is no respective single-opening-quote
-      if (!hasSingleOpeningQuote(textArr, offset, singleQuotes[0])) {
-        return
-      }
-      return singleQuotes[1]
+      // An empty or missing apostrophe config leaves the typed character alone
+      return apostrophe || undefined
     }
     return quotes[1]
   }
 
-  if (shouldBeOpeningQuote(textArr, offset - 2)) {
+  if (isAtWordStart(textArr, offset - 2)) {
     return isCharSingleQuote ? singleQuotes[0] : quotes[0]
   }
 }
