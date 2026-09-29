@@ -81,6 +81,11 @@ export const applySmartQuotes = (range, config, char, target, cursorOffset) => {
   const offset = range.startOffset
   const textArr = [...range.startContainer.textContent]
 
+  // The typed quote can be gone by the time this runs, e.g. when it was deleted right away
+  if (textArr[offset - 1] !== char) {
+    return
+  }
+
   const quote = getQuote(textArr, offset, isCharSingleQuote, config)
   if (!quote) {
     return
