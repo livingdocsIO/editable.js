@@ -1,4 +1,5 @@
 import * as nodeType from './node-type.js'
+import NodeIterator from './node-iterator.js'
 
 const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
 const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
@@ -75,11 +76,48 @@ const getReplacement = (text, offset, {quotes, singleQuotes, apostrophe}) => {
   return {index: rule.writeAt === 'before' ? index - 1 : index, char}
 }
 
+// Reads the text of the host, so the rules also see the text in a link
+// or in bold text. A <br> reads as a line break.
+const readText = (host) => {
+  let text = ''
+  const nodes = []
+  for (const node of new NodeIterator(host)) {
+    if (node.nodeType !== nodeType.textNode && node.nodeName !== 'BR') continue
+    nodes.push({node, start: text.length})
+    text += node.nodeValue ?? '\n'
+  }
+  return {text, nodes}
+}
+
+// Returns the cursor offset in the text of the host,
+// or undefined if the cursor is not in a text node of the host
+const getCursorOffset = (nodes, {startContainer, startOffset}) => {
+  if (startContainer.nodeType !== nodeType.textNode) return
+  const cursorNode = nodes.find(({node}) => node === startContainer)
+  if (cursorNode) return cursorNode.start + startOffset
+}
+
 // Inserts and deletes instead of replacing, so a highlight that ends
 // right after the character keeps its end
-const replaceChar = (textNode, index, char) => {
-  textNode.insertData(index, char)
-  textNode.deleteData(index + char.length, 1)
+const replaceChar = (nodes, index, char) => {
+  const {node, start} = nodes.findLast((n) => n.start <= index)
+  const offset = index - start
+  node.insertData(offset, char)
+  node.deleteData(offset + char.length, 1)
+}
+
+export const applySmartQuotes = (host, range, config, char) => {
+  const {quotes, singleQuotes, apostrophe} = config
+  if ([...quotes, ...singleQuotes, apostrophe].includes(char)) return
+
+  const {text, nodes} = readText(host)
+  const offset = getCursorOffset(nodes, range)
+
+  // The typed character can be gone by now, e.g. when it was deleted right away
+  if (offset === undefined || text[offset - 1] !== char) return
+
+  const replacement = getReplacement(text, offset, config)
+  if (replacement) replaceChar(nodes, replacement.index, replacement.char)
 }
 
 const isValidQuotePairConfig = (quotePair) => Array.isArray(quotePair) && quotePair.length === 2
@@ -87,18 +125,4 @@ const isValidQuotePairConfig = (quotePair) => Array.isArray(quotePair) && quoteP
 export const shouldApplySmartQuotes = (config, target) => {
   const {smartQuotes, quotes, singleQuotes} = config
   return !!smartQuotes && isValidQuotePairConfig(quotes) && isValidQuotePairConfig(singleQuotes) && target.isContentEditable
-}
-
-export const applySmartQuotes = (range, config, char) => {
-  const {startContainer: textNode, startOffset: offset} = range
-  if (textNode.nodeType !== nodeType.textNode) return
-
-  const {quotes, singleQuotes, apostrophe} = config
-  if ([...quotes, ...singleQuotes, apostrophe].includes(char)) return
-
-  // The typed character can be gone by now, e.g. when it was deleted right away
-  if (textNode.nodeValue[offset - 1] !== char) return
-
-  const replacement = getReplacement(textNode.nodeValue, offset, config)
-  if (replacement) replaceChar(textNode, replacement.index, replacement.char)
 }
