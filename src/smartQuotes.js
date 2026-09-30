@@ -13,7 +13,7 @@ export const isSeparatorOrWhitespace = (char) => /\s|[>\-–—]/.test(char)
 
 const isAtWordStart = (text, indexCharBefore) => indexCharBefore < 0 || isSeparatorOrWhitespace(text[indexCharBefore])
 const isInWord = (text, indexCharBefore) => !!text[indexCharBefore] && !isSeparatorOrWhitespace(text[indexCharBefore])
-const hasCharAfter = (textArr, indexCharAfter) => !!textArr[indexCharAfter] && !isWhitespace(textArr[indexCharAfter])
+const hasCharAfter = (text, indexCharAfter) => !!text[indexCharAfter] && !isWhitespace(text[indexCharAfter])
 const shouldBeSingleOpeningQuote = (text, indexCharBefore) => !!text[indexCharBefore] && isDoubleQuote(text[indexCharBefore])
 
 const replaceQuote = (range, index, quoteType) => {
@@ -26,13 +26,13 @@ const replaceQuote = (range, index, quoteType) => {
   return true
 }
 
-const hasSingleOpeningQuote = (textArr, offset, singleOpeningQuote) => {
+const hasSingleOpeningQuote = (text, offset, singleOpeningQuote) => {
   if (offset <= 0) {
     return false
   }
   for (let i = offset - 1; i >= 0; i--) {
-    if (isSingleQuote(textArr[i]) && (!isApostrophe(singleOpeningQuote) && !isApostrophe(textArr[i]))) {
-      return textArr[i] === singleOpeningQuote
+    if (isSingleQuote(text[i]) && (!isApostrophe(singleOpeningQuote) && !isApostrophe(text[i]))) {
+      return text[i] === singleOpeningQuote
     }
   }
   return false
@@ -40,18 +40,18 @@ const hasSingleOpeningQuote = (textArr, offset, singleOpeningQuote) => {
 
 // Returns the quote to write in place of the typed one, or undefined if the
 // typed character should be left alone.
-const getQuote = (textArr, offset, isCharSingleQuote, {quotes, singleQuotes, apostrophe}) => {
+const getQuote = (text, offset, isCharSingleQuote, {quotes, singleQuotes, apostrophe}) => {
   // Special case for a single quote following a double quote,
   // which should be transformed into a single opening quote
-  if (isCharSingleQuote && shouldBeSingleOpeningQuote(textArr, offset - 2)) {
+  if (isCharSingleQuote && shouldBeSingleOpeningQuote(text, offset - 2)) {
     return singleQuotes[0]
   }
 
-  if (isInWord(textArr, offset - 2)) {
+  if (isInWord(text, offset - 2)) {
     if (isCharSingleQuote) {
       // An open single quote has precedence over the apostrophe,
       // unless a character follows, e.g. when correcting an existing word
-      if (!hasCharAfter(textArr, offset) && hasSingleOpeningQuote(textArr, offset, singleQuotes[0])) {
+      if (!hasCharAfter(text, offset) && hasSingleOpeningQuote(text, offset, singleQuotes[0])) {
         return singleQuotes[1]
       }
       // An empty or missing apostrophe config leaves the typed character alone
@@ -60,7 +60,7 @@ const getQuote = (textArr, offset, isCharSingleQuote, {quotes, singleQuotes, apo
     return quotes[1]
   }
 
-  if (isAtWordStart(textArr, offset - 2)) {
+  if (isAtWordStart(text, offset - 2)) {
     return isCharSingleQuote ? singleQuotes[0] : quotes[0]
   }
 }
@@ -79,14 +79,14 @@ export const applySmartQuotes = (range, config, char, target, cursorOffset) => {
   }
 
   const offset = range.startOffset
-  const textArr = [...range.startContainer.textContent]
+  const text = range.startContainer.textContent
 
   // The typed quote can be gone by the time this runs, e.g. when it was deleted right away
-  if (textArr[offset - 1] !== char) {
+  if (text[offset - 1] !== char) {
     return
   }
 
-  const quote = getQuote(textArr, offset, isCharSingleQuote, config)
+  const quote = getQuote(text, offset, isCharSingleQuote, config)
   if (!quote) {
     return
   }
