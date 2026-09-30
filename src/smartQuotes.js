@@ -65,7 +65,7 @@ const getQuote = (text, offset, isCharSingleQuote, {quotes, singleQuotes, apostr
   }
 }
 
-export const applySmartQuotes = (range, config, char, target, cursorOffset) => {
+export const applySmartQuotes = (range, config, char) => {
   const isCharSingleQuote = isSingleQuote(char)
   const isCharDoubleQuote = isDoubleQuote(char)
 
@@ -91,13 +91,6 @@ export const applySmartQuotes = (range, config, char, target, cursorOffset) => {
     return
   }
 
-  if (!replaceQuote(range, offset - 1, quote)) {
-    return
-  }
-
-  // Resets the cursor to the currentPosition after applying the smart-quote
-  const window = target.ownerDocument.defaultView
-  const selection = window.getSelection()
-  selection.collapse(range.startContainer, cursorOffset ?? offset)
+  replaceQuote(range, offset - 1, quote)
 }
 

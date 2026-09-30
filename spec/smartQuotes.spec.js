@@ -146,7 +146,7 @@ describe('applySmartQuotes():', () => {
   // and returns the resulting text
   const typeQuote = (before, char, after = '', config = germanConfig) => {
     const cursor = before.length + 1
-    applySmartQuotes(render(`${before}${char}${after}`, cursor), config, char, host, cursor)
+    applySmartQuotes(render(`${before}${char}${after}`, cursor), config, char)
     return host.textContent
   }
 
@@ -234,50 +234,72 @@ describe('applySmartQuotes():', () => {
     })
   })
 
-  describe('cursor and highlights', () => {
-    it('keeps the cursor after the replaced quote', () => {
-      typeQuote('geht', `'`, 's')
-      const selection = window.getSelection()
+  describe('cursor', () => {
+    const selection = window.getSelection()
+    let range
+
+    beforeEach(() => {
+      range = render(`geht's`, 5)
+    })
+
+    // Replaces the typed quote in `geht's`
+    const replaceQuote = () => {
+      applySmartQuotes(range, germanConfig, `'`)
+      expect(host.textContent).to.equal('geht’s')
+    }
+
+    it('keeps the cursor after the quote', () => {
+      selection.collapse(host.firstChild, 5)
+      replaceQuote()
       expect(selection.anchorNode).to.equal(host.firstChild)
       expect(selection.anchorOffset).to.equal(5)
     })
 
-    it('moves the cursor to the latest input position', () => {
-      applySmartQuotes(render(`geht's`, 5), germanConfig, `'`, host, 6)
-      expect(host.textContent).to.equal('geht’s')
-      expect(window.getSelection().anchorOffset).to.equal(6)
+    it('keeps a text selection', () => {
+      selection.setBaseAndExtent(host.firstChild, 0, host.firstChild, 6)
+      replaceQuote()
+      expect(selection.toString()).to.equal('geht’s')
     })
 
-    describe('with a css highlight', () => {
-      afterEach(() => {
-        deleteCssHighlight({name: 'spellcheck'})
-      })
+    it('keeps the cursor in another element', () => {
+      const other = createElement('<div contenteditable="true">Tor</div>')
+      document.body.append(other)
+      selection.collapse(other.firstChild, 2)
+      replaceQuote()
+      expect(selection.anchorNode).to.equal(other.firstChild)
+      other.remove()
+    })
+  })
 
-      // Types `"` in `123 "you` with a highlight from `start` to `end`
-      // and returns the highlighted texts
-      const typeWithHighlight = (start, end) => {
-        const range = render('123 "you', 5)
-        setCssHighlight({name: 'spellcheck', ranges: [{editableHost: host, start, end}]})
-        applySmartQuotes(range, germanConfig, '"', host, 5)
-        expect(host.textContent).to.equal('123 „you')
-        return Array.from(CSS.highlights.get('spellcheck'), (r) => r.toString())
-      }
+  describe('highlights', () => {
+    afterEach(() => {
+      deleteCssHighlight({name: 'spellcheck'})
+    })
 
-      it('keeps a highlight around the quote', () => {
-        expect(typeWithHighlight(3, 6)).to.deep.equal([' „y'])
-      })
+    // Types `"` in `123 "you` with a highlight from `start` to `end`
+    // and returns the highlighted texts
+    const typeWithHighlight = (start, end) => {
+      const range = render('123 "you', 5)
+      setCssHighlight({name: 'spellcheck', ranges: [{editableHost: host, start, end}]})
+      applySmartQuotes(range, germanConfig, '"')
+      expect(host.textContent).to.equal('123 „you')
+      return Array.from(CSS.highlights.get('spellcheck'), (r) => r.toString())
+    }
 
-      it('keeps a highlight away from the quote', () => {
-        expect(typeWithHighlight(0, 3)).to.deep.equal(['123'])
-      })
+    it('keeps a highlight around the quote', () => {
+      expect(typeWithHighlight(3, 6)).to.deep.equal([' „y'])
+    })
 
-      it('keeps a highlight starting right after the quote', () => {
-        expect(typeWithHighlight(5, 8)).to.deep.equal(['you'])
-      })
+    it('keeps a highlight away from the quote', () => {
+      expect(typeWithHighlight(0, 3)).to.deep.equal(['123'])
+    })
 
-      it('keeps a highlight ending right before the quote', () => {
-        expect(typeWithHighlight(0, 4)).to.deep.equal(['123 '])
-      })
+    it('keeps a highlight starting right after the quote', () => {
+      expect(typeWithHighlight(5, 8)).to.deep.equal(['you'])
+    })
+
+    it('keeps a highlight ending right before the quote', () => {
+      expect(typeWithHighlight(0, 4)).to.deep.equal(['123 '])
     })
   })
 
@@ -287,19 +309,19 @@ describe('applySmartQuotes():', () => {
     })
 
     it('leaves the text alone when the typed quote is gone', () => {
-      applySmartQuotes(render('geht', 4), germanConfig, `'`, host, 4)
+      applySmartQuotes(render('geht', 4), germanConfig, `'`)
       expect(host.textContent).to.equal('geht')
     })
 
     it('leaves the text alone when the cursor is at the start', () => {
-      applySmartQuotes(render(`'abc`, 0), germanConfig, `'`, host, 0)
+      applySmartQuotes(render(`'abc`, 0), germanConfig, `'`)
       expect(host.textContent).to.equal(`'abc`)
     })
 
     it('leaves the text alone when the cursor is not in a text node', () => {
       const range = render(`geht'`, 0)
       range.setStart(host, 1)
-      applySmartQuotes(range, germanConfig, `'`, host, 1)
+      applySmartQuotes(range, germanConfig, `'`)
       expect(host.textContent).to.equal(`geht'`)
     })
   })
