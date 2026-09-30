@@ -177,6 +177,11 @@ describe('applySmartQuotes():', () => {
       expect(typeQuote('Tor –', `'`)).to.equal('Tor –‚')
     })
 
+    it('writes a single quote after an emoji', () => {
+      expect(typeQuote('🎉 Er sagte: ', `'`)).to.equal('🎉 Er sagte: ‚')
+      expect(typeQuote('‚Gratuliere 🎉', `'`)).to.equal('‚Gratuliere 🎉‘')
+    })
+
     it('writes an opening single quote directly after a double quote', () => {
       expect(typeQuote('„', `'`)).to.equal('„‚')
     })
