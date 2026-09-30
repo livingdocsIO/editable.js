@@ -1,6 +1,7 @@
 import {expect} from 'chai'
 import {shouldApplySmartQuotes, applySmartQuotes} from '../src/smartQuotes'
 import {createElement} from '../src/util/dom.js'
+import {textNodesUnder} from '../src/util/element.js'
 import {deleteCssHighlight, setCssHighlight} from '../src/plugins/highlighting/css-highlights.js'
 
 const swissConfig = {quotes: ['«', '»'], singleQuotes: ['‹', '›'], apostrophe: '’'}
@@ -53,26 +54,28 @@ describe('applySmartQuotes():', () => {
     host.remove()
   })
 
-  // Renders `text` and returns a range with the cursor at `cursor`
-  const render = (text, cursor) => {
-    host = createElement('<div contenteditable="true"></div>')
-    host.append(text)
+  // Renders `html` and returns a range with the cursor at the `|`
+  const render = (html) => {
+    host = createElement(`<div contenteditable="true">${html}</div>`)
     document.body.append(host)
+    const textNode = textNodesUnder(host).find((node) => node.nodeValue.includes('|'))
+    const cursor = textNode.nodeValue.indexOf('|')
+    textNode.deleteData(cursor, 1)
     const range = document.createRange()
-    range.setStart(host.firstChild, cursor)
+    range.setStart(textNode, cursor)
     return range
   }
 
   // Types `typed` between `before` and `after`, one input at a time,
-  // and returns the resulting text
+  // and returns the resulting html
   const type = (before, typed, after = '', config = swissConfig) => {
-    const range = render(`${before}${after}`, before.length)
+    const range = render(`${before}|${after}`)
     for (const char of typed) {
-      host.firstChild.insertData(range.startOffset, char)
-      range.setStart(host.firstChild, range.startOffset + char.length)
-      applySmartQuotes(range, config, char)
+      range.startContainer.insertData(range.startOffset, char)
+      range.setStart(range.startContainer, range.startOffset + char.length)
+      applySmartQuotes(host, range, config, char)
     }
-    return host.textContent
+    return host.innerHTML
   }
 
   describe('double quotes', () => {
@@ -106,7 +109,7 @@ describe('applySmartQuotes():', () => {
 
     it('writes an opening single quote after whitespace', () => {
       expect(type('Er sagte: ', `'`)).to.equal('Er sagte: ‹')
-      expect(type('Er sagte: ', `'`)).to.equal('Er sagte: ‹')
+      expect(type('Er sagte:&nbsp;', `'`)).to.equal('Er sagte:&nbsp;‹')
     })
 
     it('writes an opening single quote after an opening bracket or a hyphen', () => {
@@ -194,17 +197,35 @@ describe('applySmartQuotes():', () => {
     })
   })
 
+  describe('formatting and links', () => {
+    it('writes a closing single quote after a formatted word', () => {
+      expect(type('‹Er sagte <i>Abseits</i>', `'`)).to.equal('‹Er sagte <i>Abseits</i>›')
+    })
+
+    it('writes a closing single quote inside a link', () => {
+      expect(type('‹Er sagte <a href="#">Abseits', `'`, '</a>')).to.equal('‹Er sagte <a href="#">Abseits›</a>')
+    })
+
+    it('turns a closing single quote in a formatted word into the apostrophe', () => {
+      expect(type('‹Wie <b>geht›</b>', 's')).to.equal('‹Wie <b>geht’</b>s')
+    })
+
+    it('writes an opening single quote after a line break', () => {
+      expect(type('Er sagte:<br>', `'`, 'Tor')).to.equal('Er sagte:<br>‹Tor')
+    })
+  })
+
   describe('cursor', () => {
     const selection = window.getSelection()
     let range
 
     beforeEach(() => {
-      range = render(`geht's`, 5)
+      range = render(`geht'|s`)
     })
 
     // Replaces the typed quote in `geht's`
     const replaceQuote = () => {
-      applySmartQuotes(range, swissConfig, `'`)
+      applySmartQuotes(host, range, swissConfig, `'`)
       expect(host.textContent).to.equal('geht’s')
     }
 
@@ -239,9 +260,9 @@ describe('applySmartQuotes():', () => {
     // Types `"` in `Sie sagt "Hallo` with a highlight from `start` to `end`
     // and returns the highlighted texts
     const typeWithHighlight = (start, end) => {
-      const range = render('Sie sagt "Hallo', 10)
+      const range = render('Sie sagt "|Hallo')
       setCssHighlight({name: 'spellcheck', ranges: [{editableHost: host, start, end}]})
-      applySmartQuotes(range, swissConfig, '"')
+      applySmartQuotes(host, range, swissConfig, '"')
       expect(host.textContent).to.equal('Sie sagt «Hallo')
       return Array.from(CSS.highlights.get('spellcheck'), (r) => r.toString())
     }
@@ -265,19 +286,21 @@ describe('applySmartQuotes():', () => {
 
   describe('unexpected input', () => {
     it('leaves the text alone when the typed quote is gone', () => {
-      applySmartQuotes(render('geht', 4), swissConfig, `'`)
+      const range = render('geht|')
+      applySmartQuotes(host, range, swissConfig, `'`)
       expect(host.textContent).to.equal('geht')
     })
 
     it('leaves the text alone when the cursor is at the start', () => {
-      applySmartQuotes(render(`'Tor`, 0), swissConfig, `'`)
+      const range = render(`|'Tor`)
+      applySmartQuotes(host, range, swissConfig, `'`)
       expect(host.textContent).to.equal(`'Tor`)
     })
 
     it('leaves the text alone when the cursor is not in a text node', () => {
-      const range = render(`geht'`, 0)
+      const range = render(`geht'|`)
       range.setStart(host, 1)
-      applySmartQuotes(range, swissConfig, `'`)
+      applySmartQuotes(host, range, swissConfig, `'`)
       expect(host.textContent).to.equal(`geht'`)
     })
   })
