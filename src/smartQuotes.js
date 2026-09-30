@@ -1,3 +1,87 @@
+import * as nodeType from './node-type.js'
+
+const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
+const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
+const isApostrophe = (char) => /^[’']$/.test(char)
+const isLetterOrDigit = (char) => /^[\p{L}\p{N}]$/u.test(char)
+
+const isAtWordStart = (charBefore) => !charBefore || /^[\s([{/\-–—]$/.test(charBefore)
+const isAtWordEnd = (charAfter) => !isLetterOrDigit(charAfter)
+
+const isSingleQuoteOpen = (text, index, openingQuote) =>
+  [...text.slice(0, index)].findLast((char) => isSingleQuote(char) && !isApostrophe(char)) === openingQuote
+
+// The rules for a typed character, in order. The first rule that matches
+// writes its character at `writeAt`. An empty character leaves the text alone.
+const rules = [
+  {
+    // ‹geht› + s → ‹geht’s
+    when: (c) => isLetterOrDigit(c.typed) && c.before === c.singleQuotes[1] && !isAtWordStart(c.beforeBefore) && c.apostrophe !== c.singleQuotes[1],
+    write: (c) => c.apostrophe,
+    writeAt: 'before'
+  },
+  {
+    // Er sagte: ' → Er sagte: ‹
+    // «' → «‹
+    when: (c) => isSingleQuote(c.typed) && (isAtWordStart(c.before) || isDoubleQuote(c.before)),
+    write: (c) => c.singleQuotes[0],
+    writeAt: 'typed'
+  },
+  {
+    // ‹geht + ' → ‹geht›
+    when: (c) => isSingleQuote(c.typed) && !isAtWordStart(c.before) && isAtWordEnd(c.after) && isSingleQuoteOpen(c.text, c.index, c.singleQuotes[0]),
+    write: (c) => c.singleQuotes[1],
+    writeAt: 'typed'
+  },
+  {
+    // Hans + ' → Hans’
+    // geht + ' + s → geht’s (e.g. when correcting an existing word)
+    when: (c) => isSingleQuote(c.typed) && !isAtWordStart(c.before),
+    write: (c) => c.apostrophe,
+    writeAt: 'typed'
+  },
+  {
+    // Er sagte: " → Er sagte: «
+    when: (c) => isDoubleQuote(c.typed) && isAtWordStart(c.before),
+    write: (c) => c.quotes[0],
+    writeAt: 'typed'
+  },
+  {
+    // «Tor + " → «Tor»
+    when: (c) => isDoubleQuote(c.typed) && !isAtWordStart(c.before),
+    write: (c) => c.quotes[1],
+    writeAt: 'typed'
+  }
+]
+
+// Returns the index and the character to write for the character typed
+// before `offset`, or undefined if the text should be left alone.
+const getReplacement = (text, offset, {quotes, singleQuotes, apostrophe}) => {
+  const index = offset - 1
+  const context = {
+    quotes,
+    singleQuotes,
+    apostrophe,
+    text,
+    index,
+    typed: text[index],
+    before: text[index - 1],
+    beforeBefore: text[index - 2],
+    after: text[index + 1]
+  }
+  const rule = rules.find((r) => r.when(context))
+  const char = rule?.write(context)
+  if (!char) return
+  return {index: rule.writeAt === 'before' ? index - 1 : index, char}
+}
+
+// Inserts and deletes instead of replacing, so a highlight that ends
+// right after the character keeps its end
+const replaceChar = (textNode, index, char) => {
+  textNode.insertData(index, char)
+  textNode.deleteData(index + char.length, 1)
+}
+
 const isValidQuotePairConfig = (quotePair) => Array.isArray(quotePair) && quotePair.length === 2
 
 export const shouldApplySmartQuotes = (config, target) => {
@@ -5,92 +89,16 @@ export const shouldApplySmartQuotes = (config, target) => {
   return !!smartQuotes && isValidQuotePairConfig(quotes) && isValidQuotePairConfig(singleQuotes) && target.isContentEditable
 }
 
-export const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
-export const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
-export const isApostrophe = (char) => /^[’']$/.test(char)
-export const isWhitespace = (char) => /^\s$/.test(char)
-export const isSeparatorOrWhitespace = (char) => /\s|[>\-–—]/.test(char)
-
-const isAtWordStart = (text, indexCharBefore) => indexCharBefore < 0 || isSeparatorOrWhitespace(text[indexCharBefore])
-const isInWord = (text, indexCharBefore) => !!text[indexCharBefore] && !isSeparatorOrWhitespace(text[indexCharBefore])
-const hasCharAfter = (text, indexCharAfter) => !!text[indexCharAfter] && !isWhitespace(text[indexCharAfter])
-const shouldBeSingleOpeningQuote = (text, indexCharBefore) => !!text[indexCharBefore] && isDoubleQuote(text[indexCharBefore])
-
-const replaceQuote = (range, index, quoteType) => {
-  const {startContainer} = range
-  if (!startContainer.nodeValue) {
-    return false
-  }
-  startContainer.insertData(index, quoteType)
-  startContainer.deleteData(index + quoteType.length, 1)
-  return true
-}
-
-const hasSingleOpeningQuote = (text, offset, singleOpeningQuote) => {
-  if (offset <= 0) {
-    return false
-  }
-  for (let i = offset - 1; i >= 0; i--) {
-    if (isSingleQuote(text[i]) && (!isApostrophe(singleOpeningQuote) && !isApostrophe(text[i]))) {
-      return text[i] === singleOpeningQuote
-    }
-  }
-  return false
-}
-
-// Returns the quote to write in place of the typed one, or undefined if the
-// typed character should be left alone.
-const getQuote = (text, offset, isCharSingleQuote, {quotes, singleQuotes, apostrophe}) => {
-  // Special case for a single quote following a double quote,
-  // which should be transformed into a single opening quote
-  if (isCharSingleQuote && shouldBeSingleOpeningQuote(text, offset - 2)) {
-    return singleQuotes[0]
-  }
-
-  if (isInWord(text, offset - 2)) {
-    if (isCharSingleQuote) {
-      // An open single quote has precedence over the apostrophe,
-      // unless a character follows, e.g. when correcting an existing word
-      if (!hasCharAfter(text, offset) && hasSingleOpeningQuote(text, offset, singleQuotes[0])) {
-        return singleQuotes[1]
-      }
-      // An empty or missing apostrophe config leaves the typed character alone
-      return apostrophe || undefined
-    }
-    return quotes[1]
-  }
-
-  if (isAtWordStart(text, offset - 2)) {
-    return isCharSingleQuote ? singleQuotes[0] : quotes[0]
-  }
-}
-
 export const applySmartQuotes = (range, config, char) => {
-  const isCharSingleQuote = isSingleQuote(char)
-  const isCharDoubleQuote = isDoubleQuote(char)
-
-  if (!isCharDoubleQuote && !isCharSingleQuote) {
-    return
-  }
+  const {startContainer: textNode, startOffset: offset} = range
+  if (textNode.nodeType !== nodeType.textNode) return
 
   const {quotes, singleQuotes, apostrophe} = config
-  if (char === quotes[0] || char === quotes[1] || char === singleQuotes[0] || char === singleQuotes[1] || char === apostrophe) {
-    return
-  }
+  if ([...quotes, ...singleQuotes, apostrophe].includes(char)) return
 
-  const offset = range.startOffset
-  const text = range.startContainer.textContent
+  // The typed character can be gone by now, e.g. when it was deleted right away
+  if (textNode.nodeValue[offset - 1] !== char) return
 
-  // The typed quote can be gone by the time this runs, e.g. when it was deleted right away
-  if (text[offset - 1] !== char) {
-    return
-  }
-
-  const quote = getQuote(text, offset, isCharSingleQuote, config)
-  if (!quote) {
-    return
-  }
-
-  replaceQuote(range, offset - 1, quote)
+  const replacement = getReplacement(textNode.nodeValue, offset, config)
+  if (replacement) replaceChar(textNode, replacement.index, replacement.char)
 }
-

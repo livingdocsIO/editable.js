@@ -1,92 +1,12 @@
 import {expect} from 'chai'
-import {isDoubleQuote, isSingleQuote, isWhitespace, isSeparatorOrWhitespace, isApostrophe, shouldApplySmartQuotes, applySmartQuotes} from '../src/smartQuotes'
+import {shouldApplySmartQuotes, applySmartQuotes} from '../src/smartQuotes'
 import {createElement} from '../src/util/dom.js'
 import {deleteCssHighlight, setCssHighlight} from '../src/plugins/highlighting/css-highlights.js'
 
-const allSingleQuotes = ['‘', '’', '‹', '›', '‚', '‘', '›', '‹', `'`, `‘`]
-const allDoubleQuotes = ['«', '»', '»', '«', '"', '"', '“', '”', '”', '”', '“', '“', '„', '“']
-const charValues = ['', '*', '<', 'b', 'ab']
-const nonStringValues = [undefined, null, true, 123, NaN]
-const whitespaceChars = [' ', '\t', '\n', '\r', '\v', '\f']
-const separatorValues = ['>', '-', '–—']
-
-describe('Smart Quotes Helper Functions:', () => {
-  describe('isDoubleQuote', () => {
-    it('Should return false for non double quote values', () => {
-      [...charValues, ...separatorValues, ...nonStringValues, ...allSingleQuotes].forEach(value => {
-        expect(isDoubleQuote(value)).to.equal(false, `Failed for value: ${value}`)
-      })
-    })
-
-    it('Should return true for double quote values', () => {
-      allDoubleQuotes.forEach(value => {
-        expect(isDoubleQuote(value)).to.equal(true, `Failed for value: ${value}`)
-      })
-    })
-  })
-
-  describe('isSingleQuote', () => {
-    it('Should return false for non single quote values', () => {
-      [...charValues, ...separatorValues, ...nonStringValues, ...allDoubleQuotes].forEach(value => {
-        expect(isSingleQuote(value)).to.equal(false, `Failed for value: ${value}`)
-      })
-    })
-
-    it('Should return true for single quote values', () => {
-      allSingleQuotes.forEach(value => {
-        expect(isSingleQuote(value)).to.equal(true, `Failed for value: ${value}`)
-      })
-    })
-  })
-
-  describe('isWhiteSpace', () => {
-    it('should return false for non whitespace characters', () => {
-      [...charValues, ...nonStringValues].forEach(value => {
-        expect(isWhitespace(value)).to.equal(false, `Failed for: ${value}`)
-      })
-    })
-
-    it('should return true for  whitespace characters', () => {
-      [...whitespaceChars ].forEach(value => {
-        expect(isWhitespace(value)).to.equal(true, `Failed for: ${value}`)
-      })
-    })
-  })
-
-  describe('isSeparatorOrWhitespace', () => {
-    it('should return false for non whitespace/ separator characters', () => {
-      [...charValues, ...nonStringValues ].forEach(value => {
-        expect(isSeparatorOrWhitespace(value)).to.equal(false, `Failed for: ${value}`)
-      })
-    })
-
-    it('should return true for  whitespace/ separator characters', () => {
-      [...whitespaceChars, ...separatorValues].forEach(value => {
-        expect(isSeparatorOrWhitespace(value)).to.equal(true, `Failed for: ${value}`)
-      })
-    })
-  })
-
-  describe('isApostrophe', () => {
-    it('should return false for non apostrophe characters', () => {
-      [...charValues, ...nonStringValues, ...allDoubleQuotes, `'f`, '’j', '‘', '‹', '›', '‚', '‘', '›', '‹', `‘`].forEach(value => {
-        expect(isApostrophe(value)).to.equal(false, `Failed for: ${value}`)
-      })
-    })
-
-    it('should return true for apostrophe characters', () => {
-      [`'`, '’'].forEach(value => {
-        expect(isApostrophe(value)).to.equal(true, `Failed for: ${value}`)
-      })
-    })
-  })
-})
-
-const germanConfig = {quotes: ['„', '“'], singleQuotes: ['‚', '‘'], apostrophe: '’'}
-const englishConfig = {quotes: ['“', '”'], singleQuotes: ['‘', '’'], apostrophe: '’'}
+const swissConfig = {quotes: ['«', '»'], singleQuotes: ['‹', '›'], apostrophe: '’'}
 
 describe('shouldApplySmartQuotes():', () => {
-  const config = {smartQuotes: true, ...germanConfig}
+  const config = {smartQuotes: true, ...swissConfig}
   let target
 
   beforeEach(() => {
@@ -102,14 +22,14 @@ describe('shouldApplySmartQuotes():', () => {
     expect(shouldApplySmartQuotes(config, target)).to.equal(true)
   })
 
-  it('does not apply smart quotes without a double quote config', () => {
+  it('does not apply smart quotes without both double quotes', () => {
     expect(shouldApplySmartQuotes({...config, quotes: undefined}, target)).to.equal(false)
-    expect(shouldApplySmartQuotes({...config, quotes: ['„']}, target)).to.equal(false)
+    expect(shouldApplySmartQuotes({...config, quotes: ['«']}, target)).to.equal(false)
   })
 
-  it('does not apply smart quotes without a single quote config', () => {
+  it('does not apply smart quotes without both single quotes', () => {
     expect(shouldApplySmartQuotes({...config, singleQuotes: undefined}, target)).to.equal(false)
-    expect(shouldApplySmartQuotes({...config, singleQuotes: ['‚']}, target)).to.equal(false)
+    expect(shouldApplySmartQuotes({...config, singleQuotes: ['‹']}, target)).to.equal(false)
   })
 
   it('applies smart quotes without an apostrophe config', () => {
@@ -135,102 +55,142 @@ describe('applySmartQuotes():', () => {
 
   // Renders `text` and returns a range with the cursor at `cursor`
   const render = (text, cursor) => {
-    host = createElement(`<div contenteditable="true">${text}</div>`)
-    document.body.appendChild(host)
+    host = createElement('<div contenteditable="true"></div>')
+    host.append(text)
+    document.body.append(host)
     const range = document.createRange()
     range.setStart(host.firstChild, cursor)
     return range
   }
 
-  // Simulates the input event for `char` typed between `before` and `after`
+  // Types `typed` between `before` and `after`, one input at a time,
   // and returns the resulting text
-  const typeQuote = (before, char, after = '', config = germanConfig) => {
-    const cursor = before.length + 1
-    applySmartQuotes(render(`${before}${char}${after}`, cursor), config, char)
+  const type = (before, typed, after = '', config = swissConfig) => {
+    const range = render(`${before}${after}`, before.length)
+    for (const char of typed) {
+      host.firstChild.insertData(range.startOffset, char)
+      range.setStart(host.firstChild, range.startOffset + char.length)
+      applySmartQuotes(range, config, char)
+    }
     return host.textContent
   }
 
   describe('double quotes', () => {
     it('writes an opening double quote at a word start', () => {
-      expect(typeQuote('Er sagte: ', '"')).to.equal('Er sagte: „')
+      expect(type('Er sagte: ', '"')).to.equal('Er sagte: «')
     })
 
-    it('writes a closing double quote inside a word', () => {
-      expect(typeQuote('„Tor', '"')).to.equal('„Tor“')
+    it('writes an opening double quote after an opening bracket', () => {
+      expect(type('(', '"')).to.equal('(«')
     })
 
-    it('keeps a typed double quote from the config', () => {
-      expect(typeQuote('Tor', '„')).to.equal('Tor„')
+    it('writes a closing double quote after a word', () => {
+      expect(type('«Tor', '"')).to.equal('«Tor»')
+    })
+
+    it('writes a closing double quote after a punctuation mark', () => {
+      expect(type('«Tor!', '"')).to.equal('«Tor!»')
+    })
+
+    it('replaces every double quote that is not in the config', () => {
+      for (const quote of ['"', '„', '“', '”']) {
+        expect(type('Er sagte: ', quote)).to.equal('Er sagte: «', `Failed for: ${quote}`)
+      }
     })
   })
 
   describe('single quotes', () => {
     it('writes an opening single quote at block start', () => {
-      expect(typeQuote('', `'`)).to.equal('‚')
+      expect(type('', `'`)).to.equal('‹')
     })
 
     it('writes an opening single quote after whitespace', () => {
-      expect(typeQuote('Er sagte: ', `'`)).to.equal('Er sagte: ‚')
+      expect(type('Er sagte: ', `'`)).to.equal('Er sagte: ‹')
+      expect(type('Er sagte: ', `'`)).to.equal('Er sagte: ‹')
     })
 
-    it('writes an opening single quote after a separator', () => {
-      expect(typeQuote('Tor –', `'`)).to.equal('Tor –‚')
+    it('writes an opening single quote after an opening bracket or a hyphen', () => {
+      expect(type('(', `'`)).to.equal('(‹')
+      expect(type('Anti-', `'`)).to.equal('Anti-‹')
     })
 
-    it('writes a single quote after an emoji', () => {
-      expect(typeQuote('🎉 Er sagte: ', `'`)).to.equal('🎉 Er sagte: ‚')
-      expect(typeQuote('‚Gratuliere 🎉', `'`)).to.equal('‚Gratuliere 🎉‘')
+    it('writes an opening single quote after an opening double quote', () => {
+      expect(type('«', `'`)).to.equal('«‹')
     })
 
-    it('writes an opening single quote directly after a double quote', () => {
-      expect(typeQuote('„', `'`)).to.equal('„‚')
+    it('writes a closing single quote when one is open', () => {
+      expect(type('«Er rief: ‹Tor!', `'`)).to.equal('«Er rief: ‹Tor!›')
+      expect(type('‹Tor', `'`, ' und jubelte')).to.equal('‹Tor› und jubelte')
     })
 
-    it('writes a closing single quote inside a word with an open single quote', () => {
-      expect(typeQuote('„Er sagte: ‚Tor!', `'`)).to.equal('„Er sagte: ‚Tor!‘')
-      expect(typeQuote('‚Tor', `'`, ' sagte er')).to.equal('‚Tor‘ sagte er')
+    it('writes a closing single quote before a punctuation mark or a hyphen', () => {
+      expect(type('‹Abseits', `'`, '.')).to.equal('‹Abseits›.')
+      expect(type('‹Tor', `'`, '-Jubel')).to.equal('‹Tor›-Jubel')
     })
 
-    it('writes a closing single quote that equals the apostrophe', () => {
-      expect(typeQuote('‘Hi', `'`, '', englishConfig)).to.equal('‘Hi’')
-    })
-
-    it('keeps a typed single quote from the config', () => {
-      expect(typeQuote('Tor', '‚')).to.equal('Tor‚')
+    it('replaces every single quote that is not in the config', () => {
+      for (const quote of [`'`, '‚', '‘']) {
+        expect(type('Er sagte: ', quote)).to.equal('Er sagte: ‹', `Failed for: ${quote}`)
+      }
     })
   })
 
   describe('apostrophes', () => {
-    it('writes the apostrophe inside a word without an open single quote', () => {
-      expect(typeQuote('Hans', `'`)).to.equal('Hans’')
-      expect(typeQuote('geht', `'`, 's')).to.equal('geht’s')
-      expect(typeQuote('O', `'`, 'Brien')).to.equal('O’Brien')
-    })
-
-    it('writes an apostrophe that equals the closing single quote', () => {
-      expect(typeQuote('Hans', `'`, '', englishConfig)).to.equal('Hans’')
+    it('writes the apostrophe after a word without an open single quote', () => {
+      expect(type('Hans', `'`, ' Auto')).to.equal('Hans’ Auto')
+      expect(type('Wie geht', `'`, 's?')).to.equal('Wie geht’s?')
+      expect(type('O', `'`, 'Brien')).to.equal('O’Brien')
     })
 
     it('does not treat an earlier apostrophe as an open single quote', () => {
-      expect(typeQuote('Rock’n', `'`)).to.equal('Rock’n’')
+      expect(type('Rock’n', `'`)).to.equal('Rock’n’')
     })
 
-    it('writes the apostrophe before a character with an open single quote', () => {
-      expect(typeQuote('‚er geht', `'`, 's')).to.equal('‚er geht’s')
+    it('writes the apostrophe before a letter with an open single quote', () => {
+      expect(type('‹Wie geht', `'`, 's?')).to.equal('‹Wie geht’s?')
     })
 
     it('does not treat a closed single quote as an open single quote', () => {
-      expect(typeQuote('‚Tor‘ sagte Hans', `'`)).to.equal('‚Tor‘ sagte Hans’')
+      expect(type('‹Tor›, rief Hans', `'`)).to.equal('‹Tor›, rief Hans’')
     })
 
     it('keeps a typed apostrophe', () => {
-      expect(typeQuote('‚er geht', '’')).to.equal('‚er geht’')
+      expect(type('‹Wie geht', '’')).to.equal('‹Wie geht’')
     })
 
-    it('leaves the quote alone without an apostrophe config', () => {
-      expect(typeQuote('Hans', `'`, '', {...germanConfig, apostrophe: undefined})).to.equal(`Hans'`)
-      expect(typeQuote('Hans', `'`, '', {...germanConfig, apostrophe: ''})).to.equal(`Hans'`)
-      expect(typeQuote('‚er geht', `'`, 's', {...germanConfig, apostrophe: undefined})).to.equal(`‚er geht's`)
+    it('turns a closing single quote before a typed letter into the apostrophe', () => {
+      expect(type('‹Wie geht›', 's')).to.equal('‹Wie geht’s')
+      expect(type('‹Rock›', 'n')).to.equal('‹Rock’n')
+    })
+
+    it('keeps a closing single quote at a word start', () => {
+      expect(type('Das Wort ›', 'T')).to.equal('Das Wort ›T')
+    })
+
+    it('keeps a closing single quote before a typed punctuation mark', () => {
+      expect(type('‹Tor›', ',')).to.equal('‹Tor›,')
+    })
+
+    it('leaves a typed letter alone without a closing single quote before it', () => {
+      expect(type('Hall', 'o')).to.equal('Hallo')
+    })
+
+    it('writes apostrophes and single quotes in a sentence', () => {
+      expect(type('', `Er sagt 'geht's' und geht.`)).to.equal('Er sagt ‹geht’s› und geht.')
+    })
+
+    it('leaves the quotes alone without an apostrophe config', () => {
+      expect(type('Hans', `'`, ' Auto', {...swissConfig, apostrophe: undefined})).to.equal(`Hans' Auto`)
+      expect(type('Hans', `'`, ' Auto', {...swissConfig, apostrophe: ''})).to.equal(`Hans' Auto`)
+      expect(type('‹Wie geht', `'`, 's?', {...swissConfig, apostrophe: undefined})).to.equal(`‹Wie geht's?`)
+      expect(type('‹Wie geht›', 's', '', {...swissConfig, apostrophe: undefined})).to.equal('‹Wie geht›s')
+    })
+  })
+
+  describe('emojis', () => {
+    it('writes single quotes in text with an emoji', () => {
+      expect(type('🎉 Er sagte: ', `'`)).to.equal('🎉 Er sagte: ‹')
+      expect(type('‹Gratuliere 🎉', `'`)).to.equal('‹Gratuliere 🎉›')
     })
   })
 
@@ -244,7 +204,7 @@ describe('applySmartQuotes():', () => {
 
     // Replaces the typed quote in `geht's`
     const replaceQuote = () => {
-      applySmartQuotes(range, germanConfig, `'`)
+      applySmartQuotes(range, swissConfig, `'`)
       expect(host.textContent).to.equal('geht’s')
     }
 
@@ -276,52 +236,48 @@ describe('applySmartQuotes():', () => {
       deleteCssHighlight({name: 'spellcheck'})
     })
 
-    // Types `"` in `123 "you` with a highlight from `start` to `end`
+    // Types `"` in `Sie sagt "Hallo` with a highlight from `start` to `end`
     // and returns the highlighted texts
     const typeWithHighlight = (start, end) => {
-      const range = render('123 "you', 5)
+      const range = render('Sie sagt "Hallo', 10)
       setCssHighlight({name: 'spellcheck', ranges: [{editableHost: host, start, end}]})
-      applySmartQuotes(range, germanConfig, '"')
-      expect(host.textContent).to.equal('123 „you')
+      applySmartQuotes(range, swissConfig, '"')
+      expect(host.textContent).to.equal('Sie sagt «Hallo')
       return Array.from(CSS.highlights.get('spellcheck'), (r) => r.toString())
     }
 
     it('keeps a highlight around the quote', () => {
-      expect(typeWithHighlight(3, 6)).to.deep.equal([' „y'])
+      expect(typeWithHighlight(8, 11)).to.deep.equal([' «H'])
     })
 
     it('keeps a highlight away from the quote', () => {
-      expect(typeWithHighlight(0, 3)).to.deep.equal(['123'])
+      expect(typeWithHighlight(0, 3)).to.deep.equal(['Sie'])
     })
 
     it('keeps a highlight starting right after the quote', () => {
-      expect(typeWithHighlight(5, 8)).to.deep.equal(['you'])
+      expect(typeWithHighlight(10, 15)).to.deep.equal(['Hallo'])
     })
 
     it('keeps a highlight ending right before the quote', () => {
-      expect(typeWithHighlight(0, 4)).to.deep.equal(['123 '])
+      expect(typeWithHighlight(0, 9)).to.deep.equal(['Sie sagt '])
     })
   })
 
-  describe('unexpected text', () => {
-    it('leaves the text alone when the typed character is not a quote', () => {
-      expect(typeQuote('Tor', 'a')).to.equal('Tora')
-    })
-
+  describe('unexpected input', () => {
     it('leaves the text alone when the typed quote is gone', () => {
-      applySmartQuotes(render('geht', 4), germanConfig, `'`)
+      applySmartQuotes(render('geht', 4), swissConfig, `'`)
       expect(host.textContent).to.equal('geht')
     })
 
     it('leaves the text alone when the cursor is at the start', () => {
-      applySmartQuotes(render(`'abc`, 0), germanConfig, `'`)
-      expect(host.textContent).to.equal(`'abc`)
+      applySmartQuotes(render(`'Tor`, 0), swissConfig, `'`)
+      expect(host.textContent).to.equal(`'Tor`)
     })
 
     it('leaves the text alone when the cursor is not in a text node', () => {
       const range = render(`geht'`, 0)
       range.setStart(host, 1)
-      applySmartQuotes(range, germanConfig, `'`)
+      applySmartQuotes(range, swissConfig, `'`)
       expect(host.textContent).to.equal(`geht'`)
     })
   })
