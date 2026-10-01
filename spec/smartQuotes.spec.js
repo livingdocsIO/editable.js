@@ -5,6 +5,7 @@ import {textNodesUnder} from '../src/util/element.js'
 import {deleteCssHighlight, setCssHighlight} from '../src/plugins/highlighting/css-highlights.js'
 
 const swissConfig = {quotes: ['«', '»'], singleQuotes: ['‹', '›'], apostrophe: '’'}
+const englishConfig = {quotes: ['“', '”'], singleQuotes: ['‘', '’'], apostrophe: 'ʼ'}
 
 describe('shouldApplySmartQuotes():', () => {
   const config = {smartQuotes: true, ...swissConfig}
@@ -155,6 +156,12 @@ describe('applySmartQuotes():', () => {
 
     it('does not treat a closed single quote as an open single quote', () => {
       expect(type('‹Tor›, rief Hans', `'`)).to.equal('‹Tor›, rief Hans’')
+      expect(type('‘Tor’, said James', `'`, '', englishConfig)).to.equal('‘Tor’, said Jamesʼ')
+    })
+
+    it('writes an apostrophe that differs from the closing single quote', () => {
+      expect(type('', `He said 'it's fine' today.`, '', englishConfig)).to.equal('He said ‘itʼs fine’ today.')
+      expect(type('', `He said 'it's fine' today.`, '', {...englishConfig, apostrophe: '’'})).to.equal('He said ‘it’s fine’ today.')
     })
 
     it('keeps a typed apostrophe', () => {

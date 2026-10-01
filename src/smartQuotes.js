@@ -3,15 +3,14 @@ import NodeIterator from './node-iterator.js'
 
 const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
 const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
-const isApostrophe = (char) => /^[’']$/.test(char)
 const isLetter = (char) => /^\p{L}$/u.test(char)
 const isDigit = (char) => /^\p{N}$/u.test(char)
 
 const isAtWordStart = (charBefore) => !charBefore || /^[\s([{/\-–—]$/.test(charBefore)
 const isAtWordEnd = (charAfter) => !isLetter(charAfter) && !isDigit(charAfter)
 
-const isSingleQuoteOpen = (text, index, openingQuote) =>
-  [...text.slice(0, index)].findLast((char) => isSingleQuote(char) && !isApostrophe(char)) === openingQuote
+const isSingleQuoteOpen = (text, index, [openingQuote, closingQuote]) =>
+  [...text.slice(0, index)].findLast((char) => char === openingQuote || char === closingQuote) === openingQuote
 
 // The rules for a typed character, in order. The first rule that matches
 // writes its character at `writeAt`. An empty character leaves the text alone.
@@ -31,7 +30,7 @@ const rules = [
   },
   {
     // ‹geht + ' → ‹geht›
-    when: (c) => isSingleQuote(c.typed) && !isAtWordStart(c.before) && isAtWordEnd(c.after) && isSingleQuoteOpen(c.text, c.index, c.singleQuotes[0]),
+    when: (c) => isSingleQuote(c.typed) && !isAtWordStart(c.before) && isAtWordEnd(c.after) && isSingleQuoteOpen(c.text, c.index, c.singleQuotes),
     write: (c) => c.singleQuotes[1],
     writeAt: 'typed'
   },
