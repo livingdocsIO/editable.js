@@ -4,10 +4,11 @@ import NodeIterator from './node-iterator.js'
 const isDoubleQuote = (char) => /^[«»"“”„]$/.test(char)
 const isSingleQuote = (char) => /^[‘’‹›‚']$/.test(char)
 const isApostrophe = (char) => /^[’']$/.test(char)
-const isLetterOrDigit = (char) => /^[\p{L}\p{N}]$/u.test(char)
+const isLetter = (char) => /^\p{L}$/u.test(char)
+const isDigit = (char) => /^\p{N}$/u.test(char)
 
 const isAtWordStart = (charBefore) => !charBefore || /^[\s([{/\-–—]$/.test(charBefore)
-const isAtWordEnd = (charAfter) => !isLetterOrDigit(charAfter)
+const isAtWordEnd = (charAfter) => !isLetter(charAfter) && !isDigit(charAfter)
 
 const isSingleQuoteOpen = (text, index, openingQuote) =>
   [...text.slice(0, index)].findLast((char) => isSingleQuote(char) && !isApostrophe(char)) === openingQuote
@@ -17,7 +18,7 @@ const isSingleQuoteOpen = (text, index, openingQuote) =>
 const rules = [
   {
     // ‹geht› + s → ‹geht’s
-    when: (c) => isLetterOrDigit(c.typed) && c.before === c.singleQuotes[1] && !isAtWordStart(c.beforeBefore) && c.apostrophe !== c.singleQuotes[1],
+    when: (c) => isLetter(c.typed) && c.before === c.singleQuotes[1] && isLetter(c.beforeBefore) && c.apostrophe !== c.singleQuotes[1],
     write: (c) => c.apostrophe,
     writeAt: 'before'
   },
