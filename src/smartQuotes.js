@@ -110,6 +110,7 @@ const replaceChar = (nodes, index, char) => {
 export const applySmartQuotes = (host, range, config, char) => {
   const {quotes, singleQuotes, apostrophe} = config
   if ([...quotes, ...singleQuotes, apostrophe].includes(char)) return
+  if (!isSingleQuote(char) && !isDoubleQuote(char) && !(apostrophe && isLetter(char))) return
 
   const {text, nodes} = readText(host)
   const offset = getCursorOffset(nodes, range)
