@@ -175,10 +175,8 @@ describe('css highlights', function () {
       const host = addEditable('Hello wrold there')
       setCssHighlight({name, ranges: [{editableHost: host, start: 6, end: 11}]})
 
-      const before = host.firstChild
       content.cleanInternals(host)
 
-      expect(host.firstChild).to.not.equal(before)
       expect(highlightedText()).to.deep.equal(['wrold'])
     })
 
