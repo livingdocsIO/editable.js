@@ -775,4 +775,103 @@ describe('Content', function () {
       })
     })
   })
+
+  describe('cleanInternals()', function () {
+    let host
+
+    beforeEach(function () {
+      host = createElement('<div></div>')
+      document.body.appendChild(host)
+      this.range = createRange()
+    })
+
+    afterEach(function () {
+      host.remove()
+    })
+
+    describe('keeps a range on the same text', function () {
+      it('in a text node', function () {
+        host.innerHTML = 'Hello world'
+        this.range.setStart(host.firstChild, 6)
+        this.range.setEnd(host.firstChild, 11)
+        content.cleanInternals(host)
+        expect(this.range.toString()).to.equal('world')
+      })
+
+      it('when a zero width no-break space before it is removed', function () {
+        // left behind by a Shift+Enter
+        host.innerHTML = 'First<br>﻿Some lead text'
+        this.range.setStart(host.lastChild, 6)
+        this.range.setEnd(host.lastChild, 10)
+        content.cleanInternals(host)
+        expect(host.innerHTML).to.equal('First<br>Some lead text')
+        expect(this.range.toString()).to.equal('lead')
+      })
+
+      it('when its saved markers are removed', function () {
+        host.innerHTML = 'Some lead text'
+        this.range.setStart(host.firstChild, 5)
+        this.range.setEnd(host.firstChild, 9)
+        rangeSaveRestore.save(this.range)
+        content.cleanInternals(host)
+        expect(host.innerHTML).to.equal('Some lead text')
+        expect(this.range.toString()).to.equal('lead')
+      })
+
+      it('when leading whitespace is trimmed', function () {
+        host.innerHTML = '  Hello world'
+        this.range.setStart(host.firstChild, 8)
+        this.range.setEnd(host.firstChild, 13)
+        content.cleanInternals(host)
+        expect(host.innerHTML).to.equal('Hello world')
+        expect(this.range.toString()).to.equal('world')
+      })
+
+      it('when a trailing line break is removed', function () {
+        host.innerHTML = 'Hello world<br>﻿'
+        this.range.setStart(host.firstChild, 6)
+        this.range.setEnd(host.firstChild, 11)
+        content.cleanInternals(host)
+        expect(host.innerHTML).to.equal('Hello world')
+        expect(this.range.toString()).to.equal('world')
+      })
+    })
+
+    describe('cleans like extractContent()', function () {
+      const markups = [
+        'a​b',
+        'a﻿b',
+        'Foo <br data-editable="remove">Bar',
+        '<span data-editable="unwrap"><span data-editable="unwrap">a</span></span>',
+        '<span data-editable="remove"></span><span data-editable="remove"></span>',
+        '|<span data-editable="unwrap">a</span>|<span data-editable="unwrap">b</span>|',
+        'a<span data-editable="ui-unwrap">b</span>c',
+        'a<span data-editable="ui-remove">b</span>c',
+        '&nbsp; &nbsp;hello world&nbsp; &nbsp;',
+        '   <strong>hello world</strong>   ',
+        '&nbsp;<strong> hello world </strong>&nbsp;',
+        '<br>﻿Hello<br>﻿',
+        '  <span data-editable="remove">﻿</span>hello',
+        '<a href="https://livingdocs.io/​">link</a>'
+      ]
+
+      for (const markup of markups) {
+        it(escape(markup), function () {
+          host.innerHTML = markup
+          const expected = content.extractContent(host, true)
+          content.cleanInternals(host)
+          expect(host.innerHTML).to.equal(expected)
+        })
+      }
+
+      it('text split into several nodes', function () {
+        host.innerHTML = '  Hello world'
+        host.prepend('')
+        host.append('﻿', ' ')
+        const expected = content.extractContent(host, true)
+        content.cleanInternals(host)
+        expect(host.innerHTML).to.equal(expected)
+      })
+    })
+  })
 })

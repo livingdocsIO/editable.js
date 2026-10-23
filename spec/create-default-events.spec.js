@@ -2,6 +2,7 @@ import {expect} from 'chai'
 import {createRange} from '../src/util/dom.js'
 
 import Cursor from '../src/cursor.js'
+import Selection from '../src/selection.js'
 import {Editable} from '../src/core.js'
 
 describe('Default Events', function () {
@@ -66,6 +67,38 @@ describe('Default Events', function () {
         this.elem.dispatchEvent(this.blur)
         this.elem.dispatchEvent(this.focus)
         expect(onFocus.calls).to.equal(2)
+      })
+    })
+
+    describe('on blur', function () {
+
+      beforeEach(function () {
+        this.elem = document.createElement('div')
+        document.body.appendChild(this.elem)
+        this.editable = new Editable()
+        this.editable.add(this.elem)
+      })
+
+      afterEach(function () {
+        this.editable.unload()
+        this.elem.remove()
+      })
+
+      // e.g. while the focus is in the url input of a link popover
+      it('keeps a saved selection on the same text', function () {
+        // the zero width no-break space of a Shift+Enter is removed on blur
+        this.elem.innerHTML = 'First<br>﻿Some <em>lead</em> text'
+        const range = createRange()
+        range.selectNodeContents(this.elem.querySelector('em'))
+        const selection = new Selection(this.elem, range)
+        const coordinates = selection.getCoordinates()
+        selection.save()
+
+        this.elem.dispatchEvent(new Event('blur'))
+
+        expect(this.elem.innerHTML).to.equal('First<br>Some <em>lead</em> text')
+        expect(selection.text()).to.equal('lead')
+        expect(selection.getCoordinates()).to.deep.equal(coordinates)
       })
     })
   })

@@ -14,6 +14,7 @@ function restoreRange (host, range, func) {
 
 const zeroWidthSpace = /\u200B/g
 const zeroWidthNonBreakingSpace = /\uFEFF/g
+const internalCharacters = /[\uFEFF\u200B]/g
 const whitespaceExceptSpace = /[^\S ]/g
 
 const everythingWhitespace = /^\s+$/
@@ -72,14 +73,50 @@ export function normalizeWhitespace (text) {
 }
 
 // Clean the element from character, tags, etc... added by the plugin logic.
+// Results in the same markup as extractContent(element, true), but changes
+// the nodes instead of replacing them, so ranges in the element,
+// e.g. a saved selection, stay on the same text.
 //
 // @method cleanInternals
 // @param  {HTMLElement} element The element to process.
 export function cleanInternals (element) {
-  // Uses extract content for simplicity. A custom method
-  // that does not clone the element could be faster if needed.
-  element.innerHTML = extractContent(element, true)
+  removeInternalCharacters(element)
+
+  // Merge the text nodes like the parsing in extractContent() does,
+  // so the whitespaces are removed the same way.
+  element.normalize()
+  unwrapInternalNodes(element.firstChild, true)
+
+  // Remove line breaks at the beginning of a content block
+  removeWhitespaces(element, 'firstChild')
+
+  // Remove line breaks at the end of a content block
+  removeWhitespaces(element, 'lastChild')
+
+  element.normalize()
   refreshCssHighlights({editableHost: element})
+}
+
+// Remove the zero width characters editable inserts, from the text and the
+// attributes like extractContent() does. They are deleted one by one,
+// so the ranges around them keep their position.
+function removeInternalCharacters (element) {
+  const walker = element.ownerDocument.createTreeWalker(
+    element,
+    NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT | NodeFilter.SHOW_COMMENT
+  )
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    if (node.nodeType !== nodeType.elementNode) {
+      const indexes = Array.from(node.data.matchAll(internalCharacters), ({index}) => index)
+      for (const index of indexes.reverse()) node.deleteData(index, 1)
+      continue
+    }
+
+    for (const attribute of node.attributes) {
+      const value = attribute.value.replace(internalCharacters, '')
+      if (value !== attribute.value) attribute.value = value
+    }
+  }
 }
 
 // Extracts the content from a host element.
@@ -178,7 +215,9 @@ function removeWhitespaces (node, type, firstCall = true) {
   // Remove whitespaces at the end or start of a block with content
   //   e.g. '  Hello world' > 'Hello World'
   if (config.trimLeadingAndTrailingWhitespaces) {
-    elem.textContent = elem.textContent.replace(type.startsWith('last') ? trailingWhitespace : leadingWhitespace, '')
+    // Delete instead of replacing the text, so the ranges in it keep their position
+    const whitespace = elem.data.match(type.startsWith('last') ? trailingWhitespace : leadingWhitespace)
+    if (whitespace) elem.deleteData(whitespace.index, whitespace[0].length)
   }
 }
 
