@@ -12,8 +12,7 @@ function restoreRange (host, range, func) {
   return rangeSaveRestore.restore(host, range)
 }
 
-const zeroWidthSpace = /\u200B/g
-const zeroWidthNonBreakingSpace = /\uFEFF/g
+// Zero width spaces, the no-break one is used for forcing inline elements to have a height
 const internalCharacters = /[\uFEFF\u200B]/g
 const whitespaceExceptSpace = /[^\S ]/g
 
@@ -73,19 +72,28 @@ export function normalizeWhitespace (text) {
 }
 
 // Clean the element from character, tags, etc... added by the plugin logic.
-// Results in the same markup as extractContent(element, true), but changes
-// the nodes instead of replacing them, so ranges in the element,
+// Changes the nodes instead of replacing them, so ranges in the element,
 // e.g. a saved selection, stay on the same text.
 //
 // @method cleanInternals
 // @param  {HTMLElement} element The element to process.
 export function cleanInternals (element) {
+  removeInternals(element, true)
+  refreshCssHighlights({editableHost: element})
+}
+
+// Remove the characters and elements editable inserts, and the line breaks
+// and whitespaces at the beginning and end of the content.
+// Changes the nodes in place, so the ranges in the element keep their position.
+//
+// @param {HTMLElement} element The element to process.
+// @param {Boolean} keepUiElements Flag whether to keep ui elements like spellchecking highlights.
+function removeInternals (element, keepUiElements) {
   removeInternalCharacters(element)
 
-  // Merge the text nodes like the parsing in extractContent() does,
-  // so the whitespaces are removed the same way.
+  // Merge the text nodes, so the whitespaces are removed from the whole text
   element.normalize()
-  unwrapInternalNodes(element.firstChild, true)
+  unwrapInternalNodes(element.firstChild, keepUiElements)
 
   // Remove line breaks at the beginning of a content block
   removeWhitespaces(element, 'firstChild')
@@ -94,12 +102,11 @@ export function cleanInternals (element) {
   removeWhitespaces(element, 'lastChild')
 
   element.normalize()
-  refreshCssHighlights({editableHost: element})
 }
 
 // Remove the zero width characters editable inserts, from the text and the
-// attributes like extractContent() does. They are deleted one by one,
-// so the ranges around them keep their position.
+// attributes. They are deleted one by one, so the ranges around them
+// keep their position.
 function removeInternalCharacters (element) {
   const walker = element.ownerDocument.createTreeWalker(
     element,
@@ -128,23 +135,13 @@ function removeInternalCharacters (element) {
 // @param {Boolean} Flag whether to keep ui elements like spellchecking highlights.
 // @returns {String} The cleaned innerHTML of the passed element or document fragment.
 export function extractContent (element, keepUiElements) {
-  const innerHtml = (element.nodeType === nodeType.documentFragmentNode
+  // Parse a copy of the markup, which also repairs invalid nesting like nested links
+  const clone = document.createElement('div')
+  clone.innerHTML = element.nodeType === nodeType.documentFragmentNode
     ? getInnerHtmlOfFragment(element)
     : element.innerHTML
-  )
-    .replace(zeroWidthNonBreakingSpace, '') // Used for forcing inline elements to have a height
-    .replace(zeroWidthSpace, '')
 
-  const clone = document.createElement('div')
-  clone.innerHTML = innerHtml
-  unwrapInternalNodes(clone, keepUiElements)
-
-  // Remove line breaks at the beginning of a content block
-  removeWhitespaces(clone, 'firstChild')
-
-  // Remove line breaks at the end of a content block
-  removeWhitespaces(clone, 'lastChild')
-
+  removeInternals(clone, keepUiElements)
   return clone.innerHTML
 }
 
