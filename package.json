@@ -6,10 +6,10 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "@babel/cli": "^7.16.8",
-    "@babel/core": "^7.16.12",
-    "@babel/preset-env": "^7.16.11",
-    "@babel/preset-react": "^7.16.7",
+    "@babel/cli": "^8.0.0",
+    "@babel/core": "^8.0.0",
+    "@babel/preset-env": "^8.0.0",
+    "@babel/preset-react": "^8.0.0",
     "@eslint/compat": "^2.0.0",
     "babel-loader": "^10.0.0",
     "babel-plugin-add-module-exports": "^1.0.4",
