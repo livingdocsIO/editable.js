@@ -1,4 +1,5 @@
 import {expect} from 'chai'
+import sinon from 'sinon'
 import {createRange, rangesAreEqual} from '../src/util/dom.js'
 import * as content from '../src/content.js'
 import Cursor from '../src/cursor.js'
@@ -398,6 +399,55 @@ describe('Dispatcher:', function () {
         })
 
         elem.dispatchEvent(new Event('input', {bubbles: true}))
+      })
+
+      describe('with smart quotes:', function () {
+        const smartQuotesConfig = {smartQuotes: true, quotes: ['„', '“'], singleQuotes: ['‚', '‘']}
+        let previousConfig, clock
+
+        beforeEach(function () {
+          const globalConfig = Editable.getGlobalConfig()
+          previousConfig = Object.fromEntries(Object.keys(smartQuotesConfig).map((k) => [k, globalConfig[k]]))
+          Editable.globalConfig(smartQuotesConfig)
+          clock = sinon.useFakeTimers()
+        })
+
+        afterEach(function () {
+          clock.restore()
+          Editable.globalConfig(previousConfig)
+        })
+
+        // Puts the cursor at the end of the text, inside the text node, as when typing
+        const setCursorAtEndOfText = () => {
+          const range = createRange()
+          range.setStart(elem.firstChild, elem.firstChild.length)
+          createCursor(range)
+        }
+
+        it('fires "change" again after the typed quote was replaced', () => {
+          elem.innerHTML = 'foo"'
+          setCursorAtEndOfText()
+          const texts = []
+          on('change', (element) => texts.push(element.textContent))
+
+          elem.dispatchEvent(new InputEvent('input', {bubbles: true, data: '"'}))
+          clock.tick(300)
+
+          expect(elem.textContent).to.equal('foo“')
+          expect(texts).to.deep.equal(['foo"', 'foo“'])
+        })
+
+        it('does not fire "change" again when no quote was typed', () => {
+          elem.innerHTML = 'foo'
+          setCursorAtEndOfText()
+          const texts = []
+          on('change', (element) => texts.push(element.textContent))
+
+          elem.dispatchEvent(new InputEvent('input', {bubbles: true, data: 'o'}))
+          clock.tick(300)
+
+          expect(texts).to.deep.equal(['foo'])
+        })
       })
     })
   })

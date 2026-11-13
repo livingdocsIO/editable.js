@@ -149,7 +149,9 @@ export default class Dispatcher {
         if (shouldApplySmartQuotes(config, evt.target)) {
           const selection = this.selectionWatcher.getFreshSelection()
           setTimeout(() => {
-            applySmartQuotes(block, selection.range, config, evt.data)
+            if (applySmartQuotes(block, selection.range, config, evt.data)) {
+              this.notify('change', block)
+            }
           }, 300
           )
         }
