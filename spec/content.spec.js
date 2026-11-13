@@ -609,6 +609,21 @@ describe('Content', function () {
       expect(escape(result)).to.equal('ab')
     })
 
+    it('removes control characters', function () {
+      const element = createElement('<div>a\u0001b\u0008c\u000Bd\u000Ce\u001Ff\u007Fg</div>')
+      expect(escape(content.extractContent(element))).to.equal('abcdefg')
+    })
+
+    it('removes control characters from attributes', function () {
+      const element = createElement('<div><a href="https://a.com/\u000Bb">c</a></div>')
+      expect(content.extractContent(element)).to.equal('<a href="https://a.com/b">c</a>')
+    })
+
+    it('keeps tabs and line breaks', function () {
+      const element = createElement('<div>a\tb\nc</div>')
+      expect(escape(content.extractContent(element))).to.equal(escape('a\tb\nc'))
+    })
+
     it('removes a marked linebreak', function () {
       const element = createElement('<div>Foo <br data-editable="remove">Bar</div>')
       const result = content.extractContent(element)
@@ -787,6 +802,12 @@ describe('Content', function () {
 
     afterEach(function () {
       host.remove()
+    })
+
+    it('removes control characters', function () {
+      host.innerHTML = 'a\u000Bb\u0008c'
+      content.cleanInternals(host)
+      expect(escape(host.innerHTML)).to.equal('abc')
     })
 
     describe('keeps a range on the same text', function () {
