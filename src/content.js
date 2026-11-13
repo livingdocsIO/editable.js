@@ -11,8 +11,6 @@ function restoreRange (host, range, func) {
   return rangeSaveRestore.restore(host, range)
 }
 
-const zeroWidthSpace = /\u200B/g
-const zeroWidthNonBreakingSpace = /\uFEFF/g
 const whitespaceExceptSpace = /[^\S ]/g
 
 const everythingWhitespace = /^\s+$/
@@ -93,8 +91,8 @@ export function extractContent (element, keepUiElements) {
     ? getInnerHtmlOfFragment(element)
     : element.innerHTML
   )
-    .replace(zeroWidthNonBreakingSpace, '') // Used for forcing inline elements to have a height
-    .replace(zeroWidthSpace, '')
+    // The zero width spaces editable inserts and control characters
+    .replace(string.removedCharacters, '')
 
   const clone = document.createElement('div')
   clone.innerHTML = innerHtml
