@@ -7,6 +7,24 @@ const htmlCharacters = {
   "'": '&#39;'
 }
 
+// Zero width spaces (U+200B, U+FEFF). Editable inserts the no-break one, so the cursor
+// can be shown in an empty editable and on an empty line after a <br>.
+const internalCharacters = /[\uFEFF\u200B]/g
+
+// Control characters, except tab, line feed and carriage return. The Livingdocs server
+// deletes the same set when it saves a document (lib/db/query.js). If the editor kept
+// them, the saved document would differ from the editor's copy, which shows as an
+// editing conflict.
+// eslint-disable-next-line no-control-regex
+const controlCharacters = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g
+
+// The characters the cleanup removes from the content
+export const removedCharacters = new RegExp(`${internalCharacters.source}|${controlCharacters.source}`, 'g')
+
+export function removeControlCharacters (text) {
+  return text.replace(controlCharacters, '')
+}
+
 // TODO: replace with lodash methods
 export function trimRight (text) {
   return text.replace(/\s+$/, '')

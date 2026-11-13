@@ -1,6 +1,7 @@
 import NodeIterator from '../../node-iterator.js'
 import * as nodeType from '../../node-type.js'
 import {createRange} from '../../util/dom.js'
+import {removedCharacters} from '../../util/string.js'
 import {getScrollPosition} from '../../util/viewport.js'
 
 // The DOM ranges in CSS.highlights do not survive markup changes, so keep the
@@ -11,15 +12,13 @@ import {getScrollPosition} from '../../util/viewport.js'
 // win -> Map(name -> Map(editableHost -> [{start, end}]))
 const registries = new WeakMap()
 
-// Characters the editable inserts and strips again by itself, so an offset
-// counted with one of them in it would move as soon as it goes.
-const internalCharacters = /[\uFEFF\u200B]/g
+// Characters the clean on blur removes, the ones the editable inserts and control
+// characters. An offset counted with one of them in it would move as soon as it goes.
+const removedCharacter = new RegExp(removedCharacters.source)
 
-const isInternal = (character) => character === '\uFEFF' || character === '\u200B'
+const hasRemoved = (data) => removedCharacter.test(data)
 
-const hasInternal = (data) => data.indexOf('\uFEFF') >= 0 || data.indexOf('\u200B') >= 0
-
-const stripInternal = (data) => (hasInternal(data) ? data.replace(internalCharacters, '') : data)
+const stripRemoved = (data) => data.replace(removedCharacters, '')
 
 /**
  * Read an editable as plain text. Callers work in character offsets, so they
@@ -185,9 +184,9 @@ export function getCssHighlightTextOffset ({editableHost, container, containerOf
     if (next.nodeType !== nodeType.textNode || next.data === '') continue
 
     if (next === container) {
-      return counted(offset + stripInternal(next.data.slice(0, containerOffset)).length)
+      return counted(offset + stripRemoved(next.data.slice(0, containerOffset)).length)
     }
-    offset = offset + stripInternal(next.data).length
+    offset = offset + stripRemoved(next.data).length
   }
 
   // The walk never met the container. For an element that means the end of the
@@ -227,8 +226,8 @@ function drawCssHighlight ({name, hosts, win}) {
  * Read an editable once: the text callers count their offsets against, and the
  * segments those offsets resolve back through, out of the same walk.
  *
- * A <br> counts as a newline. Internal characters and the whitespace at either
- * end of the block do not, because the clean on blur takes them out; an internal
+ * A <br> counts as a newline. Internal and control characters and the whitespace
+ * at either end of the block do not, because the clean on blur takes them out; such a
  * character splits its text node in two, which is what nodeOffset is for.
  *
  * @param  {DOMNode} element
@@ -252,7 +251,7 @@ function readEditable (element) {
     if (node.nodeType !== nodeType.textNode || node.data === '') continue
 
     const data = node.data
-    if (!hasInternal(data)) {
+    if (!hasRemoved(data)) {
       push(node, 0, data)
       continue
     }
@@ -260,7 +259,7 @@ function readEditable (element) {
     let runStart = 0
     let runLength = 0
     for (let index = 0; index < data.length; index++) {
-      if (!isInternal(data[index])) {
+      if (!hasRemoved(data[index])) {
         if (runLength === 0) runStart = index
         runLength += 1
         continue

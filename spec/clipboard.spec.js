@@ -123,6 +123,19 @@ describe('Clipboard', function () {
       checkWhitespace('A\nB \n C', 'A B C')
     })
 
+    it('replaces vertical tabs and form feeds with a space, like newlines', function () {
+      checkWhitespace('A\u000BB\u000CC', 'A B C')
+    })
+
+    it('removes other control characters', function () {
+      checkWhitespace('a\u0001b\u0008c\u001Fd\u007Fe', 'abcde')
+    })
+
+    it('removes control characters from every block', function () {
+      const blocks = extract('<p>a\u0001b</p><p>c\u0008d</p>')
+      expect(blocks.map(escape)).to.deep.equal(['ab', 'cd'])
+    })
+
     // Remove Elements
     // ---------------
 

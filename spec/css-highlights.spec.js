@@ -67,6 +67,11 @@ describe('css highlights', function () {
       expect(getCssHighlightText({editableHost: host})).to.equal('Hello wrolds')
     })
 
+    it('leaves out a control character', function () {
+      const host = addEditable('Hello\u000B wrold')
+      expect(getCssHighlightText({editableHost: host})).to.equal('Hello wrold')
+    })
+
     it('leaves out whitespace and breaks at the edges of the block', function () {
       const host = addEditable('<br> Hello wrold ')
       expect(getCssHighlightText({editableHost: host})).to.equal('Hello wrold')
@@ -206,6 +211,17 @@ describe('css highlights', function () {
 
       expect(getCssHighlightText({editableHost: host})).to.equal('Hello wrolds')
       expect(highlightedText()).to.deep.equal(['wrolds'])
+    })
+
+    it('keeps the highlight when a control character before it is cleaned away', function () {
+      const host = addEditable('Hello\u000B wrold')
+      setCssHighlight({name, ranges: [{editableHost: host, start: 6, end: 11}]})
+      expect(highlightedText()).to.deep.equal(['wrold'])
+
+      content.cleanInternals(host)
+
+      expect(host.innerHTML).to.equal('Hello wrold')
+      expect(highlightedText()).to.deep.equal(['wrold'])
     })
 
     it('keeps the highlight when a leading break is cleaned away', function () {
