@@ -108,17 +108,19 @@ const replaceChar = (nodes, index, char) => {
 
 export const applySmartQuotes = (host, range, config, char) => {
   const {quotes, singleQuotes, apostrophe} = config
-  if ([...quotes, ...singleQuotes, apostrophe].includes(char)) return
-  if (!isSingleQuote(char) && !isDoubleQuote(char) && !(apostrophe && isLetter(char))) return
+  if ([...quotes, ...singleQuotes, apostrophe].includes(char)) return false
+  if (!isSingleQuote(char) && !isDoubleQuote(char) && !(apostrophe && isLetter(char))) return false
 
   const {text, nodes} = readText(host)
   const offset = getCursorOffset(nodes, range)
 
   // The typed character can be gone by now, e.g. when it was deleted right away
-  if (offset === undefined || text[offset - 1] !== char) return
+  if (offset === undefined || text[offset - 1] !== char) return false
 
   const replacement = getReplacement(text, offset, config)
-  if (replacement) replaceChar(nodes, replacement.index, replacement.char)
+  if (!replacement) return false
+  replaceChar(nodes, replacement.index, replacement.char)
+  return true
 }
 
 const isValidQuotePairConfig = (quotePair) => Array.isArray(quotePair) && quotePair.length === 2
