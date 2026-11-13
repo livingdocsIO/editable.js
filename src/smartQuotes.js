@@ -45,12 +45,12 @@ export const applySmartQuotes = (range, config, char, target, cursorOffset) => {
   const isCharDoubleQuote = isDoubleQuote(char)
 
   if (!isCharDoubleQuote && !isCharSingleQuote) {
-    return
+    return false
   }
 
   const {quotes, singleQuotes} = config
   if (char === quotes[0] || char === quotes[1] || char === singleQuotes[0] || char === singleQuotes[1]) {
-    return
+    return false
   }
 
   const offset = range.startOffset
@@ -65,11 +65,11 @@ export const applySmartQuotes = (range, config, char, target, cursorOffset) => {
     if (isCharSingleQuote) {
       // Don't transform apostrophes
       if (hasCharAfter(textArr, offset)) {
-        return
+        return false
       }
       // Don't transform single-quote if there is no respective single-opening-quote
       if (!hasSingleOpeningQuote(textArr, offset, singleQuotes[0])) {
-        return
+        return false
       }
     }
     const closingQuote = isCharSingleQuote ? singleQuotes[1] : quotes[1]
@@ -80,12 +80,13 @@ export const applySmartQuotes = (range, config, char, target, cursorOffset) => {
   }
 
   if (!newTextNode) {
-    return
+    return false
   }
 
   // Resets the cursor to the currentPosition after applying the smart-quote
   const window = target.ownerDocument.defaultView
   const selection = window.getSelection()
   selection.collapse(newTextNode, cursorOffset ?? offset)
+  return true
 }
 

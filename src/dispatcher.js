@@ -152,7 +152,9 @@ export default class Dispatcher {
           // Save offset of new input, to reset cursor correctly after timeout delay
           currentInput.offset = selection.range?.startOffset
           setTimeout(() => {
-            applySmartQuotes(selection.range, config, evt.data, evt.target, currentInput.offset)
+            if (applySmartQuotes(selection.range, config, evt.data, evt.target, currentInput.offset)) {
+              this.notify('change', block)
+            }
           }, 300
           )
         }
