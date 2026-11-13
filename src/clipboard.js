@@ -3,6 +3,7 @@ import * as string from './util/string.js'
 import * as nodeType from './node-type.js'
 import * as quotes from './quotes.js'
 import {isPlainTextBlock} from './block.js'
+import {removeControlCharacters} from './content.js'
 
 let allowedElements, allowedPlainTextElements, requiredAttributes, transformElements, blockLevelElements, replaceQuotes
 let splitIntoBlocks, blacklistedElements
@@ -68,7 +69,7 @@ export function parseContent (element, {plainText = false} = {}) {
   return filterHtmlElements(element, options)
   // Handle Blocks
     .split(blockPlaceholder)
-    .map((entry) => string.trim(cleanWhitespace(replaceAllQuotes(entry))))
+    .map((entry) => string.trim(cleanText(replaceAllQuotes(entry))))
     .filter((entry) => !whitespaceOnly.test(entry))
 }
 
@@ -147,9 +148,16 @@ function shouldKeepNode (nodeName, node, options) {
   return options.allowedElements[nodeName] && hasRequiredAttributes(nodeName, node)
 }
 
-function cleanWhitespace (str) {
-  return str
-    .replace(/\n/g, ' ')
+// Vertical tabs and form feeds count as line breaks. Word, for example, pastes a
+// Shift+Enter line break as a vertical tab. Like a newline, they become a space,
+// so the words on both sides stay apart.
+// eslint-disable-next-line no-control-regex
+const lineBreaks = /[\n\u000B\u000C]/g
+
+// Pasted blocks don't go through extractContent(). They are inserted as they are,
+// so the other control characters are removed here too.
+function cleanText (str) {
+  return removeControlCharacters(str.replace(lineBreaks, ' '))
     .replace(/ {2,}/g, ' ')
     .replace(/(.)\u00A0/g, (match, group) => group + (/[\u0020]/.test(group)
       ? '\u00A0'

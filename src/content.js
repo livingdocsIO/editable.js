@@ -12,8 +12,23 @@ function restoreRange (host, range, func) {
   return rangeSaveRestore.restore(host, range)
 }
 
-// Zero width spaces, the no-break one is used for forcing inline elements to have a height
+// Zero width spaces (U+200B, U+FEFF). Editable inserts the no-break one, so the cursor
+// can be shown in an empty editable and on an empty line after a <br>.
 const internalCharacters = /[\uFEFF\u200B]/g
+
+// Control characters, except tab, line feed and carriage return. The Livingdocs server
+// deletes the same set when it saves a document (lib/db/query.js). If the editor kept
+// them, the saved document would differ from the editor's copy, which shows as an
+// editing conflict.
+// eslint-disable-next-line no-control-regex
+const controlCharacters = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g
+
+const removedCharacters = new RegExp(`${internalCharacters.source}|${controlCharacters.source}`, 'g')
+
+export function removeControlCharacters (text) {
+  return text.replace(controlCharacters, '')
+}
+
 const whitespaceExceptSpace = /[^\S ]/g
 
 const everythingWhitespace = /^\s+$/
@@ -89,7 +104,7 @@ export function cleanInternals (element) {
 // @param {HTMLElement} element The element to process.
 // @param {Boolean} keepUiElements Flag whether to keep ui elements like spellchecking highlights.
 function removeInternals (element, keepUiElements) {
-  removeInternalCharacters(element)
+  removeCharacters(element)
 
   // Merge the text nodes, so the whitespaces are removed from the whole text
   element.normalize()
@@ -104,23 +119,22 @@ function removeInternals (element, keepUiElements) {
   element.normalize()
 }
 
-// Remove the zero width characters editable inserts, from the text and the
-// attributes. They are deleted one by one, so the ranges around them
-// keep their position.
-function removeInternalCharacters (element) {
+// Remove the internal and the control characters from the text and the attribute
+// values. They are deleted one by one, so the ranges around them keep their position.
+function removeCharacters (element) {
   const walker = element.ownerDocument.createTreeWalker(
     element,
     NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT | NodeFilter.SHOW_COMMENT
   )
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     if (node.nodeType !== nodeType.elementNode) {
-      const indexes = Array.from(node.data.matchAll(internalCharacters), ({index}) => index)
+      const indexes = Array.from(node.data.matchAll(removedCharacters), ({index}) => index)
       for (const index of indexes.reverse()) node.deleteData(index, 1)
       continue
     }
 
     for (const attribute of node.attributes) {
-      const value = attribute.value.replace(internalCharacters, '')
+      const value = attribute.value.replace(removedCharacters, '')
       if (value !== attribute.value) attribute.value = value
     }
   }
