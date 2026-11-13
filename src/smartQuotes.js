@@ -118,7 +118,9 @@ export const applySmartQuotes = (host, range, config, char) => {
   if (offset === undefined || text[offset - 1] !== char) return
 
   const replacement = getReplacement(text, offset, config)
-  if (replacement) replaceChar(nodes, replacement.index, replacement.char)
+  if (!replacement) return false
+  replaceChar(nodes, replacement.index, replacement.char)
+  return true
 }
 
 const isValidQuotePairConfig = (quotePair) => Array.isArray(quotePair) && quotePair.length === 2

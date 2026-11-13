@@ -399,6 +399,55 @@ describe('Dispatcher:', function () {
 
         elem.dispatchEvent(new Event('input', {bubbles: true}))
       })
+
+      describe('with smart quotes:', function () {
+        const smartQuotesConfig = {smartQuotes: true, quotes: ['„', '“'], singleQuotes: ['‚', '‘']}
+        let previousConfig
+
+        beforeEach(function () {
+          const globalConfig = Editable.getGlobalConfig()
+          previousConfig = Object.fromEntries(Object.keys(smartQuotesConfig).map((k) => [k, globalConfig[k]]))
+          Editable.globalConfig(smartQuotesConfig)
+        })
+
+        afterEach(function () {
+          Editable.globalConfig(previousConfig)
+        })
+
+        const waitForSmartQuotes = () => new Promise((resolve) => setTimeout(resolve, 400))
+
+        // Puts the cursor at the end of the text, inside the text node, as when typing
+        const setCursorAtEndOfText = () => {
+          const range = createRange()
+          range.setStart(elem.firstChild, elem.firstChild.length)
+          createCursor(range)
+        }
+
+        it('fires "change" again after the typed quote was replaced', async () => {
+          elem.innerHTML = 'foo"'
+          setCursorAtEndOfText()
+          const texts = []
+          on('change', (element) => texts.push(element.textContent))
+
+          elem.dispatchEvent(new InputEvent('input', {bubbles: true, data: '"'}))
+          await waitForSmartQuotes()
+
+          expect(elem.textContent).to.equal('foo“')
+          expect(texts).to.deep.equal(['foo"', 'foo“'])
+        })
+
+        it('does not fire "change" again when no quote was typed', async () => {
+          elem.innerHTML = 'foo'
+          setCursorAtEndOfText()
+          const texts = []
+          on('change', (element) => texts.push(element.textContent))
+
+          elem.dispatchEvent(new InputEvent('input', {bubbles: true, data: 'o'}))
+          await waitForSmartQuotes()
+
+          expect(texts).to.deep.equal(['foo'])
+        })
+      })
     })
   })
 })
