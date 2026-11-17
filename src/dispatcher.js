@@ -152,6 +152,9 @@ export default class Dispatcher {
           // Save offset of new input, to reset cursor correctly after timeout delay
           currentInput.offset = selection.range?.startOffset
           setTimeout(() => {
+            // The block can be removed or disabled within the 300 ms.
+            // Leave the quote alone then, so no change fires for it.
+            if (!block.isConnected || !block.isContentEditable) return
             if (applySmartQuotes(selection.range, config, evt.data, evt.target, currentInput.offset)) {
               this.notify('change', block)
             }
