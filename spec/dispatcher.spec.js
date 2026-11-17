@@ -448,6 +448,34 @@ describe('Dispatcher:', function () {
 
           expect(texts).to.deep.equal(['foo'])
         })
+
+        it('leaves the quote alone when the block was disabled in the meantime', () => {
+          elem.innerHTML = 'foo"'
+          setCursorAtEndOfText()
+          const texts = []
+          on('change', (element) => texts.push(element.textContent))
+
+          elem.dispatchEvent(new InputEvent('input', {bubbles: true, data: '"'}))
+          editable.disable(elem)
+          clock.tick(300)
+
+          expect(elem.textContent).to.equal('foo"')
+          expect(texts).to.deep.equal(['foo"'])
+        })
+
+        it('leaves the quote alone when the block was removed in the meantime', () => {
+          elem.innerHTML = 'foo"'
+          setCursorAtEndOfText()
+          const texts = []
+          on('change', (element) => texts.push(element.textContent))
+
+          elem.dispatchEvent(new InputEvent('input', {bubbles: true, data: '"'}))
+          elem.remove()
+          clock.tick(300)
+
+          expect(elem.textContent).to.equal('foo"')
+          expect(texts).to.deep.equal(['foo"'])
+        })
       })
     })
   })
