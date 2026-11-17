@@ -149,6 +149,9 @@ export default class Dispatcher {
         if (shouldApplySmartQuotes(config, evt.target)) {
           const selection = this.selectionWatcher.getFreshSelection()
           setTimeout(() => {
+            // The block can be removed or disabled within the 300 ms.
+            // Leave the quote alone then, so no change fires for it.
+            if (!block.isConnected || !block.isContentEditable) return
             if (applySmartQuotes(block, selection.range, config, evt.data)) {
               this.notify('change', block)
             }
